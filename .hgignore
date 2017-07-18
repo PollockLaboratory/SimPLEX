@@ -1,0 +1,5 @@
+\.exe$
+\.d$
+\.o$
+debug
+testing/test_run/
