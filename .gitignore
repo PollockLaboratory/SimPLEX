@@ -1,0 +1,7 @@
+\.exe$
+\.d$
+\.o$
+debug
+testing/test_run/
+bin/
+build/
