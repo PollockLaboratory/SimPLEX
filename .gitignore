@@ -5,3 +5,5 @@ debug
 testing/test_run/
 bin/
 build/
+testing/
+\.png
