@@ -1,47 +1,32 @@
-
 #ifndef MCMC_h_
 #define MCMC_h_
 
 #include <fstream>
-
-
 #include "Options.h"
-
-//Data is incorporated into the model
-//#include "Data.h"
 #include "Model.h"
 
-extern Options options;
-
+extern Options options; // why is this here, exactly
 
 class MCMC {
 public:
 	MCMC();
-
-	//Data is incorporated into the model
-//	void Initialize(Data* data, Model* model);
-	void Initialize(Model* model);
+	void Init(Model* model);
 	void Run();
 
 private:
-	Model* model;
-
-	//Data is incorporated into the model
-	//Data* data;
-
-	double log_likelihood;
-	double proposed_log_likelihood;
+    Model* model;
+   // Model* pmodel;
+    int gen;
+    int gens;
+	double lnL;
+	double newLnL;
 	bool accepted;
 
-	int generation;
-	int generations;
-
-	static std::ofstream likelihood_out;
+	static std::ofstream lnlout;
 
 	void RecordState();
-
 	Model ProposeModel();
-	bool IsProposedModelAccepted(double proposed_likelihood);
+	bool TestAccept(double newLnL);
 };
 
 #endif

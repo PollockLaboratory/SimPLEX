@@ -6,9 +6,7 @@
 #include "Options.h"
 
 extern double Random();
-
 extern Options options;
-
 using namespace std;
 
 // These are instantiated in Tree.cpp
@@ -39,8 +37,8 @@ Tree_B1::Tree_B1() {
 }
 
 Tree_B1::Tree_B1(const Tree_B1& tree) {
-	id = number_of_trees;
-	number_of_trees++;
+	id = num_trees;
+	num_trees++;
 
 	is_constant = tree.is_constant;
 

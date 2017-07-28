@@ -13,43 +13,36 @@ using std::string;
 class Options {
 public:
 	Options();
+	void ReadOptions();         // read in default and control files
+    	void PrependOutputDirectory(string &parameter);     // wtf?
 
-	void ReadOptions();
+	string defaultfile;         // where to find default settings
+	string optionsfile;         // where to find optional control settings
 
-	void PrependOutputDirectory(string &parameter);
-
-	string default_control_file;
-	string options_control_file;
-
-	bool debug;
-
-	int random_number_generator_seed;
-
-	bool constant_tree;
-
+	int seed;                   // random number generator seed
+    	bool debug;                 // turns debugging on or off
+	bool constant_tree;         // allow branch lengths, topology to vary?
+    	int mixture_classes;        // number of classes in mixture model
 
 	std::queue<int> substitution_model_types;
 	std::queue<bool> constant_substitution_models;
 	std::queue<int> substitution_models_initialization_type;
 	std::queue<string> substitution_models_initialization_files;
 
-	int number_of_substitution_models_in_mixture_model;
+	int gens;                   // mcmc generation end point
+	int outfreq;                // how often in mcmc to print
+	double max_segment_length;         // bigger than this and segments should be split
+	int tree_type;              // we might get rid of this
 
 
-	int generations;
-	int output_frequency;
-	double max_segment_length;
-	int tree_type;
+	string outdir;              // directory for output files
 
-
-	string output_directory;
-
-	string tree_file;
-	string sequences_file;
-	string tree_out_file;
-	string sequences_out_file;
-	string substitutions_out_file;
-	string likelihood_out_file;
+	string treefile;            // name of file containing tree or trees
+	string seqfile;             // name of file containing sequences
+	string treeout;             // name of file to output trees
+	string seqsout;             // name of file to output sequences
+	string subsout;             // name of file to output substitutions
+	string lnlout;              // name of file to output likelihoods
 
 private:
 	void ReadControlFile(string controlfile);
@@ -59,6 +52,7 @@ private:
 	void WriteOptions(std::ofstream& osparam);
 	void UpdateOutputOptions();
 	void CopyFile(string source_filename, string destination_filename);
+	void debugint(bool debug, string blurb, int integer);
 	void InitializeRandomNumberGeneratorSeed();
 };
 

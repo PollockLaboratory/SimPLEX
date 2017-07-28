@@ -86,7 +86,7 @@ void SubstitutionMixtureModel::InitializeSubstitutionModels(int number_of_sites,
 		vector<string> states) {
 
 	substitution_models.resize(
-			options.number_of_substitution_models_in_mixture_model);
+			options.mixture_classes);
 
 	for (int substitution_model = 0;
 			substitution_model < substitution_models.size();

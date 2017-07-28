@@ -33,12 +33,9 @@ public:
 	
 	//STP: This method is necessary for recursive inherited classes to work
 	virtual Tree* Clone();
-
 	virtual void Initialize(map<string, vector<int> > taxa_names_to_sequences,
 			vector<string> states);
-
 	virtual void SampleParameters();
-
 	virtual void RecordState();
 
 	bool IsRoot() const;
@@ -52,7 +49,7 @@ public:
 public:
 	typedef unsigned int size_type;
 
-	static int number_of_trees;
+	static int num_trees;
 	int id;
 	bool is_constant;
 

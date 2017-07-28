@@ -25,7 +25,7 @@ void Data::Initialize() {
 /// This function is too long.
 void Data::ReadSequences() {
 	// This is the only dependency on options.
-	ifstream sequences_in(options.sequences_file.c_str());
+	ifstream sequences_in(options.seqfile.c_str());
 
 	if (not sequences_in.good()) {
 		cerr << "Cannot read sequence file" << endl;

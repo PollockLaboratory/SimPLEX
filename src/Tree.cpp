@@ -6,59 +6,38 @@
 #include "Options.h"
 
 extern double Random();
-
 extern Options options;
-
 using namespace std;
 
-int Tree::number_of_trees = 0;
+int Tree::num_trees = 0;
 
 // See "Print yourself.odt" for rationale for why these are class static.
 ofstream Tree::substitutions_out;
 ofstream Tree::sequences_out;
 ofstream Tree::tree_out;
 
-Tree::Tree() {
-	// Is this considered doing work? Is this exception safe?
-	id = number_of_trees;
-	number_of_trees++;
+// Tree constructor // Is this considered doing work? Is this exception safe?
+Tree::Tree() {   
+	id = num_trees;  
+	num_trees++;
 	name = "Node_" + IdToString();
-
-	is_constant = false;
-
-	distance = 0;
-
-	left = NULL;
-	right = NULL;
-	up = NULL;
+	is_constant = false;  distance = 0;
+	left = NULL; right = NULL; up = NULL;
 }
 
-Tree::Tree(const Tree& tree) {
-	id = number_of_trees;
-	number_of_trees++;
+// copy
+Tree::Tree(const Tree& tree) { id = num_trees; num_trees++;
+    name = tree.name;  is_constant = tree.is_constant; distance = tree.distance;
 
-	is_constant = tree.is_constant;
-
-	name = tree.name;
-	distance = tree.distance;
-	sequence = tree.sequence;
-
-	states = tree.states;
-
+    sequence = tree.sequence; states = tree.states; // not in constructor
 	if (tree.IsSubtree()) {
-		left = tree.left->Clone();
-		left->up = this;
-		right = tree.right->Clone();
-		right->up = this;
-	} else {
-		left = NULL;
-		right = NULL;
-	}
+		left = tree.left->Clone();  left->up = this;
+		right = tree.right->Clone();  right->up = this;
+	} else { left = NULL;  right = NULL;  }
 }
 
 //Copy-swap
 Tree& Tree::operator=(Tree tree) {
-
 	std::swap(id, tree.id);
 	std::swap(is_constant, tree.is_constant);
 	std::swap(name, tree.name);
@@ -72,22 +51,18 @@ Tree& Tree::operator=(Tree tree) {
 	return *this;
 }
 
+// Tree destruction
 Tree::~Tree() {
-	if (left != NULL) 
-		delete left;
-	if (right != NULL)
-		delete right;
-	/* if (IsSubtree()) {
-		delete left;
-		delete right;
-	} */
+	if (left != NULL)  delete left;
+	if (right != NULL) delete right;
 }
 
-Tree* Tree::Clone() {
-//	std::cout << "cloning tree" << std::endl;
+// Tree cloning
+Tree* Tree::Clone() {  //	std::cout << "cloning tree" << std::endl;
 	return new Tree(*this);
 }
 
+// Tree Initialize using seqs and states
 void Tree::Initialize(map<string, vector<int> > taxa_names_to_sequences,
 		vector<string> states) {
 	this->states = states;
@@ -98,10 +73,10 @@ void Tree::Initialize(map<string, vector<int> > taxa_names_to_sequences,
 }
 
 void Tree::ReadFromTreeFile() {
-	ifstream tree_in(options.tree_file.c_str());
+	ifstream tree_in(options.treefile.c_str());
 
 	if (not tree_in.good()) {
-		cout << "Could not read tree file " << options.tree_file << endl;
+		cout << "Could not read tree file " << options.treefile << endl;
 		exit(-1);
 	}
 
@@ -186,17 +161,9 @@ void Tree::ExtractName(string& tree_string) {
 	}
 }
 
-bool Tree::IsRoot() const {
-	return up == NULL;
-}
-
-bool Tree::IsSubtree() const {
-	return (left != NULL and right != NULL);
-}
-
-bool Tree::IsLeaf() const {
-	return (left == NULL and right == NULL);
-}
+bool Tree::IsRoot() const { return up == NULL;  }
+bool Tree::IsSubtree() const { return (left != NULL and right != NULL); }
+bool Tree::IsLeaf() const { return (left == NULL and right == NULL); }
 
 //STP: I have chosen the name "segment" to describe a node that exists only
 // to subdivide a branch.
@@ -211,6 +178,7 @@ bool Tree::IsLeaf() const {
  * Now one can initialize internal node sequences
  *
  */
+
 void Tree::InitializeSequences(
 		map<string, vector<int> > taxa_names_to_sequences) {
 	if (IsSubtree()) {
@@ -232,15 +200,15 @@ void Tree::InitializeSequences(
 }
 
 void Tree::InitializeOutputStreams() {
-	tree_out.open(options.tree_out_file.c_str());
-	sequences_out.open(options.sequences_out_file.c_str());
-	substitutions_out.open(options.substitutions_out_file.c_str());
+	tree_out.open(options.treeout.c_str());
+	sequences_out.open(options.seqsout.c_str());
+	substitutions_out.open(options.subsout.c_str());
 
 	substitutions_out << "Branch\tSubstitutions" << endl;
 }
 
-void Tree::SampleParameters() {
-//	std::cout << "Sampling tree parameters" << std::endl;
+// sampling tree parameters
+void Tree::SampleParameters() { //	std::cout << "Sampling tree parameters" << std::endl;
 	SampleSubtreeParameters();
 }
 
@@ -265,9 +233,7 @@ void Tree::SampleSubtreeParameters() {
  */
 
 void Tree::SampleSequence() {
-	if (not IsLeaf()) {
-		MetropolisHastingsStateSampling();
-	}
+	if (not IsLeaf()) {  MetropolisHastingsStateSampling(); }
 }
 
 /**
@@ -306,16 +272,10 @@ void Tree::DescendentStateSampling() {
 	}
 }
 
-/**
- * This is a uniform prior, metropolis-Hastings algorithm for sampling the
- * states: they are simply chosen randomly. The posterior distribution is then
- * purely influenced by the data and by neither the prior (because it is
- * uniform) nor the sampling algorithm.
- *
- * This method should mix poorly.
+/*  uniform prior for sampling thestates at all sites for a node.
+ The sample is not influenced by data. This method should mix poorly.
  */
-
-void Tree::MetropolisHastingsStateSampling() {
+void Tree::MetropolisHastingsStateSampling() { // this is not MH
 	for (int site = 0; site < sequence.size(); site++) {
 		int state_integer = std::floor(Random() * states.size());
 		sequence.at(site) = state_integer;
@@ -355,14 +315,14 @@ void Tree::MetropolisHastingsStateSampling() {
  * probabilities from one value to a different value and back again.
  *
  */
+
+// simpler to make step size, choose random
+// could also sometimes choose smaller or larger step size
 void Tree::SampleDistance() {
 	if (not is_constant) {
 		//distance = distance * (4.0 / 3.0 * std::pow(Random(), 2) + 2.0 / 3.0);
-		if (Random() < 0.5) {
-			distance *= 9.0 / 10.0;
-		} else {
-			distance *= 10.0 / 9.0;
-		}
+		if (Random() < 0.5) { distance *= 9.0 / 10.0;
+		} else { distance *= 10.0 / 9.0; }
 	}
 }
 
@@ -382,18 +342,12 @@ void Tree::RecordSubtreeState() {
 		right->RecordSubtreeState();
 		tree_out << ")";
 	}
-
 	RecordToTreefile();
 	RecordSequence();
 	RecordSubstitutions();
 }
 
-/**
- * Need to remember to print tree at least once to attach the names of the
- * internal nodes to the tree.
- *
- * This needs a better name.
- */
+/* Need to remember to print tree at least once to attach the names of the internal nodes to the tree. This needs a better name.  */
 void Tree::RecordToTreefile() {
 	tree_out << name << ":" << distance;
 }
@@ -463,15 +417,10 @@ void Tree::RecordChildSubstitutions(Tree* child) {
 	substitutions_out << endl;
 }
 
-/**
- * Adding the final semicolon must happen at only the root node. But the
- * root node doesn't know it is the root node. So the model must call this
- * function after the root has recorded itself.
- *
- */
+// simplify explanation here
+/* Add final semicolon only at root node. But root doesn't know it is root, so call this function after the root has recorded itself.   */
 void Tree::AddGenerationEndIndicatorsToOutputFiles() {
 	tree_out << ";" << endl;
-	// I like this being an empty line rather than a "//"
 	sequences_out << endl;
 	// This is required because the root node is not a child of anything and so
 	// its substitutions are never printed. This would not be here if a tree

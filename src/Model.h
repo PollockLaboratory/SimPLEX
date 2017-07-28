@@ -27,27 +27,27 @@ public:
 	void Initialize(map<string, vector<int> > taxa_names_to_sequences,
 			vector<string> states);
 
-	void SampleParameters();
+	void SampleParameters();  // SampleParameters();
 
-	double CalculateLogLikelihood();
+	double CalcLnl(); // Calculate the log likelihood
 
 	void RecordState();
 
 	void Terminate();
 
 private:
-	static int number_of_models;
+	static int num_models; // number_of_models;
 	int id;
 
 	//Must be a pointer to use polymorphism
 	Tree* tree;
 
 	//Must be a pointer to use polymorphism
-	SubstitutionModel* substitution_model;
+	SubstitutionModel* sub_model;
 
 	double CalculateLogLikelihoodOfSubtree(Tree& tree);
 	double CalculateLogLikelihoodOfChild(Tree& tree, Tree& child);
-	void InitializeSubstitutionModel(int number_of_sites,
+	void InitSubModel(int number_of_sites,
 			vector<string> states);
 };
 

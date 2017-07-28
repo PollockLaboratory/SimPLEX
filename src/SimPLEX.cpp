@@ -10,14 +10,10 @@
  */
 
 #include "SimPLEX.h"
-
 #include "Options.h"
-
 #include "Model.h"
 #include "Data.h"
 #include "MCMC.h"
-
-
 
 Options options;
 
@@ -31,14 +27,12 @@ int main() {
 	model.Initialize(data.taxa_names_to_sequences, data.states);
 
 	MCMC mcmc;
-	mcmc.Initialize(&model);
+	mcmc.Init(&model);
 
 	mcmc.Run();
 
-	// Now that I have objects allocated on the heap, this is required. Unless
-	// I use shared pointers...
+	// Now that I have objects allocated on the heap, this is required. Unless I use shared pointers...
 	model.Terminate();
-
 	SimPLEX::Terminate();
 
 	return 0;
