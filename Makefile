@@ -5,11 +5,27 @@ EXEC_DIR ?= ./bin
 BUILD_DIR ?= ./build
 SRC_DIR ?= ./src
 
-SRCS := $(shell find $(SRC_DIR) -name *.cpp) #This is specific to linux.
+PWD := $(dir $(lastword $(MAKEFILE_LIST)))
+
+
+ifeq ($(OS),Windows_NT)
+	SRCS := $(shell dir $(SRC_DIR)/*.cpp)
+	SRCS := $(patsubst $(PWD)%, ./%, $(SRCS))
+else
+	SRCS := $(shell find $(SRC_DIR) -name *.cpp) #This is specific to linux.
+endif
 OBJS := $(SRCS:%.cpp=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
 INC_DIRS := $(shell find $(SRC_DIR) -type d)
+
+ifeq ($(OS),Windows_NT)
+	INC_DIRS := $(shell dir /A:D $(SRC_DIR)/*)
+	INC_DIRS := $(patsubst $(PWD)%, ./%, $(INC_DIRS))
+else
+	INC_DIRS := $(shell find $(SRC_DIR) -type d)
+endif
+
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
