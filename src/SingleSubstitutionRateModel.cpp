@@ -3,6 +3,7 @@
 #include <cstdlib> // For exit()
 #include <iostream>
 #include <cmath> // For exp()
+
 #include "Options.h"
 extern Options options;
 
@@ -37,7 +38,7 @@ void SingleSubstitutionRateModel::InitializeOutputStream() {
 void SingleSubstitutionRateModel::Initialize(int number_of_sites,
 		std::vector<std::string> states) {
 	std::cout << "Initializing Single Substitution Rate Model" << std::endl;
-	SubstitutionModel::Initialize(); // sets is_constant
+	SubstitutionModel::Initialize(); // sets is_	constant
 
 	InitializeState(); // Can call SampleParameters or InitializeStateFromFunction
 
@@ -71,18 +72,7 @@ void SingleSubstitutionRateModel::InitializeStateFromFile(
  */
 static double step_size = 0.1;
 void SingleSubstitutionRateModel::SampleParameters() {
-	if (not is_constant) {
-		if (substitution_rate == 0) {
-			substitution_rate = Random();
-		}
-		if (Random() < 0.5 and substitution_rate > step_size) {
-//			substitution_rate *= 9.0 / 10.0;
-			substitution_rate -= step_size;
-		} else {
-//			substitution_rate *= 10.0 / 9.0;
-			substitution_rate += step_size;
-		}
-	}
+	substitution_rate.sample();
 }
 
 void SingleSubstitutionRateModel::RecordState() {

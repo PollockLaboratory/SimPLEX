@@ -17,11 +17,9 @@ endif
 OBJS := $(SRCS:%.cpp=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
-INC_DIRS := $(shell find $(SRC_DIR) -type d)
-
 ifeq ($(OS),Windows_NT)
-	INC_DIRS := $(shell dir /A:D $(SRC_DIR)/*)
-	INC_DIRS := $(patsubst $(PWD)%, ./%, $(INC_DIRS))
+	#INC_DIRS := $(shell dir /A:D $(SRC_DIR)/*)
+	#INC_DIRS := $(patsubst $(PWD)%, ./%, $(INC_DIRS))
 else
 	INC_DIRS := $(shell find $(SRC_DIR) -type d)
 endif

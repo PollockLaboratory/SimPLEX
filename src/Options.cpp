@@ -164,7 +164,7 @@ void Options::UpdateOutputOptions() {
 #ifdef _WIN32
 //	if (CreateDirectory(outputDirectory.c_str(), 0)) {
 	if (mkdir(outdir.c_str())) {
-		std::cout << "Could not make output directory " << output_directory
+		std::cout << "Could not make output directory " << outdir
 				<< std::endl;
 	} else {
 		std::cout << "Making directory successful" << std::endl;

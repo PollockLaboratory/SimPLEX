@@ -5,6 +5,8 @@
 
 #include "SubstitutionModel.h"
 
+#include "FloatParameter.h"
+
 /**
  * Single substitution rate model
  *
@@ -34,7 +36,7 @@ public:
 			int descendent_state, int site, double branch_length);
 private:
 	static int number_of_single_substitution_rate_models;
-	double substitution_rate;
+	FloatParameter substitution_rate;
 
 	void InitializeOutputStream();
 };
