@@ -45,6 +45,7 @@ private:
 
 	void DetermineColumnsWithoutGaps();
 	void PrintTaxaAndSequences();
+	string cleanLine(string);
 };
 
 #endif

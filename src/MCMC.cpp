@@ -6,60 +6,69 @@
 #include "Options.h"
 #include "Model.h"
 
-extern double Random();
 std::ofstream MCMC::lnlout;
 
+extern double Random();
 
 /// Public Functions ///
 
-// default constructor
 MCMC::MCMC() {
-	model = 0; // should be  model = NULL; ?
+	/*
+	 * Default constructor.
+	 */
+	model = 0;
 	gen = 0;
 	gens = 0;
 	lnL = 0;
 } 
-// Init MCMC with model, gens, calculate lnL
-void MCMC::Init(Model* model) { std::cout << "Initializing MCMC" << std::endl;
+
+void MCMC::Init(Model* model) {
+	/*
+	 * Init MCMC with model, gens calculate lnL.
+	 */
+
+	std::cout << "Initializing MCMC" << std::endl;
 	this->model = model; // associate the pointer with the MCMC
-	gens = options.gens;
-	lnL = model->CalcLnl(); // should be in Run()?
+	std::cout << "Model pointer initialized." << std::endl;
+	gens = options.get_int("generations");
+	std::cout << "Gens: " << gens << std::endl;
+
+	//Calculate initial likelihood.
+	lnL = model->CalcLnl();
+
+	//Initialize output file.
 	lnlout.open(options.lnlout.c_str());
-    // Print_Headers(); would be better if this were somewhere else consistent, maybe static vector
 	lnlout << "Generation\tLog_likelihood\tProposed_log_likelihood\tAccepted" << std::endl;
 }
 
-// Run an initialized MCMC
-void MCMC::Run() {  std::cout << "Running MCMC" << std::endl;
+void MCMC::Run() {
+	/*
+	 * Run an initialized MCMC.
+	 */
+
+	int outfreq = options.get_int("output_frequency");
+
+	std::cout << "Running MCMC" << std::endl;
 	for (gen = 1; gen <= gens; gen++) {
-		Model pmodel = ProposeModel(); // returns model, which is prop_mod; bad: newly constructed
-		newLnL = pmodel.CalcLnl();
+		model->SampleParameters();
+		newLnL = model->CalcLnl();
 
-		accepted = TestAccept(newLnL);
-		RecordState();
-
-		if (accepted) {  // Danger Will Robinson!
-			*model = pmodel; // swap() would be better
+		accepted = log(Random()) < (newLnL - lnL);
+		if (accepted) { 
 			lnL = newLnL;
+			model->accept();
+		} else {
+			model->reject();
+		}
+		
+		if(gen % outfreq == 0) {
+			RecordState();
 		}
 	}
 }
 
 ///  Private Functions  ///
-
-// this should be fixed pmodel as parameter of mcmc
-Model MCMC::ProposeModel() {
-	Model pmodel(*model); // copy current to proposed
-	pmodel.SampleParameters(); // propose new parameters
-	return pmodel;
-}
-
-bool MCMC::TestAccept(double newLnL) {
-	return log(Random()) < (newLnL - lnL);
-}
-
 void MCMC::RecordState() {  // ought to use a function to return tab separated items with endl
-	lnlout << gen << "\t" << lnL << "\t"
-		<< newLnL << "\t" << accepted << std::endl;
+	lnlout << gen << "\t" << lnL << "\t" << newLnL << "\t" << accepted << std::endl;
 	model->RecordState(); // is this always getting lnlout?
 }

@@ -3,7 +3,8 @@
 #include <iostream>
 #include <sstream> // For ostringstream
 #include <cmath> // for floor and pow
-#include "Options.h"
+#include "../Options.h"
+#include "../utils.h"
 
 extern double Random();
 extern Options options;
@@ -16,39 +17,28 @@ ofstream Tree::substitutions_out;
 ofstream Tree::sequences_out;
 ofstream Tree::tree_out;
 
-// Tree constructor // Is this considered doing work? Is this exception safe?
+// Tree constructor.
 Tree::Tree() {   
+	std::cout << "Creating default tree." << std::endl;
 	id = num_trees;  
 	num_trees++;
 	name = "Node_" + IdToString();
-	is_constant = false;  distance = 0;
+	is_constant = false;
+	distance = 0;
 	left = NULL; right = NULL; up = NULL;
 }
 
 // copy
 Tree::Tree(const Tree& tree) { id = num_trees; num_trees++;
-    name = tree.name;  is_constant = tree.is_constant; distance = tree.distance;
+    name = tree.name;
+    is_constant = tree.is_constant;
+    distance = tree.distance;
 
     sequence = tree.sequence; states = tree.states; // not in constructor
 	if (tree.IsSubtree()) {
 		left = tree.left->Clone();  left->up = this;
 		right = tree.right->Clone();  right->up = this;
 	} else { left = NULL;  right = NULL;  }
-}
-
-//Copy-swap
-Tree& Tree::operator=(Tree tree) {
-	std::swap(id, tree.id);
-	std::swap(is_constant, tree.is_constant);
-	std::swap(name, tree.name);
-	std::swap(distance, tree.distance);
-	std::swap(sequence, tree.sequence);
-	std::swap(left, tree.left);
-	std::swap(right, tree.right);
-	std::swap(up, tree.up);
-	std::swap(states, tree.states);
-
-	return *this;
 }
 
 // Tree destruction
@@ -58,13 +48,14 @@ Tree::~Tree() {
 }
 
 // Tree cloning
-Tree* Tree::Clone() {  //	std::cout << "cloning tree" << std::endl;
+Tree* Tree::Clone() {
+	// std::cout << "cloning tree" << std::endl;
 	return new Tree(*this);
 }
 
 // Tree Initialize using seqs and states
-void Tree::Initialize(map<string, vector<int> > taxa_names_to_sequences,
-		vector<string> states) {
+void Tree::Initialize(map<string, vector<int> > taxa_names_to_sequences, vector<string> states) {
+	std::cout << "INITIALIZING TREE." << std::endl;
 	this->states = states;
 	ReadFromTreeFile();
 	InitializeSequences(taxa_names_to_sequences);
@@ -73,10 +64,11 @@ void Tree::Initialize(map<string, vector<int> > taxa_names_to_sequences,
 }
 
 void Tree::ReadFromTreeFile() {
-	ifstream tree_in(options.treefile.c_str());
+	string treefile = options.get("tree_file");
+	ifstream tree_in(treefile.c_str());
 
 	if (not tree_in.good()) {
-		cout << "Could not read tree file " << options.treefile << endl;
+		cout << "Could not read tree file " << treefile << endl;
 		exit(-1);
 	}
 
@@ -95,7 +87,7 @@ void Tree::ReadFromTreeFile() {
 void Tree::ReadFromString(string tree_string) {
 
 	// STP: Why is the constancy of the tree determined here?
-	is_constant = options.constant_tree;
+	is_constant = options.get_int("constant_tree");
 	
 	ExtractDistance(tree_string);
 	ExtractName(tree_string);

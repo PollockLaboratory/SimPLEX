@@ -3,7 +3,8 @@
 #include <iostream>
 #include <sstream> // For ostringstream
 #include <cmath> // for floor and pow
-#include "Options.h"
+
+#include "../../Options.h"
 
 extern double Random();
 extern Options options;
@@ -110,12 +111,12 @@ void Tree_B1::Initialize(map<string, vector<int> > taxa_names_to_sequences,
 
 void Tree_B1::ReadFromString(string tree_string) {
 	// STP: Why is the constancy of the tree determined here?
-	is_constant = options.constant_tree;
+	is_constant = options.get_int("constant_tree");
 	
 	ExtractDistance(tree_string);
 	ExtractName(tree_string);
 	
-	if (distance > options.max_segment_length) {
+	if (distance > options.get_float("max_segment_length")) {
 		SegmentBranch();
 	}
 
@@ -128,7 +129,7 @@ void Tree_B1::ReadFromString(string tree_string) {
 void Tree_B1::SegmentBranch(){
 	// At the end of this method, "this" must be the bottom segment and the top
 	// segment's "up" must point to the current "this->up"
-	int number_of_segments = std::ceil(distance / options.max_segment_length);
+	int number_of_segments = std::ceil(distance / options.get_float("max_segment_length"));
 	float segment_length = distance / number_of_segments;
 	
 	std::cout << "This branch needs to be broken up " << name << std::endl

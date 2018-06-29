@@ -2,6 +2,9 @@
 
 #include <cstdlib> // For atoi()
 #include <iostream>
+#include <sstream>
+#include <stdlib.h>
+#include <typeinfo> //Just for testing.
 
 #ifdef _WIN32
 #include <dir.h> // For mkdir()
@@ -12,52 +15,31 @@
 #include <sys/times.h> // For time()
 #endif
 
-//Initialize all options here but don't do work.
 Options::Options() {
+	/*
+	 *  Initialize options class.
+	 *  Sets a few minor defaults states, however the majority of the default states are 
+	 *  read from default.ctrl.
+	 */
 
-	defaultfile = "resources/defaults.ctrl";   // default control file, sets the type of analysis
-	optionsfile = "resources/options.ctrl";   // options control file, tend to vary from run to run
-    	outdir = "testing/test_run/";              // directory for output files
-    	treefile = "testing/5taxon.tree";           // name of file containing tree or trees
-    	seqfile = "testing/5taxon.fasta";      // name of file containing sequences
-    	treeout = "tree_out.newick";       // name of file to output trees
-    	seqsout = "sequences_out.fasta";  // name of file to output sequences
-    	subsout = "substitutions";  // name of file to output substitutions
-    	lnlout = "likelihoods";  // name of file to output likelihoods
+	defaultfile = "resources/defaults.ctrl";
+	optionsfile = "resources/options.ctrl";
 
-    
-	seed = 830472018;               // random number generator seed
-	debug = false;                  // factory default is don't debug
-	constant_tree = false;          // factory default is that tree varies
-	mixture_classes = 0;            // factory default is no mixtures
-    	// model queues do not have default values
-
-	gens =  100;                    // factory default is 100 generations
-	outfreq = 25;                   // factory default is print output every 25 generations
-	max_segment_length = 0.08;             // bigger than this and segments should be split
-	tree_type = 0;                  // numbered tree types; should this be a name?
+	seed = 0;
+	total_options = 0;
 }
 
+// Initialize options.
 void Options::ReadOptions() {
 	ReadControlFile(defaultfile);
 	ReadControlFile(optionsfile);
 	ProcessOptions();
+	PrintOptions();
 }
 
-void Options::ProcessOptions() {
-	InitializeRandomNumberGeneratorSeed(); // InitRandom(seed);
-	UpdateOutputOptions();                  // meaning what?
-
-	this->CopyFile(optionsfile, outdir + optionsfile);
-	this->CopyFile(defaultfile, outdir + defaultfile);
-
-	if (substitution_model_types.size() > 1) { // Remove substitution model type read from default file
-		substitution_model_types.pop();  // this seems clunky
-	}  if (mixture_classes < 1) mixture_classes = 1;
-}
-
+// Read control files.
 void Options::ReadControlFile(string control_file) {
-	std::cout << "Reading options from " << control_file << std::endl;
+	std::cout << std::endl << "Reading options from " << control_file << std::endl;
 
 	std::ifstream controlfile_stream(control_file.c_str());
 	if (not controlfile_stream.good()) {
@@ -65,148 +47,59 @@ void Options::ReadControlFile(string control_file) {
 		exit(-1);
 	}
 
-	bool in_comment = false;
-	string key = "";  string value = "";
-	while (controlfile_stream.good()) {   controlfile_stream >> key;
-		if (key == "#") { in_comment = not in_comment;
-		} else if (not in_comment) { // read value and set option
-			controlfile_stream >> value;
-			SetOption(key, value);
+	std::string key = "";
+	std::string value = "";
+
+	std::string line;
+
+	while(std::getline(controlfile_stream, line)) {
+		if(line != "") {
+			std::istringstream iss(line);
+			iss >> key;
+			if(key != "#") {
+				iss >> value;
+				SetOption(key, value);
+			}
 		}
 	}
 }
 
-// there is no check if options are of right type
-void Options::SetOption(string option, string value) {  // can we do a case here?
-	if (option == "debug") debug = atoi(value.c_str());
-	else if (option == "seed") seed = atoi(value.c_str());
-	else if (option == "treefile") treefile = value;
-	else if (option == "seqfile") seqfile = value;
-	else if (option == "treeout") treeout = value;
-	else if (option == "subsout") subsout = value;
-	else if (option == "seqsout") seqsout = value;
-	else if (option == "lnlout") lnlout = value;
-	else if (option == "outfreq") outfreq = atoi(value.c_str());
-	else if (option == "gens") gens = atoi(value.c_str());
-	else if (option == "constant_tree") constant_tree = atoi(value.c_str());
-	else if (option == "tree_type") tree_type = atoi(value.c_str());
-	else if (option == "max_segment_length") max_segment_length = atof(value.c_str());
-	else if (option == "substitution_model_type") substitution_model_types.push(atoi(value.c_str()));
-	else if (option == "constant_substitution_model") constant_substitution_models.push(atoi(value.c_str()));
-	else if (option == "substitution_model_initialization") substitution_models_initialization_type.push(atoi(value.c_str()));
-	else if (option == "substitution_model_initialization_file") substitution_models_initialization_files.push(value);
-	else if (option == "mixture_classes") mixture_classes = atoi(value.c_str());
-	else if (option == "outdir") outdir = value;
-	else { //STP: Unrecognized option is a non-fatal error so simply print warning
-		std::cerr << "Unrecognized option found in control file:" << std::endl;
-		std::cerr << "\"" << option << "\" with a value \"" << value << "\""
-				<< std::endl;
-	}
-}
-
-// Might remove this function because it is never called
-// but it should be
-void Options::WriteOptions(std::ofstream& out_stream) {
-	/* Modified 2013-4-1 STP
-	 * Using setw(20) cannot handle longer arguments well. In particular, the
-	 * output files are long strings and are being cut at 20 characters.
-	 * I changed setw to using \t instead
-	 */
-	out_stream << "Using options specified by control file:" << std::endl;
-	out_stream << std::endl << "# debug and loudness controls #" << std::endl;
-	out_stream << "\tdebug\t\t\t" << debug << std::endl;
-	out_stream << "\tseed\t\t\t" << seed << std::endl;
-
-	out_stream << std::endl << "# control generations, frequency of sampling #"
-			<< std::endl;
-	out_stream << "\tgenerations\t\t\t" << gens << std::endl;
-
-	out_stream << std::endl
-			<< "# options for simulation to get proposal step in MCMC #"
-			<< std::endl;
-
-	out_stream << std::endl << "# probablity calculation method #" << std::endl;
-
-	out_stream << std::endl << "# optional input file names #" << std::endl;
-	out_stream << "\ttreefile\t\t\t" << treefile << std::endl;
-	out_stream << "\tseqfile\t\t\t" << seqfile << std::endl;
-
-	out_stream << std::endl << "# optional output file names #" << std::endl;
-	out_stream << "\ttreeoutfile\t\t\t" << treeout << std::endl; // Validated
-	out_stream << "\tsuboutfile\t\t\t" << subsout << std::endl; // Validated
-	out_stream << "\tseqoutfile\t\t\t" << seqsout << std::endl;
-	out_stream << "\tlikelihoodoutfile\t\t\t" << lnlout
-			<< std::endl;
-}
-
-void Options::UpdateOutputOptions() {
-	if (outdir == "") {
-		time_t rawtime = time(NULL); // initializes rawtime
-		struct tm * timeinfo = localtime(&rawtime); // transforms it into a local tm struct
-
-		char dir[100];
-		strftime(dir, 100, "%Y-%m-%d_%H%M%S/", timeinfo);
-		outdir = std::string(dir);
-	}
-	char lastchar = outdir.at(outdir.length() - 1);
-	if (debug)
-		std::cout << "The last char in " << outdir << " is "
-				<< lastchar << std::endl;
-
-	if (lastchar != '/' && lastchar != '\\') {
-		if (debug)
-			std::cout << "last char is not /" << std::endl;
-		outdir += '/';
-	}
-	// For Windows
-	// According to http://sourceforge.net/p/predef/wiki/OperatingSystems/
-	// TODO: double check this works on windows for directory that already exists
-#ifdef _WIN32
-//	if (CreateDirectory(outputDirectory.c_str(), 0)) {
-	if (mkdir(outdir.c_str())) {
-		std::cout << "Could not make output directory " << outdir
-				<< std::endl;
+void Options::SetOption(string option, string value) {
+	if(option_to_index.find(option) == option_to_index.end()) {
+		//Option does not already exist in options_to_index.
+		option_to_index[option] = total_options;
+		option_values[total_options] = value;
+		total_options++;
 	} else {
-		std::cout << "Making directory successful" << std::endl;
+		//Option does already exist.
+		int i = option_to_index[option];
+		option_values[i] = value;
 	}
-#else	//ifdef __linux__ || __APPLE__
-	struct stat st;
-	if (stat(outdir.c_str(), &st) == 0 && S_ISDIR(st.st_mode)) {
-		if (not debug) {
-			std::cout << "output dir " << outdir
-			<< " exists. Overwrite? (Y/n)" << std::endl;
-			if (getchar() != 'Y')
-			exit(1);
-		}
-	} else {
-		mkdir(outdir.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
-	}
-	/*Read, write, and search, or execute, for the file owner; S_IRWXU is the bitwise inclusive OR of S_IRUSR, S_IWUSR, and S_IXUSR.
-	 Read, write, and search or execute permission for the file's group. S_IRWXG is the bitwise inclusive OR of S_IRGRP, S_IWGRP, and S_IXGRP.
-	 Read, write, and search or execute permission for users other than the file owner. S_IRWXO is the bitwise inclusive OR of S_IROTH, S_IWOTH, and S_IXOTH.*/
-//		std::cout << "making directory successful: " << m_strOutputDirectory << std::endl;
-#endif
-
-	PrependOutputDirectory(treeout);
-	PrependOutputDirectory(subsout);
-	PrependOutputDirectory(lnlout);
-	PrependOutputDirectory(seqsout);
 }
 
-void Options::PrependOutputDirectory(std::string &parameter) {
-	if (parameter == "") std::cerr << "Cannot prepend output directory to empty parameter" << std::endl;
-	parameter = outdir + parameter;
-}
+// Process options.
+void Options::ProcessOptions() {
+	debug = get_int("debug");
+	outdir = get("output_directory");
 
-void Options::debugint(bool debug, string blurb, int integer) {
-    if (debug) std::cout << blurb << integer << std::endl;
+	InitializeRandomNumberGeneratorSeed();
+	ConfigureOutputDirectory();
+
+	treeout = findFullFilePath(get("tree_out_file"));
+	subsout = findFullFilePath(get("substitutions_out_file"));
+	lnlout = findFullFilePath(get("likelihood_out_file"));
+	seqsout = findFullFilePath(get("sequences_out_file"));
+
+	CopyFile(optionsfile, outdir + optionsfile);
+	CopyFile(defaultfile, outdir + defaultfile);
+
 }
 
 void Options::InitializeRandomNumberGeneratorSeed() {
-    string blurb = "Seed not specified so set to ";
-    if (seed == 0) { // If seed not specified, set from clock
-	    seed = time(0); 
-	    debugint(debug,blurb,seed);
+    if (option_to_index.find("seed") != option_to_index.end()) {
+	    seed = get_int("seed");
+    } else {
+	    seed = time(0) ; 
     }
     srand(seed);
 }
@@ -215,4 +108,97 @@ void Options::CopyFile(string sourcefile, string newfile) {
 	std::ifstream source(sourcefile.c_str());
 	std::ofstream destination(newfile.c_str());
 	destination << source.rdbuf();
+}
+
+// Print options.
+void Options::PrintOptions() {
+
+	std::cout << std::endl << "Options:" << std::endl;
+
+	for(std::map<std::string, int>::iterator it = option_to_index.begin(); it != option_to_index.end(); ++it) {
+		std::cout << it->first << " = " << option_values[it->second] << " " << std::endl;
+	}
+
+	std::cout << std::endl;
+}
+
+// Retreiving options.
+void Options::check_option_exists(std::string option) {
+	if(option_to_index.find(option) == option_to_index.end()) {
+		std::cerr << "Error: Option \"" << option << "\" not set." << std::endl;
+		exit(EXIT_FAILURE);
+	}
+}
+
+std::string Options::get(std::string option) {
+	check_option_exists(option);
+
+	int i = option_to_index[option];
+	return option_values[i];
+}
+
+int Options::get_int(std::string option) {
+	return atoi(get(option).c_str());
+}
+
+float Options::get_float(std::string option) {
+	return atof(get(option).c_str());
+}
+
+// Configuring the output directory.
+void Options::ConfigureOutputDirectory() {
+	/*
+	 * Configures the output directory and the file names of the output files.
+	 * Creates the output directory and changes the file names of the output file to
+	 * include to full path to the output directory.
+	 *
+	 * For example: "seq.out" -> "/output_dir/seq.out"
+	 */
+	
+	char lastchar = outdir.at(outdir.length() - 1);
+
+	if (debug) std::cout << "The last char in " << outdir << " is " << lastchar << std::endl;
+
+	if (lastchar != '/' && lastchar != '\\') {
+		if (debug) std::cout << "last char is not /" << std::endl;
+		outdir += '/';
+	}
+
+	// For Windows
+	// According to http://sourceforge.net/p/predef/wiki/OperatingSystems/
+	// TODO: double check this works on windows for directory that already exists
+#ifdef _WIN32
+	if (mkdir(outdir.c_str())) {
+		std::cout << "Could not make output directory " << output_directory << std::endl;
+	} else {
+		std::cout << "Making directory successful" << std::endl;
+	}
+#else	//ifdef __linux__ || __APPLE__
+	struct stat st;
+	if (stat(outdir.c_str(), &st) == 0 && S_ISDIR(st.st_mode)) {
+		if (not debug) {
+			std::cout << "output dir " << outdir << " exists. Overwrite? (Y/n)" << std::endl;
+			if (getchar() != 'Y') exit(1);
+		}
+	} else {
+		mkdir(outdir.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
+	}
+	/*Read, write, and search, or execute, for the file owner; S_IRWXU is the bitwise inclusive
+	 * OR of S_IRUSR, S_IWUSR, and S_IXUSR.
+	 * Read, write, and search or execute permission for the file's group. S_IRWXG is the
+	 * bitwise inclusive OR of S_IRGRP, S_IWGRP, and S_IXGRP. Read, write, and search or
+	 * execute permission for users other than the file owner. S_IRWXO is the bitwise inclusive
+	 * OR of S_IROTH, S_IWOTH, and S_IXOTH.*/
+#endif
+}
+
+inline string Options::findFullFilePath(std::string parameter) {
+	/*
+	 * Prepends the output directory path to the output file names, giving the full path name
+	 * for the given file.
+	 */
+
+	if (parameter == "") std::cerr << "Cannot prepend output directory to empty parameter" << std::endl;
+	parameter = outdir + parameter;
+	return parameter;
 }

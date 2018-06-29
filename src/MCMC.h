@@ -8,25 +8,22 @@
 extern Options options; // why is this here, exactly
 
 class MCMC {
-public:
-	MCMC();
-	void Init(Model* model);
-	void Run();
-
-private:
-    Model* model;
-   // Model* pmodel;
-    int gen;
-    int gens;
-	double lnL;
-	double newLnL;
-	bool accepted;
-
-	static std::ofstream lnlout;
-
-	void RecordState();
-	Model ProposeModel();
-	bool TestAccept(double newLnL);
+	public:
+		MCMC();
+		void Init(Model* model);
+		void Run();
+	private:
+		Model* model;
+		int gen;
+		int gens;
+		double lnL;
+		double newLnL;
+		bool accepted;
+		
+		static std::ofstream lnlout;
+		
+		void RecordState();
+		bool TestAccept(double newLnL);
 };
 
 #endif

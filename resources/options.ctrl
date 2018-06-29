@@ -1,40 +1,37 @@
+# Options file.
 
 debug 1
+
 # random_number_generator_seed 1 #
 
-# 
-Tree types
-0	Normal
-1	B1
-#
+# Tree types
+# 0	Normal
+# 1	B1
+
 tree_type	1
 max_segment_length	0.08
 constant_tree	0
-
-# 
-Substitution model types
-0	Single probability 
-1 	Single substitution rate 
-2	Probability matrix 
-3	Substitution rate matrix
-4	Radius dependent model
-5	Mixture model
-#
+ 
+# Substitution model types
+# 0	Single probability 
+# 1 	Single substitution rate 
+# 2	Probability matrix 
+# 3	Substitution rate matrix
+# 4	Radius dependent model
+# 5	Mixture model
 
 substitution_model_type		0
 constant_substitution_model	0
 substitution_model_initialization	0
 
-
-generations 3000
-
+generations 1000
+output_frequency 100
 
 sequences_file	testing/5taxon.fasta
 tree_file	testing/5taxon.tree
-#
 
-sequences_file	testing/sequences_long.fasta
-tree_file	testing/tree.newick
-#
+# sequences_file	testing/sequences_long.fasta
+# tree_file	testing/tree.newick
 
 output_directory testing/test_run/
+

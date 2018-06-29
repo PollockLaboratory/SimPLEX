@@ -1,30 +1,25 @@
+# Default options control file.
 
 debug 			0
 
-# 
-Substitution model types
-0	Single probability 
-1 	Single substitution rate 
-#
+# Substitution model types
+# 0	Single probability 
+# 1 	Single substitution rate 
 
 substitution_model_type		0
-constant_substitution_model	0
-substitution_model_initialization	0
 
-# 
-Mixture model types
-0	Single substitution model
-1	Multiple substitution models
-// 2	Multiple substitution matrices with one rate model // Not implemented
-#
+# Mixture model types
+# 0	Single substitution model
+# 1	Multiple substitution models
+# 2	Multiple substitution matrices with one rate model // Not implemented
 
-number_of_substitution_models_in_mixture_model	1
+mixture_classes	1
 
 generations		2
-output_frequency		100
+output_frequency	100
 
 tree_out_file		tree_out.newick
-sequences_out_file		sequences_out.fasta
+sequences_out_file	sequences_out.fasta
 likelihood_out_file	likelihoods
-substitutions_out_file		substitutions
+substitutions_out_file	substitutions
 

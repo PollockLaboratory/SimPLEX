@@ -13,42 +13,31 @@
 
 #include <vector>
 
-#include "Tree.h"
+#include "Trees/Types/Tree.h"
 
-#include "SubstitutionModel.h"
+#include "SubstitutionModels/SubstitutionModel.h"
 
 class Model {
 public:
 	Model();
-	Model(const Model& model);
-	Model& operator=(Model model);
 	~Model();
+	void Initialize(map<string, vector<int> > taxa_names_to_sequences, vector<string> states);
 
-	void Initialize(map<string, vector<int> > taxa_names_to_sequences,
-			vector<string> states);
+	void SampleParameters();
+	void accept();
+	void reject();
 
-	void SampleParameters();  // SampleParameters();
-
-	double CalcLnl(); // Calculate the log likelihood
-
+	double CalcLnl();
 	void RecordState();
-
 	void Terminate();
 
 private:
-	static int num_models; // number_of_models;
-	int id;
-
-	//Must be a pointer to use polymorphism
-	Tree* tree;
-
-	//Must be a pointer to use polymorphism
-	SubstitutionModel* sub_model;
+	Tree* tree; //Must be a pointer to use polymorphism
+	SubstitutionModel* substitution_model; //Must be a pointer to use polymorphism
 
 	double CalculateLogLikelihoodOfSubtree(Tree& tree);
 	double CalculateLogLikelihoodOfChild(Tree& tree, Tree& child);
-	void InitSubModel(int number_of_sites,
-			vector<string> states);
+	SubstitutionModel* InitializeSubstitutionModel(int number_of_sites, vector<string> states);
 };
 
 #endif

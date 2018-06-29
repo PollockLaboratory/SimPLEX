@@ -1,6 +1,7 @@
 #include "Data.h"
 
 #include <algorithm>
+#include <map>
 
 #include "Options.h"
 
@@ -22,10 +23,22 @@ void Data::Initialize() {
 	RemoveColumnsWithGapsFromSequences();
 }
 
+string Data::cleanLine(string line) {
+	/* 
+	 * Cleans up the a line to remove blank spaces a line returns.
+	 */
+
+	//Remove spaces and concatenate words
+	line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
+	//This removes the carriage return in Windows files
+	line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
+	return line;
+}
+
 /// This function is too long.
 void Data::ReadSequences() {
 	// This is the only dependency on options.
-	ifstream sequences_in(options.seqfile.c_str());
+	ifstream sequences_in(options.get("sequences_file").c_str());
 
 	if (not sequences_in.good()) {
 		cerr << "Cannot read sequence file" << endl;
@@ -39,18 +52,14 @@ void Data::ReadSequences() {
 
 	while (sequences_in.good()) {
 		getline(sequences_in, line);
-		//STP: Remove spaces and concatenate words
-		line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
-		//STP: This removes the carriage return in Windows files
-		line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
+		line = cleanLine(line);
 
 		if (line == "")
 			continue;
 
 		if (line.at(0) == '>') {
 			if (sequence != "") {
-				taxa_names_to_sequences[name] = EncodeSequenceAndReportGaps(
-						sequence);
+				taxa_names_to_sequences[name] = EncodeSequenceAndReportGaps(sequence);
 			}
 			name = line.substr(1);
 			sequence = "";
@@ -66,15 +75,17 @@ vector<int> Data::EncodeSequenceAndReportGaps(string sequence) {
 	vector<int> encoded_sequence(sequence.length());
 
 	for (int site = 0; site < sequence.length(); site++) {
-		string state = sequence.substr(site, 1);
-		if (HasGap(state)) {
+		string current_pos = sequence.substr(site, 1);
+		// cout << state;
+		if (HasGap(current_pos)) {
 			ReportGapAtColumn(site);
 			encoded_sequence.at(site) = gap_indicator;
 		} else {
-			AddStateToStates(state);
-			encoded_sequence.at(site) = state_to_integer[state];
+			AddStateToStates(current_pos);
+			encoded_sequence.at(site) = state_to_integer[current_pos];
 		}
 	}
+	// cout << endl;
 	return encoded_sequence;
 }
 
@@ -89,6 +100,7 @@ void Data::ReportGapAtColumn(int column) {
 }
 
 void Data::AddStateToStates(string state) {
+	// Checks to see of state exists in state_to_interger_map.
 	if (state_to_integer.find(state) == state_to_integer.end()) {
 		int encoded_state = state_to_integer.size();
 		state_to_integer[state] = encoded_state;
