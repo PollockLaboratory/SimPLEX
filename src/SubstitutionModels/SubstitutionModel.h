@@ -30,7 +30,7 @@ class SubstitutionModel {
 		std::ofstream* substitution_model_out;
 		void Initialize();
 		ParameterSet parameters;
-		std::ofstream* CreateOutputStream(std::string file_name);
+		//std::ofstream CreateOutputStream(std::string file_name);
 	private:
 };
 

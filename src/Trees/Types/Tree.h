@@ -7,40 +7,48 @@
 #include <string>
 #include <map>
 #include <vector>
+#include "Trees/TreeParser.h"
 
 using std::string;
 using std::map;
 using std::vector;
 
+class TreeNode {
+	public:
+		std::string name;
+		double distance;
+		vector<int> sequence;	
+		TreeNode* up;
+		TreeNode* left;
+		TreeNode* right;
+		
+		TreeNode();
+		TreeNode(IO::RawTreeNode* raw_tree, TreeNode* up_node);
+		void attachSequences(map<string, vector<int>> taxa_names_to_sequences);
+		bool isTip();
+	};
+	
 class Tree {
 
-//	friend class Model;
 public:
 
 	string name;
 	double distance;
-	vector<int> sequence;
-	// STP: How can I allow a derived class to put a pointer to the derived
-	// class in these members?
-	Tree* left;
-	Tree* right;
-	Tree* up;
+	map<string, vector<int>> names_to_sequences;
+	TreeNode* root;
 
 	Tree();
-	Tree(const Tree& tree);
 	Tree& operator=(Tree tree);
-	virtual ~Tree();
 	
 	//STP: This method is necessary for recursive inherited classes to work
-	virtual Tree* Clone();
-	virtual void Initialize(map<string, vector<int> > taxa_names_to_sequences,
-			vector<string> states);
+	virtual void Initialize(IO::RawTreeNode* raw_tree, map<string, vector<int>> taxa_names_to_sequences, vector<string> states);
 	virtual void SampleParameters();
 	virtual void RecordState();
 
-	bool IsRoot() const;
-	virtual bool IsSubtree() const;
-	virtual bool IsLeaf() const;
+	//bool IsRoot() const;
+	//virtual bool IsSubtree() const;
+	//virtual bool IsLeaf() const;
+	double calculate_likelihood();
 
 // STP: All these things should be protected, but when they are, the derived 
 // class Tree_B1 seems to not have access to them. The definition of protected
@@ -71,8 +79,7 @@ public:
 	 */
  
 	vector<string> states;
-	
-	
+		
 	/**
 	 * Should these really be class statics? I like pointers better than class
 	 * statics. And now since there will be a terminate call, it can delete
@@ -88,32 +95,24 @@ public:
 	static std::ofstream tree_out;
 	static std::ofstream substitutions_out;
 	static std::ofstream sequences_out;
-
-	void ReadFromTreeFile();
-	virtual void ReadFromString(string);
-	virtual void ReadSubtree(string);
-	void ExtractDistance(string&);
-	void ExtractName(string&);
-
-
-	virtual void InitializeSequences(
-			std::map<string, vector<int> > taxa_names_to_sequences);
+//
+//	virtual void InitializeSequences(std::map<string, vector<int> > taxa_names_to_sequences);
 	void InitializeOutputStreams();
-
-	virtual void SampleSubtreeParameters();
-	void SampleSequence();
-	void SampleDistance();
-
-	virtual void RecordSubtreeState();
-	void RecordSequence();
-	void RecordToTreefile();
-	virtual void RecordSubstitutions();
-	void RecordChildSubstitutions(Tree* child);
-	void AddGenerationEndIndicatorsToOutputFiles();
-
-	string IdToString();
-	virtual void DescendentStateSampling();
-	void MetropolisHastingsStateSampling();
+//
+//	virtual void SampleSubtreeParameters();
+//	void SampleSequence();
+//	void SampleDistance();
+//
+//	virtual void RecordSubtreeState();
+//	void RecordSequence();
+//	void RecordToTreefile();
+//	virtual void RecordSubstitutions();
+//	void RecordChildSubstitutions(Tree* child);
+//	void AddGenerationEndIndicatorsToOutputFiles();
+//
+//	virtual void DescendentStateSampling();
+//	void MetropolisHastingsStateSampling();
 };
+
 
 #endif

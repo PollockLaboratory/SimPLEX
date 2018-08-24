@@ -4,17 +4,19 @@
 #include <cmath>
 
 #include "Trees/TreeTypes.h"
+#include "Trees/TreeParser.h"
 #include "SubstitutionModels/SubstitutionModelTypes.h"
 #include "SubstitutionModels/SubstitutionModel.h"
 
-#include "Options.h"
+#include "Environment.h"
+#include "IO.h"
 
-extern Options options;
+extern Environment env;
+extern IO::Files files;
 
 /*  The tree needs the names_to_sequence map. The substitution model might need the empirical frequencies. */
 
 using namespace std;
-
 
 Model::Model() {
 	/*
@@ -53,11 +55,19 @@ void Model::Initialize(map<string, vector<int> > taxa_names_to_sequences, vector
 	 * - the tree class - contains the tree topology as well as the sequences.
 	 * - the substitution model class - which contains all the rate matrices.
 	 */
-	tree = InstantiateTree();
-	std::cout << "Init tree." << std::endl;
-	tree->Initialize(taxa_names_to_sequences, states);
-	std::cout << "Init tree end." << std::endl;
+	
+	std::string treefile = env.get("tree_file"); 	
+	files.add_file("tree_input", treefile, IOtype::INPUT);
+	ifstream tree_in = files.get_ifstream("tree_input");
 
+	string tree_string;
+	getline(tree_in, tree_string);
+
+	IO::RawTreeNode* raw_tree = IO::parseTree(tree_string);
+	tree = TreeTypes::pickTreeType();
+	tree->Initialize(raw_tree, taxa_names_to_sequences, states);
+
+	//Not quite sure what this is doing.
 	int num_sites = taxa_names_to_sequences.begin()->second.size();
 	substitution_model = InitializeSubstitutionModel(num_sites, states);
 }
@@ -90,41 +100,8 @@ double Model::CalcLnl() {
 	/*
 	 * Calculates the likelihood of the current tree and substitution model.
 	 */
-	return CalculateLogLikelihoodOfSubtree(*tree);
-}
-
-double Model::CalculateLogLikelihoodOfSubtree(Tree& tree) {
-	/*
-	 * Makes calculations for branches to children, then add calculation for children subtrees
-	 *
-	 * Note: This method for calculating the subtree does not result in correct values
-	 * because the substitution mapping is too simple and incorrect. To properly
-	 * calculate the likelihood, the substitution model must take into account
-	 * all the possible substitution mappings that would begin with the ancestral
-	 * state and end in the descendant state.
-	 * */
-
-	double Lnl = 0.0;
-	if (tree.IsSubtree()) {  // required because children don't know their parent
-		Lnl += CalculateLogLikelihoodOfChild(tree, *tree.left);
-		Lnl += CalculateLogLikelihoodOfChild(tree, *tree.right);
-
-		Lnl += CalculateLogLikelihoodOfSubtree(*tree.left);
-		Lnl += CalculateLogLikelihoodOfSubtree(*tree.right);
-	}  return Lnl;
-}
-
-double Model::CalculateLogLikelihoodOfChild(Tree& tree, Tree& child) {
-	/*
-	 * foreach site k, get substitution probability from seq state at k in parent to child,
-	 * over distance (attached to child).
-	 *
-	 * Note: this needs to be changed for true plex calculation, and avoid log every time
-	 */
-	double Lnl = 0.0;
-	for (int site = 0; site < tree.sequence.size(); site++) {
-		Lnl += log(substitution_model->SubstitutionProbability(tree.sequence.at(site), child.sequence.at(site), site, child.distance));
-	}  return Lnl;
+	return(tree->calculate_likelihood());
+	//return CalculateLogLikelihoodOfSubtree(*tree);
 }
 
 void Model::Terminate() {

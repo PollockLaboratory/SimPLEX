@@ -2,11 +2,11 @@
 #include <cstdlib>
 
 #include "SubstitutionModel.h"
-#include "../Options.h"
+#include "../Environment.h"
 
 #include "Types/GeneralTimeReversible.h"
 
-extern Options options;
+extern Environment env;
 
 static const int general_time_reversible_model_type = 0;
 
@@ -17,7 +17,7 @@ SubstitutionModel* GetSubstitutionModel() {
 	 */
 
 	SubstitutionModel* substitution_model = NULL;
-	int next_model_type = options.get_int("substitution_model_type");
+	int next_model_type = env.get_int("substitution_model_type");
 
 	if (next_model_type == general_time_reversible_model_type) {
 		substitution_model = new GeneralTimeReversible();

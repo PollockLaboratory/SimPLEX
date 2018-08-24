@@ -3,9 +3,9 @@
 #include <iostream>
 #include <cstdlib>
 
-#include "Options.h"
+#include "Environment.h"
 
-extern Options options;
+extern Environment env;
 
 GeneralTimeReversible::GeneralTimeReversible() {
 }
@@ -14,8 +14,8 @@ void GeneralTimeReversible::Initialize(int number_of_sites, std::vector<std::str
 	/*
 	 * std::cout << "Initializing Single Probability Model" << std::endl;
 	 */
-	//Hamish	
-	substitution_model_out = CreateOutputStream("Single_probability_model");
+	//substitution_model_out = CreateOutputStream("Single_probability_model");
+	substitution_model_out = new std::ofstream;
 
 	std::cout << "Initializing General Time Reversible Model (GTR)." << std::endl;
 

@@ -2,10 +2,8 @@
 #define MCMC_h_
 
 #include <fstream>
-#include "Options.h"
+#include "Environment.h"
 #include "Model.h"
-
-extern Options options; // why is this here, exactly
 
 class MCMC {
 	public:

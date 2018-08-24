@@ -32,11 +32,9 @@ public:
 	void Terminate();
 
 private:
-	Tree* tree; //Must be a pointer to use polymorphism
+	Tree* tree;
 	SubstitutionModel* substitution_model; //Must be a pointer to use polymorphism
 
-	double CalculateLogLikelihoodOfSubtree(Tree& tree);
-	double CalculateLogLikelihoodOfChild(Tree& tree, Tree& child);
 	SubstitutionModel* InitializeSubstitutionModel(int number_of_sites, vector<string> states);
 };
 

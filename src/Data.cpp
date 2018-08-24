@@ -3,9 +3,11 @@
 #include <algorithm>
 #include <map>
 
-#include "Options.h"
+#include "Environment.h"
+#include "IO.h"
 
-extern Options options;
+extern Environment env;
+extern IO::Files files;
 
 static const int gap_indicator = -1;
 
@@ -37,13 +39,8 @@ string Data::cleanLine(string line) {
 
 /// This function is too long.
 void Data::ReadSequences() {
-	// This is the only dependency on options.
-	ifstream sequences_in(options.get("sequences_file").c_str());
-
-	if (not sequences_in.good()) {
-		cerr << "Cannot read sequence file" << endl;
-		exit(-1);
-	}
+	files.add_file("sequences_in", env.get("sequences_file"), IOtype::INPUT);
+	ifstream sequences_in = files.get_ifstream("sequences_in");
 
 	vector<int> encoded_sequence;
 	string line;
@@ -120,17 +117,15 @@ void Data::DetermineColumnsWithoutGaps() {
 		}
 	}
 
-	cout << "Number of columns without gaps: "
-			<< columns_without_gaps.size() << endl;
+	cout << "Number of columns without gaps: " << columns_without_gaps.size() << endl;
 }
 
 void Data::RemoveColumnsWithGapsFromSequences() {
-	if (options.debug)
+	if (env.debug)
 		cout << "Removing gaps" << endl;
 
-	for (std::map<string, vector<int> >::iterator it =
-			taxa_names_to_sequences.begin();
-			it != taxa_names_to_sequences.end(); it++) {
+	for (std::map<string, vector<int> >::iterator it = taxa_names_to_sequences.begin();
+			it != taxa_names_to_sequences.end(); ++it) {
 		vector<int> encoded_sequence = it->second;
 		it->second = RemoveGapsFromEncodedSequence(encoded_sequence);
 	}
@@ -147,8 +142,7 @@ vector<int> Data::RemoveGapsFromEncodedSequence(vector<int> encoded_sequence) {
 }
 
 void Data::PrintTaxaAndSequences() {
-	for (std::map<string, vector<int> >::iterator it =
-			taxa_names_to_sequences.begin();
+	for (std::map<string, vector<int> >::iterator it = taxa_names_to_sequences.begin();
 			it != taxa_names_to_sequences.end(); ++it) {
 		cout << it->first << ":";
 		for (int i = 0; i < it->second.size(); i++)

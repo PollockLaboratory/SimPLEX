@@ -3,12 +3,15 @@
 #include <fstream>
 #include <cmath>
 #include <limits>
-#include "Options.h"
+
 #include "Model.h"
+#include "IO.h"
 
 std::ofstream MCMC::lnlout;
 
 extern double Random();
+extern Environment env;
+extern IO::Files files;
 
 /// Public Functions ///
 
@@ -30,14 +33,15 @@ void MCMC::Init(Model* model) {
 	std::cout << "Initializing MCMC" << std::endl;
 	this->model = model; // associate the pointer with the MCMC
 	std::cout << "Model pointer initialized." << std::endl;
-	gens = options.get_int("generations");
+	gens = env.get_int("generations");
 	std::cout << "Gens: " << gens << std::endl;
 
 	//Calculate initial likelihood.
 	lnL = model->CalcLnl();
 
 	//Initialize output file.
-	lnlout.open(options.lnlout.c_str());
+	files.add_file("likelihoods", env.get("likelihood_out_file"), IOtype::OUTPUT);
+	lnlout = files.get_ofstream("likelihoods");
 	lnlout << "Generation\tLog_likelihood\tProposed_log_likelihood\tAccepted" << std::endl;
 }
 
@@ -46,7 +50,7 @@ void MCMC::Run() {
 	 * Run an initialized MCMC.
 	 */
 
-	int outfreq = options.get_int("output_frequency");
+	int outfreq = env.get_int("output_frequency");
 
 	std::cout << "Running MCMC" << std::endl;
 	for (gen = 1; gen <= gens; gen++) {

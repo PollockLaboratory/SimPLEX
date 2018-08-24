@@ -5,7 +5,7 @@
 
 #include "Types/GeneralTimeReversible.h"
 
-#include "../Options.h"
+#include "../Environment.h"
 
 SubstitutionModel* GetSubstitutionModel();
 

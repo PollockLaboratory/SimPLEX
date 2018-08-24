@@ -40,10 +40,10 @@ private:
 	void ReportGapAtColumn(int column);
 	void AddStateToStates(string state);
 
+	void DetermineColumnsWithoutGaps();
 	void RemoveColumnsWithGapsFromSequences();
 	vector<int> RemoveGapsFromEncodedSequence(vector<int> encoded_sequence);
 
-	void DetermineColumnsWithoutGaps();
 	void PrintTaxaAndSequences();
 	string cleanLine(string);
 };
