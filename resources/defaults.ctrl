@@ -22,4 +22,4 @@ tree_out_file		tree_out.newick
 sequences_out_file	sequences_out.fasta
 likelihood_out_file	likelihoods
 substitutions_out_file	substitutions
-
+time_out_file 		time_taken

@@ -24,13 +24,21 @@ TreeNode::TreeNode() {
 	this->name = "NULL";
 }
 
-TreeNode::TreeNode(IO::RawTreeNode* raw_tree, TreeNode* up_node) {
+TreeNode::TreeNode(IO::RawTreeNode* raw_tree) {
+	/* 
+	 * TreeNode Constructor - from rawTreeNode.
+	 */
 	name = raw_tree->name;
-	std::cout << "Name: " << name << std::endl;
 	distance = raw_tree->distance;
-	up = up_node;
-	left = (raw_tree->left != 0) ? new TreeNode(raw_tree->left, this) : 0;
-	right = (raw_tree->right != 0) ? new TreeNode(raw_tree->right, this) : 0;
+	std::cout << "Name: " << name << " distance: " << distance << std::endl;
+}
+
+TreeNode::TreeNode(std::string n) {
+	/* 
+	 * TreeNode Constructor - from name and distance.
+	 */
+	name = n;
+	std::cout << "Name: " << name << std::endl;
 }
 
 void TreeNode::attachSequences(map<string, vector<int>> taxa_names_to_sequences) {
@@ -38,8 +46,8 @@ void TreeNode::attachSequences(map<string, vector<int>> taxa_names_to_sequences)
 		sequence = taxa_names_to_sequences[name];
 		std::cout << name << std::endl;
 	} else {
-		left->attachSequences(taxa_names_to_sequences);
-		right->attachSequences(taxa_names_to_sequences);
+		//left->attachSequences(taxa_names_to_sequences);
+		//right->attachSequences(taxa_names_to_sequences);
 	}
 }
 
@@ -51,20 +59,94 @@ bool TreeNode::isTip() {
 	}
 }
 
+// Branch segment.
+BranchSegment::BranchSegment(float distance) {
+	this->distance = distance;
+	std::cout << "Making new branch segment. Distance: " << this->distance << std::endl;
+}
+
 // Tree constructor.
 Tree::Tree() {   
 	std::cout << "Creating Basic tree." << std::endl;
-	name = "Basic_tree";
 	is_constant = true;
+}
+
+// Managing creation of tree nodes.
+std::pair<BranchSegment*, BranchSegment*> Tree::splitBranch(float distance) {
+	float d = distance;
+	std::cout << "Splitting branches, distance: " << d << std::endl;
+
+	// Calculate how many internal nodes are needed for given branch.
+	int extraNodes = 0;
+	for(int i = 0; d > max_seg_len; i++) {
+		d = d/2.0;
+		extraNodes += pow(2, i);
+	}
+
+	std::cout << "Extra nodes needed: " << extraNodes << std::endl;
+	
+	BranchSegment* newBranchTop = new BranchSegment(distance);
+	BranchSegment* newBranchBottom = newBranchTop;
+
+	//Create extra nodes and link together.
+	if(extraNodes > 0) {
+		for(int i = 0; i < extraNodes; i++) {
+			std::cout << "Creating extra branches and nodes." << std::endl;
+			TreeNode* n = new TreeNode("InternalBranchNode");
+			BranchSegment* b = new BranchSegment(d);
+
+			newBranchBottom->decendant = n;
+			n->up = newBranchBottom;
+
+			n->left = b;
+			b->ancestral = n;
+
+			newBranchBottom = b;
+		}
+	}
+
+	return std::make_pair(newBranchTop, newBranchBottom);
+}
+
+void Tree::connectNodes(TreeNode* ancestralNode, BranchSegment* ancestralBP, TreeNode* decendantNode, float distance) {
+	/* This function is responsible for connecting two Nodes with branch segments.
+	 * This includes braking up long branches into smaller branch segment when needed and creating new internal branch nodes.
+	 * Arguments:
+	 * 	ancestralNode - pointer to the ancestral node.
+	 * 	ancestralBP - pointer of the ancestral node that points to the decendant node. (This is needed to distinguish between the left and right branch pointers.)
+	 * 	decendantNode - pointer to the decendantNode.
+	 * 	distance - the branch length.
+	 */
+	std::cout << "Connecting nodes. " << distance << std::endl;
+	std::pair<BranchSegment*, BranchSegment*> intermediateBranches = splitBranch(distance);
+	BranchSegment* newBranchTop = intermediateBranches.first;
+	BranchSegment* newBranchBottom = intermediateBranches.second;
+
+	decendantNode->up = newBranchTop;
+	ancestralBP = newBranchBottom;
+
+	newBranchTop->ancestral = ancestralNode;
+	newBranchBottom->decendant = decendantNode;
+}
+
+TreeNode* Tree::createTreeNode(IO::RawTreeNode* raw_tree, TreeNode* ancestralNode, BranchSegment* ancestralBP) {
+	TreeNode* newTreeNode = new TreeNode(raw_tree);
+	connectNodes(ancestralNode, ancestralBP, newTreeNode, raw_tree->distance);
+	if(raw_tree->left != 0) { createTreeNode(raw_tree->left, newTreeNode, newTreeNode->left); }
+	if(raw_tree->right != 0) { createTreeNode(raw_tree->right, newTreeNode, newTreeNode->right); }
+	return newTreeNode;
 }
 
 // Tree Initialize using seqs and states
 void Tree::Initialize(IO::RawTreeNode* raw_tree, map<string, vector<int> > taxa_names_to_sequences, vector<string> states) {
 	std::cout << "INITIALIZING BASIC TREE." << std::endl;
+	max_seg_len = env.get_float("max_segment_length");
+	std::cout << "Max segment length: " << max_seg_len << std::endl;
 	this->names_to_sequences = taxa_names_to_sequences;
 	this->states = states;
-	TreeNode* root = new TreeNode(raw_tree, 0);
-	root->attachSequences(names_to_sequences);
+	BranchSegment* proxyBranch = 0;
+	TreeNode* root = createTreeNode(raw_tree, 0, proxyBranch);
+	//root->attachSequences(names_to_sequences);
 	//InitializeSequences(taxa_names_to_sequences);
 	InitializeOutputStreams();
 	//RecordState();

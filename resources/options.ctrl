@@ -6,11 +6,10 @@ debug 1
 
 # Tree types
 # 0	Normal
-# 1	B1
 
-tree_type	1
+tree_type	0
 max_segment_length	0.08
-constant_tree	0
+# constant_tree	0
  
 # Substitution model types
 # 0	Single probability 
@@ -27,8 +26,8 @@ substitution_model_initialization	0
 generations 1000
 output_frequency 100
 
-sequences_file	testing/5taxon.fasta
-tree_file	testing/5taxon.tree
+sequences_file	resources/5taxon.fasta
+tree_file	resources/5taxon.tree
 
 # sequences_file	testing/sequences_long.fasta
 # tree_file	testing/tree.newick
