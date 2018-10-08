@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "Trees/Types/Tree.h"
+#include "Data.h"
 
 #include "SubstitutionModels/SubstitutionModel.h"
 
@@ -21,7 +22,7 @@ class Model {
 public:
 	Model();
 	~Model();
-	void Initialize(map<string, vector<int> > taxa_names_to_sequences, vector<string> states);
+	void Initialize(SequenceAlignment* &MSA);
 
 	void SampleParameters();
 	void accept();

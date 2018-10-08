@@ -2,61 +2,52 @@
 #define Tree_h_
 
 #include <algorithm>
+#include <functional>
 #include <istream>
 #include <fstream>
 #include <string>
 #include <map>
 #include <vector>
+#include <list>
+#include "Sequence.h"
 #include "Trees/TreeParser.h"
+#include "TreeParts.h"
+#include "BranchSplitting.h"
 
 using std::string;
 using std::map;
 using std::vector;
 
-class BranchSegment;
-
-class TreeNode {
-	public:
-		std::string name;
-		double distance;
-		vector<int> sequence;	
-		BranchSegment* up;
-		BranchSegment* left;
-		BranchSegment* right;
-		
-		TreeNode();
-		TreeNode(IO::RawTreeNode* raw_tree);
-		TreeNode(std::string n);
-		void attachSequences(map<string, vector<int>> taxa_names_to_sequences);
-		bool isTip();
-};
-
-class BranchSegment {
-	public:
-		float distance;
-		TreeNode* ancestral;
-		TreeNode* decendant;
-
-		BranchSegment(float distance);
-};
-	
 class Tree {
 	public:
-		map<string, vector<int>> names_to_sequences;
 		TreeNode* root;
 		Tree();
 		Tree& operator=(Tree tree);
 
+		map<string, vector<int>> names_to_sequences;
+		std::list<BranchSegment*> branchList;
+		std::list<TreeNode*> nodeList;
+
 		// Internal Tree nodes.
-		std::pair<BranchSegment*, BranchSegment*> splitBranch(float distance); 
-		void connectNodes(TreeNode* ancestral, BranchSegment* ancestralBP, TreeNode* decendant, float distance);
-		TreeNode* createTreeNode(IO::RawTreeNode* raw_tree, TreeNode* ancestralNode, BranchSegment* ancestralBP);
+		void connectNodes(TreeNode* &ancestral, BranchSegment* &ancestralBP, TreeNode* &decendant, float distance);
+		TreeNode* createTreeNode(IO::RawTreeNode* raw_tree, TreeNode* &ancestralNode, BranchSegment* &ancestralBP);
 
 		// Setting options.
-		float max_seg_len;
+		float max_seg_len; // Max segment length.
+		std::function< std::pair<BranchSegment*, BranchSegment*>(float)> splitBranch; // Algorithm for splitting branches.
 		
-		//STP: This method is necessary for recursive inherited classes to work
-		virtual void Initialize(IO::RawTreeNode* raw_tree, map<string, vector<int>> taxa_names_to_sequences, vector<string> states);
+		// Initializing.
+		map<string, vector<int>> taxa_names_to_sequences;
+		//vector<string> states;
+
+		void Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA);
+		void configureSequences(TreeNode* n);
+
+		// Debug tools.
+		void printBranchList();
+		void printNodeList();
+
+		// Sampling
 		virtual void SampleParameters();
 		virtual void RecordState();
 		
@@ -105,7 +96,6 @@ class Tree {
 	 	 * Or use shared pointers instead of manually allocating them.
 	 	 *
 	 	 */
-
 
 		static std::ofstream tree_out;
 		static std::ofstream substitutions_out;

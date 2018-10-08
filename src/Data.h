@@ -1,7 +1,5 @@
-
 #ifndef ObservedData_h_
 #define ObservedData_h_
-
 
 #include <iostream>
 #include <fstream>
@@ -12,6 +10,8 @@
 #include <map> // for taxa_names_to_sequences
 #include <algorithm>
 
+#include "Sequence.h"
+
 using namespace std;
 
 class Data {
@@ -20,6 +20,7 @@ public:
 	// Don't need to initialize the following because they are not primitives.
 	// Their default constructors are called.
 	map<string, vector<int> > taxa_names_to_sequences;
+	SequenceAlignment* MSA;
 
 	map<string, int> state_to_integer;
 	vector<string> states;
@@ -33,19 +34,8 @@ private:
 	set<int> columns_with_gaps;
 	vector<int> columns_without_gaps;
 
-	void ReadSequences();
-
-	vector<int> EncodeSequenceAndReportGaps(string);
-	bool HasGap(string);
-	void ReportGapAtColumn(int column);
-	void AddStateToStates(string state);
-
-	void DetermineColumnsWithoutGaps();
-	void RemoveColumnsWithGapsFromSequences();
-	vector<int> RemoveGapsFromEncodedSequence(vector<int> encoded_sequence);
-
-	void PrintTaxaAndSequences();
 	string cleanLine(string);
+	void ReadSequences();
 };
 
 #endif

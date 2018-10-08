@@ -48,7 +48,7 @@ int main() {
 	data.Initialize();
 
 	Model model;
-	model.Initialize(data.taxa_names_to_sequences, data.states);
+	model.Initialize(data.MSA);
 
 	MCMC mcmc;
 	mcmc.Init(&model);

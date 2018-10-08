@@ -48,7 +48,7 @@ SubstitutionModel* Model::InitializeSubstitutionModel(int num_sites, vector<stri
 	return(substitution_model);
 }
 
-void Model::Initialize(map<string, vector<int> > taxa_names_to_sequences, vector<string> states) {
+void Model::Initialize(SequenceAlignment* &MSA) {
 	/*
 	 * Initialize the model class.
 	 * There are two main components within the model class:
@@ -65,11 +65,11 @@ void Model::Initialize(map<string, vector<int> > taxa_names_to_sequences, vector
 
 	IO::RawTreeNode* raw_tree = IO::parseTree(tree_string);
 	tree = TreeTypes::pickTreeType();
-	tree->Initialize(raw_tree, taxa_names_to_sequences, states);
+	tree->Initialize(raw_tree, MSA);
 
 	//Not quite sure what this is doing.
-	int num_sites = taxa_names_to_sequences.begin()->second.size();
-	substitution_model = InitializeSubstitutionModel(num_sites, states);
+	int num_sites = ((MSA->taxa_names_to_sequences).begin()->second)->encoded_sequence.size();
+	substitution_model = InitializeSubstitutionModel(num_sites, MSA->states);
 }
 
 void Model::SampleParameters() {

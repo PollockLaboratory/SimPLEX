@@ -20,95 +20,14 @@ ofstream Tree::substitutions_out;
 ofstream Tree::sequences_out;
 ofstream Tree::tree_out;
 
-TreeNode::TreeNode() {
-	this->name = "NULL";
-}
-
-TreeNode::TreeNode(IO::RawTreeNode* raw_tree) {
-	/* 
-	 * TreeNode Constructor - from rawTreeNode.
-	 */
-	name = raw_tree->name;
-	distance = raw_tree->distance;
-	std::cout << "Name: " << name << " distance: " << distance << std::endl;
-}
-
-TreeNode::TreeNode(std::string n) {
-	/* 
-	 * TreeNode Constructor - from name and distance.
-	 */
-	name = n;
-	std::cout << "Name: " << name << std::endl;
-}
-
-void TreeNode::attachSequences(map<string, vector<int>> taxa_names_to_sequences) {
-	if(this->isTip()) {
-		sequence = taxa_names_to_sequences[name];
-		std::cout << name << std::endl;
-	} else {
-		//left->attachSequences(taxa_names_to_sequences);
-		//right->attachSequences(taxa_names_to_sequences);
-	}
-}
-
-bool TreeNode::isTip() {
-	if(this->left == 0 and this->right == 0) {
-		return(true);
-	} else {
-		return(false);
-	}
-}
-
-// Branch segment.
-BranchSegment::BranchSegment(float distance) {
-	this->distance = distance;
-	std::cout << "Making new branch segment. Distance: " << this->distance << std::endl;
-}
-
 // Tree constructor.
 Tree::Tree() {   
 	std::cout << "Creating Basic tree." << std::endl;
 	is_constant = true;
 }
 
-// Managing creation of tree nodes.
-std::pair<BranchSegment*, BranchSegment*> Tree::splitBranch(float distance) {
-	float d = distance;
-	std::cout << "Splitting branches, distance: " << d << std::endl;
-
-	// Calculate how many internal nodes are needed for given branch.
-	int extraNodes = 0;
-	for(int i = 0; d > max_seg_len; i++) {
-		d = d/2.0;
-		extraNodes += pow(2, i);
-	}
-
-	std::cout << "Extra nodes needed: " << extraNodes << std::endl;
-	
-	BranchSegment* newBranchTop = new BranchSegment(distance);
-	BranchSegment* newBranchBottom = newBranchTop;
-
-	//Create extra nodes and link together.
-	if(extraNodes > 0) {
-		for(int i = 0; i < extraNodes; i++) {
-			std::cout << "Creating extra branches and nodes." << std::endl;
-			TreeNode* n = new TreeNode("InternalBranchNode");
-			BranchSegment* b = new BranchSegment(d);
-
-			newBranchBottom->decendant = n;
-			n->up = newBranchBottom;
-
-			n->left = b;
-			b->ancestral = n;
-
-			newBranchBottom = b;
-		}
-	}
-
-	return std::make_pair(newBranchTop, newBranchBottom);
-}
-
-void Tree::connectNodes(TreeNode* ancestralNode, BranchSegment* ancestralBP, TreeNode* decendantNode, float distance) {
+// Creation of tree nodes.
+void Tree::connectNodes(TreeNode* &ancestralNode, BranchSegment* &ancestralBP, TreeNode* &decendantNode, float distance) {
 	/* This function is responsible for connecting two Nodes with branch segments.
 	 * This includes braking up long branches into smaller branch segment when needed and creating new internal branch nodes.
 	 * Arguments:
@@ -117,40 +36,101 @@ void Tree::connectNodes(TreeNode* ancestralNode, BranchSegment* ancestralBP, Tre
 	 * 	decendantNode - pointer to the decendantNode.
 	 * 	distance - the branch length.
 	 */
-	std::cout << "Connecting nodes. " << distance << std::endl;
 	std::pair<BranchSegment*, BranchSegment*> intermediateBranches = splitBranch(distance);
 	BranchSegment* newBranchTop = intermediateBranches.first;
 	BranchSegment* newBranchBottom = intermediateBranches.second;
 
-	decendantNode->up = newBranchTop;
-	ancestralBP = newBranchBottom;
+	decendantNode->up = newBranchBottom;
+	ancestralBP = newBranchTop;
 
 	newBranchTop->ancestral = ancestralNode;
 	newBranchBottom->decendant = decendantNode;
 }
 
-TreeNode* Tree::createTreeNode(IO::RawTreeNode* raw_tree, TreeNode* ancestralNode, BranchSegment* ancestralBP) {
+TreeNode* Tree::createTreeNode(IO::RawTreeNode* raw_tree, TreeNode* &ancestralNode, BranchSegment* &ancestralBP) {
 	TreeNode* newTreeNode = new TreeNode(raw_tree);
 	connectNodes(ancestralNode, ancestralBP, newTreeNode, raw_tree->distance);
+
 	if(raw_tree->left != 0) { createTreeNode(raw_tree->left, newTreeNode, newTreeNode->left); }
 	if(raw_tree->right != 0) { createTreeNode(raw_tree->right, newTreeNode, newTreeNode->right); }
-	return newTreeNode;
+
+	return(newTreeNode);
+}
+
+// Configure sequences.
+
+void Tree::configureSequences(TreeNode* n) {
+	/*
+	 * Traverses the tree attaching sequences to nodes.
+	 * Also adds all the Nodes and Branch segments to their corresponding lists.
+	 */
+
+	nodeList.push_back(n);
+	std::cout << "Configure Node: " << n->name << std::endl;
+	if(names_to_sequences.count(n->name)) {
+		n->sequence = names_to_sequences.at(n->name);
+	}
+	std::cout << "a1" << std::endl;
+	if(n->left != 0) {
+		std::cout << "a2" << std::endl;
+		BranchSegment* b = n->left;
+		std::cout << "a3" << std::endl;
+		branchList.push_back(b);
+		std::cout << "a4" << std::endl;
+		configureSequences(b->decendant);
+		std::cout << "a5" << std::endl;
+	}
+
+	std::cout << "b1" << std::endl;
+	if(n->right != 0) {
+		std::cout << "b2" << std::endl;
+		BranchSegment* b = n->right;
+		std::cout << "b3" << std::endl;
+		branchList.push_back(b);
+		std::cout << "b4" << std::endl;
+		configureSequences(b->decendant);
+		std::cout << "b5" << std::endl;
+	}
+
+	std::cout << "Here 2." << std::endl;
 }
 
 // Tree Initialize using seqs and states
-void Tree::Initialize(IO::RawTreeNode* raw_tree, map<string, vector<int> > taxa_names_to_sequences, vector<string> states) {
+void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA) {
 	std::cout << "INITIALIZING BASIC TREE." << std::endl;
 	max_seg_len = env.get_float("max_segment_length");
 	std::cout << "Max segment length: " << max_seg_len << std::endl;
+
+	splitBranch = pickBranchSplitAlgorithm();
 	this->names_to_sequences = taxa_names_to_sequences;
 	this->states = states;
-	BranchSegment* proxyBranch = 0;
-	TreeNode* root = createTreeNode(raw_tree, 0, proxyBranch);
-	//root->attachSequences(names_to_sequences);
+	BranchSegment* proxyBranch = new BranchSegment(0.0);
+	TreeNode* proxyNode = new TreeNode("Proxy");
+	TreeNode* root = createTreeNode(raw_tree, proxyNode, proxyBranch);
+	//configureSequences(root);
 	//InitializeSequences(taxa_names_to_sequences);
 	InitializeOutputStreams();
 	//RecordState();
 }
+
+// Debug tools.
+
+void Tree::printBranchList() {
+	std::cout << "Printing Branch list. Size: " << branchList.size() << std::endl;
+	for(std::list<BranchSegment*>::iterator it = branchList.begin(); it != branchList.end(); ++it) {
+		std::cout << "Branch: " << (*it)->distance << std::endl;
+	}
+}
+
+void Tree::printNodeList() {
+	std::cout << "Printing Node list. Size:  " << nodeList.size() << std::endl;
+	for(std::list<TreeNode*>::iterator it = nodeList.begin(); it != nodeList.end(); ++it) {
+		std::cout << "Node: " << (*it)->name << std::endl;
+	}
+
+}
+
+// Sampling and likelihood.
 
 double Tree::calculate_likelihood() {
 	return(0.0);

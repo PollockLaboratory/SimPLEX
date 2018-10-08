@@ -29,7 +29,7 @@ std::pair<std::string, std::string> IO::splitBranchString(std::string branch_str
 			tree_depth--;
 		else if (character == ',' and tree_depth == 0) {
 			b.first = branch_string.substr(0, position);
-			b.second = branch_string.substr(position + 1, branch_string.size() - position - 1);
+			b.second = branch_string.substr(position + 1, branch_string.size() - position + 1);
 		}
 	}
 	return(b);
@@ -50,7 +50,7 @@ node_data IO::deconstructNodeString(std::string node_string) {
 	} else {
 		int len = last_colon_position - last_parens_position - 1;
 		name = node_string.substr(last_parens_position + 1, len);
-		branch_strings = splitBranchString(node_string.substr(1, last_colon_position - 3));
+		branch_strings = splitBranchString(node_string.substr(1, last_parens_position - 1));
 	}
 
 	node_data n = {name, distance, branch_strings.first, branch_strings.second};
