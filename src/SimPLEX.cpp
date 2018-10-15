@@ -48,7 +48,7 @@ int main() {
 	data.Initialize();
 
 	Model model;
-	model.Initialize(data.MSA);
+	model.Initialize(data.raw_tree, data.MSA);
 
 	MCMC mcmc;
 	mcmc.Init(&model);

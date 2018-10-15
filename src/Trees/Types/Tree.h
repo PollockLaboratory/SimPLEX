@@ -21,6 +21,8 @@ using std::vector;
 class Tree {
 	public:
 		TreeNode* root;
+		SequenceAlignment* MSA;
+
 		Tree();
 		Tree& operator=(Tree tree);
 
@@ -51,9 +53,6 @@ class Tree {
 		virtual void SampleParameters();
 		virtual void RecordState();
 		
-		//bool IsRoot() const;
-		//virtual bool IsSubtree() const;
-		//virtual bool IsLeaf() const;
 		double calculate_likelihood();
 		
 		// STP: All these things should be protected, but when they are, the derived 
@@ -84,7 +83,7 @@ class Tree {
 	 	 * shared pointer to it (unlike a regular pointer).
 	 	 */
  
-		vector<string> states;
+		//vector<string> states;
 		
 		/**
 	 	 * Should these really be class statics? I like pointers better than class

@@ -4,7 +4,14 @@
 #include<string>
 #include<map>
 #include<vector>
+#include<list>
 #include<set>
+
+struct substitution {
+	int pos;
+	int anc;
+	int dec;
+};
 
 class Sequence;
 
@@ -20,7 +27,11 @@ class SequenceAlignment {
 		std::map<std::string, int> state_to_integer;
 		std::map<int, std::string> integer_to_state;
 
+		// Adding sequences to alignment.
 		void add(std::string name, std::string sequence_str);
+		void addVariable(std::string name);
+
+		// Processing input sequences.	
 		std::vector<int> EncodeSequence(std::string sequence);
 		void AddStateToStates(std::string state);
 		void DetermineColumnsWithoutGaps();
@@ -29,6 +40,10 @@ class SequenceAlignment {
 
 		void Initialize();
 		void print();
+
+		// Utilities
+		static std::vector<int> findParsimony(const std::vector<int> &s1, const std::vector<int> &s2);
+		static std::list<substitution> findSubstitutions(const std::vector<int> &anc, const std::vector<int> &dec);
 };
 
 class Sequence {
@@ -38,6 +53,7 @@ class Sequence {
 		SequenceAlignment* MSA;
 		
 		Sequence(std::vector<int> enc, SequenceAlignment* MSA);
+		void set(std::vector<int> seq);
 		std::string as_str();
 };
 

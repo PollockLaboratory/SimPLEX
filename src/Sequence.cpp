@@ -3,6 +3,7 @@
 #include "Environment.h"
 
 extern Environment env;
+extern double Random();
 
 // Sequence Alignment class.
 
@@ -12,8 +13,16 @@ SequenceAlignment::SequenceAlignment() {
 static const int gap_indicator = -1;
 
 void SequenceAlignment::add(std::string name, std::string sequence_str) {
+	// Adds extant sequence to alignment. This will not be sampled during the MCMC.
 	std::cout << "Adding: " << name << std::endl;
 	std::vector<int> enc = EncodeSequence(sequence_str);
+	taxa_names_to_sequences[name] = new Sequence(enc, this);
+}
+
+void SequenceAlignment::addVariable(std::string name) {
+	// Adds sequence to alignment, that WILL be sampled during MCMC. 
+	// This is for the ancestral nodes.
+	std::vector<int> enc = {};
 	taxa_names_to_sequences[name] = new Sequence(enc, this);
 }
 
@@ -55,7 +64,7 @@ void SequenceAlignment::AddStateToStates(std::string state) {
 void SequenceAlignment::print() {
 	std::cout << "SEQUENCES" << std::endl;
 	for(std::map<std::string, Sequence*>::iterator it = taxa_names_to_sequences.begin(); it != taxa_names_to_sequences.end(); ++it) {
-		std::cout << "Name: " << it->first << " Sequence: " << (it->second)->as_str() << std::endl;
+		std::cout << ">" << it->first << "\n" << (it->second)->as_str() << std::endl;
 	}
 }
 
@@ -96,11 +105,42 @@ void SequenceAlignment::Initialize() {
 	RemoveColumnsWithGapsFromSequences();
 }
 
+std::vector<int> SequenceAlignment::findParsimony(const std::vector<int> &s1, const std::vector<int> &s2) {
+	std::vector<int> p = {};
+	for(int i = 0; i < s1.size(); i++) {
+		if(s1.at(i) == s2.at(i)) {
+			p.push_back(s1.at(i));
+		} else {
+			if(Random() < 0.5) {
+				p.push_back(s1.at(i));
+			} else {
+				p.push_back(s2.at(i));
+			}
+		}
+	}	
+	return(p);
+}
+
+std::list<substitution> SequenceAlignment::findSubstitutions(const std::vector<int> &anc, const std::vector<int> &dec) {
+	std::list<substitution> s = {};
+	for(int i = 0; i < anc.size(); i++) {
+		if(anc.at(i) != dec.at(i)) {
+			substitution sub = {i, anc.at(i), dec.at(i)};
+			s.push_back(sub);
+		}
+	}	
+	return(s);
+}
+
 // Indervidual Sequence class.
 
 Sequence::Sequence(std::vector<int> enc, SequenceAlignment* MSA) {
 	encoded_sequence = enc;
 	this->MSA = MSA;
+}
+
+void Sequence::set(std::vector<int> seq) {
+	encoded_sequence = seq;
 }
 
 std::string Sequence::as_str() {

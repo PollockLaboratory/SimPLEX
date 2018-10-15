@@ -20,12 +20,14 @@ Data::~Data() {
 }
 
 void Data::Initialize() {
-	MSA = new SequenceAlignment();
-	ReadSequences();
+	MSA = ReadSequences();
 	MSA->print();
 	MSA->Initialize();
+
+	raw_tree = ReadTree();
 }
 
+// Sequences
 string Data::cleanLine(string line) {
 	/* 
 	 * Cleans up the a line to remove blank spaces a line returns.
@@ -38,7 +40,9 @@ string Data::cleanLine(string line) {
 	return line;
 }
 
-void Data::ReadSequences() {
+SequenceAlignment* Data::ReadSequences() {
+	MSA = new SequenceAlignment();
+
 	files.add_file("sequences_in", env.get("sequences_file"), IOtype::INPUT);
 	ifstream sequences_in = files.get_ifstream("sequences_in");
 
@@ -66,5 +70,21 @@ void Data::ReadSequences() {
 	}
 	// Add final sequence
 	MSA->add(name, sequence);
+	return(MSA);
 }
 
+// Trees
+
+IO::RawTreeNode* Data::ReadTree() {
+	std::string treefile = env.get("tree_file"); 	
+	files.add_file("tree_input", treefile, IOtype::INPUT);
+	ifstream tree_in = files.get_ifstream("tree_input");
+
+	string tree_string;
+	getline(tree_in, tree_string);
+
+	IO::RawTreeNode* raw_tree = IO::parseTree(tree_string);
+
+	return(raw_tree);
+
+}

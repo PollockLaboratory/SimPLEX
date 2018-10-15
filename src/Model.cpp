@@ -48,7 +48,7 @@ SubstitutionModel* Model::InitializeSubstitutionModel(int num_sites, vector<stri
 	return(substitution_model);
 }
 
-void Model::Initialize(SequenceAlignment* &MSA) {
+void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA) {
 	/*
 	 * Initialize the model class.
 	 * There are two main components within the model class:
@@ -56,14 +56,6 @@ void Model::Initialize(SequenceAlignment* &MSA) {
 	 * - the substitution model class - which contains all the rate matrices.
 	 */
 	
-	std::string treefile = env.get("tree_file"); 	
-	files.add_file("tree_input", treefile, IOtype::INPUT);
-	ifstream tree_in = files.get_ifstream("tree_input");
-
-	string tree_string;
-	getline(tree_in, tree_string);
-
-	IO::RawTreeNode* raw_tree = IO::parseTree(tree_string);
 	tree = TreeTypes::pickTreeType();
 	tree->Initialize(raw_tree, MSA);
 

@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Trees/TreeParser.h"
+#include "Sequence.h"
 
 using std::string;
 using std::map;
@@ -18,15 +19,18 @@ class BranchSegment {
 		float distance;
 		TreeNode* ancestral;
 		TreeNode* decendant;
+		std::list<substitution> subs;
 
 		BranchSegment(float distance);
+		~BranchSegment();
 };
 
 class TreeNode {
 	public:
+		static int unique_id;
 		std::string name;
 		double distance;
-		vector<int> sequence;	
+		Sequence* sequence;	
 		BranchSegment* up;
 		BranchSegment* left;
 		BranchSegment* right;
@@ -37,5 +41,4 @@ class TreeNode {
 
 		bool isTip();
 };
-
 #endif

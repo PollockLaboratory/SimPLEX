@@ -32,7 +32,7 @@ void Tree::connectNodes(TreeNode* &ancestralNode, BranchSegment* &ancestralBP, T
 	 * This includes braking up long branches into smaller branch segment when needed and creating new internal branch nodes.
 	 * Arguments:
 	 * 	ancestralNode - pointer to the ancestral node.
-	 * 	ancestralBP - pointer of the ancestral node that points to the decendant node. (This is needed to distinguish between the left and right branch pointers.)
+	 * 	ancestralBP - pointer of the ancestral node that points to the decendant node. (This is needed to distinguish between the left and right branch pointers of ancestral node.)
 	 * 	decendantNode - pointer to the decendantNode.
 	 * 	distance - the branch length.
 	 */
@@ -51,8 +51,12 @@ TreeNode* Tree::createTreeNode(IO::RawTreeNode* raw_tree, TreeNode* &ancestralNo
 	TreeNode* newTreeNode = new TreeNode(raw_tree);
 	connectNodes(ancestralNode, ancestralBP, newTreeNode, raw_tree->distance);
 
-	if(raw_tree->left != 0) { createTreeNode(raw_tree->left, newTreeNode, newTreeNode->left); }
-	if(raw_tree->right != 0) { createTreeNode(raw_tree->right, newTreeNode, newTreeNode->right); }
+	if(raw_tree->left != 0) { 
+		createTreeNode(raw_tree->left, newTreeNode, newTreeNode->left);
+	}
+
+	if(raw_tree->right != 0) {
+		createTreeNode(raw_tree->right, newTreeNode, newTreeNode->right); }
 
 	return(newTreeNode);
 }
@@ -65,34 +69,48 @@ void Tree::configureSequences(TreeNode* n) {
 	 * Also adds all the Nodes and Branch segments to their corresponding lists.
 	 */
 
+	std::cout << "Configure: " << n->name << std::endl;
 	nodeList.push_back(n);
-	std::cout << "Configure Node: " << n->name << std::endl;
-	if(names_to_sequences.count(n->name)) {
-		n->sequence = names_to_sequences.at(n->name);
+	if(MSA->taxa_names_to_sequences.count(n->name)) {
+		n->sequence = MSA->taxa_names_to_sequences.at(n->name);
+	} else {
+		MSA->addVariable(n->name);
+		n->sequence = MSA->taxa_names_to_sequences.at(n->name);
 	}
-	std::cout << "a1" << std::endl;
+
 	if(n->left != 0) {
-		std::cout << "a2" << std::endl;
 		BranchSegment* b = n->left;
-		std::cout << "a3" << std::endl;
 		branchList.push_back(b);
-		std::cout << "a4" << std::endl;
 		configureSequences(b->decendant);
-		std::cout << "a5" << std::endl;
 	}
 
-	std::cout << "b1" << std::endl;
 	if(n->right != 0) {
-		std::cout << "b2" << std::endl;
 		BranchSegment* b = n->right;
-		std::cout << "b3" << std::endl;
 		branchList.push_back(b);
-		std::cout << "b4" << std::endl;
 		configureSequences(b->decendant);
-		std::cout << "b5" << std::endl;
 	}
 
-	std::cout << "Here 2." << std::endl;
+	// Fill missing sequences/
+	if(n->isTip()) {
+		// Node is tip.
+		std::cout << "Tip Here: " << n->name << std::endl;
+	} else if(n->left != 0 and n->right == 0) {
+		// Internal Continous.
+		std::cout << "Internal Continous Here: " << n->name << std::endl;
+		TreeNode* dsNode = n->left->decendant; // ds = downstream.
+		n->sequence->set(dsNode->sequence->encoded_sequence);
+	} else {
+		// Root or internal branch.
+		std::cout << "Internal Splitting Here: " << n->name << std::endl;
+		vector<int> dsNodeLseq = n->left->decendant->sequence->encoded_sequence;
+		vector<int>  dsNodeRseq = n->right->decendant->sequence->encoded_sequence;
+		vector<int> p = MSA->findParsimony(dsNodeLseq, dsNodeRseq);
+		n->sequence->set(p);
+
+		// Add substituions to branches.
+		n->left->subs = MSA->findSubstitutions(p, dsNodeLseq);
+		n->right->subs = MSA->findSubstitutions(p, dsNodeRseq);
+	}
 }
 
 // Tree Initialize using seqs and states
@@ -102,12 +120,20 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA) {
 	std::cout << "Max segment length: " << max_seg_len << std::endl;
 
 	splitBranch = pickBranchSplitAlgorithm();
-	this->names_to_sequences = taxa_names_to_sequences;
-	this->states = states;
+	this->MSA = MSA;
+
+	// Proxys are created to correctly create root node.
 	BranchSegment* proxyBranch = new BranchSegment(0.0);
 	TreeNode* proxyNode = new TreeNode("Proxy");
 	TreeNode* root = createTreeNode(raw_tree, proxyNode, proxyBranch);
-	//configureSequences(root);
+	delete proxyBranch;
+	delete proxyNode;
+
+	configureSequences(root);
+	printNodeList();
+	printBranchList();
+
+	MSA->print();
 	//InitializeSequences(taxa_names_to_sequences);
 	InitializeOutputStreams();
 	//RecordState();
@@ -118,7 +144,13 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA) {
 void Tree::printBranchList() {
 	std::cout << "Printing Branch list. Size: " << branchList.size() << std::endl;
 	for(std::list<BranchSegment*>::iterator it = branchList.begin(); it != branchList.end(); ++it) {
-		std::cout << "Branch: " << (*it)->distance << std::endl;
+		BranchSegment* b = *it;
+		std::cout << "Branch: " << b->distance;
+		auto subs = b->subs;
+		for(std::list<substitution>::iterator s = subs.begin(); s != subs.end(); ++s) {
+			std::cout << " " << (*s).pos << " " << (*s).anc << " " << (*s).dec;	
+		}
+		std::cout << std::endl;
 	}
 }
 

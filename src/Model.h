@@ -22,7 +22,7 @@ class Model {
 public:
 	Model();
 	~Model();
-	void Initialize(SequenceAlignment* &MSA);
+	void Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA);
 
 	void SampleParameters();
 	void accept();

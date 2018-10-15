@@ -11,6 +11,7 @@
 #include <algorithm>
 
 #include "Sequence.h"
+#include "Trees/TreeParser.h"
 
 using namespace std;
 
@@ -21,6 +22,7 @@ public:
 	// Their default constructors are called.
 	map<string, vector<int> > taxa_names_to_sequences;
 	SequenceAlignment* MSA;
+	IO::RawTreeNode* raw_tree;
 
 	map<string, int> state_to_integer;
 	vector<string> states;
@@ -35,7 +37,9 @@ private:
 	vector<int> columns_without_gaps;
 
 	string cleanLine(string);
-	void ReadSequences();
+	SequenceAlignment* ReadSequences();
+
+	IO::RawTreeNode* ReadTree();
 };
 
 #endif

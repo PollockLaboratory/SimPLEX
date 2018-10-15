@@ -41,7 +41,7 @@ std::pair<BranchSegment*, BranchSegment*> splitHalfMethod(float distance) {
 	//Create extra nodes and link together.
 	if(extraNodes > 0) {
 		for(int i = 0; i < extraNodes; i++) {
-			TreeNode* n = new TreeNode("InternalBranchNode");
+			TreeNode* n = new TreeNode();
 			//nodeList.push_back(n);
 
 			BranchSegment* b = new BranchSegment(dist);
