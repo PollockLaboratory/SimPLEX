@@ -30,7 +30,7 @@ class TreeNode {
 		static int unique_id;
 		std::string name;
 		double distance;
-		Sequence* sequence;	
+		std::vector<int>* sequence;	
 		BranchSegment* up;
 		BranchSegment* left;
 		BranchSegment* right;

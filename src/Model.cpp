@@ -60,7 +60,7 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA) {
 	tree->Initialize(raw_tree, MSA);
 
 	//Not quite sure what this is doing.
-	int num_sites = ((MSA->taxa_names_to_sequences).begin()->second)->encoded_sequence.size();
+	int num_sites = (MSA->taxa_names_to_sequences).begin()->second.size();
 	substitution_model = InitializeSubstitutionModel(num_sites, MSA->states);
 }
 

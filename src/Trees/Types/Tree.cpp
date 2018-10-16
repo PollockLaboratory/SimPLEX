@@ -15,7 +15,6 @@ using namespace std;
 
 int Tree::num_trees = 0;
 
-// See "Print yourself.odt" for rationale for why these are class static.
 ofstream Tree::substitutions_out;
 ofstream Tree::sequences_out;
 ofstream Tree::tree_out;
@@ -72,10 +71,14 @@ void Tree::configureSequences(TreeNode* n) {
 	std::cout << "Configure: " << n->name << std::endl;
 	nodeList.push_back(n);
 	if(MSA->taxa_names_to_sequences.count(n->name)) {
-		n->sequence = MSA->taxa_names_to_sequences.at(n->name);
+		n->sequence = &(MSA->taxa_names_to_sequences.at(n->name));
 	} else {
-		MSA->addVariable(n->name);
-		n->sequence = MSA->taxa_names_to_sequences.at(n->name);
+		if(n->isTip()){
+			std::cerr << "Error: Missing sequence for \"" << n->name << "\"." << std::endl;
+			exit(EXIT_FAILURE);
+		}
+		MSA->add(n->name);
+		n->sequence = &(MSA->taxa_names_to_sequences.at(n->name));
 	}
 
 	if(n->left != 0) {
@@ -98,14 +101,14 @@ void Tree::configureSequences(TreeNode* n) {
 		// Internal Continous.
 		std::cout << "Internal Continous Here: " << n->name << std::endl;
 		TreeNode* dsNode = n->left->decendant; // ds = downstream.
-		n->sequence->set(dsNode->sequence->encoded_sequence);
+		*(n->sequence) = *(dsNode->sequence);
 	} else {
 		// Root or internal branch.
 		std::cout << "Internal Splitting Here: " << n->name << std::endl;
-		vector<int> dsNodeLseq = n->left->decendant->sequence->encoded_sequence;
-		vector<int>  dsNodeRseq = n->right->decendant->sequence->encoded_sequence;
+		vector<int> dsNodeLseq = *(n->left->decendant->sequence);
+		vector<int> dsNodeRseq = *(n->right->decendant->sequence);
 		vector<int> p = MSA->findParsimony(dsNodeLseq, dsNodeRseq);
-		n->sequence->set(p);
+		*(n->sequence) = p;
 
 		// Add substituions to branches.
 		n->left->subs = MSA->findSubstitutions(p, dsNodeLseq);
@@ -148,7 +151,7 @@ void Tree::printBranchList() {
 		std::cout << "Branch: " << b->distance;
 		auto subs = b->subs;
 		for(std::list<substitution>::iterator s = subs.begin(); s != subs.end(); ++s) {
-			std::cout << " " << (*s).pos << " " << (*s).anc << " " << (*s).dec;	
+			std::cout << " " << MSA->decodeChar((*s).anc) << (*s).pos << MSA->decodeChar((*s).dec);	
 		}
 		std::cout << std::endl;
 	}

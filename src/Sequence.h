@@ -18,7 +18,7 @@ class Sequence;
 class SequenceAlignment {
 	public:
 		SequenceAlignment();
-		std::map<std::string, Sequence*> taxa_names_to_sequences;
+		std::map<std::string, std::vector<int>> taxa_names_to_sequences;
 		
 		std::set<int> columns_with_gaps;
 		std::vector<int> columns_without_gaps;
@@ -29,7 +29,7 @@ class SequenceAlignment {
 
 		// Adding sequences to alignment.
 		void add(std::string name, std::string sequence_str);
-		void addVariable(std::string name);
+		void add(std::string name);
 
 		// Processing input sequences.	
 		std::vector<int> EncodeSequence(std::string sequence);
@@ -42,19 +42,9 @@ class SequenceAlignment {
 		void print();
 
 		// Utilities
+		std::string decodeChar(int &c);
+		std::string decodeSequence(std::vector<int> &enc_seq);
 		static std::vector<int> findParsimony(const std::vector<int> &s1, const std::vector<int> &s2);
 		static std::list<substitution> findSubstitutions(const std::vector<int> &anc, const std::vector<int> &dec);
 };
-
-class Sequence {
-	public: 
-
-		std::vector<int> encoded_sequence;
-		SequenceAlignment* MSA;
-		
-		Sequence(std::vector<int> enc, SequenceAlignment* MSA);
-		void set(std::vector<int> seq);
-		std::string as_str();
-};
-
 #endif

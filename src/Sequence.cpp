@@ -14,16 +14,15 @@ static const int gap_indicator = -1;
 
 void SequenceAlignment::add(std::string name, std::string sequence_str) {
 	// Adds extant sequence to alignment. This will not be sampled during the MCMC.
-	std::cout << "Adding: " << name << std::endl;
 	std::vector<int> enc = EncodeSequence(sequence_str);
-	taxa_names_to_sequences[name] = new Sequence(enc, this);
+	taxa_names_to_sequences[name] = enc;
 }
 
-void SequenceAlignment::addVariable(std::string name) {
+void SequenceAlignment::add(std::string name) {
 	// Adds sequence to alignment, that WILL be sampled during MCMC. 
 	// This is for the ancestral nodes.
 	std::vector<int> enc = {};
-	taxa_names_to_sequences[name] = new Sequence(enc, this);
+	taxa_names_to_sequences[name] = enc;
 }
 
 std::vector<int> SequenceAlignment::EncodeSequence(std::string sequence) {
@@ -63,13 +62,13 @@ void SequenceAlignment::AddStateToStates(std::string state) {
 
 void SequenceAlignment::print() {
 	std::cout << "SEQUENCES" << std::endl;
-	for(std::map<std::string, Sequence*>::iterator it = taxa_names_to_sequences.begin(); it != taxa_names_to_sequences.end(); ++it) {
-		std::cout << ">" << it->first << "\n" << (it->second)->as_str() << std::endl;
+	for(std::map<std::string, std::vector<int>>::iterator it = taxa_names_to_sequences.begin(); it != taxa_names_to_sequences.end(); ++it) {
+		std::cout << ">" << it->first << "\n" << decodeSequence(it->second) << std::endl;
 	}
 }
 
 void SequenceAlignment::DetermineColumnsWithoutGaps() {
-	int number_of_sites = taxa_names_to_sequences.begin()->second->encoded_sequence.size();
+	int number_of_sites = taxa_names_to_sequences.begin()->second.size();
 	std::cout << "Number of columns in alignment: " << number_of_sites << std::endl;
 
 	for (int site = 0; site < number_of_sites; site++) {
@@ -85,9 +84,9 @@ void SequenceAlignment::DetermineColumnsWithoutGaps() {
 void SequenceAlignment::RemoveColumnsWithGapsFromSequences() {
 	if (env.debug) std::cout << "Removing gaps" << std::endl;
 
-	for (std::map<std::string, Sequence*>::iterator it = taxa_names_to_sequences.begin(); it != taxa_names_to_sequences.end(); ++it) {
-		std::vector<int> encoded_sequence = it->second->encoded_sequence;
-		it->second->encoded_sequence = RemoveGapsFromEncodedSequence(encoded_sequence);
+	for (std::map<std::string, std::vector<int>>::iterator it = taxa_names_to_sequences.begin(); it != taxa_names_to_sequences.end(); ++it) {
+		std::vector<int> encoded_sequence = it->second;
+		it->second = RemoveGapsFromEncodedSequence(encoded_sequence);
 	}
 }
 
@@ -103,6 +102,19 @@ std::vector<int> SequenceAlignment::RemoveGapsFromEncodedSequence(std::vector<in
 void SequenceAlignment::Initialize() {
 	DetermineColumnsWithoutGaps();
 	RemoveColumnsWithGapsFromSequences();
+}
+
+// Utilities
+std::string SequenceAlignment::decodeChar(int &c) {
+	return(integer_to_state[c]);
+}
+
+std::string SequenceAlignment::decodeSequence(std::vector<int> &enc_seq) {
+	std::string decoded_sequence;
+	for(std::vector<int>::iterator it = enc_seq.begin(); it != enc_seq.end(); ++it) {
+		decoded_sequence.append(decodeChar(*it));
+	}
+	return(decoded_sequence);
 }
 
 std::vector<int> SequenceAlignment::findParsimony(const std::vector<int> &s1, const std::vector<int> &s2) {
@@ -131,24 +143,4 @@ std::list<substitution> SequenceAlignment::findSubstitutions(const std::vector<i
 	}	
 	return(s);
 }
-
-// Indervidual Sequence class.
-
-Sequence::Sequence(std::vector<int> enc, SequenceAlignment* MSA) {
-	encoded_sequence = enc;
-	this->MSA = MSA;
-}
-
-void Sequence::set(std::vector<int> seq) {
-	encoded_sequence = seq;
-}
-
-std::string Sequence::as_str() {
-	std::string decoded_sequence;
-	for(std::vector<int>::iterator it = encoded_sequence.begin(); it != encoded_sequence.end(); ++it) {
-		decoded_sequence.append(MSA->integer_to_state[*it]);
-	}
-	return(decoded_sequence);
-}
-
 
