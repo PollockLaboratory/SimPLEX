@@ -83,12 +83,14 @@ void Tree::configureSequences(TreeNode* n) {
 
 	if(n->left != 0) {
 		BranchSegment* b = n->left;
+		b->rates.resize(seqLen);
 		branchList.push_back(b);
 		configureSequences(b->decendant);
 	}
 
 	if(n->right != 0) {
 		BranchSegment* b = n->right;
+		b->rates.resize(seqLen);
 		branchList.push_back(b);
 		configureSequences(b->decendant);
 	}
@@ -116,14 +118,31 @@ void Tree::configureSequences(TreeNode* n) {
 	}
 }
 
+void Tree::configureRateVectors() {
+	std::cout << "Configuring rate vectors." << std::endl;
+	for(auto it = branchList.begin(); it != branchList.end(); ++it) {
+		std::cout << "Adding rate vector: " << *(*it) << std::endl;
+		BranchSegment* branch = (*it);
+		std::vector<int> s = *(branch->ancestral->sequence);
+		for(int i = 0; i < s.size() ; i++) {
+			RateVector* r = SM->selectRateVector(branch, i);	
+			branch->rates[i] = r;
+		}
+	}
+}
+
 // Tree Initialize using seqs and states
-void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA) {
+void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, SubstitutionModel* &SM) {
 	std::cout << "INITIALIZING BASIC TREE." << std::endl;
 	max_seg_len = env.get_float("max_segment_length");
 	std::cout << "Max segment length: " << max_seg_len << std::endl;
 
+	u = env.get_float("uniformization_constant");
+
 	splitBranch = pickBranchSplitAlgorithm();
 	this->MSA = MSA;
+	seqLen = MSA->numCols();
+	this->SM = SM;
 
 	// Proxys are created to correctly create root node.
 	BranchSegment* proxyBranch = new BranchSegment(0.0);
@@ -133,11 +152,12 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA) {
 	delete proxyNode;
 
 	configureSequences(root);
-	printNodeList();
-	printBranchList();
+	configureRateVectors();
+
+	// printNodeList();
+	// printBranchList();
 
 	MSA->print();
-	//InitializeSequences(taxa_names_to_sequences);
 	InitializeOutputStreams();
 	//RecordState();
 }
@@ -165,10 +185,54 @@ void Tree::printNodeList() {
 
 }
 
+void Tree::printParameters() {
+	SM->printParameters();	
+}
+
 // Sampling and likelihood.
+std::map<float, std::pair<int, int>> Tree::findKeyStatistics() {
+	/*
+	 * Finds the key stats for the likelihood function.
+	 */
+	std::map<float, std::pair<int, int>> branch_classes;
+	for(auto it = branchList.begin(); it != branchList.end(); ++it) {
+		BranchSegment* b = *it;
+		if(branch_classes.find(b->distance) == branch_classes.end()) {
+			// Branch class does NOT already exists.
+			branch_classes[b->distance] = b->countSubstitutions();
+		} else {
+			// Branch class does already exist.
+			std::pair<int, int> c = b->countSubstitutions();
+			branch_classes[b->distance].first = branch_classes[b->distance].first + c.first;
+			branch_classes[b->distance].second = branch_classes[b->distance].second + c.second;
+		}
+	}
+	return(branch_classes);
+}
 
 double Tree::calculate_likelihood() {
-	return(0.0);
+	std::cout << "Calculating likelihood." << std::endl;
+	std::map<float, std::pair<int, int>> s = findKeyStatistics();
+
+	// For debugging.
+	for(auto it = s.begin(); it != s.end(); ++it) {
+		// std::cout << it->first << " ";
+	}
+	// std::cout << std::endl;
+	for(auto it = s.begin(); it != s.end(); ++it) {
+		// std::cout << it->second.first << " " << it->second.second << " ";
+	}
+	//std::cout << std::endl;
+
+	double l = 0.0;
+	for(auto it = s.begin(); it != s.end(); ++it) {
+		float t = it->first;
+		int num0subs = it->second.first;
+		int num1subs = it->second.second;
+		l += num0subs * log(1/(1 + u*t)) + num1subs * log(t/(1 + u*t));
+	}
+	std::cout << "Likelihood: " << l << std::endl;
+	return(l);
 }
 
 // bool Tree::IsRoot() const { return up == NULL;  }

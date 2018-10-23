@@ -42,6 +42,7 @@ class SequenceAlignment {
 		void print();
 
 		// Utilities
+		int numCols();
 		std::string decodeChar(int &c);
 		std::string decodeSequence(std::vector<int> &enc_seq);
 		static std::vector<int> findParsimony(const std::vector<int> &s1, const std::vector<int> &s2);

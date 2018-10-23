@@ -9,7 +9,9 @@
 #include <map>
 #include <vector>
 #include <list>
+
 #include "Sequence.h"
+#include "SubstitutionModel.h"
 #include "Trees/TreeParser.h"
 #include "TreeParts.h"
 #include "BranchSplitting.h"
@@ -22,10 +24,12 @@ class Tree {
 	public:
 		TreeNode* root;
 		SequenceAlignment* MSA;
+		SubstitutionModel* SM;
 
 		Tree();
 		Tree& operator=(Tree tree);
 
+		int seqLen;
 		map<string, vector<int>> names_to_sequences;
 		std::list<BranchSegment*> branchList;
 		std::list<TreeNode*> nodeList;
@@ -39,28 +43,31 @@ class Tree {
 		std::function< std::pair<BranchSegment*, BranchSegment*>(float)> splitBranch; // Algorithm for splitting branches.
 		
 		// Initializing.
-		map<string, vector<int>> taxa_names_to_sequences;
-		//vector<string> states;
-
-		void Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA);
-		void configureSequences(TreeNode* n);
+		void Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, SubstitutionModel* &SM);
 
 		// Debug tools.
 		void printBranchList();
 		void printNodeList();
+		void printParameters();
 
-		// Sampling
+		// Sampling.
 		virtual void SampleParameters();
 		virtual void RecordState();
-		
+	
+		// Likelihood.
+		std::map<float, std::pair<int, int>> findKeyStatistics(); //Find the key statistics need for the likelihood function.
 		double calculate_likelihood();
-		
+	private:
+		void configureSequences(TreeNode* n);
+		void configureRateVectors();
 		// STP: All these things should be protected, but when they are, the derived 
 		// class Tree_B1 seems to not have access to them. The definition of protected
 		// here means derived classes should have access to them. 
 		//protected:
+
+		float u;
 	public:
-		typedef unsigned int size_type;
+//		typedef unsigned int size_type;
 
 		static int num_trees;
 		int id;

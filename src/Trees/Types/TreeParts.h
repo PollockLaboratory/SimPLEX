@@ -4,9 +4,11 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <iostream>
 
 #include "Trees/TreeParser.h"
 #include "Sequence.h"
+#include "RateVector.h"
 
 using std::string;
 using std::map;
@@ -16,13 +18,18 @@ class TreeNode;
 
 class BranchSegment {
 	public:
+		BranchSegment(float distance);
+		~BranchSegment();
+
 		float distance;
 		TreeNode* ancestral;
 		TreeNode* decendant;
 		std::list<substitution> subs;
+		std::vector<RateVector*> rates;
 
-		BranchSegment(float distance);
-		~BranchSegment();
+		friend std::ostream& operator<< (std::ostream &out, const BranchSegment &b);
+
+		std::pair<int, int> countSubstitutions();
 };
 
 class TreeNode {

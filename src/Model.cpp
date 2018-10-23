@@ -41,7 +41,6 @@ SubstitutionModel* Model::InitializeSubstitutionModel(int num_sites, vector<stri
 	 */
 	std::cout << "Start initialize." << std::endl;
 	SubstitutionModel* substitution_model = GetSubstitutionModel(); // In SubstituionModelTypes.h
-	std::cout << "Pointer: " << substitution_model << std::endl;
 	substitution_model->Initialize(num_sites, states);
 	substitution_model->RecordState();
 	std::cout << "Successfully initialized model. " << substitution_model << std::endl;
@@ -55,20 +54,18 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA) {
 	 * - the tree class - contains the tree topology as well as the sequences.
 	 * - the substitution model class - which contains all the rate matrices.
 	 */
-	
-	tree = TreeTypes::pickTreeType();
-	tree->Initialize(raw_tree, MSA);
-
-	//Not quite sure what this is doing.
 	int num_sites = (MSA->taxa_names_to_sequences).begin()->second.size();
 	substitution_model = InitializeSubstitutionModel(num_sites, MSA->states);
+
+	tree = TreeTypes::pickTreeType();
+	tree->Initialize(raw_tree, MSA, substitution_model);
 }
 
 void Model::SampleParameters() {
 	/*
 	 * Samples both the parameters associated with the tree as well as the substitution model.
 	 */
-	tree->SampleParameters();
+	//tree->SampleParameters();
 	substitution_model->SampleParameters();
 }
 
@@ -78,6 +75,10 @@ void Model::accept() {
 
 void Model::reject() {
 	substitution_model->reject();
+}
+
+void Model::printParameters() {
+	tree->printParameters();
 }
 
 void Model::RecordState() {

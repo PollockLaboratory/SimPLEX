@@ -29,3 +29,4 @@ sequences_out_file		sequences_out.fasta
 likelihood_out_file	likelihoods
 substitutions_out_file		substitutions
 
+uniformization_constant 5.0

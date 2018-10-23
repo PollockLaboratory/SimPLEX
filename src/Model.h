@@ -27,6 +27,7 @@ public:
 	void SampleParameters();
 	void accept();
 	void reject();
+	void printParameters();
 
 	double CalcLnl();
 	void RecordState();

@@ -69,6 +69,7 @@ void MCMC::Run() {
 			RecordState();
 		}
 	}
+	model->printParameters();
 }
 
 ///  Private Functions  ///

@@ -105,6 +105,10 @@ void SequenceAlignment::Initialize() {
 }
 
 // Utilities
+int SequenceAlignment::numCols() {
+	return(columns_without_gaps.size());
+}
+
 std::string SequenceAlignment::decodeChar(int &c) {
 	return(integer_to_state[c]);
 }

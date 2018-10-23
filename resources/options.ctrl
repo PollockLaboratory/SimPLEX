@@ -13,6 +13,7 @@ max_segment_length	0.08
 branch_split_algorithm	0 
 # constant_tree	0
 tree_type	0
+uniformization_constant 5.0
  
 # Substitution model types
 # 0	Single probability 

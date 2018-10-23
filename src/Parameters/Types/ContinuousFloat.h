@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 
-#include "../AbstractParameter.h"
+#include "../AbstractValue.h"
 
 class ContinuousFloat : public AbstractParameter {
 	public:

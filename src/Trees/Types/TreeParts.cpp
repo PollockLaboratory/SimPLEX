@@ -13,11 +13,38 @@ extern double Random();
 // Branch segment.
 BranchSegment::BranchSegment(float distance) {
 	this->distance = distance;
+	rates = {};
 //	std::cout << "Making new branch segment. Distance: " << this->distance << std::endl;
 }
 
 BranchSegment::~BranchSegment() {
 	decendant->up = 0;
+}
+
+std::ostream& operator<< (std::ostream &out, const BranchSegment &b) {
+	out << b.distance;
+	return out;
+}
+
+std::pair<int, int> BranchSegment::countSubstitutions() {
+	/*
+	 * The first int is number of 0 subs (C^0_b') and the second is the number of 1 sub (C^1_b')
+	 */
+	int num0subs = 0;
+	int num1subs = 0;
+
+	std::vector<int> s1 = *(ancestral->sequence);
+	std::vector<int> s2 = *(decendant->sequence);
+	for(int i = 0; i < s1.size(); i++) {
+		if(s1[i] == s2[i]) {
+			num0subs += 1;
+		} else {
+			num1subs += 1;
+		}
+	}
+	
+	std::pair<int, int> c = {num0subs, num1subs};
+	return(c);
 }
 
 // Tree nodes.
