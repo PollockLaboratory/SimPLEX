@@ -15,6 +15,9 @@ void ParameterSet::Initialize(std::ofstream* &out_file_buffer) {
 
 	// Set up deps.
 	setupDependancies();
+	for(auto p = parameter_list.begin(); p != parameter_list.end(); ++p) {
+		refreshDependancies(*p);
+	}
 
 	AddHeaderToFile();
 	RecordStateToFile();
@@ -32,33 +35,25 @@ void ParameterSet::add_parameter(AbstractParameter* param) {
 }
 
 void ParameterSet::add_rate_vector(RateVector* v) {
-	std::cout << "Adding rate vector." << std::endl;
 	std::vector<AbstractValue*> r = v->rates;	
 	for(std::vector<AbstractValue*>::iterator it = r.begin(); it != r.end(); ++it) {
-		AbstractParameter* p = dynamic_cast<AbstractParameter*> (*it);
-		if(p != NULL) {
-			value_to_dependents[p] = {};
-			add_parameter(p);
-		} else {
-			AbstractHyperParameter* hp = dynamic_cast<AbstractHyperParameter*> (*it);
-			value_to_dependents[hp] = {};
-			hyperparameter_list.push_back(hp);
+		if(value_to_dependents.find(*it) == value_to_dependents.end()) {
+			AbstractParameter* p = dynamic_cast<AbstractParameter*> (*it);
+			if(p != NULL) {
+				value_to_dependents[p] = {};
+				add_parameter(p);
+			} else {
+				AbstractDependentParameter* hp = dynamic_cast<AbstractDependentParameter*> (*it);
+				value_to_dependents[hp] = {};
+				dependent_parameter_list.push_back(hp);
+			}
 		}
 	}
 }
 
-void ParameterSet::add_rate_matrix(RateMatrix* Q) {
-	std::cout << "Adding rate matrix." << std::endl;
-	std::vector<RateVector*> rv = Q->rv;	
-	for(std::vector<RateVector*>::iterator it = rv.begin(); it != rv.end(); ++it) {
-		add_rate_vector(*it);
-	}
-}
-
 void ParameterSet::setupDependancies() {
-	for(auto p = hyperparameter_list.begin(); p != hyperparameter_list.end(); ++p) {
+	for(auto p = dependent_parameter_list.begin(); p != dependent_parameter_list.end(); ++p) {
 		std::vector<AbstractValue*> deps = (*p)->get_dependancies();	
-		(*p)->printValue();
 		for(auto d = deps.begin(); d != deps.end(); ++d) {
 			value_to_dependents[(*d)].push_back(*p);
 		}
@@ -66,7 +61,7 @@ void ParameterSet::setupDependancies() {
 }
 
 void ParameterSet::refreshDependancies(AbstractValue* v) {
-	std::list<AbstractHyperParameter*> deps = value_to_dependents[v];
+	std::list<AbstractDependentParameter*> deps = value_to_dependents[v];
 	for(auto d = deps.begin(); d != deps.end(); ++d) {
 		(*d)->refresh();
 		refreshDependancies(*d);
@@ -111,8 +106,8 @@ void ParameterSet::print() {
 	for(auto iter = parameter_list.begin(); iter != parameter_list.end(); ++iter) {
 		(*iter)->printValue();
 	}
-	std::cout << "HyperParameter Set - size: " << hyperparameter_list.size() << std::endl;
-	for(auto iter = hyperparameter_list.begin(); iter != hyperparameter_list.end(); ++iter) {
+	std::cout << "Dependent Parameter Set - size: " << dependent_parameter_list.size() << std::endl;
+	for(auto iter = dependent_parameter_list.begin(); iter != dependent_parameter_list.end(); ++iter) {
 		(*iter)->printValue();
 	}
 }
@@ -122,6 +117,10 @@ double ParameterSet::get(const std::string &name) {
 	 * Will retreive the value of a parameter from the parameter set.
 	 */
 	return name_to_address[name]->getValue();
+}
+
+int ParameterSet::size() {
+	return(parameter_list.size());
 }
 
 void ParameterSet::AddHeaderToFile() {

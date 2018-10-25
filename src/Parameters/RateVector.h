@@ -11,7 +11,7 @@
 // Fundamental collection type of parameters in substitution model.
 class RateVector {
 	public: 
-		//RateVector(int size);
+		RateVector(std::string, int state, std::vector<AbstractValue*>);
 		RateVector(std::string name, int size, int state, float u);
 		std::vector<AbstractValue*> rates;
 		int state; // Determines the state that this rate vector applies to.
@@ -24,18 +24,6 @@ class RateVector {
 };
 
 // Collections of rate vectors.
-class RateMatrix {
-	public:
-		RateMatrix(int size);
-		RateMatrix(std::string name, int size);
-		std::vector<RateVector*> rv;	
-	private:
-		int size;
-		static int IDc;
-		std::string name;
-		inline void create_vectors(int n);
-};
-
 class RateVectorSet {
 	// This collection holds all of the rate vectors currently in the substitution model.
 	public:
@@ -46,10 +34,8 @@ class RateVectorSet {
 		RateVector*& operator[] (const int i);
 
 		void add(RateVector* v);
-		void add(RateMatrix* Q);
 
 		void print();
 };
-
 
 #endif

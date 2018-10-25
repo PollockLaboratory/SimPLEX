@@ -28,9 +28,9 @@ class AbstractParameter : public AbstractValue {
 		bool fixedQ; //Indicates whether the state of this parameter is fixed or still being trialed.
 };
 
-class AbstractHyperParameter : public AbstractValue {
+class AbstractDependentParameter : public AbstractValue {
 	public:
-		AbstractHyperParameter(std::string parameter_name) : AbstractValue(parameter_name) {}
+		AbstractDependentParameter(std::string parameter_name) : AbstractValue(parameter_name) {}
 		virtual void refresh() = 0;
 		virtual void add_dependancy(AbstractValue*) = 0;
 		std::vector<AbstractValue*> get_dependancies() { return(dependent_values); }

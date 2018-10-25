@@ -54,8 +54,11 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA) {
 	 * - the tree class - contains the tree topology as well as the sequences.
 	 * - the substitution model class - which contains all the rate matrices.
 	 */
+	i = 1;
+	tree_sample_freq = env.get_int("tree_sample_frequency");
 	int num_sites = (MSA->taxa_names_to_sequences).begin()->second.size();
 	substitution_model = InitializeSubstitutionModel(num_sites, MSA->states);
+	num_parameters = substitution_model->getNumberOfParameters();
 
 	tree = TreeTypes::pickTreeType();
 	tree->Initialize(raw_tree, MSA, substitution_model);
@@ -65,8 +68,13 @@ void Model::SampleParameters() {
 	/*
 	 * Samples both the parameters associated with the tree as well as the substitution model.
 	 */
-	//tree->SampleParameters();
-	substitution_model->SampleParameters();
+	if(i % tree_sample_freq == 0) {
+		tree->SampleParameters();
+		i = 0;
+	} else {
+		substitution_model->SampleParameters();
+	}
+	i++;
 }
 
 void Model::accept() {

@@ -9,6 +9,8 @@
 class ContinuousFloat : public AbstractParameter {
 	public:
 		ContinuousFloat(std::string, double, double);
+		ContinuousFloat(std::string, double, double, double);
+		ContinuousFloat(std::string, double, double, double, double);
 		virtual void printValue();
 		virtual void sample();
 		virtual double getValue();
@@ -17,6 +19,10 @@ class ContinuousFloat : public AbstractParameter {
 	private:
 		double value;
 		double std_dev;
+
+		double lower_bound;
+		double upper_bound;
+
 		double previous_value;
 		
 };

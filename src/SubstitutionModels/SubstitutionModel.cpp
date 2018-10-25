@@ -11,12 +11,12 @@ SubstitutionModel::SubstitutionModel() {
 	substitution_model_out = 0;
 }
 
-RateVector* SubstitutionModel::selectRateVector(BranchSegment* b, int pos) {
+RateVector* SubstitutionModel::selectRateVector(int state) {
 	/*
 	 * This is a simple function right now but it will become hugely complex.
 	 * Given infomation about a BranchSegment and state of interest will return the corresponding rate vector.
 	 */
-	return(rateVectors[pos]);
+	return(rateVectors[state]);
 }
 
 void SubstitutionModel::SampleParameters() {
@@ -44,6 +44,13 @@ void SubstitutionModel::printParameters() {
 	parameters.print();
 }
 
+int SubstitutionModel::getNumberOfParameters() {
+	/*
+	 * Finds the number of sampleable parameters aka the length of the size of the parameter set.
+	 */
+	return(parameters.size());
+}
+
 void SubstitutionModel::RecordState() {
 	parameters.RecordStateToFile();
 }
@@ -57,16 +64,14 @@ void SubstitutionModel::add_rate_vector(RateVector* v) {
 	rateVectors.add(v);
 }
 
-void SubstitutionModel::add_rate_matrix(RateMatrix* Q) {
-	parameters.add_rate_matrix(Q);
-	rateVectors.add(Q);
-}
-
 void SubstitutionModel::finalize() {
 	substitution_model_out = new std::ofstream;
-	parameters.print();
-	rateVectors.print();
 	parameters.Initialize(substitution_model_out);
+	std::cout << std::endl;
+	parameters.print();
+	std::cout << std::endl;
+	rateVectors.print();
+	std::cout << std::endl;
 }
 
 //std::ofstream SubstitutionModel::CreateOutputStream(std::string file_name) {

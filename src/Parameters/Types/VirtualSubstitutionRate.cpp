@@ -1,7 +1,7 @@
 #include <iostream>
 #include "VirtualSubstitutionRate.h"
 
-VirtualSubstitutionRate::VirtualSubstitutionRate(std::string parameter_name, double unif) : AbstractHyperParameter(parameter_name) {
+VirtualSubstitutionRate::VirtualSubstitutionRate(std::string parameter_name, double unif) : AbstractDependentParameter(parameter_name) {
 	u = unif;
 }
 

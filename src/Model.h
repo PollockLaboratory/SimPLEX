@@ -35,8 +35,11 @@ public:
 
 private:
 	Tree* tree;
+	int i; // Sample counter.
+	int tree_sample_freq;
+	int num_parameters;
+	
 	SubstitutionModel* substitution_model; //Must be a pointer to use polymorphism
-
 	SubstitutionModel* InitializeSubstitutionModel(int number_of_sites, vector<string> states);
 };
 

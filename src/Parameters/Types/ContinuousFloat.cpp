@@ -1,14 +1,34 @@
 #include <iostream>
 #include <stdlib.h> //This gives rand.
+#include <limits>
 
 #include "ContinuousFloat.h" 
 
-ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, double initial_std_dev = 1.0) : AbstractParameter(name) {
+double inf = std::numeric_limits<double>::infinity();
+
+ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, double initial_std_dev = 1.0) : AbstractParameter(name), value(initial_value), std_dev(initial_std_dev) {
 	/*
 	 * The default constructor for the Continuous Float parameter class.
 	 */
-	value = initial_value;
-	std_dev = initial_std_dev;
+	lower_bound = -inf;
+	upper_bound = inf;
+
+	previous_value = 0.0;
+}
+
+ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, double initial_std_dev = 1.0, double lower_bound = -inf) : AbstractParameter(name), value(initial_value), std_dev(initial_std_dev), lower_bound(lower_bound) {
+	/*
+	 * The default constructor for the Continuous Float parameter class - with bounds
+	 */
+	upper_bound = inf;
+
+	previous_value = 0.0;
+}
+
+ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, double initial_std_dev = 1.0, double lower_bound = -inf, double upper_bound = inf) : AbstractParameter(name), value(initial_value), std_dev(initial_std_dev), lower_bound(lower_bound), upper_bound(upper_bound) {
+	/*
+	 * The default constructor for the Continuous Float parameter class - with bounds
+	 */
 	previous_value = 0.0;
 }
 
@@ -22,6 +42,13 @@ void ContinuousFloat::sample() {
 
 	double r = ((rand() % 10000) / 10000.0) - 0.5;
 	value = value + (r * std_dev);
+	if(value < lower_bound) {
+		value = 2*lower_bound - value;
+	}
+
+	if(value > upper_bound) {
+		value = 2*upper_bound - value;
+	}
 }
 
 double ContinuousFloat::getValue() {

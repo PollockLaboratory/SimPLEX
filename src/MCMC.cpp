@@ -54,6 +54,10 @@ void MCMC::Run() {
 
 	std::cout << "Running MCMC" << std::endl;
 	for (gen = 1; gen <= gens; gen++) {
+		if(gen % 100 == 0) {
+			std::cout << "Likelihood: " << lnL << std::endl;
+		}
+
 		model->SampleParameters();
 		newLnL = model->CalcLnl();
 
@@ -69,6 +73,7 @@ void MCMC::Run() {
 			RecordState();
 		}
 	}
+
 	model->printParameters();
 }
 

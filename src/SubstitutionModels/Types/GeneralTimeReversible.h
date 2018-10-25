@@ -6,6 +6,8 @@
 #include "SubstitutionModel.h"
 #include "../../Parameters/ParameterSet.h"
 #include "../../Parameters/Types/ContinuousFloat.h"
+#include "../../Parameters/Types/VirtualSubstitutionRate.h"
+#include "../../Parameters/AbstractValue.h"
 #include "../../Parameters/RateVector.h"
 
 class GeneralTimeReversible: public SubstitutionModel {

@@ -4,7 +4,7 @@
 #include "AbstractValue.h"
 #include <string>
 
-class VirtualSubstitutionRate : public AbstractHyperParameter {
+class VirtualSubstitutionRate : public AbstractDependentParameter {
 	public:
 		VirtualSubstitutionRate(std::string parameter_name, double unif);
 		virtual double getValue(); 	

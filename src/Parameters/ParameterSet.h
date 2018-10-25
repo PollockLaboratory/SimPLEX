@@ -17,7 +17,6 @@ class ParameterSet {
 		void Initialize(std::ofstream* &out_file_buffer);
 		void add_parameter(AbstractParameter* param);
 		void add_rate_vector(RateVector* v);
-		void add_rate_matrix(RateMatrix* Q);
 
 		void sample();
 		void accept();
@@ -25,17 +24,19 @@ class ParameterSet {
 
 		void print();
 		double get(const std::string &name);
+		int size();
+
 		void RecordStateToFile();
 	private:
 		void stepToNextParameter();
 		void AddHeaderToFile();
 
-		std::list<AbstractHyperParameter*> hyperparameter_list;
+		std::list<AbstractDependentParameter*> dependent_parameter_list;
 		std::list<AbstractParameter*> parameter_list;
 		std::list<AbstractParameter*>::iterator current_parameter; //Tracks the current parameter to be sampled, via an iterator across the parameter_list.
 	
 		// Dependancies.
-		std::map<AbstractValue*, std::list<AbstractHyperParameter*>> value_to_dependents; // Maps AbstractValues to AbstractHyperParameters that depend on them.
+		std::map<AbstractValue*, std::list<AbstractDependentParameter*>> value_to_dependents; // Maps AbstractValues to AbstractDependentParameters that depend on them.
 		void setupDependancies();
 		void refreshDependancies(AbstractValue*);
 

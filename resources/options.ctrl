@@ -11,9 +11,10 @@ debug 1
 # TREE SETTINGS
 max_segment_length	0.08
 branch_split_algorithm	0 
+tree_sample_frequency 200
 # constant_tree	0
 tree_type	0
-uniformization_constant 5.0
+uniformization_constant 2.2
  
 # Substitution model types
 # 0	Single probability 

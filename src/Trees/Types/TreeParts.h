@@ -5,14 +5,12 @@
 #include <map>
 #include <vector>
 #include <iostream>
+#include <math.h>
 
 #include "Trees/TreeParser.h"
 #include "Sequence.h"
 #include "RateVector.h"
-
-using std::string;
-using std::map;
-using std::vector;
+#include "SubstitutionModels/SubstitutionModel.h"
 
 class TreeNode;
 
@@ -24,12 +22,18 @@ class BranchSegment {
 		float distance;
 		TreeNode* ancestral;
 		TreeNode* decendant;
+		
+		std::vector<RateVector*> rates; //By site.
+
+		// Key statistics.
 		std::list<substitution> subs;
-		std::vector<RateVector*> rates;
+		int num0subs;
+		int num1subs;
+
+		bool virtualSubstituionQ(int state);
+		void updateStats();
 
 		friend std::ostream& operator<< (std::ostream &out, const BranchSegment &b);
-
-		std::pair<int, int> countSubstitutions();
 };
 
 class TreeNode {
@@ -37,15 +41,25 @@ class TreeNode {
 		static int unique_id;
 		std::string name;
 		double distance;
-		std::vector<int>* sequence;	
+		
 		BranchSegment* up;
 		BranchSegment* left;
 		BranchSegment* right;
 		
+		std::vector<int>* sequence;	
+		SequenceAlignment* MSA;
+	
+		SubstitutionModel* SM;
+
 		TreeNode();
 		TreeNode(IO::RawTreeNode* raw_tree);
 		TreeNode(std::string n);
 
+		void sampleSequence();
+		void sampleSinglePosition(int pos);
+
 		bool isTip();
+		bool sampled;
 };
+
 #endif

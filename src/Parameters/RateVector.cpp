@@ -5,6 +5,11 @@ extern Environment env;
 
 int RateVector::IDc = 0;
 
+RateVector::RateVector(std::string name, int state, std::vector<AbstractValue*> params) : name(name), state(state) {
+	size = params.size();
+	rates = params;
+}
+
 inline void RateVector::create_parameters(int n, float u) {
 	VirtualSubstitutionRate* unifp = new VirtualSubstitutionRate(this->name + "-virtual", u);
 	for(int i = 0; i < n; i++) {
@@ -19,13 +24,6 @@ inline void RateVector::create_parameters(int n, float u) {
 	}
 	unifp->refresh();
 }
-
-// RateVector::RateVector(int size) {
-//	this->size = size;
-//	name = std::to_string(IDc);
-//	IDc++;	
-//	create_parameters(size);
-//}
 
 RateVector::RateVector(std::string name, int size, int state, float u) {
 	/*
@@ -46,36 +44,6 @@ void RateVector::print() {
 }
 
 // COLLECTIONS of rate vectors.
-// RateMatrix.
-
-int RateMatrix::IDc = 0;
-
-inline void RateMatrix::create_vectors(int n) {
-	float u = env.get_float("uniformization_constant");
-	std::cout << "Unif: " << u << std::endl;
-	for(int i = 0; i < n; i++) {
-		std::cout << "Creating rate vectors." << std::endl;
-		std::string name = this->name + "-" + std::to_string(i);
-		RateVector* v = new RateVector(name, n, i, u);
-		rv.push_back(v);
-	}
-}
-
-RateMatrix::RateMatrix(int size) {
-	this->size = size;
-	name = std::to_string(IDc);
-	IDc++;
-	create_vectors(size);
-}
-
-RateMatrix::RateMatrix(std::string name, int size) {
-	this->size = size;
-	this->name = name;
-	create_vectors(size);
-}
-
-// RateVectorSet
-
 RateVectorSet::RateVectorSet() {
 }
 
@@ -88,12 +56,6 @@ RateVector*& RateVectorSet::operator[] (const int i) {
 
 void RateVectorSet::add(RateVector* v) {
 	c.push_back(v);
-}
-
-void RateVectorSet::add(RateMatrix* Q) {
-	for(std::vector<RateVector*>::iterator it = Q->rv.begin(); it != Q->rv.end(); ++it) {
-		c.push_back(*it);
-	}
 }
 
 void RateVectorSet::print() {
