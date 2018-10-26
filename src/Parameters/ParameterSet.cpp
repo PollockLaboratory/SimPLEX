@@ -1,5 +1,12 @@
 #include "ParameterSet.h"
 #include "RateVector.h"
+#include "Environment.h"
+#include "IO.h"
+
+extern Environment env;
+extern IO::Files files;
+
+std::ofstream ParameterSet::out_file;
 
 // Constructors.
 ParameterSet::ParameterSet() {
@@ -9,9 +16,8 @@ ParameterSet::ParameterSet() {
 }
 
 // Setup.
-void ParameterSet::Initialize(std::ofstream* &out_file_buffer) {
+void ParameterSet::Initialize() {
 	current_parameter = parameter_list.begin();
-	out_stream_buffer = out_file_buffer;
 
 	// Set up deps.
 	setupDependancies();
@@ -19,8 +25,17 @@ void ParameterSet::Initialize(std::ofstream* &out_file_buffer) {
 		refreshDependancies(*p);
 	}
 
-	AddHeaderToFile();
-	RecordStateToFile();
+	files.add_file("parameters", env.get("parameters_out_file"), IOtype::OUTPUT);
+	out_file = files.get_ofstream("parameters");
+
+	out_file << "I,GEN,LogL";
+	for(auto it = parameter_list.begin(); it != parameter_list.end(); ++it) {
+		out_file << "," << (*it)->name;
+	}
+	for(auto it = dependent_parameter_list.begin(); it != dependent_parameter_list.end(); ++it) {
+		out_file << "," << (*it)->name;
+	}
+	out_file << std::endl;
 }
 
 void ParameterSet::add_parameter(AbstractParameter* param) {
@@ -69,12 +84,13 @@ void ParameterSet::refreshDependancies(AbstractValue* v) {
 }
 
 // Sampling.
-void ParameterSet::sample() {
+bool ParameterSet::sample() {
 	/*
 	 * Will sample the current parameters.
 	 */
-	(*current_parameter)->sample();
+	bool sampleType = (*current_parameter)->sample();
 	refreshDependancies(*current_parameter);
+	return (sampleType);
 }
 
 inline void ParameterSet::stepToNextParameter() {
@@ -123,35 +139,19 @@ int ParameterSet::size() {
 	return(parameter_list.size());
 }
 
-void ParameterSet::AddHeaderToFile() {
-	/*
-	 * Adds the columns names to the output csv file.
-	 */
-	std::list<AbstractParameter*>::iterator iter = parameter_list.begin();
-	while(iter != parameter_list.end()) {
-		if(iter != parameter_list.begin()) {
-			*out_stream_buffer << ", ";
-
-		}
-		*out_stream_buffer << (*iter)->name;
-		++iter;
-	}
-	*out_stream_buffer << std::endl;
-}
-
-void ParameterSet::RecordStateToFile(){
+void ParameterSet::saveToFile(int gen, double l) {
 	/*
 	 * Saves the current parameter values to the output csv file, contained
-	 * in the out_stream_buffer.
+	 * in the out_file.
 	 */
-	std::list<AbstractParameter*>::iterator iter = parameter_list.begin();
-	while(iter != parameter_list.end()) {
-		if(iter != parameter_list.begin()) {
-			*out_stream_buffer << ", ";
-
-		}
-		*out_stream_buffer << (*iter)->getValue();
-		++iter;
+	static int i = -1;
+	++i;
+	out_file << i << "," << gen << "," << l;
+	for(auto it = parameter_list.begin(); it != parameter_list.end(); ++it) {
+		out_file << "," << (*it)->getValue();
 	}
-	*out_stream_buffer << std::endl;
+	for(auto it = dependent_parameter_list.begin(); it != dependent_parameter_list.end(); ++it) {
+		out_file << "," << (*it)->getValue();
+	}
+	out_file << std::endl;
 }

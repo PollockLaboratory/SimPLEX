@@ -21,7 +21,7 @@ class AbstractParameter : public AbstractValue {
 			fixedQ = true;
 		}
 
-		virtual void sample() = 0;
+		virtual bool sample() = 0; // If return true Metropolis Hasting Sample, else Gibbs.
 		virtual void undo() = 0;
 		virtual void fix() = 0;
 	protected:

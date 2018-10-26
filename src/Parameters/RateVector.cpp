@@ -1,7 +1,9 @@
 #include "RateVector.h"
 #include "Environment.h"
+#include "IO.h"
 
-extern Environment env; 
+extern Environment env;
+extern IO::Files files;
 
 int RateVector::IDc = 0;
 
@@ -10,6 +12,7 @@ RateVector::RateVector(std::string name, int state, std::vector<AbstractValue*> 
 	rates = params;
 }
 
+// These are redundant now I think.
 inline void RateVector::create_parameters(int n, float u) {
 	VirtualSubstitutionRate* unifp = new VirtualSubstitutionRate(this->name + "-virtual", u);
 	for(int i = 0; i < n; i++) {
@@ -35,6 +38,7 @@ RateVector::RateVector(std::string name, int size, int state, float u) {
 	create_parameters(size, u);
 }
 
+// Util.
 void RateVector::print() {
 	std::cout << "RateVector:\t" << name << "\t";
 	for(auto it = rates.begin(); it != rates.end(); ++it) {
@@ -44,10 +48,20 @@ void RateVector::print() {
 }
 
 // COLLECTIONS of rate vectors.
+std::ofstream RateVectorSet::out_file;
+
 RateVectorSet::RateVectorSet() {
 }
 
-void Initialize() {
+void RateVectorSet::Initialize() {
+	files.add_file("rate_vectors", env.get("rate_vectors_out_file"), IOtype::OUTPUT);
+	out_file = files.get_ofstream("rate_vectors");
+		
+	out_file << "I,GEN,LogL,NAME,ANC";
+	for(auto it = env.state_to_integer.begin(); it != env.state_to_integer.end(); ++it) {
+		out_file << "," << it->first;
+	}
+	out_file << std::endl;
 }
 
 RateVector*& RateVectorSet::operator[] (const int i) {
@@ -64,3 +78,14 @@ void RateVectorSet::print() {
 	}
 }
 
+void RateVectorSet::saveToFile(int gen, double l) {
+	static int i = -1;
+	++i;
+	for(auto it = c.begin(); it != c.end(); ++it) {
+		out_file << i << "," << gen << "," << l << "," << (*it)->name << "," << (*it)->state;
+		for(auto jt = (*it)->rates.begin(); jt != (*it)->rates.end(); ++jt) {
+			out_file << "," << (*jt)->getValue();
+		}
+	out_file << std::endl;
+	}
+}

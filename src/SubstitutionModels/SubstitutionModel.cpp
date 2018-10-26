@@ -19,11 +19,12 @@ RateVector* SubstitutionModel::selectRateVector(int state) {
 	return(rateVectors[state]);
 }
 
-void SubstitutionModel::SampleParameters() {
+bool SubstitutionModel::SampleParameters() {
 	/*
 	 * Samples a single parameter within the parameter set();
 	 */
-	parameters.sample();
+	bool sampleType = parameters.sample();
+	return(sampleType);
 }
 
 void SubstitutionModel::accept() {
@@ -51,8 +52,9 @@ int SubstitutionModel::getNumberOfParameters() {
 	return(parameters.size());
 }
 
-void SubstitutionModel::RecordState() {
-	parameters.RecordStateToFile();
+void SubstitutionModel::saveToFile(int gen, double l) {
+	parameters.saveToFile(gen, l);
+	rateVectors.saveToFile(gen, l);
 }
 
 void SubstitutionModel::Terminate() {
@@ -65,8 +67,9 @@ void SubstitutionModel::add_rate_vector(RateVector* v) {
 }
 
 void SubstitutionModel::finalize() {
-	substitution_model_out = new std::ofstream;
-	parameters.Initialize(substitution_model_out);
+	parameters.Initialize();
+	rateVectors.Initialize();
+
 	std::cout << std::endl;
 	parameters.print();
 	std::cout << std::endl;

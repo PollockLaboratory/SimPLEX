@@ -38,6 +38,7 @@ void MCMC::Init(Model* model) {
 
 	//Calculate initial likelihood.
 	lnL = model->CalcLnl();
+	RecordState();
 
 	//Initialize output file.
 	files.add_file("likelihoods", env.get("likelihood_out_file"), IOtype::OUTPUT);
@@ -51,6 +52,7 @@ void MCMC::Run() {
 	 */
 
 	int outfreq = env.get_int("output_frequency");
+	bool sampleType;
 
 	std::cout << "Running MCMC" << std::endl;
 	for (gen = 1; gen <= gens; gen++) {
@@ -58,27 +60,30 @@ void MCMC::Run() {
 			std::cout << "Likelihood: " << lnL << std::endl;
 		}
 
-		model->SampleParameters();
+		sampleType = model->SampleParameters();
 		newLnL = model->CalcLnl();
-
-		accepted = log(Random()) < (newLnL - lnL);
-		if (accepted) { 
-			lnL = newLnL;
-			model->accept();
+	
+		if(sampleType) {	
+			//Metropolis-Hasting method.
+			accepted = log(Random()) < (newLnL - lnL);
+			if (accepted) { 
+				lnL = newLnL;
+				model->accept();
+			} else {
+				model->reject();
+			}
 		} else {
-			model->reject();
+			lnL = newLnL;
 		}
 		
 		if(gen % outfreq == 0) {
 			RecordState();
 		}
 	}
-
-	model->printParameters();
 }
 
 ///  Private Functions  ///
 void MCMC::RecordState() {  // ought to use a function to return tab separated items with endl
 	lnlout << gen << "\t" << lnL << "\t" << newLnL << "\t" << accepted << std::endl;
-	model->RecordState(); // is this always getting lnlout?
+	model->RecordState(gen, lnL); // is this always getting lnlout?
 }

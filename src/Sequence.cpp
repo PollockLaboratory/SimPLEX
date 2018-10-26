@@ -1,13 +1,33 @@
 #include "Sequence.h"
 #include <iostream>
 #include "Environment.h"
+#include "IO.h"
 
-extern Environment env;
 extern double Random();
+extern Environment env;
+extern IO::Files files;
+
+std::vector<std::string> aa({"A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"});
+std::vector<std::string> nucleotides({"A", "T", "C", "G"});
+
+std::ofstream SequenceAlignment::sequences_out;
 
 // Sequence Alignment class.
 
 SequenceAlignment::SequenceAlignment() {
+	int states_option = env.get_int("states");
+	switch(states_option) {
+		case 0: // Nucleotide.
+			states = nucleotides;
+		case 1:
+			states = aa;
+	}
+
+	for(int i = 0; i < states.size(); i++) {
+		state_to_integer[states[i]] = i;
+		integer_to_state[i] = states[i];
+	}
+	env.state_to_integer = state_to_integer;
 }
 
 static const int gap_indicator = -1;
@@ -25,6 +45,33 @@ void SequenceAlignment::add(std::string name) {
 	taxa_names_to_sequences[name] = enc;
 }
 
+void SequenceAlignment::print() {
+	std::cout << "SEQUENCES" << std::endl;
+	for(std::map<std::string, std::vector<int>>::iterator it = taxa_names_to_sequences.begin(); it != taxa_names_to_sequences.end(); ++it) {
+		std::cout << ">" << it->first << "\n" << decodeSequence(it->second) << std::endl;
+	}
+}
+
+void SequenceAlignment::Initialize() {
+	// Process sequences.
+	DetermineColumnsWithoutGaps();
+	RemoveColumnsWithGapsFromSequences();
+
+	// Setup output.
+	files.add_file("sequences", env.get("sequences_out_file"), IOtype::OUTPUT);
+	sequences_out = files.get_ofstream("sequences");
+}
+
+void SequenceAlignment::saveToFile(int gen, double l) {
+	static int i = -1;
+	++i;
+	sequences_out << "#" << i << ":" << gen << ":" << l << std::endl;
+	for(auto it = taxa_names_to_sequences.begin(); it != taxa_names_to_sequences.end(); ++it) {
+		sequences_out << ">" << it->first << "\n" << decodeSequence(it->second) << std::endl;
+	}
+}
+
+// Reading Fasta files.
 std::vector<int> SequenceAlignment::EncodeSequence(std::string sequence) {
 	/*
 	 * Takes a string representation of a sequence and returns vector of integers.
@@ -42,29 +89,11 @@ std::vector<int> SequenceAlignment::EncodeSequence(std::string sequence) {
 			encoded_sequence.at(site) = gap_indicator;
 		} else {
 			//No gap.
-			AddStateToStates(current_pos);
+			//AddStateToStates(current_pos);
 			encoded_sequence.at(site) = state_to_integer[current_pos];
 		}
 	}
 	return encoded_sequence;
-}
-
-void SequenceAlignment::AddStateToStates(std::string state) {
-	// Checks to see of state exists in state_to_interger_map.
-	if (state_to_integer.find(state) == state_to_integer.end()) {
-		int encoded_state = state_to_integer.size();
-		state_to_integer[state] = encoded_state;
-		integer_to_state[encoded_state] = state;
-
-		states.push_back(state);
-	}
-}
-
-void SequenceAlignment::print() {
-	std::cout << "SEQUENCES" << std::endl;
-	for(std::map<std::string, std::vector<int>>::iterator it = taxa_names_to_sequences.begin(); it != taxa_names_to_sequences.end(); ++it) {
-		std::cout << ">" << it->first << "\n" << decodeSequence(it->second) << std::endl;
-	}
 }
 
 void SequenceAlignment::DetermineColumnsWithoutGaps() {
@@ -97,11 +126,6 @@ std::vector<int> SequenceAlignment::RemoveGapsFromEncodedSequence(std::vector<in
 		encoded_sequence_without_gaps.at(site) = encoded_sequence.at(columns_without_gaps.at(site));
 	}
 	return encoded_sequence_without_gaps;
-}
-
-void SequenceAlignment::Initialize() {
-	DetermineColumnsWithoutGaps();
-	RemoveColumnsWithGapsFromSequences();
 }
 
 // Utilities

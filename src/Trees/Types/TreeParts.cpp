@@ -6,9 +6,11 @@
  */
 
 #include "TreeParts.h"
+#include "Environment.h"
 #include <iostream>
 
 extern double Random();
+extern Environment env;
 
 // Branch segment.
 BranchSegment::BranchSegment(float distance) {
@@ -27,7 +29,7 @@ std::ostream& operator<< (std::ostream &out, const BranchSegment &b) {
 }
 
 bool BranchSegment::virtualSubstituionQ(int state) {
-	double u = 2.2;
+	float u = env.u;
 	double rate = decendant->SM->selectRateVector(state)->rates[state]->getValue();
 
 	double noSub = 1.0/(1.0 + u*distance);
@@ -113,7 +115,7 @@ void branchLikelihood(double &l, int anc, int dec, float t_b, SubstitutionModel*
 	 * Calculates the likelihood of a branch, and adds it to the vector l.
 	 */
 	// Doesn't take into account virtual substitutions.
-	float u = 2.2;
+	float u = env.u;
 	if(anc == dec) {
 		l *= 1.0/(1.0 + t_b *u);
 	} else {
@@ -175,9 +177,9 @@ void TreeNode::sampleSinglePosition(int pos) {
 		c += l[i];
 	}
 	
-	if(sequence->at(pos) != i) {
-		std::cout << "Old aa: " << sequence->at(pos) << " New: " << i << std::endl;
-	}
+	//if(sequence->at(pos) != i) {
+//		std::cout << "Old aa: " << sequence->at(pos) << " New: " << i << std::endl;
+//	}
 
 	(*sequence)[pos] = i;
 }

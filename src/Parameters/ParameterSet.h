@@ -14,11 +14,11 @@
 class ParameterSet {
 	public:
 		ParameterSet();
-		void Initialize(std::ofstream* &out_file_buffer);
+		void Initialize();
 		void add_parameter(AbstractParameter* param);
 		void add_rate_vector(RateVector* v);
 
-		void sample();
+		bool sample();
 		void accept();
 		void reject();
 
@@ -26,10 +26,9 @@ class ParameterSet {
 		double get(const std::string &name);
 		int size();
 
-		void RecordStateToFile();
+		void saveToFile(int gen, double l);
 	private:
 		void stepToNextParameter();
-		void AddHeaderToFile();
 
 		std::list<AbstractDependentParameter*> dependent_parameter_list;
 		std::list<AbstractParameter*> parameter_list;
@@ -41,7 +40,7 @@ class ParameterSet {
 		void refreshDependancies(AbstractValue*);
 
 		std::map<std::string, AbstractParameter*> name_to_address; //A map from the name of a parameter to the pointer of the parameter class.
-		std::ofstream* out_stream_buffer;
+		static std::ofstream out_file;
 };
 
 #endif

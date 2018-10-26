@@ -34,6 +34,8 @@ void Environment::ReadOptions(std::ifstream &default_file_stream, std::ifstream 
 	debug = get_int("debug");
 	InitializeRandomNumberGeneratorSeed();
 
+	u = get_float("uniformization_constant");
+
 	PrintOptions();
 }
 

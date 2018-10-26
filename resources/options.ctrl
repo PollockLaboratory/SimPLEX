@@ -7,11 +7,16 @@ debug 1
 # Tree types
 # 0	Normal
 
+# SEQUENCE SETTINGS
+# States options
+# 0 nucleotide
+# 1 amino acid
+states 1
 
 # TREE SETTINGS
 max_segment_length	0.08
 branch_split_algorithm	0 
-tree_sample_frequency 200
+tree_sample_frequency 250
 # constant_tree	0
 tree_type	0
 uniformization_constant 2.2
@@ -28,8 +33,8 @@ substitution_model_type		0
 constant_substitution_model	0
 substitution_model_initialization	0
 
-generations 1000
-output_frequency 100
+generations 1000000
+output_frequency 10000
 
 sequences_file	resources/5taxon.fasta
 tree_file	resources/5taxon.tree
@@ -38,4 +43,6 @@ tree_file	resources/5taxon.tree
 # tree_file	testing/tree.newick
 
 output_directory testing/test_run/
-
+sequences_out_file		sequences_out.fasta
+parameters_out_file		parameters_out.csv
+rate_vectors_out_file		rate_vectors_out.csv 

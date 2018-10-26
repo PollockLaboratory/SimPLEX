@@ -15,12 +15,13 @@ class RateVector {
 		RateVector(std::string name, int size, int state, float u);
 		std::vector<AbstractValue*> rates;
 		int state; // Determines the state that this rate vector applies to.
+		std::string name;
 		void print();
 	private:
 		int size;
 		static int IDc;
-		std::string name;
 		inline void create_parameters(int n, float u);
+		
 };
 
 // Collections of rate vectors.
@@ -36,6 +37,9 @@ class RateVectorSet {
 		void add(RateVector* v);
 
 		void print();
+		void saveToFile(int gen, double l);
+	private:
+		static std::ofstream out_file;
 };
 
 #endif

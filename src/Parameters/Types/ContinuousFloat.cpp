@@ -36,7 +36,7 @@ void ContinuousFloat::printValue() {
 	std::cout << "Continuous float - " << name << ": " << value << std::endl;
 }
 
-void ContinuousFloat::sample() {
+bool ContinuousFloat::sample() {
 	previous_value = value; 
 	fixedQ = false;
 
@@ -49,6 +49,8 @@ void ContinuousFloat::sample() {
 	if(value > upper_bound) {
 		value = 2*upper_bound - value;
 	}
+
+	return(true);
 }
 
 double ContinuousFloat::getValue() {

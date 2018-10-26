@@ -31,15 +31,9 @@ class SequenceAlignment {
 		void add(std::string name, std::string sequence_str);
 		void add(std::string name);
 
-		// Processing input sequences.	
-		std::vector<int> EncodeSequence(std::string sequence);
-		void AddStateToStates(std::string state);
-		void DetermineColumnsWithoutGaps();
-		void RemoveColumnsWithGapsFromSequences();
-		std::vector<int> RemoveGapsFromEncodedSequence(std::vector<int> encoded_sequence);
-
-		void Initialize();
 		void print();
+		void Initialize();
+		void saveToFile(int gen, double l);
 
 		// Utilities
 		int numCols();
@@ -47,5 +41,14 @@ class SequenceAlignment {
 		std::string decodeSequence(std::vector<int> &enc_seq);
 		static std::vector<int> findParsimony(const std::vector<int> &s1, const std::vector<int> &s2);
 		static std::list<substitution> findSubstitutions(const std::vector<int> &anc, const std::vector<int> &dec);
+	private:
+		// Processing input sequences - fasta.
+		std::vector<int> EncodeSequence(std::string sequence);
+		void DetermineColumnsWithoutGaps();
+		void RemoveColumnsWithGapsFromSequences();
+		std::vector<int> RemoveGapsFromEncodedSequence(std::vector<int> encoded_sequence);
+
+		// Output.
+		static std::ofstream sequences_out;
 };
 #endif

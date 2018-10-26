@@ -1,5 +1,4 @@
 #include "Model.h"
-
 #include <iostream>
 #include <cmath>
 
@@ -42,7 +41,6 @@ SubstitutionModel* Model::InitializeSubstitutionModel(int num_sites, vector<stri
 	std::cout << "Start initialize." << std::endl;
 	SubstitutionModel* substitution_model = GetSubstitutionModel(); // In SubstituionModelTypes.h
 	substitution_model->Initialize(num_sites, states);
-	substitution_model->RecordState();
 	std::cout << "Successfully initialized model. " << substitution_model << std::endl;
 	return(substitution_model);
 }
@@ -64,17 +62,19 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA) {
 	tree->Initialize(raw_tree, MSA, substitution_model);
 }
 
-void Model::SampleParameters() {
+bool Model::SampleParameters() {
 	/*
 	 * Samples both the parameters associated with the tree as well as the substitution model.
 	 */
+	bool sampleType;
 	if(i % tree_sample_freq == 0) {
-		tree->SampleParameters();
+		sampleType = tree->SampleParameters();
 		i = 0;
 	} else {
-		substitution_model->SampleParameters();
+		sampleType = substitution_model->SampleParameters();
 	}
 	i++;
+	return(sampleType);	
 }
 
 void Model::accept() {
@@ -89,12 +89,12 @@ void Model::printParameters() {
 	tree->printParameters();
 }
 
-void Model::RecordState() {
+void Model::RecordState(int gen, double l) {
 	/*
 	 * Records the state of both the tree and the substitution model.
 	 */
-	tree->RecordState();
-	substitution_model->RecordState();
+	tree->RecordState(gen, l);
+	substitution_model->saveToFile(gen, l);
 }
 
 double Model::CalcLnl() {

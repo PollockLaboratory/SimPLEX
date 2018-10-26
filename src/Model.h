@@ -24,13 +24,13 @@ public:
 	~Model();
 	void Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA);
 
-	void SampleParameters();
+	bool SampleParameters();
 	void accept();
 	void reject();
 	void printParameters();
 
 	double CalcLnl();
-	void RecordState();
+	void RecordState(int gen, double l);
 	void Terminate();
 
 private:

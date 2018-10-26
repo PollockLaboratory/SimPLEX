@@ -18,7 +18,6 @@ using namespace std;
 int Tree::num_trees = 0;
 
 ofstream Tree::substitutions_out;
-ofstream Tree::sequences_out;
 ofstream Tree::tree_out;
 
 // Tree constructor.
@@ -155,14 +154,14 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
 		(*b)->updateStats();
 	}
 
+	findKeyStatistics();
+	InitializeOutputStreams();
+	
 	// printNodeList();
 	// printBranchList();
-
-	findKeyStatistics();
-
 	MSA->print();
-	InitializeOutputStreams();
-	//RecordState();
+
+	//RecordState(0, calculate_likelihood());
 }
 
 // Debug tools.
@@ -238,10 +237,8 @@ double Tree::calculate_likelihood() {
 void Tree::InitializeOutputStreams() {
 	files.add_file("tree", env.get("tree_out_file"), IOtype::OUTPUT);
 	tree_out = files.get_ofstream("tree");
-	files.add_file("sequences", env.get("sequences_out_file"), IOtype::OUTPUT);
-	sequences_out = files.get_ofstream("sequences");
 	files.add_file("substitutions", env.get("substitutions_out_file"), IOtype::OUTPUT);
-	substitutions_out = files.get_ofstream("sequences");
+	substitutions_out = files.get_ofstream("substitutions");
 
 	substitutions_out << "Branch\tSubstitutions" << endl;
 }
@@ -252,7 +249,7 @@ void Tree::InitializeOutputStreams() {
 
 void SampleNode(TreeNode* n) {
 	if(n->sampled == false) {
-		std::cout << "Sampling tree node: " << n->name << std::endl;
+		// std::cout << "Sampling tree node: " << n->name << std::endl;
 		n->sampled = true;
 		n->sampleSequence();
 
@@ -270,16 +267,16 @@ void SampleNode(TreeNode* n) {
 	}
 }
 
-void Tree::SampleParameters() {
+bool Tree::SampleParameters() {
 	double r = Random();
-	std::cout << "Sampling tree parameters: " << r << " " << nodeList.size() << " " << 1.0/nodeList.size() << std::endl;
+	// std::cout << "Sampling tree parameters: " << r << " " << nodeList.size() << " " << 1.0/nodeList.size() << std::endl;
 	float s = 1.0 / nodeList.size();
 	int i = 0;
 	while(r > (i+1)*s) {
 		i++;
 	}
 
-	std::cout << "Starting node: " << i << " " <<  std::endl;
+	// std::cout << "Starting node: " << i << " " <<  std::endl;
 	SampleNode(nodeList[i]);
 
 	for(auto n = nodeList.begin(); n != nodeList.end(); ++n) {
@@ -290,10 +287,13 @@ void Tree::SampleParameters() {
 	for(auto b = branchList.begin(); b != branchList.end(); ++b) {
 		(*b)->updateStats();
 	}
+	
+	return(false);
 }
 
 // Record State.
-void Tree::RecordState() {
+void Tree::RecordState(int gen, double l) {
+	MSA->saveToFile(gen, l);
 	//RecordSubtreeState();
 	//AddGenerationEndIndicatorsToOutputFiles();
 }

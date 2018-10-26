@@ -21,14 +21,14 @@ class SubstitutionModel {
 
 		RateVector* selectRateVector(int state);
 
-		void SampleParameters();
+		bool SampleParameters();
 		void accept(); //After a model is sampled it must be accepted or rejected before next sampling.
 		void reject();
 
 		void printParameters();
 		int getNumberOfParameters();
 
-		void RecordState();
+		void saveToFile(int gen, double l);
 		virtual void Terminate();
 	protected:
 		std::ofstream* substitution_model_out;
@@ -41,6 +41,7 @@ class SubstitutionModel {
 	private:
 		ParameterSet parameters;
 		RateVectorSet rateVectors;
+		
 };
 
 #endif

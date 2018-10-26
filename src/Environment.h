@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <string>
+#include <vector>
 #include <queue>
 #include <map>
 
@@ -14,8 +15,11 @@ public:
 	void PrintOptions();
 	void ReadOptions(std::ifstream &default_file_stream, std::ifstream &options_file_stream);         // read in default and control files
 
+	// Key values.
 	int seed;                   // random number generator seed
     	bool debug;                 // turns debugging on or off
+	float u;		    // uniformization constant.
+	std::map<std::string, int> state_to_integer;
 
 	// Storing option values.
 	int total_options;

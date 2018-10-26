@@ -15,7 +15,7 @@ void GeneralTimeReversible::Initialize(int number_of_sites, std::vector<std::str
 	 * std::cout << "Initializing Single Probability Model" << std::endl;
 	 */
 
-	float u = env.get_float("uniformization_constant");
+	float u = env.u;
 
 	std::cout << "Initializing General Time Reversible Model (GTR)." << std::endl;
 
@@ -29,7 +29,7 @@ void GeneralTimeReversible::Initialize(int number_of_sites, std::vector<std::str
 			if(i == j) {
 				Q[i][j] = new VirtualSubstitutionRate(aa[i] + aa[j], u);
 			} else if(i < j) {
-				Q[i][j] = new ContinuousFloat(aa[i] + aa[j], 0.1, 0.2, 0.0);
+				Q[i][j] = new ContinuousFloat(aa[i] + aa[j], 0.1, 0.01, 0.0);
 			} else {
 				Q[i][j] = Q[j][i];
 			}

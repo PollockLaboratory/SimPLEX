@@ -12,7 +12,7 @@ class ContinuousFloat : public AbstractParameter {
 		ContinuousFloat(std::string, double, double, double);
 		ContinuousFloat(std::string, double, double, double, double);
 		virtual void printValue();
-		virtual void sample();
+		virtual bool sample();
 		virtual double getValue();
 		virtual void undo();
 		virtual void fix();

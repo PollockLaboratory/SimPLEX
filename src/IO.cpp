@@ -196,5 +196,5 @@ void IO::Files::ConfigureOutputDirectory() {
 	 * bitwise inclusive OR of S_IRGRP, S_IWGRP, and S_IXGRP. Read, write, and search or
 	 * execute permission for users other than the file owner. S_IRWXO is the bitwise inclusive
 	 * OR of S_IROTH, S_IWOTH, and S_IXOTH.*/
-#endif
 }
+#endif

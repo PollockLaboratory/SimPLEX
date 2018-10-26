@@ -52,10 +52,10 @@ class Tree {
 		void printParameters();
 
 		// Sampling.
-		void SampleParameters();
+		bool SampleParameters();
 		
 		// Recording state data.
-		void RecordState();
+		void RecordState(int gen, double l);
 	
 		// Likelihood.
 		void findKeyStatistics(); //Find the key statistics need for the likelihood function.
@@ -74,7 +74,6 @@ class Tree {
 
 		static std::ofstream tree_out;
 		static std::ofstream substitutions_out;
-		static std::ofstream sequences_out;
 
 		void InitializeOutputStreams();
 };
