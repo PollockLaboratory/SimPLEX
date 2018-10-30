@@ -33,15 +33,15 @@ void MCMC::Init(Model* model) {
 	 * Init MCMC with model, gens calculate lnL.
 	 */
 
-	std::cout << "Initializing MCMC" << std::endl;
+	std::cout << "Initializing MCMC." << std::endl;
 	this->model = model; // associate the pointer with the MCMC
-	std::cout << "Model pointer initialized." << std::endl;
-	
+
+	// Env settings.
+	out_freq = env.get_int("output_frequency");
+	print_freq = env.get_int("print_frequency");
 	gens = env.get_int("generations");
 	tree_sample_freq = env.get_int("tree_sample_frequency");
 	
-	std::cout << "Gens: " << gens << std::endl;
-
 	//Calculate initial likelihood.
 	lnL = model->CalcLnl();
 	RecordState();
@@ -54,6 +54,7 @@ void MCMC::Init(Model* model) {
 	files.add_file("time", env.get("time_out_file"), IOtype::OUTPUT);
 	time_out = files.get_ofstream("time");
 
+	// Track time.
 	n_tree_samples = 0;
 	total_time_tree_samples = 0;
 	n_parameter_samples = 0;
@@ -71,7 +72,6 @@ void MCMC::sample() {
 		float oldLnl = lnL;
 		sampleType = model->SampleTree(); // All tree sampling right now is Gibbs.
 		lnL = model->CalcLnl();
-		//std::cout << "Tree sample: Old: " << oldLnl << " New: " << lnL << " " << (lnL > oldLnl) << std::endl;
 		i = 0;
 
 		time_taken = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count();
@@ -83,7 +83,6 @@ void MCMC::sample() {
 		if(sampleType) {	
 			//Metropolis-Hasting method.
 			float r = log(Random());
-			//std::cout << "Random: " << r << " " << (newLnL - lnL) << std::endl;
 			accepted = r < (newLnL - lnL);
 			if (accepted) { 
 				lnL = newLnL;
@@ -107,10 +106,7 @@ void MCMC::Run() {
 	 * Run an initialized MCMC.
 	 */
 
-	int outfreq = env.get_int("output_frequency");
-	int print_freq = env.get_int("print_frequency");
-
-	std::cout << "Running MCMC" << std::endl;
+	std::cout << "Starting MCMC:" << std::endl;
 	for (gen = 1; gen <= gens; gen++) {
 		if(isnan(lnL)) {
 			exit(-1);
@@ -121,7 +117,7 @@ void MCMC::Run() {
 		
 		sample();	
 		
-		if(gen % outfreq == 0) {
+		if(gen % out_freq == 0) {
 			RecordState();
 		}
 	}

@@ -17,7 +17,7 @@ void GeneralTimeReversible::Initialize(int number_of_sites, std::vector<std::str
 
 	float u = env.u;
 
-	std::cout << "Initializing General Time Reversible Model (GTR)." << std::endl;
+	std::cout << "Protein General Time Reversible Model (GTR)." << std::endl;
 
 	std::array<std::string, 20> aa = {"A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"};
 

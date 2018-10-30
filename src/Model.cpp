@@ -40,10 +40,10 @@ SubstitutionModel* Model::InitializeSubstitutionModel(int num_sites, vector<stri
 	/*
 	 * This is in the substituionModelType.h, can we make this more explicit?
 	 */
-	std::cout << "Start initialize." << std::endl;
+	std::cout << "Initializing Substitution Model: ";
 	SubstitutionModel* substitution_model = GetSubstitutionModel(); // In SubstituionModelTypes.h
 	substitution_model->Initialize(num_sites, states);
-	std::cout << "Successfully initialized model. " << substitution_model << std::endl;
+	std::cout << std::endl;
 	return(substitution_model);
 }
 
@@ -54,7 +54,6 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA) {
 	 * - the tree class - contains the tree topology as well as the sequences.
 	 * - the substitution model class - which contains all the rate matrices.
 	 */
-	tree_sample_freq = env.get_int("tree_sample_frequency");
 	int num_sites = (MSA->taxa_names_to_sequences).begin()->second.size();
 	substitution_model = InitializeSubstitutionModel(num_sites, MSA->states);
 	num_parameters = substitution_model->getNumberOfParameters();

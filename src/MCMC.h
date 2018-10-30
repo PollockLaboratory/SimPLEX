@@ -16,10 +16,12 @@ class MCMC {
 		double lnL;
 		double newLnL;
 		bool accepted;
-		
+
 		// Settings.
-		int gens;
-		int tree_sample_freq;
+		int out_freq; // Frequency of saving state.
+		int print_freq; // Frequency of printing likelihood to term.
+		int gens; // Number of generations.
+		int tree_sample_freq; // Frequncy of tree ancestral state sampling.
 		
 		static std::ofstream lnlout;
 

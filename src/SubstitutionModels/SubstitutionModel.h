@@ -31,14 +31,11 @@ class SubstitutionModel {
 		void saveToFile(int gen, double l);
 		virtual void Terminate();
 	protected:
+		void add_rate_vector(RateVector* v);
+		void finalize();
+	private:
 		std::ofstream* substitution_model_out;
 
-		void add_rate_vector(RateVector* v);
-
-		void finalize();
-
-		//std::ofstream CreateOutputStream(std::string file_name);
-	private:
 		ParameterSet parameters;
 		RateVectorSet rateVectors;
 		

@@ -24,6 +24,7 @@ void Data::Initialize() {
 	MSA->Initialize();
 
 	raw_tree = ReadTree();
+	std::cout << std::endl;
 }
 
 // Sequences
@@ -44,6 +45,8 @@ SequenceAlignment* Data::ReadSequences() {
 
 	files.add_file("sequences_in", env.get("sequences_file"), IOtype::INPUT);
 	ifstream sequences_in = files.get_ifstream("sequences_in");
+
+	std::cout << "Reading sequences from:\t" << files.get_file_path("sequences_in") << std::endl;
 
 	vector<int> encoded_sequence;
 	string line;
@@ -77,6 +80,9 @@ SequenceAlignment* Data::ReadSequences() {
 IO::RawTreeNode* Data::ReadTree() {
 	std::string treefile = env.get("tree_file"); 	
 	files.add_file("tree_input", treefile, IOtype::INPUT);
+
+	std::cout << "Reading tree from:\t" << files.get_file_path("tree_input") << std::endl;
+
 	ifstream tree_in = files.get_ifstream("tree_input");
 
 	string tree_string;

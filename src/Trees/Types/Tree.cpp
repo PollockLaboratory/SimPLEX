@@ -15,15 +15,11 @@ extern IO::Files files;
 
 using namespace std;
 
-int Tree::num_trees = 0;
-
 ofstream Tree::substitutions_out;
 ofstream Tree::tree_out;
 
 // Tree constructor.
 Tree::Tree() {   
-	std::cout << "Creating Basic tree." << std::endl;
-	is_constant = true;
 }
 
 // Creation of tree nodes.
@@ -115,7 +111,6 @@ void Tree::configureSequences(TreeNode* n) {
 }
 
 void Tree::configureRateVectors() {
-	std::cout << "Configuring rate vectors." << std::endl;
 	BranchSegment* branch;
 	std::vector<int> s; 
 	for(auto it = branchList.begin(); it != branchList.end(); ++it) {
@@ -134,12 +129,11 @@ void Tree::configureRateVectors() {
 
 // Tree Initialize using seqs and states
 void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, SubstitutionModel* &SM) {
-	std::cout << "INITIALIZING BASIC TREE." << std::endl;
+	std::cout << "Creating MCMC tree structure." << std::endl;
+
 	max_seg_len = env.get_float("max_segment_length");
-	std::cout << "Max segment length: " << max_seg_len << std::endl;
-
 	u = env.get_float("uniformization_constant");
-
+	
 	splitBranch = pickBranchSplitAlgorithm();
 	this->MSA = MSA;
 	seqLen = MSA->numCols();
@@ -151,8 +145,11 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
 	TreeNode* root = createTreeNode(raw_tree, proxyNode, proxyBranch);
 	delete proxyBranch;
 	delete proxyNode;
+	
 
+	std::cout << "Attaching sequences to tree." << std::endl;
 	configureSequences(root);
+	std::cout << "Attaching rate vectors to tree." << std::endl;
 	configureRateVectors();
 
 	for(auto b = branchList.begin(); b != branchList.end(); ++b) {
@@ -160,10 +157,9 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
 	}
 
 	findKeyStatistics();
-	InitializeOutputStreams();
-	
-	// printNodeList();
-	// printBranchList();
+	InitializeOutputStreams();	
+
+	std::cout << std::endl;
 }
 
 // Debug tools.

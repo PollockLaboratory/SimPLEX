@@ -15,7 +15,6 @@ Tree* TreeTypes::pickTreeType() {
 	Tree* tree = NULL;
 	int chosen_tree_type = env.get_int("tree_type");
 	
-	std::cout << "INSTANTIATING THE TREE:" << std::endl;
 	if (chosen_tree_type == default_tree_type) {
 		tree = new Tree();
 	} else {

@@ -19,6 +19,7 @@ public:
 	int seed;                   // random number generator seed
     	bool debug;                 // turns debugging on or off
 	float u;		    // uniformization constant.
+	int num_states;		    // number of states, not including gap.
 	std::map<std::string, int> state_to_integer;
 
 	// Storing option values.

@@ -37,7 +37,6 @@ public:
 	void Terminate();
 private:
 	Tree* tree;
-	int tree_sample_freq;
 	int num_parameters;
 	
 	SubstitutionModel* substitution_model; //Must be a pointer to use polymorphism

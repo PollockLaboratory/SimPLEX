@@ -17,12 +17,15 @@ std::ofstream SequenceAlignment::sequences_out;
 
 SequenceAlignment::SequenceAlignment() {
 	int states_option = env.get_int("states");
+
 	switch(states_option) {
 		case 0: // Nucleotide.
 			states = nucleotides;
-		case 1:
+		case 1: // Amino acid.
 			states = aa;
 	}
+
+	env.num_states = states.size();
 
 	for(int i = 0; i < states.size(); i++) {
 		state_to_integer[states[i]] = i;
@@ -30,6 +33,7 @@ SequenceAlignment::SequenceAlignment() {
 		integer_to_state[i] = states[i];
 		integer_to_state[-1] = "-";
 	}
+
 	env.state_to_integer = state_to_integer;
 }
 
@@ -80,7 +84,6 @@ std::vector<int> SequenceAlignment::EncodeSequence(const std::string &sequence) 
 	 * Takes a string representation of a sequence and returns vector of integers.
 	 * Also tracks the gaps in the alignment.
 	 */
-	std::cout << "Reading sequence: " << sequence << std::endl;
 	std::vector<int> encoded_sequence(sequence.length());
 
 	for (int site = 0; site < sequence.length(); site++) {
@@ -92,7 +95,6 @@ std::vector<int> SequenceAlignment::EncodeSequence(const std::string &sequence) 
 
 void SequenceAlignment::DetermineColumnsWithoutGaps() {
 	int number_of_sites = taxa_names_to_sequences.begin()->second.size();
-	std::cout << "Number of columns in alignment: " << number_of_sites << std::endl;
 
 	for (int site = 0; site < number_of_sites; site++) {
 		// If site is not in columns with gaps
@@ -100,13 +102,9 @@ void SequenceAlignment::DetermineColumnsWithoutGaps() {
 			columns_without_gaps.push_back(site);
 		}
 	}
-
-	std::cout << "Number of columns without gaps: " << columns_without_gaps.size() << std::endl;
 }
 
 void SequenceAlignment::RemoveColumnsWithGapsFromSequences() {
-	if (env.debug) std::cout << "Removing gaps" << std::endl;
-
 	for (std::map<std::string, std::vector<int>>::iterator it = taxa_names_to_sequences.begin(); it != taxa_names_to_sequences.end(); ++it) {
 		std::vector<int> encoded_sequence = it->second;
 		it->second = RemoveGapsFromEncodedSequence(encoded_sequence);

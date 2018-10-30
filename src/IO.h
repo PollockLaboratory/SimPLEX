@@ -20,10 +20,13 @@ namespace IO {
 class Files {
 public:
 	Files();
-	void setupOutput();
+	void setupOutputDirectory();
 	void add_file(std::string name, std::string path, IOtype);
+
 	std::ifstream get_ifstream(std::string name);
 	std::ofstream get_ofstream(std::string name);
+
+	std::string get_file_path(std::string name);
 	void print();
 	void close();
 

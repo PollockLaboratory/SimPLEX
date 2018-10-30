@@ -140,9 +140,9 @@ std::vector<double> normalizeLikelihoods(std::vector<double> &l) {
 }
 
 void TreeNode::sampleSinglePosition(int pos) {
-	// Don't hard code 20 states
-	std::vector<double> l(20, 1.0);	
-	for(int state = 0; state < 20; state++) {
+	int n = env.num_states;	
+	std::vector<double> l(n, 1.0);	
+	for(int state = 0; state < n; state++) {
 		if(up) {
 			int anc = up->ancestral->sequence->at(pos);
 			if(anc == -1) {

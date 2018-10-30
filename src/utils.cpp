@@ -9,8 +9,8 @@ extern IO::Files files;
 
 void utils::printHeader() {
 	std::cout << std::endl << "SimPLEX" << std::endl
-		<< "by Stephen T. Pollard" << std::endl
-		<< "stephen.pollard@ucdenver.edu" << std::endl
+		<< "by Hamish N.C. Pike" << std::endl
+		<< "hamish.pike@ucdenver.edu" << std::endl
 		<< "For internal use only." << std::endl
 		<< std::endl;
 }

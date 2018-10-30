@@ -67,10 +67,7 @@ class Tree {
 		float u;
 	public:
 //		typedef unsigned int size_type;
-
-		static int num_trees;
 		int id;
-		bool is_constant;
 
 		static std::ofstream tree_out;
 		static std::ofstream substitutions_out;

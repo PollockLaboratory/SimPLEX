@@ -28,7 +28,7 @@ IO::Files::Files() {
 	add_file("options", optionsfile, IOtype::INPUT);
 }
 
-void IO::Files::setupOutput () {
+void IO::Files::setupOutputDirectory() {
 	outdir = env.get("output_directory");
 	ConfigureOutputDirectory();
 }
@@ -81,6 +81,11 @@ std::ofstream IO::Files::get_ofstream(std::string name) {
 	std::ofstream file_stream(path);
 
 	return(file_stream);
+}
+
+std::string IO::Files::get_file_path(std::string name) {
+	int i = file_to_index[name];
+	return(file_values[i].path);
 }
 
 void IO::Files::print() {
@@ -164,8 +169,6 @@ void IO::Files::ConfigureOutputDirectory() {
 	
 	char lastchar = outdir.at(outdir.length() - 1);
 
-	if(env.debug) std::cout << "The last char in " << outdir << " is " << lastchar << std::endl;
-
 	if(lastchar != '/' && lastchar != '\\') {
 		if (env.debug) std::cout << "last char is not /" << std::endl;
 		outdir += '/';
@@ -190,6 +193,7 @@ void IO::Files::ConfigureOutputDirectory() {
 	} else {
 		mkdir(outdir.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
 	}
+
 	/*Read, write, and search, or execute, for the file owner; S_IRWXU is the bitwise inclusive
 	 * OR of S_IRUSR, S_IWUSR, and S_IXUSR.
 	 * Read, write, and search or execute permission for the file's group. S_IRWXG is the
