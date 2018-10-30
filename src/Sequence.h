@@ -43,7 +43,7 @@ class SequenceAlignment {
 		static std::list<substitution> findSubstitutions(const std::vector<int> &anc, const std::vector<int> &dec);
 	private:
 		// Processing input sequences - fasta.
-		std::vector<int> EncodeSequence(std::string sequence);
+		std::vector<int> EncodeSequence(const std::string &sequence);
 		void DetermineColumnsWithoutGaps();
 		void RemoveColumnsWithGapsFromSequences();
 		std::vector<int> RemoveGapsFromEncodedSequence(std::vector<int> encoded_sequence);

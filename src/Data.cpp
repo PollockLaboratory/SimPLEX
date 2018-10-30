@@ -21,7 +21,6 @@ Data::~Data() {
 
 void Data::Initialize() {
 	MSA = ReadSequences();
-	MSA->print();
 	MSA->Initialize();
 
 	raw_tree = ReadTree();

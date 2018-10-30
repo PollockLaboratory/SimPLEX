@@ -116,13 +116,18 @@ void Tree::configureSequences(TreeNode* n) {
 
 void Tree::configureRateVectors() {
 	std::cout << "Configuring rate vectors." << std::endl;
+	BranchSegment* branch;
+	std::vector<int> s; 
 	for(auto it = branchList.begin(); it != branchList.end(); ++it) {
-		std::cout << "Adding rate vector: " << *(*it) << std::endl;
-		BranchSegment* branch = (*it);
-		std::vector<int> s = *(branch->ancestral->sequence);
+		branch = (*it);
+		s = *(branch->ancestral->sequence);
 		for(int i = 0; i < s.size(); i++) {
-			RateVector* r = SM->selectRateVector(s[i]);	
-			branch->rates[i] = r;
+			// Don't add rate vector if gap.
+			if(s[i] == -1) {
+				branch->rates[i] = NULL;
+			} else {
+				branch->rates[i] = SM->selectRateVector(s[i]);	
+			}
 		}
 	}
 }
@@ -159,9 +164,6 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
 	
 	// printNodeList();
 	// printBranchList();
-	MSA->print();
-
-	//RecordState(0, calculate_likelihood());
 }
 
 // Debug tools.
@@ -213,15 +215,16 @@ void Tree::findKeyStatistics() {
 }
 
 double Tree::calculate_likelihood() {
-	// Waiting times.
 	double l = 0.0;
+
+	// Waiting times.
 	for(auto it = substitution_counts.begin(); it != substitution_counts.end(); ++it) {
 		float t = it->first;
 		int num0subs = it->second.first;
 		int num1subs = it->second.second;
 		l += num0subs * log(1/(1 + u*t)) + num1subs * log(t/(1 + u*t));
 	}
-	
+
 	// Substitutions.
 	for(auto b = branchList.begin(); b != branchList.end(); ++b) {
 		BranchSegment* branch = *b;
@@ -269,7 +272,6 @@ void SampleNode(TreeNode* n) {
 
 bool Tree::SampleParameters() {
 	double r = Random();
-	// std::cout << "Sampling tree parameters: " << r << " " << nodeList.size() << " " << 1.0/nodeList.size() << std::endl;
 	float s = 1.0 / nodeList.size();
 	int i = 0;
 	while(r > (i+1)*s) {
@@ -287,6 +289,8 @@ bool Tree::SampleParameters() {
 	for(auto b = branchList.begin(); b != branchList.end(); ++b) {
 		(*b)->updateStats();
 	}
+
+	findKeyStatistics();
 	
 	return(false);
 }

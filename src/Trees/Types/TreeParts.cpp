@@ -53,19 +53,21 @@ void BranchSegment::updateStats() {
 	std::vector<int> anc = *(ancestral->sequence);
 	std::vector<int> dec = *(decendant->sequence);
 	substitution s;
-	for(int i = 0; i < anc.size(); i++) {
-		if(anc.at(i) == dec.at(i)) {
-			if(virtualSubstituionQ(anc.at(i))) {
-				num1subs += 1;
-				s = {i, anc.at(i), dec.at(i)};
-				subs.push_back(s);
+	for(int pos = 0; pos < anc.size(); pos++) {
+		if(dec.at(pos) != -1) {
+			if(anc.at(pos) == dec.at(pos)) {
+				if(virtualSubstituionQ(anc.at(pos))) {
+					num1subs += 1;
+					s = {pos, anc.at(pos), dec.at(pos)};
+					subs.push_back(s);
+				} else {
+					num0subs += 1;
+				}
 			} else {
-				num0subs += 1;
+				num1subs += 1;
+				s = {pos, anc.at(pos), dec.at(pos)};
+				subs.push_back(s);
 			}
-		} else {
-			num1subs += 1;
-			s = {i, anc.at(i), dec.at(i)};
-			subs.push_back(s);
 		}
 	}
 }
@@ -143,32 +145,40 @@ void TreeNode::sampleSinglePosition(int pos) {
 	for(int state = 0; state < 20; state++) {
 		if(up) {
 			int anc = up->ancestral->sequence->at(pos);
+			if(anc == -1) {
+				std::cout << "Gap." << std::endl;
+			}
 			branchLikelihood(l[state], anc, state, up->distance, SM);
 		}
 
 		if(left) {
 			int dec = left->decendant->sequence->at(pos);
-			branchLikelihood(l[state], state, dec, left->distance, SM);
+			if(dec != -1) {
+				branchLikelihood(l[state], state, dec, left->distance, SM);
+			}
 		}
 
 		if(right) {
 			int dec = right->decendant->sequence->at(pos);
-			branchLikelihood(l[state], state, dec, right->distance, SM);
+			if(dec != -1) {
+				branchLikelihood(l[state], state, dec, right->distance, SM);
+			}
 		}
 	}
 	
-	// std::cout << "Un-normalized likelihoods: ";
-	//for(auto it = l.begin(); it != l.end(); ++it) {
-	 //	std::cout << *it << " ";
-	//}
-	//std::cout << std::endl;
+//	std::cout << "Un-normalized likelihoods: ";
+//	for(auto it = l.begin(); it != l.end(); ++it) {
+//	 	std::cout << *it << " ";
+//	}
+//	std::cout << std::endl;
 
-	//std::cout << "Normalized likelihoods: ";
+//	std::cout << "Normalized likelihoods: ";
 	l = normalizeLikelihoods(l);
-	//for(auto it = l.begin(); it != l.end(); ++it) {
-	//	std::cout << *it << " ";
-	//}
-	
+//	for(auto it = l.begin(); it != l.end(); ++it) {
+//		std::cout << *it << " ";
+//	}
+//	std::cout << std::endl;
+
 	double r = Random();
 	int i = 0;
 	double c = l[0];
@@ -177,7 +187,7 @@ void TreeNode::sampleSinglePosition(int pos) {
 		c += l[i];
 	}
 	
-	//if(sequence->at(pos) != i) {
+//	if(sequence->at(pos) != i) {
 //		std::cout << "Old aa: " << sequence->at(pos) << " New: " << i << std::endl;
 //	}
 
@@ -186,8 +196,11 @@ void TreeNode::sampleSinglePosition(int pos) {
 
 void TreeNode::sampleSequence() {
 	if(!isTip()) {
-		for(int i = 0; i < sequence->size(); i++) {
-			sampleSinglePosition(i);		
+		for(int pos = 0; pos < sequence->size(); pos++) {
+			// Skip sampling if gap.
+			if((*sequence)[pos] != -1) {
+				sampleSinglePosition(pos);		
+			}
 		}
 	}
 }

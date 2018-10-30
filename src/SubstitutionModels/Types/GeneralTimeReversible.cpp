@@ -29,7 +29,7 @@ void GeneralTimeReversible::Initialize(int number_of_sites, std::vector<std::str
 			if(i == j) {
 				Q[i][j] = new VirtualSubstitutionRate(aa[i] + aa[j], u);
 			} else if(i < j) {
-				Q[i][j] = new ContinuousFloat(aa[i] + aa[j], 0.1, 0.01, 0.0);
+				Q[i][j] = new ContinuousFloat(aa[i] + aa[j], 0.01, 0.0001, 0.0);
 			} else {
 				Q[i][j] = Q[j][i];
 			}

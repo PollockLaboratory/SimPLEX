@@ -12,6 +12,7 @@
 #define Model_h_
 
 #include <vector>
+#include <fstream>
 
 #include "Trees/Types/Tree.h"
 #include "Data.h"
@@ -24,7 +25,9 @@ public:
 	~Model();
 	void Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA);
 
-	bool SampleParameters();
+	bool SampleTree(); 
+	bool SampleSubstitutionModel();
+
 	void accept();
 	void reject();
 	void printParameters();
@@ -32,10 +35,8 @@ public:
 	double CalcLnl();
 	void RecordState(int gen, double l);
 	void Terminate();
-
 private:
 	Tree* tree;
-	int i; // Sample counter.
 	int tree_sample_freq;
 	int num_parameters;
 	

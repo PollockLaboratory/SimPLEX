@@ -13,15 +13,28 @@ class MCMC {
 	private:
 		Model* model;
 		int gen;
-		int gens;
 		double lnL;
 		double newLnL;
 		bool accepted;
 		
+		// Settings.
+		int gens;
+		int tree_sample_freq;
+		
 		static std::ofstream lnlout;
+
+		void sample();
 		
 		void RecordState();
-		bool TestAccept(double newLnL);
+		//bool TestAccept(double newLnL);
+		
+		// Data for time calculations
+		int n_tree_samples;
+		int total_time_tree_samples;
+		int n_parameter_samples;
+		int total_time_parameter_samples;
+
+		static std::ofstream time_out;
 };
 
 #endif

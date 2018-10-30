@@ -28,9 +28,9 @@ void utils::Terminate(time_t start_time) {
 	std::cout << "Time taken: " << result << std::endl;
 	std::string time_taken_file = "Time_taken";
 
-	files.add_file("time", env.get("time_out_file"), IOtype::OUTPUT);
-	std::ofstream time_out = files.get_ofstream("time");
-	time_out << result << std::endl;
+	// files.add_file("time", env.get("time_out_file"), IOtype::OUTPUT);
+	// std::ofstream time_out = files.get_ofstream("time");
+	// time_out << result << std::endl;
 
 	std::cout << std::endl << "Output placed in " << env.get("output_directory") << std::endl;
 }

@@ -1,7 +1,9 @@
-#include "Model.h"
 #include <iostream>
 #include <cmath>
+#include <sys/times.h>
+#include <chrono>
 
+#include "Model.h"
 #include "Trees/TreeTypes.h"
 #include "Trees/TreeParser.h"
 #include "SubstitutionModels/SubstitutionModelTypes.h"
@@ -15,7 +17,7 @@ extern IO::Files files;
 
 /*  The tree needs the names_to_sequence map. The substitution model might need the empirical frequencies. */
 
-using namespace std;
+// using namespace std;
 
 Model::Model() {
 	/*
@@ -52,7 +54,6 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA) {
 	 * - the tree class - contains the tree topology as well as the sequences.
 	 * - the substitution model class - which contains all the rate matrices.
 	 */
-	i = 1;
 	tree_sample_freq = env.get_int("tree_sample_frequency");
 	int num_sites = (MSA->taxa_names_to_sequences).begin()->second.size();
 	substitution_model = InitializeSubstitutionModel(num_sites, MSA->states);
@@ -62,19 +63,12 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA) {
 	tree->Initialize(raw_tree, MSA, substitution_model);
 }
 
-bool Model::SampleParameters() {
-	/*
-	 * Samples both the parameters associated with the tree as well as the substitution model.
-	 */
-	bool sampleType;
-	if(i % tree_sample_freq == 0) {
-		sampleType = tree->SampleParameters();
-		i = 0;
-	} else {
-		sampleType = substitution_model->SampleParameters();
-	}
-	i++;
-	return(sampleType);	
+bool Model::SampleTree() {
+	return(tree->SampleParameters());
+}
+
+bool Model::SampleSubstitutionModel() {
+	return(substitution_model->SampleParameters());
 }
 
 void Model::accept() {

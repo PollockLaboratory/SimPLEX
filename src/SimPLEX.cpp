@@ -55,7 +55,6 @@ int main() {
 
 	mcmc.Run();
 
-	// Now that I have objects allocated on the heap, this is required. Unless I use shared pointers...
 	model.Terminate();
 	utils::Terminate(start_time);
 

@@ -36,6 +36,8 @@ std::pair<std::string, std::string> IO::splitBranchString(std::string branch_str
 }
 
 node_data IO::deconstructNodeString(std::string node_string) {
+	static int ID = 0;
+	std::cout << node_string << std::endl;
 	int last_colon_position = node_string.find_last_of(':');
 	int last_parens_position = node_string.find_last_of(')');
 
@@ -50,8 +52,14 @@ node_data IO::deconstructNodeString(std::string node_string) {
 	} else {
 		int len = last_colon_position - last_parens_position - 1;
 		name = node_string.substr(last_parens_position + 1, len);
+		if(name == "") {
+			name = "BNode" + std::to_string(ID);
+			ID++;
+		}
+		std::cout << "Name: " << name << std::endl;
 		branch_strings = splitBranchString(node_string.substr(1, last_parens_position - 1));
 	}
+	std::cout << "Distance: " << distance << " Name: " << name << std::endl;
 
 	node_data n = {name, distance, branch_strings.first, branch_strings.second};
 	return(n);
@@ -72,6 +80,7 @@ IO::RawTreeNode* IO::parseRawTreeNode(std::string node_string, RawTreeNode* up) 
 }
 
 IO::RawTreeNode* IO::parseTree(std::string tree_string) {
+	std::cout << "Reading tree: " << std::endl;
 	tree_string = cleanTreeString(tree_string);
 	IO::RawTreeNode* root = new RawTreeNode;
 	*root = {"Root", 0, NULL, NULL, NULL};

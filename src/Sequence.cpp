@@ -1,6 +1,7 @@
 #include "Sequence.h"
 #include <iostream>
 #include "Environment.h"
+#include <algorithm>
 #include "IO.h"
 
 extern double Random();
@@ -25,7 +26,9 @@ SequenceAlignment::SequenceAlignment() {
 
 	for(int i = 0; i < states.size(); i++) {
 		state_to_integer[states[i]] = i;
+		state_to_integer["-"] = -1;
 		integer_to_state[i] = states[i];
+		integer_to_state[-1] = "-";
 	}
 	env.state_to_integer = state_to_integer;
 }
@@ -72,7 +75,7 @@ void SequenceAlignment::saveToFile(int gen, double l) {
 }
 
 // Reading Fasta files.
-std::vector<int> SequenceAlignment::EncodeSequence(std::string sequence) {
+std::vector<int> SequenceAlignment::EncodeSequence(const std::string &sequence) {
 	/*
 	 * Takes a string representation of a sequence and returns vector of integers.
 	 * Also tracks the gaps in the alignment.
@@ -82,16 +85,7 @@ std::vector<int> SequenceAlignment::EncodeSequence(std::string sequence) {
 
 	for (int site = 0; site < sequence.length(); site++) {
 		std::string current_pos = sequence.substr(site, 1);
-		if (sequence.find('-') != std::string::npos
-				or sequence.find('?') != std::string::npos) { // When sequence.find == string::npos, the string was not found
-			// There is gap.
-			columns_with_gaps.insert(site);
-			encoded_sequence.at(site) = gap_indicator;
-		} else {
-			//No gap.
-			//AddStateToStates(current_pos);
-			encoded_sequence.at(site) = state_to_integer[current_pos];
-		}
+		encoded_sequence.at(site) = state_to_integer[current_pos];
 	}
 	return encoded_sequence;
 }
@@ -149,9 +143,15 @@ std::vector<int> SequenceAlignment::findParsimony(const std::vector<int> &s1, co
 	std::vector<int> p = {};
 	for(int i = 0; i < s1.size(); i++) {
 		if(s1.at(i) == s2.at(i)) {
+			//If states are the same.
 			p.push_back(s1.at(i));
 		} else {
-			if(Random() < 0.5) {
+			// If states are differant - check if one of the states is gap ("-").
+			if(s1.at(i) == -1) {
+				p.push_back(s2.at(i));
+			} else if(s2.at(i) == -1) {
+				p.push_back(s1.at(i));
+			} else if(Random() < 0.5) {
 				p.push_back(s1.at(i));
 			} else {
 				p.push_back(s2.at(i));

@@ -16,10 +16,10 @@ states 1
 # TREE SETTINGS
 max_segment_length	0.08
 branch_split_algorithm	0 
-tree_sample_frequency 250
+tree_sample_frequency 10000
 # constant_tree	0
 tree_type	0
-uniformization_constant 2.2
+uniformization_constant 0.35
  
 # Substitution model types
 # 0	Single probability 
@@ -33,11 +33,15 @@ substitution_model_type		0
 constant_substitution_model	0
 substitution_model_initialization	0
 
+# MCMC settings.
 generations 1000000
 output_frequency 10000
+print_frequency 2000
 
-sequences_file	resources/5taxon.fasta
-tree_file	resources/5taxon.tree
+sequences_file	resources/Species_alignment_BLVRB.fasta
+# sequences_file	resources/5taxon.fasta
+tree_file	resources/BLVRB_subtree_MLbranches.nh
+# tree_file	resources/5taxon.tree
 
 # sequences_file	testing/sequences_long.fasta
 # tree_file	testing/tree.newick
@@ -46,3 +50,4 @@ output_directory testing/test_run/
 sequences_out_file		sequences_out.fasta
 parameters_out_file		parameters_out.csv
 rate_vectors_out_file		rate_vectors_out.csv 
+likelihood_out_file 		likelihoods_out.csv

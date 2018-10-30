@@ -70,11 +70,11 @@ void SubstitutionModel::finalize() {
 	parameters.Initialize();
 	rateVectors.Initialize();
 
-	std::cout << std::endl;
-	parameters.print();
-	std::cout << std::endl;
-	rateVectors.print();
-	std::cout << std::endl;
+	// std::cout << std::endl;
+	// parameters.print();
+	// std::cout << std::endl;
+	// rateVectors.print();
+	//std::cout << std::endl;
 }
 
 //std::ofstream SubstitutionModel::CreateOutputStream(std::string file_name) {
