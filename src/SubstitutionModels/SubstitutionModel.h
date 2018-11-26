@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 
+#include <list>
 #include <vector>
 using std::vector;
 #include <map>
@@ -11,6 +12,7 @@ using std::map;
 #include <string>
 using std::string;
 
+#include "../Parameters/AbstractValue.h"
 #include "../Parameters/ParameterSet.h"
 #include "../Parameters/RateVector.h"
 
@@ -27,6 +29,7 @@ class SubstitutionModel {
 
 		void printParameters();
 		int getNumberOfParameters();
+		std::list<AbstractValue*> get_current_parameters();
 
 		void saveToFile(int gen, double l);
 		virtual void Terminate();
@@ -38,7 +41,6 @@ class SubstitutionModel {
 
 		ParameterSet parameters;
 		RateVectorSet rateVectors;
-		
 };
 
 #endif

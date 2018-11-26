@@ -12,10 +12,12 @@
 extern double Random();
 extern Environment env;
 
-// Branch segment.
+// BRANCH SEGMENT
+
 BranchSegment::BranchSegment(float distance) {
 	this->distance = distance;
-	rates = {};
+	rates = std::vector<RateVector*>(env.n, NULL);
+	subs = std::vector<substitution>(env.n, {-1, -1, -1});
 //	std::cout << "Making new branch segment. Distance: " << this->distance << std::endl;
 }
 
@@ -28,6 +30,28 @@ std::ostream& operator<< (std::ostream &out, const BranchSegment &b) {
 	return out;
 }
 
+// Set rates vector corresponding to position to a particular rate vector.
+void BranchSegment::set_rate_vector(int pos) {
+	/*
+	 * When gap, insert NULL for rate vector for pointer.
+	 */
+	rates[pos] = NULL;
+}
+
+void BranchSegment::set_rate_vector(int pos, RateVector* rv) {
+	/*
+	 * When non-gap state insert correct pointer to rate vector. 
+	 */
+	if(rates[pos]) rates[pos]->remove_location(pos, this);
+	rates[pos] = rv;
+	rv->add_location(pos, this);
+}
+
+double BranchSegment::get_rate(int pos, int dec_state) {
+	return(rates[pos]->rates[dec_state]->getValue());
+}
+
+// Key Statistics
 bool BranchSegment::virtualSubstituionQ(int state) {
 	float u = env.u;
 	double rate = decendant->SM->selectRateVector(state)->rates[state]->getValue();
@@ -48,7 +72,7 @@ bool BranchSegment::virtualSubstituionQ(int state) {
 void BranchSegment::updateStats() {
 	num0subs = 0;
 	num1subs = 0;
-	subs = {};
+	subs = std::vector<substitution>(env.n, {-1, -1, -1});
 
 	std::vector<int> anc = *(ancestral->sequence);
 	std::vector<int> dec = *(decendant->sequence);
@@ -59,20 +83,22 @@ void BranchSegment::updateStats() {
 				if(virtualSubstituionQ(anc.at(pos))) {
 					num1subs += 1;
 					s = {pos, anc.at(pos), dec.at(pos)};
-					subs.push_back(s);
+					subs[pos] = s;
 				} else {
 					num0subs += 1;
+					s = {-1, -1, -1}; // NULL substitution
+					subs[pos] = s;
 				}
 			} else {
 				num1subs += 1;
 				s = {pos, anc.at(pos), dec.at(pos)};
-				subs.push_back(s);
+				subs[pos] = s;
 			}
 		}
 	}
 }
 
-// Tree nodes.
+// TREE NODES
 
 int TreeNode::unique_id = 0;
 
@@ -165,19 +191,8 @@ void TreeNode::sampleSinglePosition(int pos) {
 			}
 		}
 	}
-	
-//	std::cout << "Un-normalized likelihoods: ";
-//	for(auto it = l.begin(); it != l.end(); ++it) {
-//	 	std::cout << *it << " ";
-//	}
-//	std::cout << std::endl;
 
-//	std::cout << "Normalized likelihoods: ";
 	l = normalizeLikelihoods(l);
-//	for(auto it = l.begin(); it != l.end(); ++it) {
-//		std::cout << *it << " ";
-//	}
-//	std::cout << std::endl;
 
 	double r = Random();
 	int i = 0;
@@ -187,11 +202,13 @@ void TreeNode::sampleSinglePosition(int pos) {
 		c += l[i];
 	}
 	
-//	if(sequence->at(pos) != i) {
-//		std::cout << "Old aa: " << sequence->at(pos) << " New: " << i << std::endl;
-//	}
 
 	(*sequence)[pos] = i;
+
+	// Branch rates vector updated.
+	RateVector* rv = SM->selectRateVector(i);
+	if(left) left->set_rate_vector(pos, rv);	
+	if(right) right->set_rate_vector(pos, rv);	
 }
 
 void TreeNode::sampleSequence() {

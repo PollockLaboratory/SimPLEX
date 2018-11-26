@@ -30,13 +30,16 @@ public:
 
 	void accept();
 	void reject();
-	void printParameters();
 
-	double CalcLnl();
+	double CalculateLikelihood();
+	double PartialCalculateLikelihood(const double lnL);
+
 	void RecordState(int gen, double l);
+	void printParameters();
 	void Terminate();
 private:
 	Tree* tree;
+	bool ready; // Checks whether model is ready to be resampled.
 	int num_parameters;
 	
 	SubstitutionModel* substitution_model; //Must be a pointer to use polymorphism

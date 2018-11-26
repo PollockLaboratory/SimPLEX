@@ -13,8 +13,6 @@ struct substitution {
 	int dec;
 };
 
-class Sequence;
-
 class SequenceAlignment {
 	public:
 		SequenceAlignment();

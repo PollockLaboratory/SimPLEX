@@ -9,11 +9,16 @@ double VirtualSubstitutionRate::getValue() {
 	return(value);
 }
 
+double  VirtualSubstitutionRate::getOldValue() {
+	return(previous_value);
+}
+
 void VirtualSubstitutionRate::printValue() {
 	std::cout << "VirtualSubstitutionRate - " << name << ": " << value << std::endl;
 }
 
 void VirtualSubstitutionRate::refresh() {
+	previous_value = value;
 	double total = 0.0;
 	for(auto it = dependent_values.begin(); it != dependent_values.end(); ++it) {
 		total += (*it)->getValue();

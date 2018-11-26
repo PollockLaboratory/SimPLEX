@@ -34,6 +34,7 @@ double Random() {
 //Entry point for SimPLEX.
 int main() {
 	time_t start_time = time(NULL);
+	std::cout.precision(17);
 
 	utils::printHeader();
 

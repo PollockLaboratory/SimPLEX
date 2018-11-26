@@ -8,6 +8,7 @@
 #include "Model.h"
 #include "IO.h"
 
+
 std::ofstream MCMC::lnlout;
 
 extern double Random();
@@ -43,7 +44,7 @@ void MCMC::Init(Model* model) {
 	tree_sample_freq = env.get_int("tree_sample_frequency");
 	
 	//Calculate initial likelihood.
-	lnL = model->CalcLnl();
+	lnL = model->CalculateLikelihood();
 	RecordState();
 
 	//Initialize output file.
@@ -69,9 +70,8 @@ void MCMC::sample() {
 	std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
 	if(i % tree_sample_freq == 0) {
-		float oldLnl = lnL;
 		sampleType = model->SampleTree(); // All tree sampling right now is Gibbs.
-		lnL = model->CalcLnl();
+		lnL = model->CalculateLikelihood();
 		i = 0;
 
 		time_taken = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count();
@@ -79,7 +79,9 @@ void MCMC::sample() {
 		total_time_tree_samples += time_taken;
 	} else {
 		sampleType = model->SampleSubstitutionModel();
-		newLnL = model->CalcLnl();
+		newLnL = model->CalculateLikelihood();
+		// newLnL_test = model->PartialCalculateLikelihood(lnL);
+		// std::cout << "Old LogL: " << lnL << " Proposed LogL: " << newLnL << " Partial LogL: " << lnL + newLnL_test << std::endl;
 		if(sampleType) {	
 			//Metropolis-Hasting method.
 			float r = log(Random());

@@ -67,6 +67,9 @@ void SequenceAlignment::Initialize() {
 	// Setup output.
 	files.add_file("sequences", env.get("sequences_out_file"), IOtype::OUTPUT);
 	sequences_out = files.get_ofstream("sequences");
+
+	// Setup Environment.
+	env.n = (*taxa_names_to_sequences.begin()).second.size();
 }
 
 void SequenceAlignment::saveToFile(int gen, double l) {

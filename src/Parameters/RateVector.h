@@ -2,26 +2,52 @@
 #define RateVector_h_
 
 #include <vector>
+#include <set>
 #include <string>
+#include <list>
 
 #include "AbstractValue.h"
 #include "ContinuousFloat.h"
 #include "VirtualSubstitutionRate.h"
 
+class BranchSegment; // Defined in Trees/Types/TreeParts.h
+
+struct bpos {
+	// Represents the position and branch that a rate vector applies to.
+	BranchSegment* branch;	
+	int pos;
+
+	bool operator<(const bpos& x) const {
+		if(branch == x.branch) {
+			if(pos < x.pos) {
+				return(true);
+			} else {
+				return(false);
+			}
+		}
+		if(branch < x.branch) return(true);
+	}
+};
+
+
 // Fundamental collection type of parameters in substitution model.
 class RateVector {
 	public: 
 		RateVector(std::string, int state, std::vector<AbstractValue*>);
-		RateVector(std::string name, int size, int state, float u);
-		std::vector<AbstractValue*> rates;
-		int state; // Determines the state that this rate vector applies to.
+
 		std::string name;
+		std::vector<AbstractValue*> rates;
+		int state; // Determines the (ancestral) state that this rate vector applies to.
+		
+		void remove_location(int pos, BranchSegment* bs);
+		void add_location(int pos, BranchSegment* bs);
+		std::set<bpos> get_locations();
+
 		void print();
 	private:
+		std::set<bpos> locations; // List of branches that rate vector applies to.
 		int size;
 		static int IDc;
-		inline void create_parameters(int n, float u);
-		
 };
 
 // Collections of rate vectors.

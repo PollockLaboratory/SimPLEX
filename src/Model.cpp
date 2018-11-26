@@ -25,6 +25,7 @@ Model::Model() {
 	 */
 	tree = NULL;
 	SubstitutionModel* substitution_model = NULL;
+	ready = true;
 }
 
 Model::~Model() {
@@ -62,26 +63,51 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA) {
 	tree->Initialize(raw_tree, MSA, substitution_model);
 }
 
+// Sampling
 bool Model::SampleTree() {
-	return(tree->SampleParameters());
+	if(ready) {
+		return(tree->SampleParameters());
+	} else {
+		std::cout << "Error: Attempt to sample tree before accepting previous changes." << std::endl;
+		exit(EXIT_FAILURE);
+	}
 }
 
 bool Model::SampleSubstitutionModel() {
-	return(substitution_model->SampleParameters());
+	if(ready) {
+		return(substitution_model->SampleParameters());
+		ready = false;
+	} else {
+		std::cout << "Error: Attempt to sample parameter before accepting previous changes." << std::endl;
+		exit(EXIT_FAILURE);
+
+
+	}
 }
 
 void Model::accept() {
 	substitution_model->accept();
+	ready = true;
 }
 
 void Model::reject() {
 	substitution_model->reject();
+	ready = true;
 }
 
-void Model::printParameters() {
-	tree->printParameters();
+// Likelihood Calculations.
+double Model::CalculateLikelihood() {
+	/*
+	 * Calculates the likelihood of the current tree and substitution model.
+	 */
+	return(tree->calculate_likelihood());
 }
 
+double Model::PartialCalculateLikelihood(const double lnL) {
+	return(tree->partial_calculate_likelihood());
+}
+
+// Printing/Recording
 void Model::RecordState(int gen, double l) {
 	/*
 	 * Records the state of both the tree and the substitution model.
@@ -90,14 +116,11 @@ void Model::RecordState(int gen, double l) {
 	substitution_model->saveToFile(gen, l);
 }
 
-double Model::CalcLnl() {
-	/*
-	 * Calculates the likelihood of the current tree and substitution model.
-	 */
-	return(tree->calculate_likelihood());
-	//return CalculateLogLikelihoodOfSubtree(*tree);
+void Model::printParameters() {
+	tree->printParameters();
 }
 
+// Tidying up
 void Model::Terminate() {
 	/*
 	 * Just terminates substitution_model.

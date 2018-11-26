@@ -60,6 +60,7 @@ class Tree {
 		// Likelihood.
 		void findKeyStatistics(); //Find the key statistics need for the likelihood function.
 		double calculate_likelihood();
+		double partial_calculate_likelihood();
 	private:
 		void configureSequences(TreeNode* n);
 		void configureRateVectors();

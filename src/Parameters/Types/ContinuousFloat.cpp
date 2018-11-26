@@ -32,6 +32,7 @@ ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, d
 	previous_value = 0.0;
 }
 
+// Utils
 void ContinuousFloat::printValue() {
 	std::cout << "Continuous float - " << name << ": " << value << std::endl;
 }
@@ -42,6 +43,7 @@ bool ContinuousFloat::sample() {
 
 	double r = ((rand() % 10000) / 10000.0) - 0.5;
 	value = value + (r * std_dev);
+
 	if(value < lower_bound) {
 		value = 2*lower_bound - value;
 	}
@@ -49,12 +51,19 @@ bool ContinuousFloat::sample() {
 	if(value > upper_bound) {
 		value = 2*upper_bound - value;
 	}
-
 	return(true);
 }
 
 double ContinuousFloat::getValue() {
-	return value;
+	return(value);
+}
+
+double ContinuousFloat::getOldValue() {
+	if(fixedQ) {
+		std::cout << "Error: in ContinuousFloat::getOldValue - already fixed." << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	return(previous_value);
 }
 
 void ContinuousFloat::undo() {

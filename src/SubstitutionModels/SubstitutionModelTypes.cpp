@@ -5,10 +5,12 @@
 #include "../Environment.h"
 
 #include "Types/GeneralTimeReversible.h"
+#include "Types/SingleRate.h"
 
 extern Environment env;
 
 static const int general_time_reversible_model_type = 0;
+static const int single_rate_model_type = 1;
 
 SubstitutionModel* GetSubstitutionModel() {
 	/*
@@ -21,6 +23,8 @@ SubstitutionModel* GetSubstitutionModel() {
 
 	if (next_model_type == general_time_reversible_model_type) {
 		substitution_model = new GeneralTimeReversible();
+	} else if (next_model_type == single_rate_model_type) {
+		substitution_model = new SingleRate();
 	} else {
 		std::cerr << "Substitution model type not recognized in get next sub model " << next_model_type << std::endl;
 		std::exit(-1);

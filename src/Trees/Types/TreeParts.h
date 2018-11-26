@@ -22,11 +22,13 @@ class BranchSegment {
 		float distance;
 		TreeNode* ancestral;
 		TreeNode* decendant;
-		
-		std::vector<RateVector*> rates; //By site.
+
+		void set_rate_vector(int pos);
+		void set_rate_vector(int pos, RateVector* rv);
+		double get_rate(int pos, int dec_state); 			
 
 		// Key statistics.
-		std::list<substitution> subs;
+		std::vector<substitution> subs;
 		int num0subs;
 		int num1subs;
 
@@ -34,6 +36,8 @@ class BranchSegment {
 		void updateStats();
 
 		friend std::ostream& operator<< (std::ostream &out, const BranchSegment &b);
+	private:
+		std::vector<RateVector*> rates; //By site.
 };
 
 class TreeNode {

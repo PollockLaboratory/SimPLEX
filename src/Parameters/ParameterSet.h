@@ -22,6 +22,8 @@ class ParameterSet {
 		void accept();
 		void reject();
 
+		std::list<AbstractValue*> get_current_parameters();
+
 		void print();
 		double get(const std::string &name);
 		int size();
@@ -30,12 +32,14 @@ class ParameterSet {
 	private:
 		void stepToNextParameter();
 
-		std::list<AbstractDependentParameter*> dependent_parameter_list;
 		std::list<AbstractParameter*> parameter_list;
+		std::list<AbstractDependentParameter*> dependent_parameter_list;
 		std::list<AbstractParameter*>::iterator current_parameter; //Tracks the current parameter to be sampled, via an iterator across the parameter_list.
 	
 		// Dependancies.
 		std::map<AbstractValue*, std::list<AbstractDependentParameter*>> value_to_dependents; // Maps AbstractValues to AbstractDependentParameters that depend on them.
+		std::list<AbstractDependentParameter*> get_dependent_parameters(AbstractValue* v);
+
 		void setupDependancies();
 		void refreshDependancies(AbstractValue*);
 

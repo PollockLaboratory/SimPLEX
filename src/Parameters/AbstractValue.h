@@ -4,6 +4,12 @@
 #include <string>
 #include <vector>
 
+// Given these current class definitions there cannot be a samplable parameter that is also dependent on other
+// parameters - such as category parameters.
+
+// Defined in RateVector.h
+class RateVector;
+
 class AbstractValue {
 	public:
 		AbstractValue(std::string parameter_name) {
@@ -12,7 +18,11 @@ class AbstractValue {
 
 		std::string name;
 		virtual double getValue() = 0;
+		virtual double getOldValue() = 0;
 		virtual void printValue() = 0;
+
+		int state; // The (decendent) state that a value applies to, if used directly as rate.
+		RateVector* rv; // Pointer to the rate vector the parameter sits within.
 };
 
 class AbstractParameter : public AbstractValue {

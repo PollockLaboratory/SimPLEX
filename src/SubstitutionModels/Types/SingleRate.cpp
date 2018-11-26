@@ -1,4 +1,4 @@
-#include "GeneralTimeReversible.h"
+#include "SingleRate.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -7,31 +7,29 @@
 
 extern Environment env;
 
-GeneralTimeReversible::GeneralTimeReversible() {
+SingleRate::SingleRate() {
 }
 
-void GeneralTimeReversible::Initialize(int number_of_sites, std::vector<std::string> states) {
+void SingleRate::Initialize(int number_of_sites, std::vector<std::string> states) {
 	/*
 	 * std::cout << "Initializing Single Probability Model" << std::endl;
 	 */
 
 	float u = env.u;
 
-	std::cout << "Protein General Time Reversible Model (GTR)." << std::endl;
+	std::cout << "Protein Single Rate." << std::endl;
 
 	std::array<std::string, 20> aa = {"A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"};
 
 	std::vector<std::vector<AbstractValue*>> Q(20, std::vector<AbstractValue*>(20, NULL));
 
-	AbstractValue* r = NULL;
+	AbstractValue* r = new ContinuousFloat("Rate", 0.01, 0.0001, 0.0);
 	for(int i = 0; i < 20; i++) {
 		for(int j = 0; j < 20; j++) {
 			if(i == j) {
 				Q[i][j] = new VirtualSubstitutionRate(aa[i] + aa[j], u);
-			} else if(i < j) {
-				Q[i][j] = new ContinuousFloat(aa[i] + aa[j], 0.01, 0.05, 0.0);
 			} else {
-				Q[i][j] = Q[j][i];
+				Q[i][j] = r;
 			}
 		}
 

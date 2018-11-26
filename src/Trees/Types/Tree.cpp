@@ -82,14 +82,12 @@ void Tree::configureSequences(TreeNode* n) {
 
 	if(n->left != 0) {
 		BranchSegment* b = n->left;
-		b->rates.resize(seqLen);
 		branchList.push_back(b);
 		configureSequences(b->decendant);
 	}
 
 	if(n->right != 0) {
 		BranchSegment* b = n->right;
-		b->rates.resize(seqLen);
 		branchList.push_back(b);
 		configureSequences(b->decendant);
 	}
@@ -112,16 +110,17 @@ void Tree::configureSequences(TreeNode* n) {
 
 void Tree::configureRateVectors() {
 	BranchSegment* branch;
-	std::vector<int> s; 
+	std::vector<int> seq; 
 	for(auto it = branchList.begin(); it != branchList.end(); ++it) {
 		branch = (*it);
-		s = *(branch->ancestral->sequence);
-		for(int i = 0; i < s.size(); i++) {
+		seq = *(branch->ancestral->sequence);
+		for(int i = 0; i < seq.size(); i++) {
 			// Don't add rate vector if gap.
-			if(s[i] == -1) {
-				branch->rates[i] = NULL;
+			if(seq[i] == -1) {
+				branch->set_rate_vector(i);
 			} else {
-				branch->rates[i] = SM->selectRateVector(s[i]);	
+				RateVector* rv = SM->selectRateVector(seq[i]);
+				branch->set_rate_vector(i, rv);	
 			}
 		}
 	}
@@ -169,8 +168,8 @@ void Tree::printBranchList() {
 	for(std::list<BranchSegment*>::iterator it = branchList.begin(); it != branchList.end(); ++it) {
 		BranchSegment* b = *it;
 		std::cout << "Branch: " << b->distance;
-		auto subs = b->subs;
-		for(std::list<substitution>::iterator s = subs.begin(); s != subs.end(); ++s) {
+		std::vector<substitution> subs = b->subs;
+		for(auto s = subs.begin(); s != subs.end(); ++s) {
 			std::cout << " " << MSA->decodeChar((*s).anc) << (*s).pos << MSA->decodeChar((*s).dec);	
 		}
 		std::cout << std::endl;
@@ -222,15 +221,40 @@ double Tree::calculate_likelihood() {
 	}
 
 	// Substitutions.
+	float r = 0;
 	for(auto b = branchList.begin(); b != branchList.end(); ++b) {
 		BranchSegment* branch = *b;
-		for(auto s = branch->subs.begin(); s != branch->subs.end(); ++s) {
-			substitution sub = *s;
-			l += log(branch->rates[sub.pos]->rates[sub.dec]->getValue());
+		std::vector<substitution> subs = branch->subs;
+		for(int i = 0; i < subs.size(); i++) {
+			if(subs[i].pos != -1) {
+				r = branch->get_rate(i, subs[i].dec);
+				if(isnan(log(r))) {
+					std::cout << "Hit a nan rate: " << r << " " << log(r) << std::endl;
+				}
+				l += log(r);
+			}
+		}
+	}
+	return(l);
+}
+
+double Tree::partial_calculate_likelihood() {
+	//std::cout << "Partial Likelihood Calculation - tree" << std::endl;
+	double deltaLogL = 0.0;
+	std::list<AbstractValue*> l = SM->get_current_parameters();
+	for(auto it = l.begin(); it != l.end(); ++it) {
+		int dec = (*it)->state;
+		std::set<bpos> locs = (*it)->rv->get_locations();
+		for(auto jt = locs.begin(); jt != locs.end(); ++jt) {
+			BranchSegment* b = (*jt).branch;
+			substitution s = b->subs[(*jt).pos];
+			if(dec == s.dec) {
+				deltaLogL += log((*it)->getOldValue()/(*it)->getValue());	
+			}
 		}
 	}
 
-	return(l);
+	return(deltaLogL);
 }
 
 void Tree::InitializeOutputStreams() {
@@ -248,7 +272,6 @@ void Tree::InitializeOutputStreams() {
 
 void SampleNode(TreeNode* n) {
 	if(n->sampled == false) {
-		// std::cout << "Sampling tree node: " << n->name << std::endl;
 		n->sampled = true;
 		n->sampleSequence();
 

@@ -17,6 +17,8 @@ class MCMC {
 		double newLnL;
 		bool accepted;
 
+		double newLnL_test; // Temp value for partial likelihood update.
+
 		// Settings.
 		int out_freq; // Frequency of saving state.
 		int print_freq; // Frequency of printing likelihood to term.

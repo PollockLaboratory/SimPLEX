@@ -7,35 +7,25 @@ extern IO::Files files;
 
 int RateVector::IDc = 0;
 
+// Figure out locations Data Structure.
 RateVector::RateVector(std::string name, int state, std::vector<AbstractValue*> params) : name(name), state(state) {
 	size = params.size();
-	rates = params;
+	rates = params;	
+	locations = {};
 }
 
-// These are redundant now I think.
-inline void RateVector::create_parameters(int n, float u) {
-	VirtualSubstitutionRate* unifp = new VirtualSubstitutionRate(this->name + "-virtual", u);
-	for(int i = 0; i < n; i++) {
-		if(i == state) {
-			rates.push_back(unifp);
-		} else {
-			std::string name = this->name + "-" + std::to_string(i);
-			ContinuousFloat* p = new ContinuousFloat(name, 0.1, 0.3);
-			unifp->add_dependancy(p);
-			rates.push_back(p);
-		}
-	}
-	unifp->refresh();
+void RateVector::add_location(int pos, BranchSegment* bs) {
+	bpos loc = {bs, pos};
+	locations.insert(loc);
 }
 
-RateVector::RateVector(std::string name, int size, int state, float u) {
-	/*
-	 * The state variable also describes the position of the virtual subtitution rate in the matrix.
-	 */
-	this->size = size;
-	this->state = state;
-	this->name = name;
-	create_parameters(size, u);
+void RateVector::remove_location(int pos, BranchSegment* bs) {
+	bpos loc = {bs, pos};
+	locations.erase(loc);
+}
+
+std::set<bpos> RateVector::get_locations() {
+	    return(locations);
 }
 
 // Util.
@@ -69,6 +59,10 @@ RateVector*& RateVectorSet::operator[] (const int i) {
 }
 
 void RateVectorSet::add(RateVector* v) {
+	for(int i = 0; i < v->rates.size(); i++) {
+		v->rates[i]->state = i;
+		v->rates[i]->rv = v;
+	}
 	c.push_back(v);
 }
 

@@ -114,6 +114,31 @@ void ParameterSet::reject() {
 	stepToNextParameter();
 }
 
+std::list<AbstractDependentParameter*> ParameterSet::get_dependent_parameters(AbstractValue* v) {
+	std::list<AbstractDependentParameter*> l = {};
+
+	std::list<AbstractDependentParameter*> deps = value_to_dependents[v];
+	for(auto d = deps.begin(); d != deps.end(); ++d) {
+		l.push_back(*d);
+		l.splice(l.end(), get_dependent_parameters(*d));
+	}
+
+	return(l);
+}
+
+std::list<AbstractValue*> ParameterSet::get_current_parameters() {
+	/*
+	 * Given the position of the current_parameter iterator, will return all the dependent parameters.
+	 * This reflects all the parameters that have changed with current sampling.
+	 */
+	std::list<AbstractValue*> l = {*current_parameter};
+ 	std::list<AbstractDependentParameter*> deps = get_dependent_parameters(*current_parameter);
+	for(auto it = deps.begin(); it != deps.end(); ++it) {
+		l.push_back(*it);
+	}
+	return(l);
+}
+
 void ParameterSet::print() {
 	/*
 	 * Prints a short description of the state of the parameter_list.

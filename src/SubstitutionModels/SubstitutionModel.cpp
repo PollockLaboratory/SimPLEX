@@ -52,6 +52,10 @@ int SubstitutionModel::getNumberOfParameters() {
 	return(parameters.size());
 }
 
+std::list<AbstractValue*> SubstitutionModel::get_current_parameters() {
+	return(parameters.get_current_parameters());
+}
+
 void SubstitutionModel::saveToFile(int gen, double l) {
 	parameters.saveToFile(gen, l);
 	rateVectors.saveToFile(gen, l);
