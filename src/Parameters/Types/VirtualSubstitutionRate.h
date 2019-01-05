@@ -3,6 +3,15 @@
 
 #include "AbstractValue.h"
 #include <string>
+#include <exception>
+
+class OutOfBoundsException: public std::exception {
+	private:
+		std::string m_error;
+	public:
+		OutOfBoundsException(std::string error_message) : m_error(error_message) {
+		}
+};
 
 class VirtualSubstitutionRate : public AbstractDependentParameter {
 	public:

@@ -48,7 +48,11 @@ void BranchSegment::set_rate_vector(int pos, RateVector* rv) {
 }
 
 double BranchSegment::get_rate(int pos, int dec_state) {
-	return(rates[pos]->rates[dec_state]->getValue());
+	double r = rates[pos]->rates[dec_state]->getValue();
+	if(isnan(log(r))) {
+		rates[pos]->rates[dec_state]->printValue();
+	}
+	return(r);
 }
 
 // Key Statistics
@@ -80,10 +84,12 @@ void BranchSegment::updateStats() {
 	for(int pos = 0; pos < anc.size(); pos++) {
 		if(dec.at(pos) != -1) {
 			if(anc.at(pos) == dec.at(pos)) {
+				// Add virtual substitution.
 				if(virtualSubstituionQ(anc.at(pos))) {
 					num1subs += 1;
 					s = {pos, anc.at(pos), dec.at(pos)};
 					subs[pos] = s;
+				// Don't add virtual substitution.
 				} else {
 					num0subs += 1;
 					s = {-1, -1, -1}; // NULL substitution

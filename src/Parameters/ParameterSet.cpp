@@ -86,10 +86,22 @@ void ParameterSet::refreshDependancies(AbstractValue* v) {
 // Sampling.
 bool ParameterSet::sample() {
 	/*
-	 * Will sample the current parameters.
+	 * Sample the current parameters.
 	 */
 	bool sampleType = (*current_parameter)->sample();
-	refreshDependancies(*current_parameter);
+
+	try {
+		refreshDependancies(*current_parameter);
+	}
+
+	catch(OutOfBoundsException &exception) {
+		// A dependent parameter is out of bounds, undo the change 
+		// and try again.
+		(*current_parameter)->undo();
+		refreshDependancies(*current_parameter);
+		sampleType = sample();
+	}
+
 	return (sampleType);
 }
 

@@ -310,7 +310,7 @@ bool Tree::SampleParameters() {
 	}
 
 	findKeyStatistics();
-	
+
 	return(false);
 }
 

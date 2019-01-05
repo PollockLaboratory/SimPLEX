@@ -24,6 +24,9 @@ void VirtualSubstitutionRate::refresh() {
 		total += (*it)->getValue();
 	}
 	value = u - total;
+	if(value < 0.0 || value > 1.0) {
+		throw OutOfBoundsException("VirtualSubstitutionRate out of bounds.");
+	}
 }
 
 void VirtualSubstitutionRate::add_dependancy(AbstractValue* v) {

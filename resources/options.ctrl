@@ -30,14 +30,14 @@ constant_substitution_model	0
 substitution_model_initialization	0
 
 # MCMC settings.
-generations 1000001
-output_frequency 100
+generations 100000
+output_frequency 1000
 print_frequency 1000
 
-# sequences_file	resources/Species_alignment_BLVRB.fasta
-sequences_file	resources/5taxon.fasta
-# tree_file	resources/BLVRB_subtree_MLbranches.nh
-tree_file	resources/5taxon.tree
+sequences_file	resources/Species_alignment_BLVRB.fasta
+# sequences_file	resources/5taxon.fasta
+tree_file	resources/BLVRB_subtree_MLbranches.nh
+# tree_file	resources/5taxon.tree
 
 # sequences_file	testing/sequences_long.fasta
 # tree_file	testing/tree.newick

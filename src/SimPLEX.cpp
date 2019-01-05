@@ -4,8 +4,8 @@
  *
  * Renamed from SimPLEX on 2014-2-13
  *
- * Author: Stephen Pollard
- * Stephen.T.Pollard@gmail.com
+ * Author: Hamish Pike
+ * hamish.pike@ucdenver.edu
  * 2013-12-05
  */
 
