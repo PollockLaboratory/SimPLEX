@@ -20,11 +20,19 @@ Data::~Data() {
 }
 
 void Data::Initialize() {
-	MSA = ReadSequences();
-	MSA->Initialize();
+  if(env.get("ancestral_sequences") == "nil") {
+    MSA = ReadSequences();
+    MSA->Initialize();
+  } else {
+    std::cout << "Ancestral sequences given." << std::endl;
+  }
 
-	raw_tree = ReadTree();
-	std::cout << std::endl;
+  raw_tree = ReadTree();
+  std::cout << std::endl;
+
+  // Test exit
+  //std::cout << "Test exit." << std::endl;
+  //exit(0);
 }
 
 // Sequences

@@ -55,6 +55,7 @@ class Tree {
 		bool SampleParameters();
 		
 		// Recording state data.
+		void RecordTree();
 		void RecordState(int gen, double l);
 	
 		// Likelihood.

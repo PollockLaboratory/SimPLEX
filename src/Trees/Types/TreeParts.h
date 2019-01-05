@@ -41,29 +41,30 @@ class BranchSegment {
 };
 
 class TreeNode {
-	public:
-		static int unique_id;
-		std::string name;
-		double distance;
-		
-		BranchSegment* up;
-		BranchSegment* left;
-		BranchSegment* right;
-		
-		std::vector<int>* sequence;	
-		SequenceAlignment* MSA;
-	
-		SubstitutionModel* SM;
+ public:
+  static int unique_id;
+  std::string name;
+  double distance;
 
-		TreeNode();
-		TreeNode(IO::RawTreeNode* raw_tree);
-		TreeNode(std::string n);
+  BranchSegment* up;
+  BranchSegment* left;
+  BranchSegment* right;
 
-		void sampleSequence();
-		void sampleSinglePosition(int pos);
+  std::vector<int>* sequence;
+  SequenceAlignment* MSA;
 
-		bool isTip();
-		bool sampled;
+  SubstitutionModel* SM;
+
+  TreeNode();
+  TreeNode(IO::RawTreeNode* raw_tree);
+  TreeNode(std::string n);
+
+  void sampleSequence();
+  void sampleSinglePosition(int pos);
+  std::string toString();
+
+  bool isTip();
+  bool sampled;
 };
 
 #endif

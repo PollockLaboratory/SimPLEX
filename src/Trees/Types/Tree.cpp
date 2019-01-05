@@ -141,7 +141,7 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
 	// Proxys are created to correctly create root node.
 	BranchSegment* proxyBranch = new BranchSegment(0.0);
 	TreeNode* proxyNode = new TreeNode("Proxy");
-	TreeNode* root = createTreeNode(raw_tree, proxyNode, proxyBranch);
+	root = createTreeNode(raw_tree, proxyNode, proxyBranch);
 	delete proxyBranch;
 	delete proxyNode;
 	
@@ -315,9 +315,15 @@ bool Tree::SampleParameters() {
 }
 
 // Record State.
+void Tree::RecordTree() {
+  std::cout << "Recording Tree." << std::endl;
+  std::cout << root->name << std::endl;
+  tree_out << root->toString();
+}
+
 void Tree::RecordState(int gen, double l) {
-	MSA->saveToFile(gen, l);
-	//RecordSubtreeState();
-	//AddGenerationEndIndicatorsToOutputFiles();
+  MSA->saveToFile(gen, l);
+  //RecordSubtreeState();
+  //AddGenerationEndIndicatorsToOutputFiles();
 }
 

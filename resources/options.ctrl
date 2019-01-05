@@ -16,10 +16,14 @@ states 1
 # TREE SETTINGS
 max_segment_length	0.08
 branch_split_algorithm	0 
-tree_sample_frequency 2000
+tree_sample_frequency 50
 # constant_tree	0
 tree_type	0
 uniformization_constant 0.35
+
+# TREE DATA
+# if ancestral sequences file is given, will use those given sequences rather than resampling through the MCMC.
+ancestral_sequences nil
  
 # Substitution model types
 # 0	General Time Reversible
@@ -30,14 +34,14 @@ constant_substitution_model	0
 substitution_model_initialization	0
 
 # MCMC settings.
-generations 100000
-output_frequency 1000
-print_frequency 1000
+generations 1001
+output_frequency 100
+print_frequency 100
 
-sequences_file	resources/Species_alignment_BLVRB.fasta
-# sequences_file	resources/5taxon.fasta
-tree_file	resources/BLVRB_subtree_MLbranches.nh
-# tree_file	resources/5taxon.tree
+#sequences_file	resources/Species_alignment_BLVRB.fasta
+sequences_file	resources/test_data/5taxon.fasta
+#tree_file	resources/BLVRB_subtree_MLbranches.nh
+tree_file	resources/test_data/5taxon.tree
 
 # sequences_file	testing/sequences_long.fasta
 # tree_file	testing/tree.newick

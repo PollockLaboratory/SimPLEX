@@ -217,6 +217,25 @@ void TreeNode::sampleSinglePosition(int pos) {
 	if(right) right->set_rate_vector(pos, rv);	
 }
 
+std::string TreeNode::toString() {
+  std::cout << "Node to string: " << std::endl;
+  std::string n = name + ":" + std::to_string(distance);
+  if(left == 0 and right == 0) {
+    std::cout << "Tip" << std::endl;
+    return(n);
+  } else if(left == 0) {
+    std::cout << "left" << std::endl;
+    return("(" + right->decendant->toString() + ")" + n);
+  } else if(right == 0) {
+    std::cout << "right" << std::endl;
+    return("(" + left->decendant->toString() + ")" + n);
+  } else {
+    std::cout << "Here." << std::endl;
+    return("(" + left->decendant->toString() + ":" + right->decendant->toString() + ")" + n);
+  }
+  return("Hello");
+}
+
 void TreeNode::sampleSequence() {
 	if(!isTip()) {
 		for(int pos = 0; pos < sequence->size(); pos++) {
@@ -229,11 +248,11 @@ void TreeNode::sampleSequence() {
 }
 
 bool TreeNode::isTip() {
-	if(this->left == 0 and this->right == 0) {
-		return(true);
-	} else {
-		return(false);
-	}
+  if(this->left == 0 and this->right == 0) {
+    return(true);
+  } else {
+    return(false);
+  }
 }
 
 

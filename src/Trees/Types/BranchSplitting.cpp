@@ -42,6 +42,7 @@ std::pair<BranchSegment*, BranchSegment*> splitHalfMethod(float distance) {
 	if(extraNodes > 0) {
 		for(int i = 0; i < extraNodes; i++) {
 			TreeNode* n = new TreeNode();
+			n->distance = dist;
 			//nodeList.push_back(n);
 
 			BranchSegment* b = new BranchSegment(dist);

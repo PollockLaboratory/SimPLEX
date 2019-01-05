@@ -125,5 +125,7 @@ void Model::Terminate() {
 	/*
 	 * Just terminates substitution_model.
 	 */
-	substitution_model->Terminate();
+  // Save the tree data.
+  tree->RecordTree();
+  substitution_model->Terminate();
 }
