@@ -49,40 +49,38 @@ SubstitutionModel* Model::InitializeSubstitutionModel(int num_sites, vector<stri
 }
 
 void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA) {
-	/*
-	 * Initialize the model class.
-	 * There are two main components within the model class:
-	 * - the tree class - contains the tree topology as well as the sequences.
-	 * - the substitution model class - which contains all the rate matrices.
-	 */
-	int num_sites = (MSA->taxa_names_to_sequences).begin()->second.size();
-	substitution_model = InitializeSubstitutionModel(num_sites, MSA->states);
-	num_parameters = substitution_model->getNumberOfParameters();
+  /*
+   * Initialize the model class.
+   * There are two main components within the model class:
+   * - the tree class - contains the tree topology as well as the sequences.
+   * - the substitution model class - which contains all the rate matrices.
+   */
+  int num_sites = (MSA->taxa_names_to_sequences).begin()->second.size();
+  substitution_model = InitializeSubstitutionModel(num_sites, MSA->states);
+  num_parameters = substitution_model->getNumberOfParameters();
 
-	tree = TreeTypes::pickTreeType();
-	tree->Initialize(raw_tree, MSA, substitution_model);
+  tree = TreeTypes::pickTreeType();
+  tree->Initialize(raw_tree, MSA, substitution_model);
 }
 
 // Sampling
 bool Model::SampleTree() {
-	if(ready) {
-		return(tree->SampleParameters());
-	} else {
-		std::cout << "Error: Attempt to sample tree before accepting previous changes." << std::endl;
-		exit(EXIT_FAILURE);
-	}
+  if(ready) {
+    return((tree->*tree->treeSamplingMethod)());
+  } else {
+    std::cout << "Error: Attempt to sample tree before accepting previous changes." << std::endl;
+    exit(EXIT_FAILURE);
+  }
 }
 
 bool Model::SampleSubstitutionModel() {
-	if(ready) {
-		return(substitution_model->SampleParameters());
-		ready = false;
-	} else {
-		std::cout << "Error: Attempt to sample parameter before accepting previous changes." << std::endl;
-		exit(EXIT_FAILURE);
-
-
-	}
+  if(ready) {
+    return(substitution_model->SampleParameters());
+    ready = false;
+  } else {
+    std::cout << "Error: Attempt to sample parameter before accepting previous changes." << std::endl;
+    exit(EXIT_FAILURE);
+  }
 }
 
 void Model::accept() {

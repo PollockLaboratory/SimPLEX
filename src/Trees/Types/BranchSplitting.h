@@ -10,6 +10,7 @@
 std::function< std::pair<BranchSegment*, BranchSegment*>(float)> pickBranchSplitAlgorithm();
 
 // Possible algorithms.
+std::pair<BranchSegment*, BranchSegment*> noSplitMethod(float distance); 
 std::pair<BranchSegment*, BranchSegment*> splitHalfMethod(float distance); 
 
 #endif

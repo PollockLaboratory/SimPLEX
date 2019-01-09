@@ -218,22 +218,16 @@ void TreeNode::sampleSinglePosition(int pos) {
 }
 
 std::string TreeNode::toString() {
-  std::cout << "Node to string: " << std::endl;
   std::string n = name + ":" + std::to_string(distance);
   if(left == 0 and right == 0) {
-    std::cout << "Tip" << std::endl;
     return(n);
   } else if(left == 0) {
-    std::cout << "left" << std::endl;
     return("(" + right->decendant->toString() + ")" + n);
   } else if(right == 0) {
-    std::cout << "right" << std::endl;
     return("(" + left->decendant->toString() + ")" + n);
   } else {
-    std::cout << "Here." << std::endl;
-    return("(" + left->decendant->toString() + ":" + right->decendant->toString() + ")" + n);
+    return("(" + left->decendant->toString() + "," + right->decendant->toString() + ")" + n);
   }
-  return("Hello");
 }
 
 void TreeNode::sampleSequence() {

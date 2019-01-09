@@ -15,11 +15,6 @@ states 1
 
 # TREE SETTINGS
 max_segment_length	0.08
-
-# Branch splitting methods
-# When "ancestral sequences" is 1, will override and always choose no split method.
-# 0 no splitting
-# 1 split in half
 branch_split_algorithm	1
 tree_sample_frequency 50
 # constant_tree	0
@@ -28,7 +23,7 @@ uniformization_constant 0.35
 
 # TREE DATA
 # if ancestral sequences file is given, will use those given sequences rather than resampling through the MCMC.
-ancestral_sequences 1
+ancestral_sequences nil
  
 # Substitution model types
 # 0	General Time Reversible
@@ -43,8 +38,13 @@ generations 1001
 output_frequency 100
 print_frequency 100
 
-sequences_file	resources/test_data/fixed_ancestral.fasta
-tree_file	resources/test_data/fixed_ancestral.newick
+#sequences_file	resources/Species_alignment_BLVRB.fasta
+sequences_file	resources/test_data/5taxon.fasta
+#tree_file	resources/BLVRB_subtree_MLbranches.nh
+tree_file	resources/test_data/5taxon.tree
+
+# sequences_file	testing/sequences_long.fasta
+# tree_file	testing/tree.newick
 
 output_directory testing/test_run/
 sequences_out_file		sequences_out.fasta

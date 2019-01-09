@@ -37,6 +37,19 @@ SequenceAlignment::SequenceAlignment() {
 	env.state_to_integer = state_to_integer;
 }
 
+SequenceAlignment::SequenceAlignment(const SequenceAlignment &msa) {
+  // The copy constructor.
+  // Check whether this is truely copying.
+  taxa_names_to_sequences = msa.taxa_names_to_sequences;
+  columns_with_gaps = msa.columns_with_gaps;
+  columns_without_gaps = msa.columns_without_gaps;
+  states = msa.states;
+  state_to_integer = msa.state_to_integer;
+  integer_to_state = msa.integer_to_state;
+  MSA_list = msa.MSA_list;
+  current_MSA = MSA_list->begin();
+}
+
 static const int gap_indicator = -1;
 
 void SequenceAlignment::add(std::string name, std::string sequence_str) {
@@ -59,10 +72,11 @@ void SequenceAlignment::print() {
 	}
 }
 
-void SequenceAlignment::Initialize() {
+void SequenceAlignment::Initialize(std::list<SequenceAlignment*>* msa_List) {
 	// Process sequences.
 	DetermineColumnsWithoutGaps();
 	RemoveColumnsWithGapsFromSequences();
+	MSA_list = msa_List;
 
 	// Setup output.
 	files.add_file("sequences", env.get("sequences_out_file"), IOtype::OUTPUT);
@@ -171,5 +185,30 @@ std::list<substitution> SequenceAlignment::findSubstitutions(const std::vector<i
 		}
 	}	
 	return(s);
+}
+
+std::list<std::string> SequenceAlignment::getNodeNames() {
+  std::list<std::string> names;
+  for(auto it = taxa_names_to_sequences.begin(); it != taxa_names_to_sequences.end(); ++it) {
+    names.push_back(it->first);
+  }
+  return(names);
+}
+
+// Ancestral Sequences
+void SequenceAlignment::stepToNextMSA() {
+  if(env.ancestral_sequences != 1) {
+    std::cerr << "Error: Invalid stepToNextMSA call, ancestral sequences not previously determined." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  ++current_MSA;
+  if(current_MSA == MSA_list->end()) {
+    current_MSA = MSA_list->begin();
+  }
+  for(auto it = taxa_names_to_sequences.begin(); it != taxa_names_to_sequences.end(); ++it) {
+    //std::cout << "Current sequence: " << decodeSequence(it->second) << std::endl;
+    //std::cout << "New Sequence: " << decodeSequence((*current_MSA)->taxa_names_to_sequences[it->first]) << std::endl;
+    it->second = (*current_MSA)->taxa_names_to_sequences[it->first];
+  }
 }
 

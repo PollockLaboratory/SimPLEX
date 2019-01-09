@@ -32,7 +32,7 @@ void Tree::connectNodes(TreeNode* &ancestralNode, BranchSegment* &ancestralBP, T
 	 * 	decendantNode - pointer to the decendantNode.
 	 * 	distance - the branch length.
 	 */
-	std::pair<BranchSegment*, BranchSegment*> intermediateBranches = splitBranch(distance);
+	std::pair<BranchSegment*, BranchSegment*> intermediateBranches = splitBranchMethod(distance);
 	BranchSegment* newBranchTop = intermediateBranches.first;
 	BranchSegment* newBranchBottom = intermediateBranches.second;
 
@@ -44,68 +44,81 @@ void Tree::connectNodes(TreeNode* &ancestralNode, BranchSegment* &ancestralBP, T
 }
 
 TreeNode* Tree::createTreeNode(IO::RawTreeNode* raw_tree, TreeNode* &ancestralNode, BranchSegment* &ancestralBP) {
-	TreeNode* newTreeNode = new TreeNode(raw_tree);
-	connectNodes(ancestralNode, ancestralBP, newTreeNode, raw_tree->distance);
+  TreeNode* newTreeNode = new TreeNode(raw_tree);
+  connectNodes(ancestralNode, ancestralBP, newTreeNode, raw_tree->distance);
 
-	if(raw_tree->left != 0) { 
-		createTreeNode(raw_tree->left, newTreeNode, newTreeNode->left);
-	}
+  if(raw_tree->left != 0) {
+    createTreeNode(raw_tree->left, newTreeNode, newTreeNode->left);
+  }
 
-	if(raw_tree->right != 0) {
-		createTreeNode(raw_tree->right, newTreeNode, newTreeNode->right); }
+  if(raw_tree->right != 0) {
+    createTreeNode(raw_tree->right, newTreeNode, newTreeNode->right);
+  }
 
-	return(newTreeNode);
+  return(newTreeNode);
 }
 
 // Configure sequences.
-
 void Tree::configureSequences(TreeNode* n) {
-	/*
-	 * Traverses the tree attaching sequences to nodes.
-	 * Also adds all the Nodes and Branch segments to their corresponding lists.
-	 */
+  /*
+   * Traverses the tree attaching sequences to nodes.
+   * Also adds all the Nodes and Branch segments to their corresponding lists.
+   */
 
-	nodeList.push_back(n);
-	n->MSA = MSA;
-	n->SM = SM;
+  n->MSA = MSA;
+  n->SM = SM;
 
-	if(MSA->taxa_names_to_sequences.count(n->name)) {
-		n->sequence = &(MSA->taxa_names_to_sequences.at(n->name));
-	} else {
-		if(n->isTip()){
-			std::cerr << "Error: Missing sequence for \"" << n->name << "\"." << std::endl;
-			exit(EXIT_FAILURE);
-		}
-		MSA->add(n->name);
-		n->sequence = &(MSA->taxa_names_to_sequences.at(n->name));
-	}
-
-	if(n->left != 0) {
-		BranchSegment* b = n->left;
-		branchList.push_back(b);
-		configureSequences(b->decendant);
-	}
-
-	if(n->right != 0) {
-		BranchSegment* b = n->right;
-		branchList.push_back(b);
-		configureSequences(b->decendant);
-	}
+  if(MSA->taxa_names_to_sequences.count(n->name)) {
+    n->sequence = &(MSA->taxa_names_to_sequences.at(n->name));
+  } else {
+    if(env.ancestral_sequences) {
+      // ANCESTRAL SEQUENCES KNOWN
+      // In the case when ancestral sequences are known there can be no missing sequences.
+      // New sequences should not be created.
+      std::cerr << "Error: Missing sequence for \"" << n->name << "\"." << std::endl;
+      exit(EXIT_FAILURE);
+    } else {
+      // NORMAL RUN
+      // only tip sequences are needed.
+      if(n->isTip()){
+	std::cerr << "Error: Missing sequence for \"" << n->name << "\"." << std::endl;
+	exit(EXIT_FAILURE);
+      } else {
+	// Add new sequence to sequence alignments.
+	MSA->add(n->name);
+	n->sequence = &(MSA->taxa_names_to_sequences.at(n->name));
 
 	// Fill missing sequences/
-	if(n->isTip()) {
-		// Node is tip.
-	} else if(n->left != 0 and n->right == 0) {
-		// Internal Continous.
-		TreeNode* dsNode = n->left->decendant; // ds = downstream.
-		*(n->sequence) = *(dsNode->sequence);
+	if(n->left != 0 and n->right == 0) {
+	  // Internal Continous.
+	  TreeNode* dsNode = n->left->decendant; // ds = downstream.
+	  *(n->sequence) = *(dsNode->sequence);
 	} else {
-		// Root or internal branch.
-		vector<int> dsNodeLseq = *(n->left->decendant->sequence);
-		vector<int> dsNodeRseq = *(n->right->decendant->sequence);
-		vector<int> p = MSA->findParsimony(dsNodeLseq, dsNodeRseq);
-		*(n->sequence) = p;
+	  // Root or internal branch.
+	  vector<int> dsNodeLseq = *(n->left->decendant->sequence);
+	  vector<int> dsNodeRseq = *(n->right->decendant->sequence);
+	  vector<int> p = MSA->findParsimony(dsNodeLseq, dsNodeRseq);
+	  *(n->sequence) = p;
 	}
+      }
+    }
+  }
+
+  // Add nodes to nodeList and BranchSegments to branchList.
+  // Recursively call cofigureSequences on rest of the tree.
+  nodeList.push_back(n);
+
+  if(n->left != 0) {
+    BranchSegment* b = n->left;
+    branchList.push_back(b);
+    configureSequences(b->decendant);
+  }
+
+  if(n->right != 0) {
+    BranchSegment* b = n->right;
+    branchList.push_back(b);
+    configureSequences(b->decendant);
+  } 
 }
 
 void Tree::configureRateVectors() {
@@ -128,64 +141,70 @@ void Tree::configureRateVectors() {
 
 // Tree Initialize using seqs and states
 void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, SubstitutionModel* &SM) {
-	std::cout << "Creating MCMC tree structure." << std::endl;
+  std::cout << "Creating MCMC tree structure." << std::endl;
 
-	max_seg_len = env.get_float("max_segment_length");
-	u = env.get_float("uniformization_constant");
-	
-	splitBranch = pickBranchSplitAlgorithm();
-	this->MSA = MSA;
-	seqLen = MSA->numCols();
-	this->SM = SM;
+  // Configuration
+  max_seg_len = env.get_float("max_segment_length");
+  u = env.get_float("uniformization_constant");
 
-	// Proxys are created to correctly create root node.
-	BranchSegment* proxyBranch = new BranchSegment(0.0);
-	TreeNode* proxyNode = new TreeNode("Proxy");
-	root = createTreeNode(raw_tree, proxyNode, proxyBranch);
-	delete proxyBranch;
-	delete proxyNode;
-	
+  // Dynamicly chosen functions.
+  splitBranchMethod = pickBranchSplitAlgorithm();
+  if(env.ancestral_sequences) {
+    treeSamplingMethod = &Tree::StepThroughMSAs;
+  } else {
+    treeSamplingMethod = &Tree::SampleParameters;
+  }
+  
+  this->MSA = MSA;
+  seqLen = MSA->numCols();
+  this->SM = SM;
 
-	std::cout << "Attaching sequences to tree." << std::endl;
-	configureSequences(root);
-	std::cout << "Attaching rate vectors to tree." << std::endl;
-	configureRateVectors();
+  // Proxys are created to correctly create root node.
+  BranchSegment* proxyBranch = new BranchSegment(0.0);
+  TreeNode* proxyNode = new TreeNode("Proxy");
+  root = createTreeNode(raw_tree, proxyNode, proxyBranch);
+  delete proxyBranch;
+  delete proxyNode;
 
-	for(auto b = branchList.begin(); b != branchList.end(); ++b) {
-		(*b)->updateStats();
-	}
+  std::cout << "Attaching sequences to tree." << std::endl;
+  configureSequences(root);
 
-	findKeyStatistics();
-	InitializeOutputStreams();	
+  std::cout << "Attaching rate vectors to tree." << std::endl;
+  configureRateVectors();
 
-	std::cout << std::endl;
+  for(auto b = branchList.begin(); b != branchList.end(); ++b) {
+  	(*b)->updateStats();
+  }
+
+  findKeyStatistics();
+  InitializeOutputStreams();	
+
+  std::cout << std::endl;
 }
 
 // Debug tools.
-
 void Tree::printBranchList() {
-	std::cout << "Printing Branch list. Size: " << branchList.size() << std::endl;
-	for(std::list<BranchSegment*>::iterator it = branchList.begin(); it != branchList.end(); ++it) {
-		BranchSegment* b = *it;
-		std::cout << "Branch: " << b->distance;
-		std::vector<substitution> subs = b->subs;
-		for(auto s = subs.begin(); s != subs.end(); ++s) {
-			std::cout << " " << MSA->decodeChar((*s).anc) << (*s).pos << MSA->decodeChar((*s).dec);	
-		}
-		std::cout << std::endl;
-	}
+  std::cout << "Printing Branch list. Size: " << branchList.size() << std::endl;
+  for(std::list<BranchSegment*>::iterator it = branchList.begin(); it != branchList.end(); ++it) {
+    BranchSegment* b = *it;
+    std::cout << "Branch: " << b->distance;
+    std::vector<substitution> subs = b->subs;
+    for(auto s = subs.begin(); s != subs.end(); ++s) {
+      std::cout << " " << MSA->decodeChar((*s).anc) << (*s).pos << MSA->decodeChar((*s).dec);
+    }
+    std::cout << std::endl;
+  }
 }
 
 void Tree::printNodeList() {
-	std::cout << "Printing Node list. Size:  " << nodeList.size() << std::endl;
-	for(auto it = nodeList.begin(); it != nodeList.end(); ++it) {
-		std::cout << "Node: " << (*it)->name << std::endl;
-	}
-
+  std::cout << "Printing Node list. Size:  " << nodeList.size() << std::endl;
+  for(auto it = nodeList.begin(); it != nodeList.end(); ++it) {
+    std::cout << "Node: " << (*it)->name << std::endl;
+  }
 }
 
 void Tree::printParameters() {
-	SM->printParameters();	
+  SM->printParameters();	
 }
 
 // Sampling and likelihood.
@@ -210,60 +229,60 @@ void Tree::findKeyStatistics() {
 }
 
 double Tree::calculate_likelihood() {
-	double l = 0.0;
+  double l = 0.0;
 
-	// Waiting times.
-	for(auto it = substitution_counts.begin(); it != substitution_counts.end(); ++it) {
-		float t = it->first;
-		int num0subs = it->second.first;
-		int num1subs = it->second.second;
-		l += num0subs * log(1/(1 + u*t)) + num1subs * log(t/(1 + u*t));
-	}
+  // Waiting times.
+  for(auto it = substitution_counts.begin(); it != substitution_counts.end(); ++it) {
+    float t = it->first;
+    int num0subs = it->second.first;
+    int num1subs = it->second.second;
+    l += num0subs * log(1/(1 + u*t)) + num1subs * log(t/(1 + u*t));
+  }
 
-	// Substitutions.
-	float r = 0;
-	for(auto b = branchList.begin(); b != branchList.end(); ++b) {
-		BranchSegment* branch = *b;
-		std::vector<substitution> subs = branch->subs;
-		for(int i = 0; i < subs.size(); i++) {
-			if(subs[i].pos != -1) {
-				r = branch->get_rate(i, subs[i].dec);
-				if(isnan(log(r))) {
-					std::cout << "Hit a nan rate: " << r << " " << log(r) << std::endl;
-				}
-				l += log(r);
-			}
-		}
+  // Substitutions.
+  float r = 0;
+  for(auto b = branchList.begin(); b != branchList.end(); ++b) {
+    BranchSegment* branch = *b;
+    std::vector<substitution> subs = branch->subs;
+    for(int i = 0; i < subs.size(); i++) {
+      if(subs[i].pos != -1) {
+	r = branch->get_rate(i, subs[i].dec);
+	if(isnan(log(r))) {
+	  std::cout << "Hit a nan rate: " << r << " " << log(r) << std::endl;
 	}
-	return(l);
+	l += log(r);
+      }
+    }
+  }
+  return(l);
 }
 
 double Tree::partial_calculate_likelihood() {
-	//std::cout << "Partial Likelihood Calculation - tree" << std::endl;
-	double deltaLogL = 0.0;
-	std::list<AbstractValue*> l = SM->get_current_parameters();
-	for(auto it = l.begin(); it != l.end(); ++it) {
-		int dec = (*it)->state;
-		std::set<bpos> locs = (*it)->rv->get_locations();
-		for(auto jt = locs.begin(); jt != locs.end(); ++jt) {
-			BranchSegment* b = (*jt).branch;
-			substitution s = b->subs[(*jt).pos];
-			if(dec == s.dec) {
-				deltaLogL += log((*it)->getOldValue()/(*it)->getValue());	
-			}
-		}
-	}
-
-	return(deltaLogL);
+  //std::cout << "Partial Likelihood Calculation - tree" << std::endl;
+  // This needs alot of work.
+  double deltaLogL = 0.0;
+  std::list<AbstractValue*> l = SM->get_current_parameters();
+  for(auto it = l.begin(); it != l.end(); ++it) {
+    int dec = (*it)->state;
+    std::set<bpos> locs = (*it)->rv->get_locations();
+    for(auto jt = locs.begin(); jt != locs.end(); ++jt) {
+      BranchSegment* b = (*jt).branch;
+      substitution s = b->subs[(*jt).pos];
+      if(dec == s.dec) {
+	deltaLogL += log((*it)->getOldValue()/(*it)->getValue());
+      }
+    }
+  }
+  return(deltaLogL);
 }
 
 void Tree::InitializeOutputStreams() {
-	files.add_file("tree", env.get("tree_out_file"), IOtype::OUTPUT);
-	tree_out = files.get_ofstream("tree");
-	files.add_file("substitutions", env.get("substitutions_out_file"), IOtype::OUTPUT);
-	substitutions_out = files.get_ofstream("substitutions");
+  files.add_file("tree", env.get("tree_out_file"), IOtype::OUTPUT);
+  tree_out = files.get_ofstream("tree");
+  files.add_file("substitutions", env.get("substitutions_out_file"), IOtype::OUTPUT);
+  substitutions_out = files.get_ofstream("substitutions");
 
-	substitutions_out << "Branch\tSubstitutions" << endl;
+  substitutions_out << "Branch\tSubstitutions" << endl;
 }
 
 //
@@ -271,53 +290,55 @@ void Tree::InitializeOutputStreams() {
 //
 
 void SampleNode(TreeNode* n) {
-	if(n->sampled == false) {
-		n->sampled = true;
-		n->sampleSequence();
+  if(n->sampled == false) {
+    n->sampled = true;
+    n->sampleSequence();
 
-		if(n->left != 0) {
-			SampleNode(n->left->decendant);
-		}
+    if(n->left != 0) {
+      SampleNode(n->left->decendant);
+    }
 
-		if(n->right != 0) {
-			SampleNode(n->right->decendant);
-		}
-		
-		if(n->up != 0) {
-			SampleNode(n->up->ancestral);
-		}
-	}
+    if(n->right != 0) {
+      SampleNode(n->right->decendant);
+    }
+
+    if(n->up != 0) {
+      SampleNode(n->up->ancestral);
+    }
+  }
 }
 
 bool Tree::SampleParameters() {
-	double r = Random();
-	float s = 1.0 / nodeList.size();
-	int i = 0;
-	while(r > (i+1)*s) {
+  // Find Random Node to start update.
+  double r = Random();
+  float s = 1.0 / nodeList.size();
+  int i = 0;
+  while(r > (i+1)*s) {
 		i++;
-	}
+  }
+  // std::cout << "Starting node: " << i << " " <<  std::endl;
+  SampleNode(nodeList[i]);
 
-	// std::cout << "Starting node: " << i << " " <<  std::endl;
-	SampleNode(nodeList[i]);
+  for(auto n = nodeList.begin(); n != nodeList.end(); ++n) {
+    (*n)->sampled = false;
+  }
 
-	for(auto n = nodeList.begin(); n != nodeList.end(); ++n) {
-		(*n)->sampled = false;
-	}
-	
-	// Update branch list - new substitutions.
-	for(auto b = branchList.begin(); b != branchList.end(); ++b) {
-		(*b)->updateStats();
-	}
+  // Update branch list - new substitutions.
+  for(auto b = branchList.begin(); b != branchList.end(); ++b) {
+    (*b)->updateStats();
+  }
 
-	findKeyStatistics();
+  findKeyStatistics();
+  return(false);
+}
 
-	return(false);
+bool Tree::StepThroughMSAs() {
+  MSA->stepToNextMSA();
+  return(false);
 }
 
 // Record State.
 void Tree::RecordTree() {
-  std::cout << "Recording Tree." << std::endl;
-  std::cout << root->name << std::endl;
   tree_out << root->toString();
 }
 

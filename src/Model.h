@@ -39,7 +39,7 @@ public:
 	void Terminate();
 private:
 	Tree* tree;
-	bool ready; // Checks whether model is ready to be resampled.
+	bool ready; // Checks whether model is ready to be resampled. If not then the changes made from the previous sampling have not been accepted or rejected.
 	int num_parameters;
 	
 	SubstitutionModel* substitution_model; //Must be a pointer to use polymorphism

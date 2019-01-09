@@ -8,6 +8,7 @@
 #include <vector>
 #include <set> // for columns_with_gaps
 #include <map> // for taxa_names_to_sequences
+#include <list>
 #include <algorithm>
 
 #include "Sequence.h"
@@ -16,30 +17,29 @@
 using namespace std;
 
 class Data {
-public:
+ public:
+  SequenceAlignment* MSA;
+  list<SequenceAlignment*> MSA_list;
+  IO::RawTreeNode* raw_tree;
 
-	// Don't need to initialize the following because they are not primitives.
-	// Their default constructors are called.
-	map<string, vector<int> > taxa_names_to_sequences;
-	SequenceAlignment* MSA;
-	IO::RawTreeNode* raw_tree;
+  Data();
+  ~Data();
 
-	map<string, int> state_to_integer;
-	vector<string> states;
+  void Initialize();
+ private:
+  set<int> columns_with_gaps;
+  vector<int> columns_without_gaps;
 
-	Data();
-	~Data();
+  string cleanLine(string);
+  list<string> readFastaFile(ifstream &sequences_file);
+  list<list<string>> readCompoundFastaFile(ifstream &sequences_file);
 
-	void Initialize();
+  void validateInputData(list<SequenceAlignment*> MSA_list, IO::RawTreeNode* raw_tree);
+  bool matchNodeNames(list<string> names1, list<string> names2);
 
-private:
-	set<int> columns_with_gaps;
-	vector<int> columns_without_gaps;
+  SequenceAlignment* ReadSequences(list<string> fasta_lines);
 
-	string cleanLine(string);
-	SequenceAlignment* ReadSequences();
-
-	IO::RawTreeNode* ReadTree();
+  IO::RawTreeNode* ReadTree();
 };
 
 #endif

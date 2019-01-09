@@ -3,6 +3,7 @@
 
 #include <string> 
 #include <iostream>
+#include <list>
 #include <utility>
 
 struct node_data {
@@ -27,6 +28,7 @@ namespace IO {
 
 	RawTreeNode* parseRawTreeNode(std::string node_string, RawTreeNode* up);
 	RawTreeNode* parseTree(std::string tree_string);
+	std::list<std::string> getRawTreeNodeNames(RawTreeNode* node);
 }
 
 #endif
