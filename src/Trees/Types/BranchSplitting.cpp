@@ -20,54 +20,51 @@ std::function< std::pair<BranchSegment*, BranchSegment*>(float)> pickBranchSplit
 
 // Possible algorithms.
 std::pair<BranchSegment*, BranchSegment*> noSplitMethod(float distance) {
-	BranchSegment* newBranchTop = new BranchSegment(distance);
-	BranchSegment* newBranchBottom = newBranchTop;
+  BranchSegment* newBranchTop = new BranchSegment(distance);
+  BranchSegment* newBranchBottom = newBranchTop;
 
-	return(std::make_pair(newBranchTop, newBranchBottom));
+  return(std::make_pair(newBranchTop, newBranchBottom));
 }
 
 std::pair<BranchSegment*, BranchSegment*> splitHalfMethod(float distance) {
-	/* 
-	 * This algorithm works by splitting branches in half until each segment is less
-	 * than the max sequence length.
-	 */
+  /* 
+   * This algorithm works by splitting branches in half until each segment is less
+   * than the max sequence length.
+   */
 
-	float dist = distance;
+  float dist = distance;
 
-	// Calculate how many internal nodes are needed for given branch.
-	int extraNodes = 0;
-	float max_seg_len = env.get_float("max_segment_length");
-	for(int i = 0; dist > max_seg_len; i++) {
-		dist = dist/2.0;
-		extraNodes += pow(2, i);
-	}
+  // Calculate how many internal nodes are needed for given branch.
+  int extraNodes = 0;
+  float max_seg_len = env.get_float("max_segment_length");
+  for(int i = 0; dist > max_seg_len; i++) {
+    dist = dist/2.0;
+    extraNodes += pow(2, i);
+  }
 
-	BranchSegment* newBranchTop = new BranchSegment(dist);
-	BranchSegment* newBranchBottom = newBranchTop;
+  BranchSegment* newBranchTop = new BranchSegment(dist);
+  BranchSegment* newBranchBottom = newBranchTop;
 
-	//branchList.push_back(newBranchTop); //Adds the new branch to the branchList.
+  //branchList.push_back(newBranchTop); //Adds the new branch to the branchList.
 
-	//Create extra nodes and link together.
-	if(extraNodes > 0) {
-		for(int i = 0; i < extraNodes; i++) {
-			TreeNode* n = new TreeNode();
-			n->distance = dist;
-			//nodeList.push_back(n);
+  //Create extra nodes and link together.
+  if(extraNodes > 0) {
+    for(int i = 0; i < extraNodes; i++) {
+      TreeNode* n = new TreeNode();
+      n->distance = dist;
 
-			BranchSegment* b = new BranchSegment(dist);
-			//branchList.push_back(b);
+      BranchSegment* b = new BranchSegment(dist);
 
-			newBranchBottom->decendant = n;
-			n->up = newBranchBottom;
+      newBranchBottom->decendant = n;
+      n->up = newBranchBottom;
 
-			n->left = b;
-			b->ancestral = n;
+      n->left = b;
+      b->ancestral = n;
 
-			newBranchBottom = b;
-		}
-	}
-
-	return(std::make_pair(newBranchTop, newBranchBottom));
+      newBranchBottom = b;
+    }
+  }
+  return(std::make_pair(newBranchTop, newBranchBottom));
 }
 
 

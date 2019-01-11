@@ -1,0 +1,52 @@
+# Options file - for the known ancestral sequences run
+
+debug 1
+
+# random_number_generator_seed 1 #
+
+# Tree types
+# 0	Normal
+
+# SEQUENCE SETTINGS
+# States options
+# 0 nucleotide
+# 1 amino acid
+states 1
+
+# Branch splitting methods
+# When "ancestral sequences" is 1, will override and always choose no split method.
+# 0 no splitting
+# 1 split in half
+
+# TREE SETTINGS
+max_segment_length	0.08
+branch_split_algorithm	0
+tree_type	0
+uniformization_constant 0.35
+
+# TREE DATA
+# if ancestral sequences file is given, will use those given sequences rather than resampling through the MCMC.
+ancestral_sequences 1
+ 
+# Substitution model types
+# 0	General Time Reversible
+# 1 	Single Rate
+# 2	Fixed Rate
+
+substitution_model_type		0
+
+# MCMC settings.
+tree_sample_frequency 2000
+generations 500001
+output_frequency 1000
+print_frequency 5000
+
+sequences_file	testing/s1_test_run/s1_sequences_out.fasta
+tree_file	testing/s1_test_run/tree_out.newick
+
+output_directory testing/s2_test_run/
+tree_out_file		s2_tree_out.newick
+sequences_out_file	s2_sequences_out.fasta
+parameters_out_file	s2_parameters_out.csv
+rate_vectors_out_file	s2_rate_vectors_out.csv 
+likelihood_out_file 	s2_likelihoods_out.csv

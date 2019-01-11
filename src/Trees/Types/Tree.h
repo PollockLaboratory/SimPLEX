@@ -50,11 +50,12 @@ class Tree {
   void printBranchList();
   void printNodeList();
   void printParameters();
+  void printCounts();
 
   // Sampling.
   bool(Tree::*treeSamplingMethod)();
   bool SampleParameters(); // When the tree is actually being sampled.
-  bool StepThroughMSAs(); // When the ancestral sequences have already been determined. 
+  bool step_through_MSAs(); // When the ancestral sequences have already been determined. 
 
   // Recording state data.
   void RecordTree();

@@ -93,6 +93,7 @@ void MCMC::sample() {
 				model->reject();
 			}
 		} else {
+		  // No Metropolis Hastings needed - Gibbs sampling.
 			lnL = newLnL;
 		}
 
@@ -104,37 +105,38 @@ void MCMC::sample() {
 }
 
 void MCMC::Run() {
-	/*
-	 * Run an initialized MCMC.
-	 */
+  /*
+   * Run an initialized MCMC.
+   */
 
-	std::cout << "Starting MCMC:" << std::endl;
-	for (gen = 1; gen <= gens; gen++) {
-		if(isnan(lnL)) {
-			exit(-1);
-		}
-		if(gen % print_freq == 0) {
-			std::cout << "Likelihood: " << lnL << std::endl;
-		}
-		
-		sample();	
-		
-		if(gen % out_freq == 0) {
-			RecordState();
-		}
-	}
+  std::cout << "Starting MCMC:" << std::endl;
+  for (gen = 1; gen <= gens; gen++) {
+    if(isnan(lnL)) {
+      std::cerr << "Error: LogLikelihood is Nan." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    if(gen % print_freq == 0) {
+      std::cout << "Likelihood: " << lnL << std::endl;
+      // model->printParameters();
+    }
 
-	time_out << "SAMPLING TIME DATA" << std::endl;
-	time_out << "Tree Sampling: Total time: " << total_time_tree_samples << " us. Average time per sample: " << total_time_tree_samples/n_tree_samples << " us." << std::endl;
-	time_out << "Parameter Sampling: Total time: " << total_time_parameter_samples << " us. Average time per sample: " << total_time_parameter_samples/n_parameter_samples << " us." << std::endl;
-	float r = ((float)total_time_tree_samples)/(total_time_tree_samples + total_time_parameter_samples);
-	time_out << r*100.0 << "\% of time spent sampling tree parameters." << std::endl;
+    sample();	
+
+    if(gen % out_freq == 0) {
+      RecordState();
+    }
+  }
+
+  time_out << "SAMPLING TIME DATA" << std::endl;
+  time_out << "Tree Sampling: Total time: " << total_time_tree_samples << " us. Average time per sample: " << total_time_tree_samples/n_tree_samples << " us." << std::endl;
+  time_out << "Parameter Sampling: Total time: " << total_time_parameter_samples << " us. Average time per sample: " << total_time_parameter_samples/n_parameter_samples << " us." << std::endl;
+  float r = ((float)total_time_tree_samples)/(total_time_tree_samples + total_time_parameter_samples);time_out << r*100.0 << "\% of time spent sampling tree parameters." << std::endl;
 }
 
 ///  Private Functions  ///
 void MCMC::RecordState() {  // ought to use a function to return tab separated items with endl
-	static int i = -1;
-	i++;
-	lnlout << i << "," << gen << "," << lnL << std::endl;
-	model->RecordState(gen, lnL); // is this always getting lnlout?
+  static int i = -1;
+  i++;
+  lnlout << i << "," << gen << "," << lnL << std::endl;
+  model->RecordState(gen, lnL); // is this always getting lnlout?
 }

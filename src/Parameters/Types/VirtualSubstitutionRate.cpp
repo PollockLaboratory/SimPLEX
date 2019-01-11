@@ -18,15 +18,16 @@ void VirtualSubstitutionRate::printValue() {
 }
 
 void VirtualSubstitutionRate::refresh() {
-	previous_value = value;
-	double total = 0.0;
-	for(auto it = dependent_values.begin(); it != dependent_values.end(); ++it) {
-		total += (*it)->getValue();
-	}
-	value = u - total;
-	if(value < 0.0 || value > 1.0) {
-		throw OutOfBoundsException("VirtualSubstitutionRate out of bounds.");
-	}
+  previous_value = value;
+  double total = 0.0;
+  for(auto it = dependent_values.begin(); it != dependent_values.end(); ++it) {
+    total += (*it)->getValue();
+  }
+
+  value = u - total;
+  if(value < 0.0 || value > 1.0) {
+    throw OutOfBoundsException("VirtualSubstitutionRate out of bounds.");
+  }
 }
 
 void VirtualSubstitutionRate::add_dependancy(AbstractValue* v) {

@@ -29,7 +29,7 @@ class SequenceAlignment {
   // Known ancestral sequences.
   std::list<SequenceAlignment*> *MSA_list; // List of other sequence alignments that could be used.
   std::list<SequenceAlignment*>::iterator current_MSA; // Iterator pointer to the MSA in use.
-  void stepToNextMSA();
+  void step_to_next_MSA();
 
   // Adding sequences to alignment.
   void add(std::string name, std::string sequence_str);

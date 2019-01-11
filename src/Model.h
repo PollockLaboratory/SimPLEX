@@ -35,6 +35,7 @@ public:
 	double PartialCalculateLikelihood(const double lnL);
 
 	void RecordState(int gen, double l);
+	void print();
 	void printParameters();
 	void Terminate();
 private:

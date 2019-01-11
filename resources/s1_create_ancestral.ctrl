@@ -1,4 +1,4 @@
-# Options file.
+# Options file - for the initial run to generate ancestral sequences.
 
 debug 1
 
@@ -13,41 +13,40 @@ debug 1
 # 1 amino acid
 states 1
 
-# TREE SETTINGS
-max_segment_length	0.08
-
 # Branch splitting methods
 # When "ancestral sequences" is 1, will override and always choose no split method.
 # 0 no splitting
 # 1 split in half
+
+# TREE SETTINGS
+max_segment_length	0.08
 branch_split_algorithm	1
-tree_sample_frequency 50
-# constant_tree	0
 tree_type	0
 uniformization_constant 0.35
 
 # TREE DATA
 # if ancestral sequences file is given, will use those given sequences rather than resampling through the MCMC.
-ancestral_sequences 1
+ancestral_sequences 0
  
 # Substitution model types
 # 0	General Time Reversible
 # 1 	Single Rate
+# 2	Fixed Rate
 
 substitution_model_type		0
-constant_substitution_model	0
-substitution_model_initialization	0
 
 # MCMC settings.
-generations 1001
-output_frequency 100
-print_frequency 100
+tree_sample_frequency 2000
+generations 500001
+output_frequency 1000
+print_frequency 5000
 
-sequences_file	resources/test_data/fixed_ancestral.fasta
-tree_file	resources/test_data/fixed_ancestral.newick
+sequences_file	resources/test_data/5taxon.fasta
+tree_file	resources/test_data/5taxon.tree
 
-output_directory testing/test_run/
-sequences_out_file		sequences_out.fasta
-parameters_out_file		parameters_out.csv
-rate_vectors_out_file		rate_vectors_out.csv 
-likelihood_out_file 		likelihoods_out.csv
+output_directory	testing/s1_test_run/
+tree_out_file		tree_out.newick
+sequences_out_file	s1_sequences_out.fasta
+parameters_out_file	s1_parameters_out.csv
+rate_vectors_out_file	s1_rate_vectors_out.csv 
+likelihood_out_file 	s1_likelihoods_out.csv

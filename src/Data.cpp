@@ -32,7 +32,7 @@ void Data::Initialize() {
   } else {
     //Compound fasta with internal sequences - when ancestral states are already calculated.
     list<list<string>> fasta_blocks = readCompoundFastaFile(sequences_in);
-
+ 
     for(auto it = fasta_blocks.begin(); it != fasta_blocks.end(); ++it) {
       SequenceAlignment* msa = ReadSequences(*it);
       msa->Initialize(&MSA_list);
@@ -40,7 +40,10 @@ void Data::Initialize() {
     }
 
     // The MSA_list should be checked here. That all the MSAs have the same node names.
-    MSA = new SequenceAlignment(*(MSA_list.front()));
+    // MSA = new SequenceAlignment(*(MSA_list.front()));
+    std::cout << "MSA_list length: " << MSA_list.size() << std::endl;
+    MSA = new SequenceAlignment(*MSA_list.front());
+    // MSA->Initialize(&MSA_list);
   }
 
   raw_tree = ReadTree();
@@ -91,6 +94,8 @@ list<list<string>> Data::readCompoundFastaFile(ifstream &sequences_file) {
       f.push_back(line);
     }
   }
+  // Add last block.
+  lf.push_back(f);
   return(lf);
 }
 

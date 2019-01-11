@@ -24,28 +24,29 @@ Tree::Tree() {
 
 // Creation of tree nodes.
 void Tree::connectNodes(TreeNode* &ancestralNode, BranchSegment* &ancestralBP, TreeNode* &decendantNode, float distance) {
-	/* This function is responsible for connecting two Nodes with branch segments.
-	 * This includes braking up long branches into smaller branch segment when needed and creating new internal branch nodes.
-	 * Arguments:
-	 * 	ancestralNode - pointer to the ancestral node.
-	 * 	ancestralBP - pointer of the ancestral node that points to the decendant node. (This is needed to distinguish between the left and right branch pointers of ancestral node.)
-	 * 	decendantNode - pointer to the decendantNode.
-	 * 	distance - the branch length.
-	 */
-	std::pair<BranchSegment*, BranchSegment*> intermediateBranches = splitBranchMethod(distance);
-	BranchSegment* newBranchTop = intermediateBranches.first;
-	BranchSegment* newBranchBottom = intermediateBranches.second;
+  /* This function is responsible for connecting two Nodes with branch segments.
+   * This includes braking up long branches into smaller branch segment when needed and creating new internal branch nodes.
+   * Arguments:
+   *    ancestralNode - pointer to the ancestral node.
+   * 	ancestralBP - pointer of the ancestral node that points to the decendant node. (This is needed to distinguish between the left and right branch pointers of ancestral node.)
+   * 	decendantNode - pointer to the decendantNode.
+   * 	distance - the branch length.
+   */
+  std::pair<BranchSegment*, BranchSegment*> intermediateBranches = splitBranchMethod(distance);
+  BranchSegment* newBranchTop = intermediateBranches.first;
+  BranchSegment* newBranchBottom = intermediateBranches.second;
 
-	decendantNode->up = newBranchBottom;
-	ancestralBP = newBranchTop;
+  decendantNode->up = newBranchBottom;
+  ancestralBP = newBranchTop;
 
-	newBranchTop->ancestral = ancestralNode;
-	newBranchBottom->decendant = decendantNode;
+  newBranchTop->ancestral = ancestralNode;
+  newBranchBottom->decendant = decendantNode;
 }
 
 TreeNode* Tree::createTreeNode(IO::RawTreeNode* raw_tree, TreeNode* &ancestralNode, BranchSegment* &ancestralBP) {
   TreeNode* newTreeNode = new TreeNode(raw_tree);
   connectNodes(ancestralNode, ancestralBP, newTreeNode, raw_tree->distance);
+  newTreeNode->distance = ancestralBP->distance; // Correct tree node distance for splitting.
 
   if(raw_tree->left != 0) {
     createTreeNode(raw_tree->left, newTreeNode, newTreeNode->left);
@@ -64,9 +65,24 @@ void Tree::configureSequences(TreeNode* n) {
    * Traverses the tree attaching sequences to nodes.
    * Also adds all the Nodes and Branch segments to their corresponding lists.
    */
-
   n->MSA = MSA;
   n->SM = SM;
+
+  // Add nodes to nodeList and BranchSegments to branchList.
+  // Recursively call cofigureSequences on rest of the tree.
+  nodeList.push_back(n);
+
+  if(n->left != 0) {
+    BranchSegment* b = n->left;
+    branchList.push_back(b);
+    configureSequences(b->decendant);
+  }
+
+  if(n->right != 0) {
+    BranchSegment* b = n->right;
+    branchList.push_back(b);
+    configureSequences(b->decendant);
+  }
 
   if(MSA->taxa_names_to_sequences.count(n->name)) {
     n->sequence = &(MSA->taxa_names_to_sequences.at(n->name));
@@ -103,40 +119,24 @@ void Tree::configureSequences(TreeNode* n) {
       }
     }
   }
-
-  // Add nodes to nodeList and BranchSegments to branchList.
-  // Recursively call cofigureSequences on rest of the tree.
-  nodeList.push_back(n);
-
-  if(n->left != 0) {
-    BranchSegment* b = n->left;
-    branchList.push_back(b);
-    configureSequences(b->decendant);
-  }
-
-  if(n->right != 0) {
-    BranchSegment* b = n->right;
-    branchList.push_back(b);
-    configureSequences(b->decendant);
-  } 
 }
 
 void Tree::configureRateVectors() {
-	BranchSegment* branch;
-	std::vector<int> seq; 
-	for(auto it = branchList.begin(); it != branchList.end(); ++it) {
-		branch = (*it);
-		seq = *(branch->ancestral->sequence);
-		for(int i = 0; i < seq.size(); i++) {
-			// Don't add rate vector if gap.
-			if(seq[i] == -1) {
-				branch->set_rate_vector(i);
-			} else {
-				RateVector* rv = SM->selectRateVector(seq[i]);
-				branch->set_rate_vector(i, rv);	
-			}
-		}
-	}
+  BranchSegment* branch;
+  std::vector<int> seq;
+  for(auto it = branchList.begin(); it != branchList.end(); ++it) {
+    branch = (*it);
+    seq = *(branch->ancestral->sequence);
+    for(int i = 0; i < seq.size(); i++) {
+      // Don't add rate vector if gap.
+      if(seq[i] == -1) {
+	branch->set_rate_vector(i);
+      } else {
+	RateVector* rv = SM->selectRateVector(seq[i]);
+	branch->set_rate_vector(i, rv);
+      }
+    }
+  }
 }
 
 // Tree Initialize using seqs and states
@@ -150,7 +150,7 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
   // Dynamicly chosen functions.
   splitBranchMethod = pickBranchSplitAlgorithm();
   if(env.ancestral_sequences) {
-    treeSamplingMethod = &Tree::StepThroughMSAs;
+    treeSamplingMethod = &Tree::step_through_MSAs;
   } else {
     treeSamplingMethod = &Tree::SampleParameters;
   }
@@ -207,25 +207,34 @@ void Tree::printParameters() {
   SM->printParameters();	
 }
 
+void Tree::printCounts() {
+  std::cout << "Printing counts:"  << std::endl;
+  std::cout << branchList.size() << std::endl;
+  std::cout << nodeList.size() << std::endl;
+  for(auto it = substitution_counts.begin(); it != substitution_counts.end(); ++it) {
+    std::cout << "Distance: " << it->first << " 0: " << (it->second).first << " 1: " << (it->second).second << std::endl;
+  }
+}
+
 // Sampling and likelihood.
 void Tree::findKeyStatistics() {
-	/*
-	 * Finds the key stats for the likelihood function.
-	 */
+  /*
+   * Finds the key stats for the likelihood function.
+   */
 
-	substitution_counts = {};
+  substitution_counts = {};
 
-	for(auto it = branchList.begin(); it != branchList.end(); ++it) {
-		BranchSegment* b = *it;
-		if(substitution_counts.find(b->distance) == substitution_counts.end()) {
-			// Branch class does NOT already exists.
-			substitution_counts[b->distance] = std::make_pair(b->num0subs, b->num1subs);
-		} else {
-			// Branch class does already exist.
-			std::pair<int, int> c = substitution_counts[b->distance];
-			substitution_counts[b->distance] = std::make_pair(b->num0subs + c.first, b->num1subs + c.second);
-		}
-	}
+  for(auto it = branchList.begin(); it != branchList.end(); ++it) {
+    BranchSegment* b = *it;
+    if(substitution_counts.find(b->distance) == substitution_counts.end()) {
+      // Branch class does NOT already exists.
+      substitution_counts[b->distance] = std::make_pair(b->num0subs, b->num1subs);
+    } else {
+      // Branch class does already exist.
+      std::pair<int, int> c = substitution_counts[b->distance];
+      substitution_counts[b->distance] = std::make_pair(b->num0subs + c.first, b->num1subs + c.second);
+    }
+  }
 }
 
 double Tree::calculate_likelihood() {
@@ -332,8 +341,14 @@ bool Tree::SampleParameters() {
   return(false);
 }
 
-bool Tree::StepThroughMSAs() {
-  MSA->stepToNextMSA();
+bool Tree::step_through_MSAs() {
+  MSA->step_to_next_MSA();
+
+  for(auto b = branchList.begin(); b != branchList.end(); ++b) {
+    (*b)->updateStats();
+  }
+
+  findKeyStatistics();
   return(false);
 }
 

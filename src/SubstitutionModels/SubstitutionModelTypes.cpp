@@ -6,11 +6,14 @@
 
 #include "Types/GeneralTimeReversible.h"
 #include "Types/SingleRate.h"
+#include "Types/FixedRate.h"
 
 extern Environment env;
 
+// This should be ENUM;
 static const int general_time_reversible_model_type = 0;
 static const int single_rate_model_type = 1;
+static const int fixed_rate_model_type = 2;
 
 SubstitutionModel* GetSubstitutionModel() {
 	/*
@@ -25,9 +28,11 @@ SubstitutionModel* GetSubstitutionModel() {
 		substitution_model = new GeneralTimeReversible();
 	} else if (next_model_type == single_rate_model_type) {
 		substitution_model = new SingleRate();
+	} else if (next_model_type == fixed_rate_model_type) {
+		substitution_model = new FixedRate();
 	} else {
 		std::cerr << "Substitution model type not recognized in get next sub model " << next_model_type << std::endl;
-		std::exit(-1);
+		std::exit(EXIT_FAILURE);
 	}
 
 	return substitution_model;
