@@ -111,16 +111,18 @@ void MCMC::Run() {
 
   std::cout << "Starting MCMC:" << std::endl;
   for (gen = 1; gen <= gens; gen++) {
+
+    sample();
+
     if(isnan(lnL)) {
       std::cerr << "Error: LogLikelihood is Nan." << std::endl;
       exit(EXIT_FAILURE);
     }
+
     if(gen % print_freq == 0) {
       std::cout << "Likelihood: " << lnL << std::endl;
       // model->printParameters();
     }
-
-    sample();	
 
     if(gen % out_freq == 0) {
       RecordState();

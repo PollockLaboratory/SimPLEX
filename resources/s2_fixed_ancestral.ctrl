@@ -37,9 +37,9 @@ substitution_model_type		0
 
 # MCMC settings.
 tree_sample_frequency 2000
-generations 500001
-output_frequency 1000
-print_frequency 5000
+generations 100001
+output_frequency 2000
+print_frequency 2000
 
 sequences_file	testing/s1_test_run/s1_sequences_out.fasta
 tree_file	testing/s1_test_run/tree_out.newick

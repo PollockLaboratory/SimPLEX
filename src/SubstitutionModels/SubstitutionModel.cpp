@@ -52,6 +52,27 @@ int SubstitutionModel::getNumberOfParameters() {
 	return(parameters.size());
 }
 
+void SubstitutionModel::get_counts() {
+  rateVectors.get_counts();  
+}
+
+
+double SubstitutionModel::get_substitution_logLikelihood() {
+  double logL = 0.0;
+  for(auto it = rateVectors.c.begin(); it != rateVectors.c.end(); ++it) {
+    logL += (*it)->get_logLikelihood();
+  }
+  return(logL);
+}
+
+void SubstitutionModel::clear_locations() {
+  rateVectors.clear_locations();
+}
+
+void SubstitutionModel::check_duplicate_locations() {
+  rateVectors.check_duplicate_locations();
+}
+
 std::list<AbstractValue*> SubstitutionModel::get_current_parameters() {
 	return(parameters.get_current_parameters());
 }

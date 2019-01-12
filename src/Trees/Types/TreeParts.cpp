@@ -30,23 +30,6 @@ std::ostream& operator<< (std::ostream &out, const BranchSegment &b) {
   return out;
 }
 
-// Set rates vector corresponding to position to a particular rate vector.
-void BranchSegment::set_rate_vector(int pos) {
-  /*
-   * When gap, insert NULL for rate vector for pointer, usually for a gap here.
-   */
-  rates[pos] = NULL;
-}
-
-void BranchSegment::set_rate_vector(int pos, RateVector* rv) {
-  /*
-   * When non-gap state insert correct pointer to rate vector. 
-   */
-  if(rates[pos]) rates[pos]->remove_location(pos, this);
-  rates[pos] = rv;
-  rv->add_location(pos, this);
-}
-
 double BranchSegment::get_rate(int pos, int dec_state) {
   double r = rates[pos]->rates[dec_state]->getValue();
   // Might not need this anymore.
@@ -57,9 +40,22 @@ double BranchSegment::get_rate(int pos, int dec_state) {
 }
 
 // Key Statistics
+inline void BranchSegment::update_rate_vectors() {
+  std::vector<int>* seq = ancestral->sequence;
+  for(int pos = 0; pos < seq->size(); pos++) {
+    if((*seq)[pos] == -1) {
+      rates[pos] = NULL;
+    } else {
+      if(rates[pos]) rates[pos]->remove_location(pos, this);
+      rates[pos] = ancestral->SM->selectRateVector((*seq)[pos]);
+      rates[pos]->add_location(pos, this);
+    }
+  }
+}
+
 bool BranchSegment::virtualSubstituionQ(int state) {
   float u = env.u;
-  double rate = decendant->SM->selectRateVector(state)->rates[state]->getValue();
+  double rate = ancestral->SM->selectRateVector(state)->rates[state]->getValue();
 
   double noSub = 1.0/(1.0 + u*distance);
   double Sub = (rate * distance)/(1 + u*distance);
@@ -74,17 +70,7 @@ bool BranchSegment::virtualSubstituionQ(int state) {
   }
 }
 
-void BranchSegment::updateStats() {
-
-  // Update rate vector.
-  int state;
-  RateVector* rv;
-  for(int pos = 0; pos < ancestral->sequence->size(); pos++) {
-    state = (*ancestral->sequence)[pos];
-    rv = ancestral->SM->selectRateVector(state);
-    set_rate_vector(pos, rv);
-  }
-
+void BranchSegment::update() {
   num0subs = 0;
   num1subs = 0;
   subs = std::vector<substitution>(env.n, {-1, -1, -1});
@@ -93,11 +79,13 @@ void BranchSegment::updateStats() {
   std::vector<int> dec = *(decendant->sequence);
   substitution s;
 
+  // Substitutions tracked.
   for(int pos = 0; pos < anc.size(); pos++) {
     if(dec.at(pos) != -1) {
       if(anc.at(pos) == dec.at(pos)) {
 	// Add virtual substitution.
-	if(virtualSubstituionQ(anc.at(pos))) {
+	//if(virtualSubstituionQ(anc.at(pos))) {
+	if(false) {
 	  num1subs += 1;
 	  s = {pos, anc.at(pos), dec.at(pos)};
 	  subs[pos] = s;
@@ -114,6 +102,10 @@ void BranchSegment::updateStats() {
       }
     }
   }
+
+  // Update rate vector.
+  update_rate_vectors();
+
 }
 
 // TREE NODES
@@ -235,6 +227,25 @@ std::string TreeNode::toString() {
     return("(" + left->decendant->toString() + ")" + n);
   } else {
     return("(" + left->decendant->toString() + "," + right->decendant->toString() + ")" + n);
+  }
+}
+
+void TreeNode::sample() {
+  if(sampled == false) {
+    sampled = true;
+    sampleSequence();
+
+    if(left != 0) {
+      left->decendant->sample();
+    }
+
+    if(right != 0) {
+      right->decendant->sample();
+    }
+
+    if(up != 0) {
+      up->ancestral->sample();
+    }
   }
 }
 

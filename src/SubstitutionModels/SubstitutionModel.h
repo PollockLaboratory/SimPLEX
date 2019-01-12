@@ -17,30 +17,37 @@ using std::string;
 #include "../Parameters/RateVector.h"
 
 class SubstitutionModel {
-	public:
-		SubstitutionModel();
-		virtual void Initialize(int number_of_sites, std::vector<std::string> states) = 0;
+ public:
+  SubstitutionModel();
+  virtual void Initialize(int number_of_sites, std::vector<std::string> states) = 0;
 
-		RateVector* selectRateVector(int state);
+  RateVector* selectRateVector(int state);
 
-		bool SampleParameters();
-		void accept(); //After a model is sampled it must be accepted or rejected before next sampling.
-		void reject();
+  bool SampleParameters();
+  void accept(); //After a model is sampled it must be accepted or rejected before next sampling.
+  void reject();
 
-		void printParameters();
-		int getNumberOfParameters();
-		std::list<AbstractValue*> get_current_parameters();
+  void printParameters();
+  int getNumberOfParameters();
+  std::list<AbstractValue*> get_current_parameters();
 
-		void saveToFile(int gen, double l);
-		virtual void Terminate();
-	protected:
-		void add_rate_vector(RateVector* v);
-		void finalize();
-	private:
-		std::ofstream* substitution_model_out;
+  void get_counts();
+  double get_substitution_logLikelihood();
 
-		ParameterSet parameters;
-		RateVectorSet rateVectors;
+  // Tmp debug.
+  void clear_locations();
+  void check_duplicate_locations();
+
+  void saveToFile(int gen, double l);
+  virtual void Terminate();
+ protected:
+  void add_rate_vector(RateVector* v);
+  void finalize();
+ private:
+  std::ofstream* substitution_model_out;
+
+  ParameterSet parameters;
+  RateVectorSet rateVectors;
 };
 
 #endif

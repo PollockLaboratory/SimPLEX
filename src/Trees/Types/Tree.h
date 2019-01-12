@@ -36,7 +36,7 @@ class Tree {
   std::vector<TreeNode*> nodeList;
 
   // Internal Tree nodes.
-  void connectNodes(TreeNode* &ancestral, BranchSegment* &ancestralBP, TreeNode* &decendant, float distance);
+  void connect_nodes(TreeNode* &ancestral, BranchSegment* &ancestralBP, TreeNode* &decendant, float distance);
   TreeNode* createTreeNode(IO::RawTreeNode* raw_tree, TreeNode* &ancestralNode, BranchSegment* &ancestralBP);
 
   // Setting options.
@@ -53,8 +53,11 @@ class Tree {
   void printCounts();
 
   // Sampling.
+  bool sample();
   bool(Tree::*treeSamplingMethod)();
-  bool SampleParameters(); // When the tree is actually being sampled.
+
+  // Possible sampling methods.
+  bool sample_ancestral_states(); // When the tree is actually being sampled.
   bool step_through_MSAs(); // When the ancestral sequences have already been determined. 
 
   // Recording state data.
@@ -62,7 +65,7 @@ class Tree {
   void RecordState(int gen, double l);
 
   // Likelihood.
-  void findKeyStatistics(); //Find the key statistics need for the likelihood function.
+  void find_substitution_counts(); //Find the key statistics need for the likelihood function.
   double calculate_likelihood();
   double partial_calculate_likelihood();
   static std::ofstream tree_out;
@@ -70,7 +73,6 @@ class Tree {
   void InitializeOutputStreams();
  private:
   void configureSequences(TreeNode* n);
-  void configureRateVectors();
   float u;
 };
 

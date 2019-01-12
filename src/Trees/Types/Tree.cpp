@@ -23,7 +23,7 @@ Tree::Tree() {
 }
 
 // Creation of tree nodes.
-void Tree::connectNodes(TreeNode* &ancestralNode, BranchSegment* &ancestralBP, TreeNode* &decendantNode, float distance) {
+void Tree::connect_nodes(TreeNode* &ancestralNode, BranchSegment* &ancestralBP, TreeNode* &decendantNode, float distance) {
   /* This function is responsible for connecting two Nodes with branch segments.
    * This includes braking up long branches into smaller branch segment when needed and creating new internal branch nodes.
    * Arguments:
@@ -45,7 +45,7 @@ void Tree::connectNodes(TreeNode* &ancestralNode, BranchSegment* &ancestralBP, T
 
 TreeNode* Tree::createTreeNode(IO::RawTreeNode* raw_tree, TreeNode* &ancestralNode, BranchSegment* &ancestralBP) {
   TreeNode* newTreeNode = new TreeNode(raw_tree);
-  connectNodes(ancestralNode, ancestralBP, newTreeNode, raw_tree->distance);
+  connect_nodes(ancestralNode, ancestralBP, newTreeNode, raw_tree->distance);
   newTreeNode->distance = ancestralBP->distance; // Correct tree node distance for splitting.
 
   if(raw_tree->left != 0) {
@@ -121,24 +121,6 @@ void Tree::configureSequences(TreeNode* n) {
   }
 }
 
-void Tree::configureRateVectors() {
-  BranchSegment* branch;
-  std::vector<int> seq;
-  for(auto it = branchList.begin(); it != branchList.end(); ++it) {
-    branch = (*it);
-    seq = *(branch->ancestral->sequence);
-    for(int i = 0; i < seq.size(); i++) {
-      // Don't add rate vector if gap.
-      if(seq[i] == -1) {
-	branch->set_rate_vector(i);
-      } else {
-	RateVector* rv = SM->selectRateVector(seq[i]);
-	branch->set_rate_vector(i, rv);
-      }
-    }
-  }
-}
-
 // Tree Initialize using seqs and states
 void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, SubstitutionModel* &SM) {
   std::cout << "Creating MCMC tree structure." << std::endl;
@@ -149,10 +131,11 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
 
   // Dynamicly chosen functions.
   splitBranchMethod = pickBranchSplitAlgorithm();
+
   if(env.ancestral_sequences) {
     treeSamplingMethod = &Tree::step_through_MSAs;
   } else {
-    treeSamplingMethod = &Tree::SampleParameters;
+    treeSamplingMethod = &Tree::sample_ancestral_states;
   }
   
   this->MSA = MSA;
@@ -169,14 +152,12 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
   std::cout << "Attaching sequences to tree." << std::endl;
   configureSequences(root);
 
-  std::cout << "Attaching rate vectors to tree." << std::endl;
-  configureRateVectors();
-
+  // SM->clear_locations();
   for(auto b = branchList.begin(); b != branchList.end(); ++b) {
-  	(*b)->updateStats();
+  	(*b)->update();
   }
 
-  findKeyStatistics();
+  find_substitution_counts();
   InitializeOutputStreams();	
 
   std::cout << std::endl;
@@ -217,10 +198,12 @@ void Tree::printCounts() {
 }
 
 // Sampling and likelihood.
-void Tree::findKeyStatistics() {
+void Tree::find_substitution_counts() {
   /*
    * Finds the key stats for the likelihood function.
    */
+
+  SM->get_counts();
 
   substitution_counts = {};
 
@@ -238,32 +221,40 @@ void Tree::findKeyStatistics() {
 }
 
 double Tree::calculate_likelihood() {
-  double l = 0.0;
+  double l_waiting = 0.0;
+  float t;
+  int num0subs;
+  int num1subs;
 
   // Waiting times.
   for(auto it = substitution_counts.begin(); it != substitution_counts.end(); ++it) {
-    float t = it->first;
-    int num0subs = it->second.first;
-    int num1subs = it->second.second;
-    l += num0subs * log(1/(1 + u*t)) + num1subs * log(t/(1 + u*t));
+    t = it->first;
+    num0subs = it->second.first;
+    num1subs = it->second.second;
+    l_waiting += num0subs * log(1/(1 + u*t)) + num1subs * log(t/(1 + u*t));
   }
 
+  double l_subs = SM->get_substitution_logLikelihood();
+
+  // double l_old = 0.0;
+  
   // Substitutions.
-  float r = 0;
-  for(auto b = branchList.begin(); b != branchList.end(); ++b) {
-    BranchSegment* branch = *b;
-    std::vector<substitution> subs = branch->subs;
-    for(int i = 0; i < subs.size(); i++) {
-      if(subs[i].pos != -1) {
-	r = branch->get_rate(i, subs[i].dec);
-	if(isnan(log(r))) {
-	  std::cout << "Hit a nan rate: " << r << " " << log(r) << std::endl;
-	}
-	l += log(r);
-      }
-    }
-  }
-  return(l);
+  // float r = 0;
+  // for(auto b = branchList.begin(); b != branchList.end(); ++b) {
+  // BranchSegment* branch = *b;
+  // std::vector<substitution> subs = branch->subs;
+  // for(int i = 0; i < subs.size(); i++) {
+  //    if(subs[i].pos != -1) {
+  //    r = branch->get_rate(i, subs[i].dec);
+  //	if(isnan(log(r))) {
+  //    std::cout << "Hit a nan rate: " << r << " " << log(r) << std::endl;
+  //}
+  //l_old += log(r);
+  //   }
+  // }
+  //}
+
+  return(l_waiting+l_subs);
 }
 
 double Tree::partial_calculate_likelihood() {
@@ -273,7 +264,7 @@ double Tree::partial_calculate_likelihood() {
   std::list<AbstractValue*> l = SM->get_current_parameters();
   for(auto it = l.begin(); it != l.end(); ++it) {
     int dec = (*it)->state;
-    std::set<bpos> locs = (*it)->rv->get_locations();
+    std::unordered_set<bpos> locs = (*it)->rv->get_locations();
     for(auto jt = locs.begin(); jt != locs.end(); ++jt) {
       BranchSegment* b = (*jt).branch;
       substitution s = b->subs[(*jt).pos];
@@ -298,57 +289,43 @@ void Tree::InitializeOutputStreams() {
 // SAMPLING TREE PARAMETERS.
 //
 
-void SampleNode(TreeNode* n) {
-  if(n->sampled == false) {
-    n->sampled = true;
-    n->sampleSequence();
+bool Tree::sample() {
+  bool s = (this->*treeSamplingMethod)();
 
-    if(n->left != 0) {
-      SampleNode(n->left->decendant);
-    }
-
-    if(n->right != 0) {
-      SampleNode(n->right->decendant);
-    }
-
-    if(n->up != 0) {
-      SampleNode(n->up->ancestral);
-    }
+  // SM->clear_locations();
+  // Update branch list - new substitutions.
+  for(auto b = branchList.begin(); b != branchList.end(); ++b) {
+    (*b)->update();
   }
+
+  find_substitution_counts();
+
+  return(s);
 }
 
-bool Tree::SampleParameters() {
-  // Find Random Node to start update.
+// Two options for changing ancestral states.
+//
+
+bool Tree::sample_ancestral_states() {
+  // Find Random Node to start sampling.
   double r = Random();
   float s = 1.0 / nodeList.size();
   int i = 0;
   while(r > (i+1)*s) {
 		i++;
   }
+
   // std::cout << "Starting node: " << i << " " <<  std::endl;
-  SampleNode(nodeList[i]);
+  nodeList[i]->sample();
 
   for(auto n = nodeList.begin(); n != nodeList.end(); ++n) {
     (*n)->sampled = false;
   }
-
-  // Update branch list - new substitutions.
-  for(auto b = branchList.begin(); b != branchList.end(); ++b) {
-    (*b)->updateStats();
-  }
-
-  findKeyStatistics();
   return(false);
 }
 
 bool Tree::step_through_MSAs() {
   MSA->step_to_next_MSA();
-
-  for(auto b = branchList.begin(); b != branchList.end(); ++b) {
-    (*b)->updateStats();
-  }
-
-  findKeyStatistics();
   return(false);
 }
 

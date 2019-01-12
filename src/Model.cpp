@@ -66,7 +66,7 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA) {
 // Sampling
 bool Model::SampleTree() {
   if(ready) {
-    return((tree->*tree->treeSamplingMethod)());
+    return(tree->sample());
   } else {
     std::cout << "Error: Attempt to sample tree before accepting previous changes." << std::endl;
     exit(EXIT_FAILURE);

@@ -23,8 +23,6 @@ class BranchSegment {
   TreeNode* ancestral;
   TreeNode* decendant;
 
-  void set_rate_vector(int pos);
-  void set_rate_vector(int pos, RateVector* rv);
   double get_rate(int pos, int dec_state);
 
   // Key statistics.
@@ -32,8 +30,9 @@ class BranchSegment {
   int num0subs;
   int num1subs;
 
+  inline void update_rate_vectors();
   bool virtualSubstituionQ(int state);
-  void updateStats();
+  void update();
 
   friend std::ostream& operator<< (std::ostream &out, const BranchSegment &b);
  private:
@@ -59,6 +58,7 @@ class TreeNode {
   TreeNode(IO::RawTreeNode* raw_tree);
   TreeNode(std::string n);
 
+  void sample();
   void sampleSequence();
   void sampleSinglePosition(int pos);
   std::string toString();
