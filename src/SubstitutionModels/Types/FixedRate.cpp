@@ -35,7 +35,7 @@ void FixedRate::Initialize(int number_of_sites, std::vector<std::string> states)
 
     for(int j = 0; j < 20; j++) {
       if(i != j) {
-	dynamic_cast<AbstractDependentParameter*>(Q[i][i])->add_dependancy(Q[i][j]);
+	Q[i][i]->add_dependancy(Q[i][j]);
       }
     }
     RateVector* v = new RateVector("rv-" + aa[i], i, Q[i]);

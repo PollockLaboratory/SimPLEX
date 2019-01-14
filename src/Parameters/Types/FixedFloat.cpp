@@ -1,7 +1,7 @@
 #include <iostream>
 #include "FixedFloat.h"
 
-FixedFloat::FixedFloat(std::string parameter_name, double v) : AbstractDependentParameter(parameter_name) {
+FixedFloat::FixedFloat(std::string parameter_name, double v) : AbstractValue(parameter_name) {
   value = v;
 }
 
@@ -18,8 +18,4 @@ void FixedFloat::printValue() {
 }
 
 void FixedFloat::refresh() {	
-}
-
-void FixedFloat::add_dependancy(AbstractValue* v) {
-  dependent_values.push_back(v);
 }

@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
   model.Initialize(data.raw_tree, data.MSA);
 
   MCMC mcmc;
-  mcmc.Init(&model);
+  mcmc.initialize(&model);
 
   mcmc.Run();
 

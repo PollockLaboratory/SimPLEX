@@ -7,27 +7,26 @@
 #include "../AbstractValue.h"
 
 class ContinuousFloat : public AbstractParameter {
-	public:
-		ContinuousFloat(std::string, double, double);
-		ContinuousFloat(std::string, double, double, double);
-		ContinuousFloat(std::string, double, double, double, double);
-		virtual void printValue();
-		virtual bool sample();
+ public:
+  ContinuousFloat(std::string, double, double);
+  ContinuousFloat(std::string, double, double, double);
+  ContinuousFloat(std::string, double, double, double, double);
+  virtual void printValue();
+  virtual bool sample();
 
-		virtual double getValue();
-		virtual double getOldValue();
+  virtual double getValue();
+  virtual double getOldValue();
 
-		virtual void undo();
-		virtual void fix();
-	private:
-		double value;
-		double std_dev;
+  virtual void undo();
+  virtual void fix();
+ private:
+  double value;
+  double std_dev;
 
-		double lower_bound;
-		double upper_bound;
+  double lower_bound;
+  double upper_bound;
 
-		double previous_value;
-		
+  double previous_value;	
 };
 
 #endif

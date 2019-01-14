@@ -226,7 +226,7 @@ double Tree::calculate_likelihood() {
   int num0subs;
   int num1subs;
 
-  // Waiting times.
+  // Waiting times - this doesn't have to be calculated everytime.
   for(auto it = substitution_counts.begin(); it != substitution_counts.end(); ++it) {
     t = it->first;
     num0subs = it->second.first;
@@ -255,25 +255,6 @@ double Tree::calculate_likelihood() {
   //}
 
   return(l_waiting+l_subs);
-}
-
-double Tree::partial_calculate_likelihood() {
-  //std::cout << "Partial Likelihood Calculation - tree" << std::endl;
-  // This needs alot of work.
-  double deltaLogL = 0.0;
-  std::list<AbstractValue*> l = SM->get_current_parameters();
-  for(auto it = l.begin(); it != l.end(); ++it) {
-    int dec = (*it)->state;
-    std::unordered_set<bpos> locs = (*it)->rv->get_locations();
-    for(auto jt = locs.begin(); jt != locs.end(); ++jt) {
-      BranchSegment* b = (*jt).branch;
-      substitution s = b->subs[(*jt).pos];
-      if(dec == s.dec) {
-	deltaLogL += log((*it)->getOldValue()/(*it)->getValue());
-      }
-    }
-  }
-  return(deltaLogL);
 }
 
 void Tree::InitializeOutputStreams() {

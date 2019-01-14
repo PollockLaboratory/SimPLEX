@@ -37,7 +37,7 @@ substitution_model_type		0
 
 # MCMC settings.
 tree_sample_frequency 2000
-generations 100001
+generations 1000001
 output_frequency 2000
 print_frequency 2000
 

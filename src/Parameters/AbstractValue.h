@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <list>
 
 // Given these current class definitions there cannot be a samplable parameter that is also dependent on other
 // parameters - such as category parameters.
@@ -12,15 +13,26 @@ class RateVector;
 
 class AbstractValue {
  public:
-  AbstractValue(std::string parameter_name) { name = parameter_name; }
+  AbstractValue(std::string parameter_name);
 
   std::string name;
+  int get_ID();
   virtual double getValue() = 0;
   virtual double getOldValue() = 0;
   virtual void printValue() = 0;
 
-  int state; // The (decendent) state that a value applies to, if used directly as rate.
-  RateVector* rv; // Pointer to the rate vector the parameter sits within.
+  virtual void refresh() = 0;
+
+  void add_host_vector(RateVector*);
+  void refresh_host_vectors();
+
+  void add_dependancy(AbstractValue*);
+  std::list<AbstractValue*> get_dependancies();
+  std::list<RateVector*> host_vectors; // Pointers to the host RateVectors that a parameter sits within.
+ protected:
+  std::list<AbstractValue*> dependent_values;
+ private:
+  int ID;
 };
 
 class AbstractParameter : public AbstractValue {
@@ -30,18 +42,9 @@ class AbstractParameter : public AbstractValue {
   virtual bool sample() = 0; // If return true Metropolis Hasting Sample, else Gibbs.
   virtual void undo() = 0;
   virtual void fix() = 0;
+  void refresh() {}
  protected:
   bool fixedQ; //Indicates whether the state of this parameter is fixed or still being trialed.
-};
-
-class AbstractDependentParameter : public AbstractValue {
- public:
-  AbstractDependentParameter(std::string parameter_name) : AbstractValue(parameter_name) {}
-  virtual void refresh() = 0;
-  virtual void add_dependancy(AbstractValue*) = 0;
-  std::vector<AbstractValue*> get_dependancies() { return(dependent_values); }
- protected:
-  std::vector<AbstractValue*> dependent_values;
 };
 
 #endif

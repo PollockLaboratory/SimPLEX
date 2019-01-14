@@ -101,9 +101,9 @@ double Model::CalculateLikelihood() {
 	return(tree->calculate_likelihood());
 }
 
-double Model::PartialCalculateLikelihood(const double lnL) {
-	return(tree->partial_calculate_likelihood());
-}
+// double Model::PartialCalculateLikelihood(const double lnL) {
+// return(tree->partial_calculate_likelihood());
+//}
 
 // Printing/Recording
 void Model::RecordState(int gen, double l) {
@@ -119,7 +119,8 @@ void Model::print() {
 }
 
 void Model::printParameters() {
-	tree->printCounts();
+  substitution_model->printParameters();
+  //tree->printCounts();
 }
 
 // Tidying up

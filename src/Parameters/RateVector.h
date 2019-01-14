@@ -7,6 +7,7 @@
 #include <functional>
 #include <string>
 #include <list>
+#include <map>
 
 #include "AbstractValue.h"
 #include "ContinuousFloat.h"
@@ -59,15 +60,22 @@ class RateVector {
   void remove_location(int pos, BranchSegment* bs);
   void add_location(int pos, BranchSegment* bs);
   std::unordered_set<bpos> get_locations();
-  void clear_locations();
 
-  void update_counts();
+  void clear_locations(); // This is tmp.
+
+  void update();
+  void update_logLikelihoods();
+  void update_single_logLikelihood(int valueID);
   double get_logLikelihood();
 
   void print();
+
   std::unordered_set<bpos> locations; // List of branches that rate vector applies to.
+  std::map<int, int> valueID_to_state; // Maps a values ID to the state it applies to in the rates vector.
  private:
-  std::vector<int> counts;
+  void update_counts();
+  std::vector<int> counts; // The counts of substitutions that apply to each rate.
+  std::vector<double> logLikelihoods; // The logLikelihoods associated with each rate. count * log(rate).
   int size;
   static int IDc;
 };
@@ -83,7 +91,10 @@ class RateVectorSet {
   RateVector*& operator[] (const int i);
 
   void add(RateVector* v);
+
   void get_counts();
+
+  // Tmp debug functions.
   void clear_locations();
   void check_duplicate_locations();
 

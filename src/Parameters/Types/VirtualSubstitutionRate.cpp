@@ -1,7 +1,7 @@
 #include <iostream>
 #include "VirtualSubstitutionRate.h"
 
-VirtualSubstitutionRate::VirtualSubstitutionRate(std::string parameter_name, double unif) : AbstractDependentParameter(parameter_name) {
+VirtualSubstitutionRate::VirtualSubstitutionRate(std::string parameter_name, double unif) : AbstractValue(parameter_name) {
 	u = unif;
 }
 
@@ -30,6 +30,3 @@ void VirtualSubstitutionRate::refresh() {
   }
 }
 
-void VirtualSubstitutionRate::add_dependancy(AbstractValue* v) {
-	dependent_values.push_back(v);
-}

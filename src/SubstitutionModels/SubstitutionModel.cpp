@@ -60,6 +60,7 @@ void SubstitutionModel::get_counts() {
 double SubstitutionModel::get_substitution_logLikelihood() {
   double logL = 0.0;
   for(auto it = rateVectors.c.begin(); it != rateVectors.c.end(); ++it) {
+    //(*it)->update_logLikelihoods();
     logL += (*it)->get_logLikelihood();
   }
   return(logL);
@@ -78,20 +79,20 @@ std::list<AbstractValue*> SubstitutionModel::get_current_parameters() {
 }
 
 void SubstitutionModel::saveToFile(int gen, double l) {
-	parameters.saveToFile(gen, l);
-	rateVectors.saveToFile(gen, l);
+  parameters.saveToFile(gen, l);
+  rateVectors.saveToFile(gen, l);
 }
 
 void SubstitutionModel::Terminate() {
-	delete substitution_model_out;
+  delete substitution_model_out;
 }
 
 void SubstitutionModel::add_rate_vector(RateVector* v) {
-	parameters.add_rate_vector(v);
-	rateVectors.add(v);
+  parameters.add_rate_vector(v);
+  rateVectors.add(v);
 }
 
 void SubstitutionModel::finalize() {
-	parameters.Initialize();
-	rateVectors.Initialize();
+  parameters.Initialize();
+  rateVectors.Initialize();
 }

@@ -12,39 +12,39 @@
 #include "RateVector.h"
 
 class ParameterSet {
-	public:
-		ParameterSet();
-		void Initialize();
-		void add_parameter(AbstractParameter* param);
-		void add_rate_vector(RateVector* v);
+ public:
+  ParameterSet();
+  void Initialize();
+  void add_parameter(AbstractParameter* param);
+  void add_rate_vector(RateVector* v);
 
-		bool sample();
-		void accept();
-		void reject();
+  bool sample();
+  void accept();
+  void reject();
 
-		std::list<AbstractValue*> get_current_parameters();
+  std::list<AbstractValue*> get_current_parameters();
 
-		void print();
-		double get(const std::string &name);
-		int size();
+  void print();
+  double get(const std::string &name);
+  int size();
 
-		void saveToFile(int gen, double l);
-	private:
-		void stepToNextParameter();
+  void saveToFile(int gen, double l);
+ private:
+  void stepToNextParameter();
 
-		std::list<AbstractParameter*> parameter_list;
-		std::list<AbstractDependentParameter*> dependent_parameter_list;
-		std::list<AbstractParameter*>::iterator current_parameter; //Tracks the current parameter to be sampled, via an iterator across the parameter_list.
-	
-		// Dependancies.
-		std::map<AbstractValue*, std::list<AbstractDependentParameter*>> value_to_dependents; // Maps AbstractValues to AbstractDependentParameters that depend on them.
-		std::list<AbstractDependentParameter*> get_dependent_parameters(AbstractValue* v);
+  std::list<AbstractParameter*> samplable_parameters_list;
+  std::list<AbstractValue*> all_parameters_list;
+  std::list<AbstractParameter*>::iterator current_parameter; //Tracks the current parameter to be sampled, via an iterator across the parameter_list.
 
-		void setupDependancies();
-		void refreshDependancies(AbstractValue*);
+  // Dependancies.
+  std::map<AbstractValue*, std::list<AbstractValue*>> value_to_dependents; // Maps AbstractValues to AbstractDependentParameters that depend on them.
+  std::list<AbstractValue*> get_dependent_parameters(AbstractValue* v);
 
-		std::map<std::string, AbstractParameter*> name_to_address; //A map from the name of a parameter to the pointer of the parameter class.
-		static std::ofstream out_file;
+  void setupDependancies();
+  void refreshDependancies(AbstractValue*);
+
+  std::map<std::string, AbstractParameter*> name_to_address; //A map from the name of a parameter to the pointer of the parameter class.
+  static std::ofstream out_file;
 };
 
 #endif

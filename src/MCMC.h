@@ -8,7 +8,7 @@
 class MCMC {
 	public:
 		MCMC();
-		void Init(Model* model);
+		void initialize(Model* model);
 		void Run();
 	private:
 		Model* model;

@@ -29,7 +29,7 @@ MCMC::MCMC() {
 	lnL = 0;
 } 
 
-void MCMC::Init(Model* model) {
+void MCMC::initialize(Model* model) {
 	/*
 	 * Init MCMC with model, gens calculate lnL.
 	 */
@@ -54,6 +54,8 @@ void MCMC::Init(Model* model) {
 
 	files.add_file("time", env.get("time_out_file"), IOtype::OUTPUT);
 	time_out = files.get_ofstream("time");
+
+	model->printParameters();
 
 	// Track time.
 	n_tree_samples = 0;

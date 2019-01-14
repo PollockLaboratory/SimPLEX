@@ -16,6 +16,11 @@ RateVector::RateVector(std::string name, int state, std::vector<AbstractValue*> 
   locations = {};
   // TODO 20 should not be hard coded.
   counts = std::vector<int>(20, 0);
+  logLikelihoods = std::vector<double>(20, 0);
+
+  for(int i = 0; i < rates.size(); i++) {
+    valueID_to_state[rates[i]->get_ID()] = i;
+  }
 }
 
 void RateVector::add_location(int pos, BranchSegment* bs) {
@@ -25,16 +30,7 @@ void RateVector::add_location(int pos, BranchSegment* bs) {
 
 void RateVector::remove_location(int pos, BranchSegment* bs) {
   bpos loc = {bs, pos};
-  //std::cout << "B: " << bs << " P: " << pos << std::endl;
-  //for(auto l = locations.begin(); l != locations.end(); ++l) {
-  // std::cout << "[ B: " << bs << " P: " << pos << " ] " << std::endl;
-  // }
-  int s = locations.size();
   locations.erase(loc);
-  if(s == locations.size()) {
-    std::cerr << "Error: location not removed from RateVector.locations." << std::endl;
-    exit(EXIT_FAILURE);
-  }
 }
 
 void RateVector::clear_locations() {
@@ -43,6 +39,26 @@ void RateVector::clear_locations() {
 
 std::unordered_set<bpos> RateVector::get_locations() {
   return(locations);
+}
+
+void RateVector::update() {
+  /*
+   * Updates the substitution counts associtated with each RateParameter(AbstractValue) and the
+   * LogLikelihood scores.
+   */
+  update_counts();
+  update_logLikelihoods();
+}
+
+void RateVector::update_logLikelihoods() {
+  for(int i = 0; i < rates.size(); i++) {
+    logLikelihoods[i] = counts[i] * log(rates[i]->getValue());
+  }
+}
+
+void RateVector::update_single_logLikelihood(int i) {
+  int k = valueID_to_state[i];
+  logLikelihoods[k] = counts[k] * log(rates[k]->getValue());
 }
 
 void RateVector::update_counts() {
@@ -72,7 +88,7 @@ void RateVector::update_counts() {
 double RateVector::get_logLikelihood() {
   double logL = 0.0;
   for(int i = 0; i < rates.size(); i++) {
-    logL += counts[i] * log(rates[i]->getValue());
+    logL += logLikelihoods[i];
   }
   return(logL);
 }
@@ -112,18 +128,19 @@ RateVector*& RateVectorSet::operator[] (const int i) {
   return(c[i]);
 }
 
-void RateVectorSet::add(RateVector* v) {
-  for(int i = 0; i < v->rates.size(); i++) {
-    v->rates[i]->state = i;
-    v->rates[i]->rv = v;
+void RateVectorSet::add(RateVector* rv) {
+  for(int i = 0; i < rv->rates.size(); i++) {
+    // Set up the AbstractValues themselves.
+    rv->rates[i]->add_host_vector(rv);
   }
-  c.push_back(v);
+  // Add RateVector to collection in RateVectorSet. 
+  c.push_back(rv);
 }
 
 void RateVectorSet::get_counts() {
   // Calls get_counts in each rate vector.
   for(auto r = c.begin(); r != c.end(); ++r) {
-    (*r)->update_counts();
+    (*r)->update();
   }
 }
 

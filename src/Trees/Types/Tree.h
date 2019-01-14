@@ -67,7 +67,7 @@ class Tree {
   // Likelihood.
   void find_substitution_counts(); //Find the key statistics need for the likelihood function.
   double calculate_likelihood();
-  double partial_calculate_likelihood();
+
   static std::ofstream tree_out;
   static std::ofstream substitutions_out;
   void InitializeOutputStreams();
