@@ -32,6 +32,7 @@ public:
 	void reject();
 
 	double CalculateLikelihood();
+	double updateLikelihood();
 	double PartialCalculateLikelihood(const double lnL);
 
 	void RecordState(int gen, double l);

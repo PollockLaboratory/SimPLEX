@@ -221,7 +221,7 @@ void Tree::find_substitution_counts() {
 }
 
 double Tree::calculate_likelihood() {
-  double l_waiting = 0.0;
+  logL_waiting = 0.0;
   float t;
   int num0subs;
   int num1subs;
@@ -231,30 +231,16 @@ double Tree::calculate_likelihood() {
     t = it->first;
     num0subs = it->second.first;
     num1subs = it->second.second;
-    l_waiting += num0subs * log(1/(1 + u*t)) + num1subs * log(t/(1 + u*t));
+    logL_waiting += num0subs * log(1/(1 + u*t)) + num1subs * log(t/(1 + u*t));
   }
 
   double l_subs = SM->get_substitution_logLikelihood();
+  return(logL_waiting+l_subs);
+}
 
-  // double l_old = 0.0;
-  
-  // Substitutions.
-  // float r = 0;
-  // for(auto b = branchList.begin(); b != branchList.end(); ++b) {
-  // BranchSegment* branch = *b;
-  // std::vector<substitution> subs = branch->subs;
-  // for(int i = 0; i < subs.size(); i++) {
-  //    if(subs[i].pos != -1) {
-  //    r = branch->get_rate(i, subs[i].dec);
-  //	if(isnan(log(r))) {
-  //    std::cout << "Hit a nan rate: " << r << " " << log(r) << std::endl;
-  //}
-  //l_old += log(r);
-  //   }
-  // }
-  //}
-
-  return(l_waiting+l_subs);
+double Tree::update_likelihood() {
+  double l_subs = SM->get_substitution_logLikelihood();
+  return(logL_waiting+l_subs);
 }
 
 void Tree::InitializeOutputStreams() {

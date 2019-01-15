@@ -81,7 +81,7 @@ void MCMC::sample() {
 		total_time_tree_samples += time_taken;
 	} else {
 		sampleType = model->SampleSubstitutionModel();
-		newLnL = model->CalculateLikelihood();
+		newLnL = model->updateLikelihood();
 		// newLnL_test = model->PartialCalculateLikelihood(lnL);
 		// std::cout << "Old LogL: " << lnL << " Proposed LogL: " << newLnL << " Partial LogL: " << lnL + newLnL_test << std::endl;
 		if(sampleType) {	

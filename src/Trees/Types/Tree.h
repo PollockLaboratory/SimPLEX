@@ -67,11 +67,13 @@ class Tree {
   // Likelihood.
   void find_substitution_counts(); //Find the key statistics need for the likelihood function.
   double calculate_likelihood();
+  double update_likelihood();
 
   static std::ofstream tree_out;
   static std::ofstream substitutions_out;
   void InitializeOutputStreams();
  private:
+  double logL_waiting; // The likelihood of the waiting times.
   void configureSequences(TreeNode* n);
   float u;
 };

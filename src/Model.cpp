@@ -101,6 +101,13 @@ double Model::CalculateLikelihood() {
 	return(tree->calculate_likelihood());
 }
 
+double Model::updateLikelihood(){
+  /*
+   * Rather recalculating the full likelihood, will modify logLikelihood only by what has changed. 
+   */
+  return(tree->update_likelihood());
+}
+
 // double Model::PartialCalculateLikelihood(const double lnL) {
 // return(tree->partial_calculate_likelihood());
 //}
