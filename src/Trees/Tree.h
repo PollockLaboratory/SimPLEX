@@ -25,57 +25,55 @@ class Tree {
   TreeNode* root;
   SequenceAlignment* MSA;
   SubstitutionModel* SM;
-  std::map<float, std::pair<int, int>> substitution_counts;
 
-  Tree();
-  Tree& operator=(Tree tree);
-
-  int seqLen;
   map<string, vector<int>> names_to_sequences;
+
   std::list<BranchSegment*> branchList; // Potentially should be vectors.
   std::vector<TreeNode*> nodeList;
+
+  // Constructing/Initializing.
+  Tree();
+  void Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, SubstitutionModel* &SM);
 
   // Internal Tree nodes.
   void connect_nodes(TreeNode* &ancestral, BranchSegment* &ancestralBP, TreeNode* &decendant, float distance);
   TreeNode* createTreeNode(IO::RawTreeNode* raw_tree, TreeNode* &ancestralNode, BranchSegment* &ancestralBP);
 
-  // Setting options.
-  float max_seg_len; // Max segment length.
-  std::function< std::pair<BranchSegment*, BranchSegment*>(float)> splitBranchMethod; // Algorithm for splitting branches.
-
-  // Initializing.
-  void Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, SubstitutionModel* &SM);
-
-  // Debug tools.
-  void printBranchList();
-  void printNodeList();
-  void printParameters();
-  void printCounts();
-
   // Sampling.
   bool sample();
-  bool(Tree::*treeSamplingMethod)();
 
   // Possible sampling methods.
+  bool(Tree::*treeSamplingMethod)(); 
   bool sample_ancestral_states(); // When the tree is actually being sampled.
   bool step_through_MSAs(); // When the ancestral sequences have already been determined. 
 
-  // Recording state data.
-  void RecordTree();
-  void RecordState(int gen, double l);
-
   // Likelihood.
+  std::map<float, std::pair<int, int>> substitution_counts;
   void find_substitution_counts(); //Find the key statistics need for the likelihood function.
   double calculate_likelihood();
   double update_likelihood();
 
+  // Recording state data.
   static std::ofstream tree_out;
   static std::ofstream substitutions_out;
-  void InitializeOutputStreams();
+  void initialize_output_streams();
+  void record_tree();
+  void record_state(int gen, double l);
+
+  // Debug tools.
+  void print_branchList();
+  void print_nodeList();
+  void print_parameters();
+  void print_counts();
  private:
+  // Settings/options.
+  float max_seg_len; // Max segment length.
+  int seqLen;
+  std::function< std::pair<BranchSegment*, BranchSegment*>(float)> splitBranchMethod; // Algorithm for splitting branches.
+  float u;
+
   double logL_waiting; // The likelihood of the waiting times.
   void configureSequences(TreeNode* n);
-  float u;
 };
 
 #endif

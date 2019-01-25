@@ -1,18 +1,19 @@
-#ifndef GeneralTimeReversible_h_
-#define GeneralTimeReversible_h_
+#ifndef CategoryGTR_h_
+#define CategoryGTR_h_
 
 #include <fstream>
 
 #include "SubstitutionModel.h"
 #include "../../Parameters/ComponentSet.h"
 #include "../../Parameters/Types/ContinuousFloat.h"
+#include "../../Parameters/Types/CategoryFloat.h"
 #include "../../Parameters/Types/VirtualSubstitutionRate.h"
 #include "../../Parameters/AbstractValue.h"
 #include "../../Parameters/RateVector.h"
 
-class GeneralTimeReversible: public SubstitutionModel {
+class CategoryGTR: public SubstitutionModel {
 	public:
-		GeneralTimeReversible();
+		CategoryGTR();
 		virtual void Initialize(int number_of_sites, std::vector<std::string> states);
 	private:
 };

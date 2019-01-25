@@ -11,38 +11,46 @@
 // Defined in RateVector.h
 class RateVector;
 
-class AbstractValue {
+class AbstractComponent {
  public:
-  AbstractValue(std::string parameter_name);
+  AbstractComponent(std::string name);
 
-  std::string name;
+  void add_dependancy(AbstractComponent*);
+  std::list<AbstractComponent*> get_dependancies();
+
   int get_ID();
+  std::string get_name();
+
+  virtual void refresh() = 0;
+  virtual void printValue() = 0;
+ protected:
+  int ID;
+  std::string name;
+  std::list<AbstractComponent*> dependent_values; 
+};
+
+class AbstractValue : public AbstractComponent {
+ public:
+  AbstractValue(std::string name);
   virtual double getValue() = 0;
   virtual double getOldValue() = 0;
   virtual void printValue() = 0;
-
-  virtual void refresh() = 0;
+  // virtual void refresh() = 0;
 
   void add_host_vector(RateVector*);
   void refresh_host_vectors();
 
-  void add_dependancy(AbstractValue*);
-  std::list<AbstractValue*> get_dependancies();
   std::list<RateVector*> host_vectors; // Pointers to the host RateVectors that a parameter sits within.
- protected:
-  std::list<AbstractValue*> dependent_values;
- private:
-  int ID;
 };
 
-class AbstractParameter : public AbstractValue {
+class SampleableValue : public AbstractValue {
  public:
-  AbstractParameter(std::string parameter_name) : AbstractValue(parameter_name) { fixedQ = true; }
+  SampleableValue(std::string parameter_name) : AbstractValue(parameter_name) { fixedQ = true; }
 
   virtual bool sample() = 0; // If return true Metropolis Hasting Sample, else Gibbs.
   virtual void undo() = 0;
   virtual void fix() = 0;
-  void refresh() {}
+  virtual void refresh() = 0;
  protected:
   bool fixedQ; //Indicates whether the state of this parameter is fixed or still being trialed.
 };

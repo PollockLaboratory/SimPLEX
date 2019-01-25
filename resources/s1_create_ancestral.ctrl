@@ -32,6 +32,7 @@ ancestral_sequences 0
 # 0	General Time Reversible
 # 1 	Single Rate
 # 2	Fixed Rate
+# 3	CategoryGTR
 
 substitution_model_type		0
 

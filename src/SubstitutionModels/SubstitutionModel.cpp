@@ -23,7 +23,7 @@ bool SubstitutionModel::SampleParameters() {
 	/*
 	 * Samples a single parameter within the parameter set();
 	 */
-	bool sampleType = parameters.sample();
+	bool sampleType = components.sample();
 	return(sampleType);
 }
 
@@ -31,25 +31,25 @@ void SubstitutionModel::accept() {
 	/*
 	 * Accepts the newly sampled parameter set.
 	 */
-	parameters.accept();
+	components.accept();
 }
 
 void SubstitutionModel::reject() {
 	/*
 	 * Rejects the newly sampled parameter set, and undoes the changes from the previous sampling.
 	 */
-	parameters.reject();
+	components.reject();
 }
 
 void SubstitutionModel::printParameters() {
-	parameters.print();
+	components.print();
 }
 
 int SubstitutionModel::getNumberOfParameters() {
 	/*
 	 * Finds the number of sampleable parameters aka the length of the size of the parameter set.
 	 */
-	return(parameters.size());
+	return(components.size());
 }
 
 void SubstitutionModel::get_counts() {
@@ -66,20 +66,12 @@ double SubstitutionModel::get_substitution_logLikelihood() {
   return(logL);
 }
 
-void SubstitutionModel::clear_locations() {
-  rateVectors.clear_locations();
-}
-
-void SubstitutionModel::check_duplicate_locations() {
-  rateVectors.check_duplicate_locations();
-}
-
-std::list<AbstractValue*> SubstitutionModel::get_current_parameters() {
-	return(parameters.get_current_parameters());
+std::list<AbstractComponent*> SubstitutionModel::get_current_parameters() {
+	return(components.get_current_parameters());
 }
 
 void SubstitutionModel::saveToFile(int gen, double l) {
-  parameters.saveToFile(gen, l);
+  components.saveToFile(gen, l);
   rateVectors.saveToFile(gen, l);
 }
 
@@ -88,11 +80,11 @@ void SubstitutionModel::Terminate() {
 }
 
 void SubstitutionModel::add_rate_vector(RateVector* v) {
-  parameters.add_rate_vector(v);
+  components.add_rate_vector(v);
   rateVectors.add(v);
 }
 
 void SubstitutionModel::finalize() {
-  parameters.Initialize();
+  components.Initialize();
   rateVectors.Initialize();
 }

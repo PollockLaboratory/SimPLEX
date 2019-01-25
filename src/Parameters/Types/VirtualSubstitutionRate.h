@@ -3,6 +3,7 @@
 
 #include "AbstractValue.h"
 #include <string>
+#include <list>
 #include <exception>
 
 class OutOfBoundsException: public std::exception {
@@ -20,9 +21,11 @@ class VirtualSubstitutionRate : public AbstractValue {
   virtual double getOldValue();
   virtual void printValue();
   void refresh();
+  void add_rate(AbstractValue*);
  private:
   double value;
   double previous_value;
   double u; //Uniformization constant.
+  std::list<AbstractValue*> dependent_rates;
 };
 #endif

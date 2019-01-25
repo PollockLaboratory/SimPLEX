@@ -14,7 +14,7 @@
 #include <vector>
 #include <fstream>
 
-#include "Trees/Types/Tree.h"
+#include "Trees/Tree.h"
 #include "Data.h"
 
 #include "SubstitutionModels/SubstitutionModel.h"

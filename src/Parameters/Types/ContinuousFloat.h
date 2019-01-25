@@ -6,7 +6,7 @@
 
 #include "../AbstractValue.h"
 
-class ContinuousFloat : public AbstractParameter {
+class ContinuousFloat : public SampleableValue {
  public:
   ContinuousFloat(std::string, double, double);
   ContinuousFloat(std::string, double, double, double);
@@ -19,6 +19,7 @@ class ContinuousFloat : public AbstractParameter {
 
   virtual void undo();
   virtual void fix();
+  virtual void refresh();
  private:
   double value;
   double std_dev;

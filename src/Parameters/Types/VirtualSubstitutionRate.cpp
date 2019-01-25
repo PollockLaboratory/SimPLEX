@@ -20,7 +20,7 @@ void VirtualSubstitutionRate::printValue() {
 void VirtualSubstitutionRate::refresh() {
   previous_value = value;
   double total = 0.0;
-  for(auto it = dependent_values.begin(); it != dependent_values.end(); ++it) {
+  for(auto it = dependent_rates.begin(); it != dependent_rates.end(); ++it) {
     total += (*it)->getValue();
   }
 
@@ -28,5 +28,10 @@ void VirtualSubstitutionRate::refresh() {
   if(value < 0.0 || value > 1.0) {
     throw OutOfBoundsException("VirtualSubstitutionRate out of bounds.");
   }
+}
+
+void VirtualSubstitutionRate::add_rate(AbstractValue* v) {
+  add_dependancy(v);
+  dependent_rates.push_back(v);
 }
 

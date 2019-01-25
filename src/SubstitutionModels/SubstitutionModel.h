@@ -13,7 +13,7 @@ using std::map;
 using std::string;
 
 #include "../Parameters/AbstractValue.h"
-#include "../Parameters/ParameterSet.h"
+#include "../Parameters/ComponentSet.h"
 #include "../Parameters/RateVector.h"
 
 class SubstitutionModel {
@@ -29,14 +29,10 @@ class SubstitutionModel {
 
   void printParameters();
   int getNumberOfParameters();
-  std::list<AbstractValue*> get_current_parameters();
+  std::list<AbstractComponent*> get_current_parameters();
 
   void get_counts();
   double get_substitution_logLikelihood();
-
-  // Tmp debug.
-  void clear_locations();
-  void check_duplicate_locations();
 
   void saveToFile(int gen, double l);
   virtual void Terminate();
@@ -46,7 +42,7 @@ class SubstitutionModel {
  private:
   std::ofstream* substitution_model_out;
 
-  ParameterSet parameters;
+  ComponentSet components;
   RateVectorSet rateVectors;
 };
 

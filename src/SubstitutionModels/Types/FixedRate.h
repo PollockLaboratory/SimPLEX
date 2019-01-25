@@ -4,7 +4,7 @@
 #include <fstream>
 
 #include "SubstitutionModel.h"
-#include "../../Parameters/ParameterSet.h"
+#include "../../Parameters/ComponentSet.h"
 #include "../../Parameters/Types/FixedFloat.h"
 #include "../../Parameters/Types/VirtualSubstitutionRate.h"
 #include "../../Parameters/AbstractValue.h"

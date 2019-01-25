@@ -6,7 +6,7 @@
 
 double inf = std::numeric_limits<double>::infinity();
 
-ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, double initial_std_dev = 1.0) : AbstractParameter(name), value(initial_value), std_dev(initial_std_dev) {
+ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, double initial_std_dev = 1.0) : SampleableValue(name), value(initial_value), std_dev(initial_std_dev) {
   /*
    * The default constructor for the Continuous Float parameter class.
    */
@@ -17,7 +17,7 @@ ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, d
   std::cout << "Inside constructor." << std::endl;
 }
 
-ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, double initial_std_dev = 1.0, double lower_bound = -inf) : AbstractParameter(name), value(initial_value), std_dev(initial_std_dev), lower_bound(lower_bound) {
+ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, double initial_std_dev = 1.0, double lower_bound = -inf) : SampleableValue(name), value(initial_value), std_dev(initial_std_dev), lower_bound(lower_bound) {
   /*
    * The default constructor for the Continuous Float parameter class - with bounds
    */
@@ -26,7 +26,7 @@ ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, d
   previous_value = 0.0;
 }
 
-ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, double initial_std_dev = 1.0, double lower_bound = -inf, double upper_bound = inf) : AbstractParameter(name), value(initial_value), std_dev(initial_std_dev), lower_bound(lower_bound), upper_bound(upper_bound) {
+ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, double initial_std_dev = 1.0, double lower_bound = -inf, double upper_bound = inf) : SampleableValue(name), value(initial_value), std_dev(initial_std_dev), lower_bound(lower_bound), upper_bound(upper_bound) {
   /*
    * The default constructor for the Continuous Float parameter class - with bounds
    */
@@ -76,5 +76,8 @@ void ContinuousFloat::undo() {
 void ContinuousFloat::fix() {
   previous_value = 0;
   fixedQ = true;
+}
+
+void ContinuousFloat::refresh() {
 }
 

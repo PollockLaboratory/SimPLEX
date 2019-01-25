@@ -4,7 +4,6 @@
 #include <chrono>
 
 #include "Model.h"
-#include "Trees/TreeTypes.h"
 #include "Trees/TreeParser.h"
 #include "SubstitutionModels/SubstitutionModelTypes.h"
 #include "SubstitutionModels/SubstitutionModel.h"
@@ -59,7 +58,7 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA) {
   substitution_model = InitializeSubstitutionModel(num_sites, MSA->states);
   num_parameters = substitution_model->getNumberOfParameters();
 
-  tree = TreeTypes::pickTreeType();
+  tree = new Tree();
   tree->Initialize(raw_tree, MSA, substitution_model);
 }
 
@@ -117,7 +116,7 @@ void Model::RecordState(int gen, double l) {
 	/*
 	 * Records the state of both the tree and the substitution model.
 	 */
-	tree->RecordState(gen, l);
+	tree->record_state(gen, l);
 	substitution_model->saveToFile(gen, l);
 }
 
@@ -136,6 +135,6 @@ void Model::Terminate() {
 	 * Just terminates substitution_model.
 	 */
   // Save the tree data.
-  tree->RecordTree();
+  tree->record_tree();
   substitution_model->Terminate();
 }
