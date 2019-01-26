@@ -16,11 +16,9 @@ ComponentSet::ComponentSet() {
 }
 
 // Setup.
+
 void ComponentSet::Initialize() {
   current_parameter = samplable_parameters_list.begin();
-
-  // Set up deps.
-  setupDependancies();
 
   // Refreshes all dependancies.
   for(auto p = all_parameters_list.begin(); p != all_parameters_list.end(); ++p) {
@@ -41,38 +39,37 @@ void ComponentSet::Initialize() {
   out_file << std::endl;
 }
 
-void ComponentSet::add_parameter(SampleableValue* param) {
+void ComponentSet::add_parameter(AbstractComponent* param) {
   /* 
    * Adds the pointer to an actual parameter onto the parameter_list, and to the
    * name_to_adress map.
    */
-  samplable_parameters_list.push_back(param);
+  if(value_to_dependents.find(param) == value_to_dependents.end()) {
+    // Check if Parameter has already been seen.
+      SampleableValue* p = dynamic_cast<SampleableValue*> (param);
+      if(p != NULL) {
+	samplable_parameters_list.push_back(p);
 
-  std::string name = param->get_name();
-  name_to_address.insert(std::make_pair(name, param));
+	std::string name = p->get_name();
+	name_to_address.insert(std::make_pair(name, p));
+      }
+
+      value_to_dependents[param] = {};
+      all_parameters_list.push_back(param);
+
+      // Add all deps
+      std::list<AbstractComponent*> deps = param->get_dependancies();
+      for(auto d = deps.begin(); d != deps.end(); ++d) {
+	add_parameter(*d);
+	value_to_dependents[*d].push_back(param);
+      }
+  }
 }
 
 void ComponentSet::add_rate_vector(RateVector* v) {
   std::vector<AbstractValue*> r = v->rates;
   for(std::vector<AbstractValue*>::iterator it = r.begin(); it != r.end(); ++it) {
-    // Check if Parameter has already been seen.
-    if(value_to_dependents.find(*it) == value_to_dependents.end()) {
-      SampleableValue* p = dynamic_cast<SampleableValue*> (*it);
-      if(p != NULL) {
-	add_parameter(p);
-      }
-      value_to_dependents[*it] = {};
-      all_parameters_list.push_back(*it);
-    }
-  }
-}
-
-void ComponentSet::setupDependancies() {
-  for(auto p = all_parameters_list.begin(); p != all_parameters_list.end(); ++p) {
-    std::list<AbstractComponent*> deps = (*p)->get_dependancies();
-    for(auto d = deps.begin(); d != deps.end(); ++d) {
-      value_to_dependents[*d].push_back(*p);
-    }
+    add_parameter(*it);
   }
 }
 
@@ -168,7 +165,7 @@ void ComponentSet::print() {
    */
   std::cout << "Parameter Set - size: " << all_parameters_list.size() << std::endl;
   for(auto iter = all_parameters_list.begin(); iter != all_parameters_list.end(); ++iter) {
-    // (*iter)->printValue();
+    (*iter)->print();
     // std::cout << "Host vectors: ";
     // for(auto i = (*iter)->host_vectors.begin(); i != (*iter)->host_vectors.end(); ++i) {
     // std::cout << (*i)->name << " ";

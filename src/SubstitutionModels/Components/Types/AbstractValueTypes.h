@@ -1,10 +1,22 @@
-#ifndef VirtualSubstitutionRate_h_
-#define VirtualSubstitutionRate_h_
+#ifndef AbstractValueTypes_h
+#define AbstractValueTypes_h
 
-#include "AbstractValue.h"
+#include"AbstractValue.h"
 #include <string>
 #include <list>
+#include <iostream>
 #include <exception>
+
+class FixedFloat : public AbstractValue {
+ public:
+  FixedFloat(std::string parameter_name, double);
+  virtual double getValue();
+  virtual double getOldValue();
+  virtual void print();
+  virtual void refresh();
+ private:
+  double value;
+};
 
 class OutOfBoundsException: public std::exception {
  private:
@@ -19,7 +31,7 @@ class VirtualSubstitutionRate : public AbstractValue {
   VirtualSubstitutionRate(std::string parameter_name, double unif);
   virtual double getValue();
   virtual double getOldValue();
-  virtual void printValue();
+  virtual void print();
   void refresh();
   void add_rate(AbstractValue*);
  private:
@@ -28,4 +40,5 @@ class VirtualSubstitutionRate : public AbstractValue {
   double u; //Uniformization constant.
   std::list<AbstractValue*> dependent_rates;
 };
+
 #endif

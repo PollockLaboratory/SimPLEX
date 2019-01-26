@@ -22,7 +22,7 @@ class AbstractComponent {
   std::string get_name();
 
   virtual void refresh() = 0;
-  virtual void printValue() = 0;
+  virtual void print() = 0;
  protected:
   int ID;
   std::string name;
@@ -34,7 +34,7 @@ class AbstractValue : public AbstractComponent {
   AbstractValue(std::string name);
   virtual double getValue() = 0;
   virtual double getOldValue() = 0;
-  virtual void printValue() = 0;
+  virtual void print() = 0;
   // virtual void refresh() = 0;
 
   void add_host_vector(RateVector*);

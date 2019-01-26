@@ -12,9 +12,9 @@ using std::map;
 #include <string>
 using std::string;
 
-#include "../Parameters/AbstractValue.h"
-#include "../Parameters/ComponentSet.h"
-#include "../Parameters/RateVector.h"
+#include "../Components/AbstractValue.h"
+#include "../Components/ComponentSet.h"
+#include "../Components/RateVector.h"
 
 class SubstitutionModel {
  public:

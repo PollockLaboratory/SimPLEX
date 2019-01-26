@@ -1,5 +1,27 @@
-#include <iostream>
-#include "VirtualSubstitutionRate.h"
+#include "AbstractValueTypes.h"
+
+// FIXED FLOAT
+
+FixedFloat::FixedFloat(std::string parameter_name, double v) : AbstractValue(parameter_name) {
+  value = v;
+}
+
+double FixedFloat::getValue() {
+  return(value);
+}
+
+double  FixedFloat::getOldValue() {
+  return(value);
+}
+
+void FixedFloat::print() {
+  std::cout << "FixedFloat - " << name << ": " << value << std::endl;
+}
+
+void FixedFloat::refresh() {	
+}
+
+// VIRTUAL SUBSTITUTION RATE
 
 VirtualSubstitutionRate::VirtualSubstitutionRate(std::string parameter_name, double unif) : AbstractValue(parameter_name) {
 	u = unif;
@@ -13,7 +35,7 @@ double  VirtualSubstitutionRate::getOldValue() {
 	return(previous_value);
 }
 
-void VirtualSubstitutionRate::printValue() {
+void VirtualSubstitutionRate::print() {
 	std::cout << "VirtualSubstitutionRate - " << name << ": " << value << std::endl;
 }
 
@@ -34,4 +56,5 @@ void VirtualSubstitutionRate::add_rate(AbstractValue* v) {
   add_dependancy(v);
   dependent_rates.push_back(v);
 }
+
 

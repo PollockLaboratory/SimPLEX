@@ -10,8 +10,9 @@
 #include <map>
 
 #include "AbstractValue.h"
-#include "ContinuousFloat.h"
-#include "VirtualSubstitutionRate.h"
+
+#include "AbstractValueTypes.h"
+#include "SampleableValueTypes.h"
 
 class BranchSegment; // Defined in Trees/Types/TreeParts.h
 
@@ -103,4 +104,5 @@ class RateVectorSet {
  private:
   static std::ofstream out_file;
 };
+
 #endif

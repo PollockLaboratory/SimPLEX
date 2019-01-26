@@ -4,11 +4,10 @@
 #include <fstream>
 
 #include "SubstitutionModel.h"
-#include "../../Parameters/ComponentSet.h"
-#include "../../Parameters/Types/FixedFloat.h"
-#include "../../Parameters/Types/VirtualSubstitutionRate.h"
-#include "../../Parameters/AbstractValue.h"
-#include "../../Parameters/RateVector.h"
+#include "../Components/ComponentSet.h"
+#include "../Components/Types/AbstractValueTypes.h"
+#include "../Components/AbstractValue.h"
+#include "../Components/RateVector.h"
 
 class FixedRate: public SubstitutionModel {
  public:

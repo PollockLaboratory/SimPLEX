@@ -15,7 +15,7 @@ class ComponentSet {
  public:
   ComponentSet();
   void Initialize();
-  void add_parameter(SampleableValue* param);
+  void add_parameter(AbstractComponent* param);
   void add_rate_vector(RateVector* v);
 
   bool sample();
@@ -40,15 +40,10 @@ class ComponentSet {
   std::map<AbstractComponent*, std::list<AbstractComponent*>> value_to_dependents; // Maps AbstractValues to AbstractDependentParameters that depend on them.
   std::list<AbstractComponent*> get_dependent_parameters(AbstractComponent* v);
 
-  void setupDependancies();
   void refreshDependancies(AbstractComponent*);
 
   std::map<std::string, SampleableValue*> name_to_address; //A map from the name of a parameter to the pointer of the parameter class.
   static std::ofstream out_file;
-};
-
-class RateCategories : AbstractComponent {
-
 };
 
 #endif

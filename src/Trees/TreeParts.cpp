@@ -34,7 +34,7 @@ double BranchSegment::get_rate(int pos, int dec_state) {
   double r = rates[pos]->rates[dec_state]->getValue();
   // Might not need this anymore.
   if(isnan(log(r))) {
-    rates[pos]->rates[dec_state]->printValue();
+    rates[pos]->rates[dec_state]->print();
   }
   return(r);
 }

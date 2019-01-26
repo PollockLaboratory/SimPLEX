@@ -23,13 +23,15 @@ void CategoryGTR::Initialize(int number_of_sites, std::vector<std::string> state
 
   std::vector<std::vector<AbstractValue*>> Q(20, std::vector<AbstractValue*>(20, NULL));
 
+  RateCategories* rc = new RateCategories("Rate Categories", 0.0, 0.1, 100);
+
   AbstractValue* r = NULL;
   for(int i = 0; i < 20; i++) {
     for(int j = 0; j < 20; j++) {
       if(i == j) {
 	Q[i][j] = new VirtualSubstitutionRate(aa[i] + aa[j], u);
       } else if(i < j) {
-	Q[i][j] = new ContinuousFloat(aa[i] + aa[j], 0.01, 0.001, 0.0);
+	Q[i][j] = new CategoryFloat(aa[i] + aa[j], rc);
       } else {
 	Q[i][j] = Q[j][i];
       }

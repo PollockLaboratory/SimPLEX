@@ -34,7 +34,7 @@ ancestral_sequences 0
 # 2	Fixed Rate
 # 3	CategoryGTR
 
-substitution_model_type		0
+substitution_model_type		3
 
 # MCMC settings.
 tree_sample_frequency 2000

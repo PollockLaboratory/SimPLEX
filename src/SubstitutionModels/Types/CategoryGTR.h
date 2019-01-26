@@ -1,15 +1,17 @@
-#ifndef CategoryGTR_h_
-#define CategoryGTR_h_
+#ifndef CategoryGTR_h
+#define CategoryGTR_h
 
 #include <fstream>
 
 #include "SubstitutionModel.h"
-#include "../../Parameters/ComponentSet.h"
-#include "../../Parameters/Types/ContinuousFloat.h"
-#include "../../Parameters/Types/CategoryFloat.h"
-#include "../../Parameters/Types/VirtualSubstitutionRate.h"
-#include "../../Parameters/AbstractValue.h"
-#include "../../Parameters/RateVector.h"
+#include "../Components/ComponentSet.h"
+
+#include "../Components/Types/AbstractValueTypes.h"
+#include "../Components/Types/SampleableValueTypes.h"
+#include "../Components/ComponentTypes.h"
+
+#include "../Components/AbstractValue.h"
+#include "../Components/RateVector.h"
 
 class CategoryGTR: public SubstitutionModel {
 	public:
