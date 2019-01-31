@@ -26,14 +26,13 @@ class BranchSegment {
   double get_rate(int pos, int dec_state);
 
   // Key statistics.
-  std::vector<substitution> subs;
-  int num0subs;
-  int num1subs;
-
   inline void update_rate_vectors();
   bool virtualSubstituionQ(int state);
-  void update();
 
+  void update_counts(std::map<RateVector*, std::vector<int>>& subs_by_rateVector, std::pair<int, int>& subs_by_branch);
+
+  void update();
+ 
   friend std::ostream& operator<< (std::ostream &out, const BranchSegment &b);
  private:
   std::vector<RateVector*> rates; //By site.

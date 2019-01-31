@@ -17,8 +17,6 @@ extern Environment env;
 BranchSegment::BranchSegment(float distance) {
   this->distance = distance;
   rates = std::vector<RateVector*>(env.n, NULL);
-  subs = std::vector<substitution>(env.n, {-1, -1, -1});
-  // std::cout << "Making new branch segment. Distance: " << this->distance << std::endl;
 }
 
 BranchSegment::~BranchSegment() {
@@ -46,9 +44,7 @@ inline void BranchSegment::update_rate_vectors() {
     if((*seq)[pos] == -1) {
       rates[pos] = NULL;
     } else {
-      if(rates[pos]) rates[pos]->remove_location(pos, this);
       rates[pos] = ancestral->SM->selectRateVector((*seq)[pos]);
-      rates[pos]->add_location(pos, this);
     }
   }
 }
@@ -71,41 +67,32 @@ bool BranchSegment::virtualSubstituionQ(int state) {
 }
 
 void BranchSegment::update() {
-  num0subs = 0;
-  num1subs = 0;
-  subs = std::vector<substitution>(env.n, {-1, -1, -1});
+  update_rate_vectors();
+}
 
+void BranchSegment::update_counts(std::map<RateVector*, std::vector<int>>& subs_by_rateVector,
+				  std::pair<int, int>& subs_by_branch) {
   std::vector<int> anc = *(ancestral->sequence);
   std::vector<int> dec = *(decendant->sequence);
-  substitution s;
 
   // Substitutions tracked.
   for(int pos = 0; pos < anc.size(); pos++) {
     if(dec.at(pos) != -1) {
       if(anc.at(pos) == dec.at(pos)) {
 	// Add virtual substitution.
-	//if(virtualSubstituionQ(anc.at(pos))) {
-	if(false) {
-	  num1subs += 1;
-	  s = {pos, anc.at(pos), dec.at(pos)};
-	  subs[pos] = s;
+	if(virtualSubstituionQ(anc.at(pos))) {
+	  subs_by_branch.second += 1;
+	  subs_by_rateVector[rates[pos]][dec.at(pos)] += 1;
 	  // Don't add virtual substitution.
 	} else {
-	  num0subs += 1;
-	  s = {-1, -1, -1}; // NULL substitution
-	  subs[pos] = s;
+	  subs_by_branch.first += 1;
 	}
       } else {
-	num1subs += 1;
-	s = {pos, anc.at(pos), dec.at(pos)};
-	subs[pos] = s;
+	subs_by_branch.second += 1;
+	subs_by_rateVector[rates[pos]][dec.at(pos)] += 1;	
       }
     }
-  }
-
-  // Update rate vector.
-  update_rate_vectors();
-
+  } 
 }
 
 // TREE NODES

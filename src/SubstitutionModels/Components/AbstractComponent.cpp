@@ -1,4 +1,4 @@
-#include <AbstractValue.h>
+#include "AbstractComponent.h"
 #include <RateVector.h>
 #include <iostream>
 
@@ -33,14 +33,12 @@ AbstractValue::AbstractValue(std::string name) : AbstractComponent(name) {
   dependent_values = {};
 }
 
-void AbstractValue::add_host_vector(RateVector* rv) {
-  host_vectors.push_back(rv);
+void AbstractValue::add_host_vector(RateVector* rv, int pos) {
+  host_vectors.push_back(std::pair<RateVector*, int>(rv, pos));
 }
 
-void AbstractValue::refresh_host_vectors() {
-  for(auto it = host_vectors.begin(); it != host_vectors.end(); ++it) {
-    (*it)->update_single_logLikelihood(ID);
-  }
+std::list<std::pair<RateVector*, int>> AbstractValue::get_host_vectors() {
+  return(host_vectors);
 }
 
 

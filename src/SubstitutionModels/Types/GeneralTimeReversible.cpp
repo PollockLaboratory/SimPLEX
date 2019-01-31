@@ -37,7 +37,7 @@ void GeneralTimeReversible::Initialize(int number_of_sites, std::vector<std::str
 
     for(int j = 0; j < 20; j++) {
       if(i != j) {
-	Q[i][i]->add_dependancy(Q[i][j]);
+	static_cast<VirtualSubstitutionRate*>(Q[i][i])->add_rate(Q[i][j]);
       }
     }
 

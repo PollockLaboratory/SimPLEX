@@ -25,6 +25,7 @@ void FixedFloat::refresh() {
 
 VirtualSubstitutionRate::VirtualSubstitutionRate(std::string parameter_name, double unif) : AbstractValue(parameter_name) {
 	u = unif;
+	value = 0.232323;
 }
 
 double VirtualSubstitutionRate::getValue() {
@@ -42,11 +43,13 @@ void VirtualSubstitutionRate::print() {
 void VirtualSubstitutionRate::refresh() {
   previous_value = value;
   double total = 0.0;
+
   for(auto it = dependent_rates.begin(); it != dependent_rates.end(); ++it) {
     total += (*it)->getValue();
   }
 
   value = u - total;
+
   if(value < 0.0 || value > 1.0) {
     throw OutOfBoundsException("VirtualSubstitutionRate out of bounds.");
   }

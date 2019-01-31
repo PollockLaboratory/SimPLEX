@@ -9,7 +9,7 @@
 #include "../Components/Types/AbstractValueTypes.h"
 #include "../Components/Types/SampleableValueTypes.h"
 
-#include "../Components/AbstractValue.h"
+#include "../Components/AbstractComponent.h"
 #include "../Components/RateVector.h"
 
 class SingleRate: public SubstitutionModel {

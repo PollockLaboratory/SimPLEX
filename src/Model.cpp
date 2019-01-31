@@ -54,18 +54,28 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA) {
    * - the tree class - contains the tree topology as well as the sequences.
    * - the substitution model class - which contains all the rate matrices.
    */
+  u = env.u;
   int num_sites = (MSA->taxa_names_to_sequences).begin()->second.size();
   substitution_model = InitializeSubstitutionModel(num_sites, MSA->states);
   num_parameters = substitution_model->getNumberOfParameters();
 
   tree = new Tree();
   tree->Initialize(raw_tree, MSA, substitution_model);
+
+  // Sort out counts.
+  counts = SubstitutionCounts(substitution_model->get_RateVectors(), tree->get_branch_lengths());
+  tree->update_counts(counts);
+  counts.print();
 }
 
 // Sampling
 bool Model::SampleTree() {
   if(ready) {
-    return(tree->sample());
+    bool t = tree->sample();
+    counts = SubstitutionCounts(substitution_model->get_RateVectors(), tree->get_branch_lengths()); // Empty list of counts
+    tree->update_counts(counts);
+
+    return(t);
   } else {
     std::cout << "Error: Attempt to sample tree before accepting previous changes." << std::endl;
     exit(EXIT_FAILURE);
@@ -83,28 +93,73 @@ bool Model::SampleSubstitutionModel() {
 }
 
 void Model::accept() {
-	substitution_model->accept();
-	ready = true;
+  substitution_model->accept();
+  ready = true;
 }
 
 void Model::reject() {
-	substitution_model->reject();
-	ready = true;
+  substitution_model->reject();
+  logL -= delta_logL;
+  ready = true;
 }
 
 // Likelihood Calculations.
 double Model::CalculateLikelihood() {
-	/*
-	 * Calculates the likelihood of the current tree and substitution model.
-	 */
-	return(tree->calculate_likelihood());
+  /*
+   * Calculates the likelihood of the current tree and substitution model.
+   */
+  logL_waiting = 0.0;
+  logL_subs = 0.0;
+  logL = 0.0;
+  float t;
+  int num0subs;
+  int num1subs;
+
+  for(auto it = counts.subs_by_branch.begin(); it != counts.subs_by_branch.end(); ++it) {
+    t = it->first;
+    num0subs = it->second.first;
+    num1subs = it->second.second;
+    logL_waiting += num0subs * log(1/(1 + u*t)) + num1subs * log(t/(1 + u*t));
+  }
+
+  for(auto it = counts.subs_by_rateVector.begin(); it != counts.subs_by_rateVector.end(); ++it) {
+    RateVector* rv = it->first;
+    std::vector<int> C_xy = it->second;
+    for(int i = 0; i < env.num_states; i++) {
+      logL_subs += C_xy[i] * log((*rv)[i]);
+    }
+  }
+
+  logL = logL_waiting + logL_subs;
+
+  // double l = tree->calculate_likelihood();
+  return(logL);
 }
 
 double Model::updateLikelihood(){
   /*
    * Rather recalculating the full likelihood, will modify logLikelihood only by what has changed. 
    */
-  return(tree->update_likelihood());
+  delta_logL = 0.0;
+
+  int time_taken;
+  std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+  
+  std::list<std::pair<RateVector*, int>> vector_changes = substitution_model->get_current_parameters();
+
+  time_taken = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - start).count();
+  std::cout << "Time: " << time_taken << std::endl;
+
+  for(auto it = vector_changes.begin(); it != vector_changes.end(); ++it) {
+    RateVector* rv = it->first;
+    std::vector<int> C_xy = counts.subs_by_rateVector[rv];
+    delta_logL += C_xy[it->second] * log(rv->get_rate_ratio(it->second)); // Should be ratio;
+  }
+
+  logL += delta_logL;
+  // double l = tree->update_likelihood();
+  // std::cout << "L1: " << l << " L2: " << logL << std::endl;
+  return(logL);
 }
 
 // double Model::PartialCalculateLikelihood(const double lnL) {
@@ -138,3 +193,4 @@ void Model::Terminate() {
   tree->record_tree();
   substitution_model->Terminate();
 }
+

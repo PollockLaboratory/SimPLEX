@@ -8,7 +8,7 @@
 // #include <iostream>
 #include <fstream>
 
-#include "AbstractValue.h"
+#include "AbstractComponent.h"
 #include "RateVector.h"
 
 class ComponentSet {

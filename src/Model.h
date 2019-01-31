@@ -12,13 +12,15 @@
 #define Model_h_
 
 #include <vector>
+#include <map>
 #include <fstream>
 
+#include "SubstitutionCounts.h"
 #include "Trees/Tree.h"
+#include "SubstitutionModels/Components/RateVector.h"
 #include "Data.h"
 
 #include "SubstitutionModels/SubstitutionModel.h"
-
 class Model {
  public:
   Model();
@@ -43,9 +45,16 @@ class Model {
   Tree* tree;
   bool ready; // Checks whether model is ready to be resampled. If not then the changes made from the previous sampling have not been accepted or rejected.
   int num_parameters;
+  SubstitutionCounts counts;
 
   SubstitutionModel* substitution_model;
   SubstitutionModel* InitializeSubstitutionModel(int number_of_sites, vector<string> states);
+
+  float u;
+  double logL_waiting; // The likelihood of the waiting times.
+  double logL_subs; // The likelihood of the waiting times.
+  double logL;
+  double delta_logL;
 };
 
 #endif

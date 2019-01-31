@@ -1,7 +1,7 @@
 #ifndef SampleableValueTypes_h
 #define SampleableValueTypes_h
 
-#include "AbstractValue.h"
+#include "AbstractComponent.h"
 #include "ComponentTypes.h"
 
 #include <string>

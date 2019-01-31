@@ -107,7 +107,7 @@ bool ComponentSet::sample() {
     sampleType = sample();
   }
 
-  (*current_parameter)->refresh_host_vectors();
+  // (*current_parameter)->refresh_host_vectors();
 
   return (sampleType);
 }
@@ -130,7 +130,7 @@ void ComponentSet::accept() {
 void ComponentSet::reject() {
   (*current_parameter)->undo();
   refreshDependancies(*current_parameter);
-  (*current_parameter)->refresh_host_vectors();
+  // (*current_parameter)->refresh_host_vectors();
   stepToNextParameter();
 }
 

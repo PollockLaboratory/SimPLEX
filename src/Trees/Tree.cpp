@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream> // For ostringstream
 #include <cmath> // for floor and pow
+#include <unordered_set>
 
 #include "Sequence.h"
 #include "Environment.h"
@@ -53,12 +54,11 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
   std::cout << "Attaching sequences to tree." << std::endl;
   configureSequences(root);
 
-  // SM->clear_locations();
   for(auto b = branchList.begin(); b != branchList.end(); ++b) {
   	(*b)->update();
   }
 
-  find_substitution_counts();
+  // find_substitution_counts();
   initialize_output_streams();	
 
   std::cout << std::endl;
@@ -164,48 +164,27 @@ void Tree::configureSequences(TreeNode* n) {
 }
 
 // Sampling and likelihood.
-void Tree::find_substitution_counts() {
-  /*
-   * Finds the key stats for the likelihood function.
-   */
-
-  SM->get_counts();
-
-  substitution_counts = {};
-
+void Tree::update_counts(SubstitutionCounts& counts) {
   for(auto it = branchList.begin(); it != branchList.end(); ++it) {
     BranchSegment* b = *it;
-    if(substitution_counts.find(b->distance) == substitution_counts.end()) {
-      // Branch class does NOT already exists.
-      substitution_counts[b->distance] = std::make_pair(b->num0subs, b->num1subs);
-    } else {
-      // Branch class does already exist.
-      std::pair<int, int> c = substitution_counts[b->distance];
-      substitution_counts[b->distance] = std::make_pair(b->num0subs + c.first, b->num1subs + c.second);
+    b->update_counts(counts.subs_by_rateVector, counts.subs_by_branch[b->distance]);
+  }
+}
+
+std::list<float> Tree::get_branch_lengths() {
+  // Maybe Tree should just hold onto all the branch lengths in play?
+  std::list<float> lens = {};
+ std:unordered_set<float> lens_set = {};
+  BranchSegment* b;
+  for(auto it = branchList.begin(); it != branchList.end(); ++it) {
+    b = *it;
+    if(lens_set.find(b->distance) == lens_set.end()) {
+      // Branch does NOT already exists.
+      lens_set.insert(b->distance);
+      lens.push_back(b->distance);
     }
   }
-}
-
-double Tree::calculate_likelihood() {
-  logL_waiting = 0.0;
-  float t;
-  int num0subs;
-  int num1subs;
-
-  for(auto it = substitution_counts.begin(); it != substitution_counts.end(); ++it) {
-    t = it->first;
-    num0subs = it->second.first;
-    num1subs = it->second.second;
-    logL_waiting += num0subs * log(1/(1 + u*t)) + num1subs * log(t/(1 + u*t));
-  }
-
-  double l_subs = SM->get_substitution_logLikelihood();
-  return(logL_waiting+l_subs);
-}
-
-double Tree::update_likelihood() {
-  double l_subs = SM->get_substitution_logLikelihood();
-  return(logL_waiting+l_subs);
+  return(lens);
 }
 
 //
@@ -215,13 +194,10 @@ double Tree::update_likelihood() {
 bool Tree::sample() {
   bool s = (this->*treeSamplingMethod)();
 
-  // SM->clear_locations();
   // Update branch list - new substitutions.
   for(auto b = branchList.begin(); b != branchList.end(); ++b) {
     (*b)->update();
   }
-
-  find_substitution_counts();
 
   return(s);
 }
@@ -279,12 +255,7 @@ void Tree::print_branchList() {
   std::cout << "Printing Branch list. Size: " << branchList.size() << std::endl;
   for(std::list<BranchSegment*>::iterator it = branchList.begin(); it != branchList.end(); ++it) {
     BranchSegment* b = *it;
-    std::cout << "Branch: " << b->distance;
-    std::vector<substitution> subs = b->subs;
-    for(auto s = subs.begin(); s != subs.end(); ++s) {
-      std::cout << " " << MSA->decodeChar((*s).anc) << (*s).pos << MSA->decodeChar((*s).dec);
-    }
-    std::cout << std::endl;
+    std::cout << "Branch: " << b->distance << std::endl;
   }
 }
 
@@ -299,13 +270,4 @@ void Tree::print_parameters() {
   SM->printParameters();	
 }
 
-void Tree::print_counts() {
-  // This is a temporary function.
-  std::cout << "Printing counts:"  << std::endl;
-  std::cout << branchList.size() << std::endl;
-  std::cout << nodeList.size() << std::endl;
-  for(auto it = substitution_counts.begin(); it != substitution_counts.end(); ++it) {
-    std::cout << "Distance: " << it->first << " 0: " << (it->second).first << " 1: " << (it->second).second << std::endl;
-  }
-}
 

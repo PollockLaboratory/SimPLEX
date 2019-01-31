@@ -14,13 +14,20 @@ RateVector::RateVector(std::string name, int state, std::vector<AbstractValue*> 
   size = params.size();
   rates = params;	
   locations = {};
-  // TODO 20 should not be hard coded.
-  counts = std::vector<int>(20, 0);
-  logLikelihoods = std::vector<double>(20, 0);
+  counts = std::vector<int>(env.num_states, 0);
+  logLikelihoods = std::vector<double>(env.num_states, 0);
 
   for(int i = 0; i < rates.size(); i++) {
     valueID_to_state[rates[i]->get_ID()] = i;
   }
+}
+
+float RateVector::operator[](int i) {
+  return(rates[i]->getValue());
+}
+
+float RateVector::get_rate_ratio(int i) {
+  return(rates[i]->getValue() / rates[i]->getOldValue());
 }
 
 void RateVector::add_location(int pos, BranchSegment* bs) {
@@ -46,51 +53,6 @@ void RateVector::update() {
    * Updates the substitution counts associtated with each RateParameter(AbstractValue) and the
    * LogLikelihood scores.
    */
-  update_counts();
-  update_logLikelihoods();
-}
-
-void RateVector::update_logLikelihoods() {
-  for(int i = 0; i < rates.size(); i++) {
-    logLikelihoods[i] = counts[i] * log(rates[i]->getValue());
-  }
-}
-
-void RateVector::update_single_logLikelihood(int i) {
-  int k = valueID_to_state[i];
-  logLikelihoods[k] = counts[k] * log(rates[k]->getValue());
-}
-
-void RateVector::update_counts() {
-  // Gets the counts of substatutions that this rate vector applies to.
-  bpos b;
-  int dec_state;
-  substitution sub;
-  // TODO 20 should not be hard coded.
-  counts = std::vector<int>(20, 0);
-  for(auto it = locations.begin(); it != locations.end(); ++it) {
-    b = *it;
-    dec_state = (*(b.branch->decendant->sequence))[b.pos];
-    if(state != dec_state) {
-      // Normal substitution - careful of indels.
-      counts[dec_state]++;
-    } else {
-      // Check for virtual substitution.
-      sub = b.branch->subs[b.pos];
-      if(sub.pos != -1) {
-	// -1 in pos indicates no substitution.
-	counts[state]++;
-      }
-    }
-  }
-}
-
-double RateVector::get_logLikelihood() {
-  double logL = 0.0;
-  for(int i = 0; i < rates.size(); i++) {
-    logL += logLikelihoods[i];
-  }
-  return(logL);
 }
 
 // Util.
@@ -120,32 +82,32 @@ void RateVectorSet::Initialize() {
 }
 
 RateVector*& RateVectorSet::operator[] (const int i) {
-  RateVector* rv = c[i];
-  if(c[i]->state != i) {
+  RateVector* rv = col[i];
+  if(col[i]->state != i) {
     std::cerr << "Error: RateVectorSet dispatching incorrect rate vector. " << std::endl;
     exit(EXIT_FAILURE);
   }
-  return(c[i]);
+  return(col[i]);
 }
 
 void RateVectorSet::add(RateVector* rv) {
   for(int i = 0; i < rv->rates.size(); i++) {
     // Set up the AbstractValues themselves.
-    rv->rates[i]->add_host_vector(rv);
+    rv->rates[i]->add_host_vector(rv, i);
   }
   // Add RateVector to collection in RateVectorSet. 
-  c.push_back(rv);
+  col.push_back(rv);
 }
 
 void RateVectorSet::get_counts() {
   // Calls get_counts in each rate vector.
-  for(auto r = c.begin(); r != c.end(); ++r) {
+  for(auto r = col.begin(); r != col.end(); ++r) {
     (*r)->update();
   }
 }
 
 void RateVectorSet::clear_locations() {
-  for(auto r = c.begin(); r != c.end(); ++r) {
+  for(auto r = col.begin(); r != col.end(); ++r) {
     (*r)->clear_locations();
   }
 }
@@ -154,7 +116,7 @@ void RateVectorSet::check_duplicate_locations() {
   std::set<bpos> locs = {};
   std::set<bpos> duplicates = {};
   std::cout << "Checking for duplicate locations." << std::endl;
-  for(auto r = c.begin(); r != c.end(); ++r) {
+  for(auto r = col.begin(); r != col.end(); ++r) {
     std::cout << (*r)->locations.size() << std::endl;
     for(auto it = (*r)->locations.begin(); it != (*r)->locations.end(); ++it) {
       if(locs.find(*it) == locs.end()) {
@@ -177,7 +139,7 @@ void RateVectorSet::check_duplicate_locations() {
 }
 
 void RateVectorSet::print() {
-  for(std::vector<RateVector*>::iterator it = c.begin(); it != c.end(); ++it) {
+  for(std::vector<RateVector*>::iterator it = col.begin(); it != col.end(); ++it) {
     (*it)->print();
   }
 }
@@ -185,7 +147,7 @@ void RateVectorSet::print() {
 void RateVectorSet::saveToFile(int gen, double l) {
   static int i = -1;
   ++i;
-  for(auto it = c.begin(); it != c.end(); ++it) {
+  for(auto it = col.begin(); it != col.end(); ++it) {
     out_file << i << "," << gen << "," << l << "," << (*it)->name << "," << (*it)->state;
     for(auto jt = (*it)->rates.begin(); jt != (*it)->rates.end(); ++jt) {
       out_file << "," << (*jt)->getValue();

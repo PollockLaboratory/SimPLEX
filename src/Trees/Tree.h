@@ -15,6 +15,7 @@
 #include "Trees/TreeParser.h"
 #include "TreeParts.h"
 #include "BranchSplitting.h"
+#include "SubstitutionCounts.h"
 
 using std::string;
 using std::map;
@@ -47,11 +48,9 @@ class Tree {
   bool sample_ancestral_states(); // When the tree is actually being sampled.
   bool step_through_MSAs(); // When the ancestral sequences have already been determined. 
 
-  // Likelihood.
-  std::map<float, std::pair<int, int>> substitution_counts;
-  void find_substitution_counts(); //Find the key statistics need for the likelihood function.
-  double calculate_likelihood();
-  double update_likelihood();
+  // Counts
+  void update_counts(SubstitutionCounts&); // New.
+  std::list<float> get_branch_lengths();
 
   // Recording state data.
   static std::ofstream tree_out;
@@ -64,7 +63,6 @@ class Tree {
   void print_branchList();
   void print_nodeList();
   void print_parameters();
-  void print_counts();
  private:
   // Settings/options.
   float max_seg_len; // Max segment length.
@@ -72,7 +70,6 @@ class Tree {
   std::function< std::pair<BranchSegment*, BranchSegment*>(float)> splitBranchMethod; // Algorithm for splitting branches.
   float u;
 
-  double logL_waiting; // The likelihood of the waiting times.
   void configureSequences(TreeNode* n);
 };
 

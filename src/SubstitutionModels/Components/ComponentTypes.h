@@ -1,7 +1,7 @@
 #ifndef ComponentTypes_h
 #define ComponentTypes_h
 
-#include "AbstractValue.h"
+#include "AbstractComponent.h"
 
 #include <string>
 #include <vector>

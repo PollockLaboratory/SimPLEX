@@ -9,7 +9,7 @@
 #include <list>
 #include <map>
 
-#include "AbstractValue.h"
+#include "AbstractComponent.h"
 
 #include "AbstractValueTypes.h"
 #include "SampleableValueTypes.h"
@@ -48,7 +48,6 @@ namespace std {
   };
 }
 
-
 // Fundamental collection type of parameters in substitution model.
 class RateVector {
  public:
@@ -57,6 +56,8 @@ class RateVector {
   std::string name;
   std::vector<AbstractValue*> rates;
   int state; // Determines the (ancestral) state that this rate vector applies to.
+  float operator[](int);
+  float get_rate_ratio(int i);
 
   void remove_location(int pos, BranchSegment* bs);
   void add_location(int pos, BranchSegment* bs);
@@ -65,9 +66,6 @@ class RateVector {
   void clear_locations(); // This is tmp.
 
   void update();
-  void update_logLikelihoods();
-  void update_single_logLikelihood(int valueID);
-  double get_logLikelihood();
 
   void print();
 
@@ -86,7 +84,7 @@ class RateVectorSet {
   // This collection holds all of the rate vectors currently in the substitution model.
  public:
   RateVectorSet();
-  std::vector<RateVector*> c;
+  std::vector<RateVector*> col;
   void Initialize();
 
   RateVector*& operator[] (const int i);

@@ -6,7 +6,7 @@
 #include "SubstitutionModel.h"
 #include "../Components/ComponentSet.h"
 #include "../Components/Types/AbstractValueTypes.h"
-#include "../Components/AbstractValue.h"
+#include "../Components/AbstractComponent.h"
 #include "../Components/RateVector.h"
 
 class FixedRate: public SubstitutionModel {

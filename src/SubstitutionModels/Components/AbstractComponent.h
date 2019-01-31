@@ -35,12 +35,12 @@ class AbstractValue : public AbstractComponent {
   virtual double getValue() = 0;
   virtual double getOldValue() = 0;
   virtual void print() = 0;
-  // virtual void refresh() = 0;
 
-  void add_host_vector(RateVector*);
-  void refresh_host_vectors();
+  void add_host_vector(RateVector*, int);
+  std::list<std::pair<RateVector*, int>> get_host_vectors();
 
-  std::list<RateVector*> host_vectors; // Pointers to the host RateVectors that a parameter sits within.
+ private:
+  std::list<std::pair<RateVector*, int>> host_vectors; // Pointers to the host RateVectors that a parameter sits within.
 };
 
 class SampleableValue : public AbstractValue {

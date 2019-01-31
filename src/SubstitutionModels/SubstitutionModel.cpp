@@ -56,18 +56,20 @@ void SubstitutionModel::get_counts() {
   rateVectors.get_counts();  
 }
 
-
-double SubstitutionModel::get_substitution_logLikelihood() {
-  double logL = 0.0;
-  for(auto it = rateVectors.c.begin(); it != rateVectors.c.end(); ++it) {
-    //(*it)->update_logLikelihoods();
-    logL += (*it)->get_logLikelihood();
-  }
-  return(logL);
+std::vector<RateVector*> SubstitutionModel::get_RateVectors() {
+  return(rateVectors.col);
 }
 
-std::list<AbstractComponent*> SubstitutionModel::get_current_parameters() {
-	return(components.get_current_parameters());
+std::list<std::pair<RateVector*, int>> SubstitutionModel::get_current_parameters() {
+  std::list<AbstractComponent*> cur_params = components.get_current_parameters();
+  std::list<std::pair<RateVector*, int>> vector_changes = {};
+  for(auto it = cur_params.begin(); it != cur_params.end(); ++it) {
+    AbstractValue* v = dynamic_cast<AbstractValue*>(*it);
+    if(v != NULL) {
+      vector_changes.splice(vector_changes.end(), v->get_host_vectors());
+    }
+  }
+  return(vector_changes);
 }
 
 void SubstitutionModel::saveToFile(int gen, double l) {

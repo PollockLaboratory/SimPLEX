@@ -10,7 +10,7 @@
 #include "../Components/Types/SampleableValueTypes.h"
 #include "../Components/ComponentTypes.h"
 
-#include "../Components/AbstractValue.h"
+#include "../Components/AbstractComponent.h"
 #include "../Components/RateVector.h"
 
 class CategoryGTR: public SubstitutionModel {
