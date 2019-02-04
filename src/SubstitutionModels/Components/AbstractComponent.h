@@ -16,31 +16,29 @@ class AbstractComponent {
   AbstractComponent(std::string name);
 
   void add_dependancy(AbstractComponent*);
-  std::list<AbstractComponent*> get_dependancies();
+  const std::list<AbstractComponent*>& get_dependancies();
 
   int get_ID();
   std::string get_name();
 
   virtual void refresh() = 0;
   virtual void print() = 0;
+  std::list<std::pair<RateVector*, int>> host_vectors; // Abstract components do not use this but it is here to avoid dynamic_casting. Pointers to the host RateVectors that a parameter sits within.
  protected:
   int ID;
   std::string name;
-  std::list<AbstractComponent*> dependent_values; 
+  std::list<AbstractComponent*> dependent_values;
 };
 
 class AbstractValue : public AbstractComponent {
  public:
   AbstractValue(std::string name);
-  virtual double getValue() = 0;
-  virtual double getOldValue() = 0;
+  virtual const double& getValue() = 0;
+  virtual const double& getOldValue() = 0;
   virtual void print() = 0;
 
   void add_host_vector(RateVector*, int);
   std::list<std::pair<RateVector*, int>> get_host_vectors();
-
- private:
-  std::list<std::pair<RateVector*, int>> host_vectors; // Pointers to the host RateVectors that a parameter sits within.
 };
 
 class SampleableValue : public AbstractValue {

@@ -17,6 +17,7 @@ class ComponentSet {
   void Initialize();
   void add_parameter(AbstractComponent* param);
   void add_rate_vector(RateVector* v);
+  AbstractComponent* get_current_parameter();
 
   bool sample();
   void accept();
@@ -29,6 +30,7 @@ class ComponentSet {
   int size();
 
   void saveToFile(int gen, double l);
+  std::map<AbstractComponent*, std::list<AbstractComponent*>> value_to_dependents; // Maps AbstractValues to AbstractDependentParameters that depend on them.
  private:
   void stepToNextParameter();
 
@@ -37,7 +39,6 @@ class ComponentSet {
   std::list<SampleableValue*>::iterator current_parameter; //Tracks the current parameter to be sampled, via an iterator across the parameter_list.
 
   // Dependancies.
-  std::map<AbstractComponent*, std::list<AbstractComponent*>> value_to_dependents; // Maps AbstractValues to AbstractDependentParameters that depend on them.
   std::list<AbstractComponent*> get_dependent_parameters(AbstractComponent* v);
 
   void refreshDependancies(AbstractComponent*);

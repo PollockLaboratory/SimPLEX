@@ -141,24 +141,17 @@ double Model::updateLikelihood(){
    * Rather recalculating the full likelihood, will modify logLikelihood only by what has changed. 
    */
   delta_logL = 0.0;
+ 
+  RateVector* rv;
+  int C_xy;
 
-  int time_taken;
-  std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-  
-  std::list<std::pair<RateVector*, int>> vector_changes = substitution_model->get_current_parameters();
-
-  time_taken = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - start).count();
-  std::cout << "Time: " << time_taken << std::endl;
-
-  for(auto it = vector_changes.begin(); it != vector_changes.end(); ++it) {
-    RateVector* rv = it->first;
-    std::vector<int> C_xy = counts.subs_by_rateVector[rv];
-    delta_logL += C_xy[it->second] * log(rv->get_rate_ratio(it->second)); // Should be ratio;
+  for(auto it = substitution_model->changed_vectors_begin(); it.at_end() == false; ++it) {
+    rv = (*it).first;
+    C_xy = counts.subs_by_rateVector[rv][(*it).second];
+    delta_logL += C_xy * log(rv->get_rate_ratio((*it).second)); // Should be ratio;
   }
 
   logL += delta_logL;
-  // double l = tree->update_likelihood();
-  // std::cout << "L1: " << l << " L2: " << logL << std::endl;
   return(logL);
 }
 

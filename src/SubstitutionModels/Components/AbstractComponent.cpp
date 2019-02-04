@@ -8,6 +8,7 @@ AbstractComponent::AbstractComponent(std::string name) : name(name) {
   static int IDc = 0;
   IDc++;
   ID = IDc;
+  host_vectors = {};
 }
 
 int AbstractComponent::get_ID() {
@@ -22,7 +23,7 @@ void AbstractComponent::add_dependancy(AbstractComponent* v) {
   dependent_values.push_back(v);
 }
 
-std::list<AbstractComponent*> AbstractComponent::get_dependancies() {
+const std::list<AbstractComponent*>& AbstractComponent::get_dependancies() {
   return(dependent_values);
 }
 

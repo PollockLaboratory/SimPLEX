@@ -73,6 +73,11 @@ void ComponentSet::add_rate_vector(RateVector* v) {
   }
 }
 
+
+AbstractComponent* ComponentSet::get_current_parameter() {
+  return(*current_parameter);
+}
+
 void ComponentSet::refreshDependancies(AbstractComponent* v) {
   std::list<AbstractComponent*> deps = value_to_dependents[v];
   for(auto d = deps.begin(); d != deps.end(); ++d) {
@@ -106,9 +111,7 @@ bool ComponentSet::sample() {
     refreshDependancies(*current_parameter);
     sampleType = sample();
   }
-
-  // (*current_parameter)->refresh_host_vectors();
-
+  
   return (sampleType);
 }
 
@@ -136,13 +139,15 @@ void ComponentSet::reject() {
 
 std::list<AbstractComponent*> ComponentSet::get_dependent_parameters(AbstractComponent* v) {
   std::list<AbstractComponent*> l = {};
-
-  std::list<AbstractComponent*> deps = value_to_dependents[v];
-  for(auto d = deps.begin(); d != deps.end(); ++d) {
-    l.push_back(*d);
-    l.splice(l.end(), get_dependent_parameters(*d));
+  if(value_to_dependents[v].empty()) {
+    return(std::move(l));
+  } else {
+    for(auto d = value_to_dependents[v].begin(); d != value_to_dependents[v].end(); ++d) {
+      l.push_back(*d);
+      l.splice(l.end(), get_dependent_parameters(*d));
+    }
+    return(l);
   }
-  return(l);
 }
 
 std::list<AbstractComponent*> ComponentSet::get_current_parameters() {
@@ -166,11 +171,6 @@ void ComponentSet::print() {
   std::cout << "Parameter Set - size: " << all_parameters_list.size() << std::endl;
   for(auto iter = all_parameters_list.begin(); iter != all_parameters_list.end(); ++iter) {
     (*iter)->print();
-    // std::cout << "Host vectors: ";
-    // for(auto i = (*iter)->host_vectors.begin(); i != (*iter)->host_vectors.end(); ++i) {
-    // std::cout << (*i)->name << " ";
-    // }
-    // std::cout << std::endl;
   }
 }
 

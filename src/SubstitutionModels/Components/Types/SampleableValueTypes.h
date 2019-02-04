@@ -17,8 +17,8 @@ class ContinuousFloat : public SampleableValue {
   virtual void print();
   virtual bool sample();
 
-  virtual double getValue();
-  virtual double getOldValue();
+  virtual const double& getValue();
+  virtual const double& getOldValue();
 
   virtual void undo();
   virtual void fix();
@@ -39,8 +39,8 @@ class CategoryFloat : public SampleableValue {
   virtual void print();
   virtual bool sample();
 
-  virtual double getValue();
-  virtual double getOldValue();
+  virtual const double& getValue();
+  virtual const double& getOldValue();
 
   virtual void undo();
   virtual void fix();

@@ -6,11 +6,11 @@ FixedFloat::FixedFloat(std::string parameter_name, double v) : AbstractValue(par
   value = v;
 }
 
-double FixedFloat::getValue() {
+const double& FixedFloat::getValue() {
   return(value);
 }
 
-double  FixedFloat::getOldValue() {
+const double&  FixedFloat::getOldValue() {
   return(value);
 }
 
@@ -28,11 +28,11 @@ VirtualSubstitutionRate::VirtualSubstitutionRate(std::string parameter_name, dou
 	value = 0.232323;
 }
 
-double VirtualSubstitutionRate::getValue() {
+const double& VirtualSubstitutionRate::getValue() {
 	return(value);
 }
 
-double  VirtualSubstitutionRate::getOldValue() {
+const double& VirtualSubstitutionRate::getOldValue() {
 	return(previous_value);
 }
 

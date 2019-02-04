@@ -57,53 +57,35 @@ void MCMC::initialize(Model* model) {
 
 	model->printParameters();
 
-	// Track time.
-	n_tree_samples = 0;
-	total_time_tree_samples = 0;
-	n_parameter_samples = 0;
-	total_time_parameter_samples = 0;
 }
 
 void MCMC::sample() {
-	static int i = 1;
-	bool sampleType;
+  static int i = 1;
+  bool sampleType;
 
-	int time_taken;
-	std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+  if(i % tree_sample_freq == 0) {
+    sampleType = model->SampleTree(); // All tree sampling right now is Gibbs.
+    lnL = model->CalculateLikelihood();
+    i = 0;
+  } else {
 
-	if(i % tree_sample_freq == 0) {
-		sampleType = model->SampleTree(); // All tree sampling right now is Gibbs.
-		lnL = model->CalculateLikelihood();
-		i = 0;
+    sampleType = model->SampleSubstitutionModel();
+    newLnL = model->updateLikelihood();
 
-		time_taken = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count();
-		n_tree_samples++;
-		total_time_tree_samples += time_taken;
-	} else {
-		sampleType = model->SampleSubstitutionModel();
-		newLnL = model->updateLikelihood();
-		// newLnL_test = model->PartialCalculateLikelihood(lnL);
-		// std::cout << "Old LogL: " << lnL << " Proposed LogL: " << newLnL << " Partial LogL: " << lnL + newLnL_test << std::endl;
-		if(sampleType) {	
-			//Metropolis-Hasting method.
-			float r = log(Random());
-			accepted = r < (newLnL - lnL);
-			if (accepted) { 
-				lnL = newLnL;
-				model->accept();
-			} else {
-				model->reject();
-			}
-		} else {
-		  // No Metropolis Hastings needed - Gibbs sampling.
-			lnL = newLnL;
-		}
-
-		time_taken = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count();
-		n_parameter_samples++;
-		total_time_parameter_samples += time_taken;
-	}
-	i++;
+    if(sampleType) {
+      //Metropolis-Hasting method.
+      if (log(Random()) < (newLnL - lnL)) {
+	lnL = newLnL;
+	model->accept();
+      } else {
+	model->reject();
+      }
+    } else {
+      // No Metropolis Hastings needed - Gibbs sampling.
+      lnL = newLnL;
+    }
+  }
+  i++;
 }
 
 void MCMC::Run() {
@@ -132,9 +114,9 @@ void MCMC::Run() {
   }
 
   time_out << "SAMPLING TIME DATA" << std::endl;
-  time_out << "Tree Sampling: Total time: " << total_time_tree_samples << " us. Average time per sample: " << total_time_tree_samples/n_tree_samples << " us." << std::endl;
-  time_out << "Parameter Sampling: Total time: " << total_time_parameter_samples << " us. Average time per sample: " << total_time_parameter_samples/n_parameter_samples << " us." << std::endl;
-  float r = ((float)total_time_tree_samples)/(total_time_tree_samples + total_time_parameter_samples);time_out << r*100.0 << "\% of time spent sampling tree parameters." << std::endl;
+  // time_out << "Tree Sampling: Total time: " << total_time_tree_samples << " us. Average time per sample: " << total_time_tree_samples/n_tree_samples << " us." << std::endl;
+  // time_out << "Parameter Sampling: Total time: " << total_time_parameter_samples << " us. Average time per sample: " << total_time_parameter_samples/n_parameter_samples << " us." << std::endl;
+  // float r = ((float)total_time_tree_samples)/(total_time_tree_samples + total_time_parameter_samples);time_out << r*100.0 << "\% of time spent sampling tree parameters." << std::endl;
 }
 
 ///  Private Functions  ///

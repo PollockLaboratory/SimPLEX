@@ -37,10 +37,10 @@ ancestral_sequences 0
 substitution_model_type		0
 
 # MCMC settings.
-tree_sample_frequency 200
-generations 1001
-output_frequency 200
-print_frequency 200
+tree_sample_frequency 5000
+generations 100001
+output_frequency 5000
+print_frequency 5000
 
 sequences_file	resources/test_data/5taxon.fasta
 tree_file	resources/test_data/5taxon.tree

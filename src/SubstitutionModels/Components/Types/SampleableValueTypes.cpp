@@ -54,11 +54,11 @@ bool ContinuousFloat::sample() {
   return(true);
 }
 
-double ContinuousFloat::getValue() {
+const double& ContinuousFloat::getValue() {
   return(value);
 }
 
-double ContinuousFloat::getOldValue() {
+const double& ContinuousFloat::getOldValue() {
   if(fixedQ) {
     std::cout << "Error: in ContinuousFloat::getOldValue - already fixed." << std::endl;
     exit(EXIT_FAILURE);
@@ -123,11 +123,11 @@ bool CategoryFloat::sample() {
   return(true);
 }
 
-double CategoryFloat::getValue() {
+const double& CategoryFloat::getValue() {
   return(value);
 }
 
-double CategoryFloat::getOldValue() {
+const double& CategoryFloat::getOldValue() {
   if(fixedQ) {
     std::cout << "Error: in CategoryFloat::getOldValue - already fixed." << std::endl;
     exit(EXIT_FAILURE);

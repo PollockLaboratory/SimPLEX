@@ -10,8 +10,8 @@
 class FixedFloat : public AbstractValue {
  public:
   FixedFloat(std::string parameter_name, double);
-  virtual double getValue();
-  virtual double getOldValue();
+  virtual const double& getValue();
+  virtual const double& getOldValue();
   virtual void print();
   virtual void refresh();
  private:
@@ -29,8 +29,8 @@ class OutOfBoundsException: public std::exception {
 class VirtualSubstitutionRate : public AbstractValue {
  public:
   VirtualSubstitutionRate(std::string parameter_name, double unif);
-  virtual double getValue();
-  virtual double getOldValue();
+  virtual const double& getValue();
+  virtual const double& getOldValue();
   virtual void print();
   void refresh();
   void add_rate(AbstractValue*);
