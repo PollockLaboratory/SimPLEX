@@ -69,6 +69,7 @@ node_data IO::deconstructNodeString(std::string node_string) {
 IO::RawTreeNode* IO::parseRawTreeNode(std::string node_string, RawTreeNode* up) {
   node_data n = deconstructNodeString(node_string);
 
+  std::cout << node_string << std::endl;
   IO::RawTreeNode* t = new RawTreeNode;
   IO::RawTreeNode* left;
   IO::RawTreeNode* right;
@@ -76,6 +77,7 @@ IO::RawTreeNode* IO::parseRawTreeNode(std::string node_string, RawTreeNode* up) 
   left = (n.left != "") ? parseRawTreeNode(n.left, t) : 0;
   right = (n.right != "") ? parseRawTreeNode(n.right, t) : 0;
 
+  std::cout << "Name: " << n.name << " Distance: " << n.distance << std::endl;
   *t = {n.name, n.distance, up, left, right};
   return(t);
 }

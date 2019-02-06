@@ -42,11 +42,11 @@ generations 100001
 output_frequency 5000
 print_frequency 5000
 
-sequences_file	resources/test_data/5taxon.fasta
-tree_file	resources/test_data/5taxon.tree
+#sequences_file	resources/test_data/5taxon.fasta
+#tree_file	resources/test_data/5taxon.tree
 
-#sequences_file	resources/test_data/Species_alignment_BLVRB.fasta
-#tree_file	resources/test_data/BLVRB_subtree_MLbranches.nh
+sequences_file	resources/test_data/Species_alignment_BLVRB.fasta
+tree_file	resources/test_data/BLVRB_subtree_MLbranches.nh
 
 output_directory	testing/s1_test_run/
 tree_out_file		tree_out.newick
