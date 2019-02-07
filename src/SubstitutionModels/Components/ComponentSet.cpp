@@ -1,7 +1,7 @@
 #include "ComponentSet.h"
 #include "RateVector.h"
-#include "Environment.h"
-#include "IO.h"
+#include "../../Environment.h"
+#include "../../IO.h"
 
 extern Environment env;
 extern IO::Files files;

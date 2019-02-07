@@ -1,5 +1,5 @@
 #include "BranchSplitting.h"
-#include "Environment.h"
+#include "../Environment.h"
 
 extern Environment env;
 

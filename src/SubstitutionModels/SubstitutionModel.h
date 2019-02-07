@@ -10,9 +10,9 @@
 #include <string>
 #include <queue>
 
-#include "../Components/AbstractComponent.h"
-#include "../Components/ComponentSet.h"
-#include "../Components/RateVector.h"
+#include "Components/AbstractComponent.h"
+#include "Components/ComponentSet.h"
+#include "Components/RateVector.h"
 
 class SubstitutionModel {
   class iterator;

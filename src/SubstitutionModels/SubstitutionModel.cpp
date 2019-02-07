@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "Environment.h"
-#include "IO.h"
+#include "../Environment.h"
+#include "../IO.h"
 #include "SubstitutionModel.h"
 
 extern Environment env;

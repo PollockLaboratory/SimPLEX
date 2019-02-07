@@ -7,10 +7,10 @@
 #include <iostream>
 #include <math.h>
 
-#include "Trees/TreeParser.h"
-#include "Sequence.h"
-#include "RateVector.h"
-#include "SubstitutionModels/SubstitutionModel.h"
+#include "TreeParser.h"
+#include "../Sequence.h"
+#include "Components/RateVector.h"
+#include "../SubstitutionModels/SubstitutionModel.h"
 
 class TreeNode;
 

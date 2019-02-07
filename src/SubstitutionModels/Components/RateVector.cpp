@@ -1,8 +1,8 @@
 #include "RateVector.h"
-#include "Sequence.h"
-#include "TreeParts.h"
-#include "Environment.h"
-#include "IO.h"
+#include "../../Sequence.h"
+#include "../../Trees/TreeParts.h"
+#include "../../Environment.h"
+#include "../../IO.h"
 
 extern Environment env;
 extern IO::Files files;

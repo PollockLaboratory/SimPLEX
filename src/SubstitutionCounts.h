@@ -1,7 +1,7 @@
 #ifndef SubstitutionCounts_h_
 #define SubstitutionCounts_h_
 
-#include "RateVector.h"
+#include "SubstitutionModels/Components/RateVector.h"
 
 class SubstitutionCounts {
  public:

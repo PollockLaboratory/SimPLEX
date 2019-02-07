@@ -5,10 +5,10 @@
 #include <cmath> // for floor and pow
 #include <unordered_set>
 
-#include "Sequence.h"
-#include "Environment.h"
-#include "IO.h"
-#include "utils.h"
+#include "../Sequence.h"
+#include "../Environment.h"
+#include "../IO.h"
+#include "../utils.h"
 
 extern double Random();
 extern Environment env;

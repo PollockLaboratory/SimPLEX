@@ -10,12 +10,12 @@
 #include <vector>
 #include <list>
 
-#include "Sequence.h"
-#include "SubstitutionModel.h"
-#include "Trees/TreeParser.h"
+#include "../Sequence.h"
+#include "../SubstitutionModels/SubstitutionModel.h"
+#include "TreeParser.h"
 #include "TreeParts.h"
 #include "BranchSplitting.h"
-#include "SubstitutionCounts.h"
+#include "../SubstitutionCounts.h"
 
 using std::string;
 using std::map;

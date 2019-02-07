@@ -11,8 +11,8 @@
 
 #include "AbstractComponent.h"
 
-#include "AbstractValueTypes.h"
-#include "SampleableValueTypes.h"
+#include "Types/AbstractValueTypes.h"
+#include "Types/SampleableValueTypes.h"
 
 class BranchSegment; // Defined in Trees/Types/TreeParts.h
 

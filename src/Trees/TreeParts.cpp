@@ -5,9 +5,10 @@
  * 	- Branche segments - Contains the branch lengths and location of substitutions.
  */
 
-#include "TreeParts.h"
-#include "Environment.h"
 #include <iostream>
+
+#include "TreeParts.h"
+#include "../Environment.h"
 
 extern double Random();
 extern Environment env;

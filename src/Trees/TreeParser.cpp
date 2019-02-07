@@ -1,6 +1,7 @@
 #include "TreeParser.h"
-#include "Environment.h"
-#include "IO.h"
+
+#include "../Environment.h"
+#include "../IO.h"
 
 #include <algorithm>
 
