@@ -20,21 +20,21 @@ Data::~Data() {
 //	cout << "Data destructor" << endl;
 }
 
-void Data::Initialize() {
+void Data::Initialize(const States* states) {
   files.add_file("sequences_in", env.get("sequences_file"), IOtype::INPUT);
   ifstream sequences_in = files.get_ifstream("sequences_in");
 
   if(env.ancestral_sequences == false) {
     // Fasta file only contains terminal sequences.
     list<string> fasta_lines = readFastaFile(sequences_in);
-    MSA = ReadSequences(fasta_lines);
+    MSA = ReadSequences(fasta_lines, states);
     MSA->Initialize(&MSA_list);
   } else {
     //Compound fasta with internal sequences - when ancestral states are already calculated.
     list<list<string>> fasta_blocks = readCompoundFastaFile(sequences_in);
  
     for(auto it = fasta_blocks.begin(); it != fasta_blocks.end(); ++it) {
-      SequenceAlignment* msa = ReadSequences(*it);
+      SequenceAlignment* msa = ReadSequences(*it, states);
       msa->Initialize(&MSA_list);
       MSA_list.push_back(msa);
     }
@@ -99,12 +99,12 @@ list<list<string>> Data::readCompoundFastaFile(ifstream &sequences_file) {
   return(lf);
 }
 
-SequenceAlignment* Data::ReadSequences(list<string> fasta_lines) {
+SequenceAlignment* Data::ReadSequences(list<string> fasta_lines, const States* states) {
   /*
    * Given a list of lines that represent a fasta file, returns a pointer to a MSA object.
    */
   
-  MSA = new SequenceAlignment();
+  MSA = new SequenceAlignment(states);
 
   string line;
   string sequence = "";

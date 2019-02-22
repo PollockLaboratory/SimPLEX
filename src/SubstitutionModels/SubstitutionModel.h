@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include <list>
+#include <set>
 #include <vector>
 #include <map>
 #include <string>
@@ -14,32 +15,45 @@
 #include "Components/ComponentSet.h"
 #include "Components/RateVector.h"
 
+struct States {
+  int n;
+  std::set<std::string> possible;
+  std::map<std::string, int> state_to_int;
+  std::map<int, std::string> int_to_state;
+};
+
 class SubstitutionModel {
   class iterator;
  public:
   SubstitutionModel();
+  virtual void Initialize() = 0;
   virtual void Initialize(int number_of_sites, std::vector<std::string> states) = 0;
 
+  // States.
+  States states;
+  void add_state(std::string);
+  void print_states();
+  const States* get_states();
+
+  // Rate Vectors.
   RateVector* selectRateVector(int state);
+  void add_rate_vector(RateVector* v);
+  std::vector<RateVector*> get_RateVectors();
+  SubstitutionModel::iterator changed_vectors_begin();
 
-  bool SampleParameters();
-  void accept(); //After a model is sampled it must be accepted or rejected before next sampling.
-  void reject();
-
+  // Parameters.
   void printParameters();
   int getNumberOfParameters();
   void get_current_parameters(std::list<std::pair<RateVector*, int>>&);
 
-  void get_counts();
-
-  std::vector<RateVector*> get_RateVectors();
+  // Sample.
+  bool SampleParameters();
+  void accept(); //After a model is sampled it must be accepted or rejected before next sampling.
+  void reject();
 
   void saveToFile(int gen, double l);
   virtual void Terminate();
-
-  SubstitutionModel::iterator changed_vectors_begin();
  protected:
-  void add_rate_vector(RateVector* v);
   void finalize();
  private:
   std::ofstream* substitution_model_out;

@@ -7,12 +7,6 @@ debug 1
 # Tree types
 # 0	Normal
 
-# SEQUENCE SETTINGS
-# States options
-# 0 nucleotide
-# 1 amino acid
-states 1
-
 # Branch splitting methods
 # When "ancestral sequences" is 1, will override and always choose no split method.
 # 0 no splitting
@@ -33,22 +27,24 @@ ancestral_sequences 0
 # 1 	Single Rate
 # 2	Fixed Rate
 # 3	CategoryGTR
+# 4	Custom Model
 
-substitution_model_type		0
+substitution_model_type		1
 
 # MCMC settings.
+custom_model ../resources/model.lua
 tree_sample_frequency 5000
 generations 100001
 output_frequency 5000
 print_frequency 5000
 
-#sequences_file	resources/test_data/5taxon.fasta
-#tree_file	resources/test_data/5taxon.tree
+sequences_file	../resources/test_data/5taxon.fasta
+tree_file	../resources/test_data/5taxon.tree
 
-sequences_file	resources/test_data/Species_alignment_BLVRB.fasta
-tree_file	resources/test_data/BLVRB_subtree_MLbranches.nh
+#sequences_file	resources/test_data/Species_alignment_BLVRB.fasta
+#tree_file	resources/test_data/BLVRB_subtree_MLbranches.nh
 
-output_directory	testing/s1_test_run/
+output_directory	../testing/s1_test_run/
 tree_out_file		tree_out.newick
 sequences_out_file	s1_sequences_out.fasta
 parameters_out_file	s1_parameters_out.csv

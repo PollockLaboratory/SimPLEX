@@ -18,10 +18,8 @@ set(SRCS
   SubstitutionModels/Components/RateVector.cpp
   SubstitutionModels/Components/Types/AbstractValueTypes.cpp
   SubstitutionModels/Components/Types/SampleableValueTypes.cpp
-  SubstitutionModels/Types/CategoryGTR.cpp
-  SubstitutionModels/Types/FixedRate.cpp
   SubstitutionModels/Types/GeneralTimeReversible.cpp
-  SubstitutionModels/Types/SingleRate.cpp
+  SubstitutionModels/Types/CustomModel.cpp
   Trees/Tree.cpp
   Trees/TreeParts.cpp
   Trees/BranchSplitting.cpp
@@ -29,5 +27,11 @@ set(SRCS
 
 add_executable( simPLEX SimPLEX.cpp)
 target_sources( simPLEX PUBLIC ${SRCS} )
+target_link_libraries( simPLEX ${LUA_LIBRARIES} )
+
+include_directories( ../libs )
+
+message( STATUS "${LUA_LIBRARIES}" )
+message( STATUS "${LUA_INCLUDE_DIR}" )
 
 set_target_properties( simPLEX PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin" )

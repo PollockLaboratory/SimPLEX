@@ -15,6 +15,7 @@
 class GeneralTimeReversible: public SubstitutionModel {
 	public:
 		GeneralTimeReversible();
+		virtual void Initialize();
 		virtual void Initialize(int number_of_sites, std::vector<std::string> states);
 	private:
 };

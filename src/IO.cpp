@@ -20,8 +20,8 @@ extern Environment env;
 
 IO::Files::Files() {
   total_files = 0;
-  defaultfile = "resources/defaults.ctrl"; // where to find default settings
-  optionsfile = "resources/options.ctrl"; // where to find optional control settings
+  defaultfile = "../resources/defaults.ctrl"; // where to find default settings
+  optionsfile = "../resources/options.ctrl"; // where to find optional control settings
 }
 
 void IO::Files::setupOutputDirectory() {

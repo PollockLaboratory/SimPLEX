@@ -21,11 +21,12 @@
 #include "Data.h"
 
 #include "SubstitutionModels/SubstitutionModel.h"
+
 class Model {
  public:
   Model();
   ~Model();
-  void Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA);
+  void Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA, SubstitutionModel* &sm);
 
   bool SampleTree();
   bool SampleSubstitutionModel();

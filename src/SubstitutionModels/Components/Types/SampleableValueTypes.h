@@ -14,6 +14,7 @@ class ContinuousFloat : public SampleableValue {
   ContinuousFloat(std::string, double, double);
   ContinuousFloat(std::string, double, double, double);
   ContinuousFloat(std::string, double, double, double, double);
+
   virtual void print();
   virtual bool sample();
 
@@ -23,6 +24,8 @@ class ContinuousFloat : public SampleableValue {
   virtual void undo();
   virtual void fix();
   virtual void refresh();
+
+  friend std::ostream& operator<<(std::ostream&, const ContinuousFloat&);
  private:
   double value;
   double std_dev;

@@ -14,7 +14,6 @@ ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, d
   upper_bound = inf;
 
   previous_value = initial_value;
-  std::cout << "Inside constructor." << std::endl;
 }
 
 ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, double initial_std_dev = 1.0, double lower_bound = -inf) : SampleableValue(name), value(initial_value), std_dev(initial_std_dev), lower_bound(lower_bound) {
@@ -78,6 +77,10 @@ void ContinuousFloat::fix() {
 }
 
 void ContinuousFloat::refresh() {
+}
+
+std::ostream& operator<<(std::ostream& os, const ContinuousFloat& cf) {
+  os << "[ContinuousFloat-" << cf.name << "]";
 }
 
 // CATEGORY FLOAT

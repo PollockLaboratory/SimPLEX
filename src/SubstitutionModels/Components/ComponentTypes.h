@@ -10,6 +10,7 @@
 
 class RateCategories : public AbstractComponent {
  public:
+  RateCategories(std::string name, std::vector<float> categories);
   RateCategories(std::string name, float lower_b, float upper_b, int steps);
   virtual void refresh();
   virtual void print();

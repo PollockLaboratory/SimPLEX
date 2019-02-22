@@ -7,6 +7,8 @@
 #include<list>
 #include<set>
 
+#include "SubstitutionModels/SubstitutionModel.h"
+
 struct substitution {
 	int pos;
 	int anc;
@@ -15,7 +17,7 @@ struct substitution {
 
 class SequenceAlignment {
  public:
-  SequenceAlignment();
+  SequenceAlignment(const States*);
   SequenceAlignment(const SequenceAlignment &msa);
   std::map<std::string, std::vector<int>> taxa_names_to_sequences;
 

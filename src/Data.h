@@ -13,6 +13,7 @@
 
 #include "Sequence.h"
 #include "Trees/TreeParser.h"
+#include "SubstitutionModels/SubstitutionModel.h"
 
 using namespace std;
 
@@ -25,7 +26,7 @@ class Data {
   Data();
   ~Data();
 
-  void Initialize();
+  void Initialize(const States*);
  private:
   set<int> columns_with_gaps;
   vector<int> columns_without_gaps;
@@ -37,7 +38,7 @@ class Data {
   void validateInputData(list<SequenceAlignment*> MSA_list, IO::RawTreeNode* raw_tree);
   bool matchNodeNames(list<string> names1, list<string> names2);
 
-  SequenceAlignment* ReadSequences(list<string> fasta_lines);
+  SequenceAlignment* ReadSequences(list<string> fasta_lines, const States*);
 
   IO::RawTreeNode* ReadTree();
 };

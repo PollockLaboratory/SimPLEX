@@ -30,33 +30,33 @@ MCMC::MCMC() {
 } 
 
 void MCMC::initialize(Model* model) {
-	/*
-	 * Init MCMC with model, gens calculate lnL.
-	 */
+  /*
+   * Init MCMC with model, gens calculate lnL.
+   */
 
-	std::cout << "Initializing MCMC." << std::endl;
-	this->model = model; // associate the pointer with the MCMC
+  std::cout << "Initializing MCMC." << std::endl;
+  this->model = model; // associate the pointer with the MCMC
 
-	// Env settings.
-	out_freq = env.get_int("output_frequency");
-	print_freq = env.get_int("print_frequency");
-	gens = env.get_int("generations");
-	tree_sample_freq = env.get_int("tree_sample_frequency");
-	
-	//Calculate initial likelihood.
-	lnL = model->CalculateLikelihood();
-	RecordState();
+  // Env settings.
+  out_freq = env.get_int("output_frequency");
+  print_freq = env.get_int("print_frequency");
+  gens = env.get_int("generations");
+  tree_sample_freq = env.get_int("tree_sample_frequency");
 
-	//Initialize output file.
-	files.add_file("likelihoods", env.get("likelihood_out_file"), IOtype::OUTPUT);
-	lnlout = files.get_ofstream("likelihoods");
-	lnlout << "I,GEN,LogL" << std::endl;
+  //Calculate initial likelihood.
+  lnL = model->CalculateLikelihood();
 
-	files.add_file("time", env.get("time_out_file"), IOtype::OUTPUT);
-	time_out = files.get_ofstream("time");
+  RecordState();
 
-	model->printParameters();
+  //Initialize output file.
+  files.add_file("likelihoods", env.get("likelihood_out_file"), IOtype::OUTPUT);
+  lnlout = files.get_ofstream("likelihoods");
+  lnlout << "I,GEN,LogL" << std::endl;
 
+  files.add_file("time", env.get("time_out_file"), IOtype::OUTPUT);
+  time_out = files.get_ofstream("time");
+
+  model->printParameters();
 }
 
 void MCMC::sample() {
@@ -71,7 +71,6 @@ void MCMC::sample() {
 
     sampleType = model->SampleSubstitutionModel();
     newLnL = model->updateLikelihood();
-
     if(sampleType) {
       //Metropolis-Hasting method.
       if (log(Random()) < (newLnL - lnL)) {
@@ -95,7 +94,6 @@ void MCMC::Run() {
 
   std::cout << "Starting MCMC:" << std::endl;
   for (gen = 1; gen <= gens; gen++) {
-
     sample();
 
     if(isnan(lnL)) {

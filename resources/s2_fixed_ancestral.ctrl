@@ -32,17 +32,20 @@ ancestral_sequences 1
 # 0	General Time Reversible
 # 1 	Single Rate
 # 2	Fixed Rate
+# 3	CategoryGTR
+# 4	Custom Model
 
 substitution_model_type		0
 
 # MCMC settings.
-tree_sample_frequency 2000
+custom_model ../resources/model.lua
+tree_sample_frequency 5000
 generations 100001
-output_frequency 2000
-print_frequency 2000
+output_frequency 5000
+print_frequency 5000
 
-sequences_file	testing/s1_test_run/s1_sequences_out.fasta
-tree_file	testing/s1_test_run/tree_out.newick
+sequences_file	../testing/s1_test_run/s1_sequences_out.fasta
+tree_file	../testing/s1_test_run/tree_out.newick
 
 output_directory testing/s2_test_run/
 tree_out_file		s2_tree_out.newick

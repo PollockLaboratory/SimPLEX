@@ -35,7 +35,6 @@ class AbstractValue : public AbstractComponent {
   AbstractValue(std::string name);
   virtual const double& getValue() = 0;
   virtual const double& getOldValue() = 0;
-  virtual void print() = 0;
 
   void add_host_vector(RateVector*, int);
   std::list<std::pair<RateVector*, int>> get_host_vectors();

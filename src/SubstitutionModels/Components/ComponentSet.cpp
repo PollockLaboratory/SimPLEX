@@ -22,7 +22,7 @@ void ComponentSet::Initialize() {
 
   // Refreshes all dependancies.
   for(auto p = all_parameters_list.begin(); p != all_parameters_list.end(); ++p) {
-    (*p)->refresh();
+    (*p)->refresh(); // This will need some exception handeling - Virtual Sub Rate OutOfBounds etc.
     refreshDependancies(*p);
   }
 
@@ -97,7 +97,7 @@ bool ComponentSet::sample() {
     // Returning false will skip Metropolis Hastings step.
     return(false);
   }
-  
+
   bool sampleType = (*current_parameter)->sample();
 
   try {
@@ -109,6 +109,9 @@ bool ComponentSet::sample() {
     // and try again.
     (*current_parameter)->undo();
     refreshDependancies(*current_parameter);
+
+    // Test here.
+    stepToNextParameter();
     sampleType = sample();
   }
   

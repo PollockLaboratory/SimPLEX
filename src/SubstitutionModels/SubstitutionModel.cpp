@@ -9,22 +9,42 @@ extern IO::Files files;
 
 SubstitutionModel::SubstitutionModel() {
 	substitution_model_out = 0;
+	states.n = 0;
+}
+
+void SubstitutionModel::add_state(std::string s) {
+  states.possible.insert(s);
+  states.state_to_int[s] = states.n;
+  states.int_to_state[states.n] = s;
+  states.n++;
+}
+
+void SubstitutionModel::print_states() {
+ std::cout << "States: ";
+ for(auto it = states.possible.begin(); it != states.possible.end(); ++it) {
+   std::cout << *it << ":" << states.state_to_int[*it] << " ";
+ }
+ std::cout << "- n = " << states.possible.size() << std::endl;
+}
+
+const States* SubstitutionModel::get_states() {
+  return(&states);
 }
 
 RateVector* SubstitutionModel::selectRateVector(int state) {
-	/*
-	 * This is a simple function right now but it will become hugely complex.
-	 * Given infomation about a BranchSegment and state of interest will return the corresponding rate vector.
-	 */
-	return(rateVectors[state]);
+  /*
+   * This is a simple function right now but it will become hugely complex.
+   * Given infomation about a BranchSegment and state of interest will return the corresponding rate vector.
+   */
+  return(rateVectors[state]);
 }
 
 bool SubstitutionModel::SampleParameters() {
-	/*
-	 * Samples a single parameter within the parameter set();
-	 */
-	bool sampleType = components.sample();
-	return(sampleType);
+  /*
+   * Samples a single parameter within the parameter set();
+   */
+  bool sampleType = components.sample();
+  return(sampleType);
 }
 
 void SubstitutionModel::accept() {
@@ -50,10 +70,6 @@ int SubstitutionModel::getNumberOfParameters() {
 	 * Finds the number of sampleable parameters aka the length of the size of the parameter set.
 	 */
 	return(components.size());
-}
-
-void SubstitutionModel::get_counts() {
-  rateVectors.get_counts();  
 }
 
 std::vector<RateVector*> SubstitutionModel::get_RateVectors() {
@@ -86,6 +102,10 @@ void SubstitutionModel::add_rate_vector(RateVector* v) {
 }
 
 void SubstitutionModel::finalize() {
+  // Add Indels to states table.
+  states.state_to_int["-"] = -1;
+  states.int_to_state[-1] = "-";
+
   components.Initialize();
   rateVectors.Initialize();
 }
@@ -120,18 +140,24 @@ SubstitutionModel::iterator::iterator(SubstitutionModel& s, bool e) : sub_model(
   cq = {};
   cq.push(sub_model.components.get_current_parameter());
 
-  // Add dependancies to queue.
-  for(auto it = sub_model.components.value_to_dependents[cq.front()].begin(); it != sub_model.components.value_to_dependents[cq.front()].end(); ++it) {
-    cq.push(*it);
-  }
+  // This if statement is for cases when there are no parameters to be fitted.
+  // Essentially a redundant if statement in vast majority of cases.
+  if(cq.front() == nullptr) {
+    endQ = true;
+  } else {
+    // Add dependancies to queue.
+    for(auto it = sub_model.components.value_to_dependents[cq.front()].begin(); it != sub_model.components.value_to_dependents[cq.front()].end(); ++it) {
+      cq.push(*it);
+    }
 
-  location = cq.front()->host_vectors.begin();
-  location_iter_end = cq.front()->host_vectors.end();
- 
-  while(location == location_iter_end) {
-    endQ = step_to_next_component();
-    if(endQ) {
+    location = cq.front()->host_vectors.begin();
+    location_iter_end = cq.front()->host_vectors.end();
+
+    while(location == location_iter_end) {
+      endQ = step_to_next_component();
+      if(endQ) {
       return;
+      }
     }
   }
 }

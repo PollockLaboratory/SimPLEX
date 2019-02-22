@@ -10,6 +10,9 @@ extern Environment env;
 GeneralTimeReversible::GeneralTimeReversible() {
 }
 
+void GeneralTimeReversible::Initialize() {
+}
+
 void GeneralTimeReversible::Initialize(int number_of_sites, std::vector<std::string> states) {
 	/*
 	 * std::cout << "Initializing Single Probability Model" << std::endl;

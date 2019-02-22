@@ -5,17 +5,16 @@
 #include "../Environment.h"
 
 #include "Types/GeneralTimeReversible.h"
-#include "Types/CategoryGTR.h"
-#include "Types/SingleRate.h"
-#include "Types/FixedRate.h"
+#include "Types/CustomModel.h"
 
 extern Environment env;
 
 // This should be ENUM;
 static const int general_time_reversible_model_type = 0;
-static const int single_rate_model_type = 1;
-static const int fixed_rate_model_type = 2;
-static const int category_GTR_model_type = 3;
+// static const int single_rate_model_type = 1;
+// static const int fixed_rate_model_type = 2;
+// static const int category_GTR_model_type = 3;
+static const int custom_model = 1;
 
 SubstitutionModel* GetSubstitutionModel() {
   /*
@@ -28,12 +27,8 @@ SubstitutionModel* GetSubstitutionModel() {
 
   if (next_model_type == general_time_reversible_model_type) {
     substitution_model = new GeneralTimeReversible();
-  } else if (next_model_type == single_rate_model_type) {
-    substitution_model = new SingleRate();
-  } else if (next_model_type == fixed_rate_model_type) {
-    substitution_model = new FixedRate();
-  } else if (next_model_type == category_GTR_model_type) {
-    substitution_model = new CategoryGTR();
+  } else if (next_model_type == custom_model) {
+    substitution_model = new CustomModel();
   } else {
     std::cerr << "Substitution model type not recognized in get next sub model " << next_model_type << std::endl;
     std::exit(EXIT_FAILURE);

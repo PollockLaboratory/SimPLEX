@@ -17,6 +17,11 @@
 #include "MCMC.h"
 #include "utils.h"
 
+#include "SubstitutionModels/SubstitutionModelTypes.h"
+#include "SubstitutionModels/SubstitutionModel.h"
+
+#include "sol2/sol.hpp"
+
 #ifdef _WIN32
 #include <sys/time.h>
 #else
@@ -48,11 +53,14 @@ int main(int argc, char* argv[]) {
   files.setupOutputDirectory();
 
   // Initiating program.
+  SubstitutionModel* sm = GetSubstitutionModel();
+  sm->Initialize();
+  
   Data data;
-  data.Initialize();
+  data.Initialize(sm->get_states());
 
   Model model;
-  model.Initialize(data.raw_tree, data.MSA);
+  model.Initialize(data.raw_tree, data.MSA, sm);
 
   MCMC mcmc;
   mcmc.initialize(&model);

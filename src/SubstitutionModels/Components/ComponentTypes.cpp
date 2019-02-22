@@ -2,6 +2,11 @@
 
 // RATE CATEGORIES
 
+RateCategories::RateCategories(std::string name, std::vector<float> categories) : AbstractComponent(name) {
+  values = categories;
+  n = values.size();
+}
+
 RateCategories::RateCategories(std::string name, float lower_b, float upper_b, int steps) : AbstractComponent(name), n(steps) {
   values = {};
   float step_size = (upper_b - lower_b) / steps;

@@ -15,24 +15,10 @@ std::ofstream SequenceAlignment::sequences_out;
 
 // Sequence Alignment class.
 
-SequenceAlignment::SequenceAlignment() {
-  int states_option = env.get_int("states");
-  switch(states_option) {
-  case 0: // Nucleotide.
-    states = nucleotides;
-  case 1: // Amino acid.
-    states = aa;
-  }
-
-  env.num_states = states.size();
-
-  for(int i = 0; i < states.size(); i++) {
-    state_to_integer[states[i]] = i;
-    state_to_integer["-"] = -1;
-    integer_to_state[i] = states[i];
-    integer_to_state[-1] = "-";
-  }
-
+SequenceAlignment::SequenceAlignment(const States* states) {
+  env.num_states = states->n;
+  state_to_integer = states->state_to_int;
+  integer_to_state = states->int_to_state;
   env.state_to_integer = state_to_integer;
 }
 

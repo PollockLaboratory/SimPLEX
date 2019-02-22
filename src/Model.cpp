@@ -47,7 +47,7 @@ SubstitutionModel* Model::InitializeSubstitutionModel(int num_sites, vector<stri
   return(substitution_model);
 }
 
-void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA) {
+void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA, SubstitutionModel* &sm) {
   /*
    * Initialize the model class.
    * There are two main components within the model class:
@@ -56,7 +56,7 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA) {
    */
   u = env.u;
   int num_sites = (MSA->taxa_names_to_sequences).begin()->second.size();
-  substitution_model = InitializeSubstitutionModel(num_sites, MSA->states);
+  substitution_model = sm;
   num_parameters = substitution_model->getNumberOfParameters();
 
   tree = new Tree();
@@ -108,6 +108,7 @@ double Model::CalculateLikelihood() {
   /*
    * Calculates the likelihood of the current tree and substitution model.
    */
+
   logL_waiting = 0.0;
   logL_subs = 0.0;
   logL = 0.0;
