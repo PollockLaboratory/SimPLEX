@@ -89,7 +89,7 @@ std::vector<int> SequenceAlignment::EncodeSequence(const std::string &sequence) 
    */
   std::vector<int> encoded_sequence(sequence.length());
 
-  for (int site = 0; site < sequence.length(); site++) {
+  for (unsigned int site = 0; site < sequence.length(); site++) {
     std::string current_pos = sequence.substr(site, 1);
     encoded_sequence.at(site) = state_to_integer[current_pos];
   }
@@ -97,9 +97,9 @@ std::vector<int> SequenceAlignment::EncodeSequence(const std::string &sequence) 
 }
 
 void SequenceAlignment::DetermineColumnsWithoutGaps() {
-  int number_of_sites = taxa_names_to_sequences.begin()->second.size();
+  unsigned int number_of_sites = taxa_names_to_sequences.begin()->second.size();
 
-  for(int site = 0; site < number_of_sites; site++) {
+  for(unsigned int site = 0; site < number_of_sites; site++) {
     // If site is not in columns with gaps
     if(columns_with_gaps.find(site) == columns_with_gaps.end()) {
       columns_without_gaps.push_back(site);
@@ -117,7 +117,7 @@ void SequenceAlignment::RemoveColumnsWithGapsFromSequences() {
 std::vector<int> SequenceAlignment::RemoveGapsFromEncodedSequence(std::vector<int> encoded_sequence) {
   std::vector<int> encoded_sequence_without_gaps(columns_without_gaps.size());
 
-  for (int site = 0; site < columns_without_gaps.size(); site++) {
+  for (unsigned int site = 0; site < columns_without_gaps.size(); site++) {
     encoded_sequence_without_gaps.at(site) = encoded_sequence.at(columns_without_gaps.at(site));
   }
   return(encoded_sequence_without_gaps);
@@ -142,7 +142,7 @@ std::string SequenceAlignment::decodeSequence(std::vector<int> &enc_seq) {
 
 std::vector<int> SequenceAlignment::findParsimony(const std::vector<int> &s1, const std::vector<int> &s2) {
   std::vector<int> p = {};
-  for(int i = 0; i < s1.size(); i++) {
+  for(unsigned int i = 0; i < s1.size(); i++) {
     if(s1.at(i) == s2.at(i)) {
       //If states are the same.
       p.push_back(s1.at(i));
@@ -162,16 +162,16 @@ std::vector<int> SequenceAlignment::findParsimony(const std::vector<int> &s1, co
   return(p);
 }
 
-std::list<substitution> SequenceAlignment::findSubstitutions(const std::vector<int> &anc, const std::vector<int> &dec) {
-  std::list<substitution> s = {};
-  for(int i = 0; i < anc.size(); i++) {
-    if(anc.at(i) != dec.at(i)) {
-      substitution sub = {i, anc.at(i), dec.at(i)};
-      s.push_back(sub);
-    }
-  }
-  return(s);
-}
+//std::list<substitution> SequenceAlignment::findSubstitutions(const std::vector<int> &anc, const std::vector<int> &dec) {
+// std::list<substitution> s = {};
+//  for(int i = 0; i < anc.size(); i++) {
+//   if(anc.at(i) != dec.at(i)) {
+//     substitution sub = {i, anc.at(i), dec.at(i)};
+//     s.push_back(sub);
+//   }
+// }
+// return(s);
+//}
 
 std::list<std::string> SequenceAlignment::getNodeNames() {
   std::list<std::string> names;

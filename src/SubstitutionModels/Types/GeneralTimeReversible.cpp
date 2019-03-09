@@ -26,7 +26,6 @@ void GeneralTimeReversible::Initialize(int number_of_sites, std::vector<std::str
 
   std::vector<std::vector<AbstractValue*>> Q(20, std::vector<AbstractValue*>(20, NULL));
 
-  AbstractValue* r = NULL;
   for(int i = 0; i < 20; i++) {
     for(int j = 0; j < 20; j++) {
       if(i == j) {

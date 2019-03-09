@@ -20,6 +20,9 @@
 #include "SubstitutionModels/SubstitutionModelTypes.h"
 #include "SubstitutionModels/SubstitutionModel.h"
 
+#include <boost/random/uniform_01.hpp>
+#include <boost/random/mersenne_twister.hpp>
+
 #include "sol2/sol.hpp"
 
 #ifdef _WIN32
@@ -33,7 +36,10 @@ Environment env;
 IO::Files files;
 
 double Random() {
-  return (std::rand() % 10000) / 10000.0;
+  boost::mt19937 rng(time(NULL));
+  static boost::random::uniform_01<boost::mt19937> dist(rng);
+  return(dist());
+  //return (std::rand() % 10000) / 10000.0;
 }
 
 //Entry point for SimPLEX.

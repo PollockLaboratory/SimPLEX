@@ -9,6 +9,7 @@
 
 #include "TreeParts.h"
 #include "../Environment.h"
+#include "../SubstitutionCounts.h"
 
 extern double Random();
 extern Environment env;
@@ -18,6 +19,7 @@ extern Environment env;
 BranchSegment::BranchSegment(float distance) {
   this->distance = distance;
   rates = std::vector<RateVector*>(env.n, NULL);
+  substitutions = std::vector<bool>(env.n, false);
 }
 
 BranchSegment::~BranchSegment() {
@@ -41,7 +43,7 @@ double BranchSegment::get_rate(int pos, int dec_state) {
 // Key Statistics
 inline void BranchSegment::update_rate_vectors() {
   std::vector<int>* seq = ancestral->sequence;
-  for(int pos = 0; pos < seq->size(); pos++) {
+  for(unsigned int pos = 0; pos < seq->size(); pos++) {
     if((*seq)[pos] == -1) {
       rates[pos] = NULL;
     } else {
@@ -50,20 +52,14 @@ inline void BranchSegment::update_rate_vectors() {
   }
 }
 
-bool BranchSegment::virtualSubstituionQ(int state) {
+void BranchSegment::set_new_substitutions() {
   float u = env.u;
-  double rate = ancestral->SM->selectRateVector(state)->rates[state]->getValue();
-
-  double noSub = 1.0/(1.0 + u*distance);
-  double Sub = (rate * distance)/(1 + u*distance);
-
-  //noSub = noSub/(Sub+noSub);
-  Sub = Sub/(Sub+noSub);
-
-  if(Random() < Sub) {
-    return(true);
-  } else {
-    return(false);
+  for(auto it = substitutions.begin(); it != substitutions.end(); ++it) {
+    if(Random() < u) {
+      *it = true;
+    } else {
+      *it = false;
+    }
   }
 }
 
@@ -72,26 +68,18 @@ void BranchSegment::update() {
 }
 
 void BranchSegment::update_counts(std::map<RateVector*, std::vector<int>>& subs_by_rateVector,
-				  std::pair<int, int>& subs_by_branch) {
+				  raw_counts& subs_by_branch) {
   std::vector<int> anc = *(ancestral->sequence);
   std::vector<int> dec = *(decendant->sequence);
 
   // Substitutions tracked.
-  for(int pos = 0; pos < anc.size(); pos++) {
-    if(dec.at(pos) != -1) {
-      if(anc.at(pos) == dec.at(pos)) {
-	// Add virtual substitution.
-	if(virtualSubstituionQ(anc.at(pos))) {
-	  subs_by_branch.second += 1;
-	  subs_by_rateVector[rates[pos]][dec.at(pos)] += 1;
-	  // Don't add virtual substitution.
-	} else {
-	  subs_by_branch.first += 1;
-	}
-      } else {
-	subs_by_branch.second += 1;
-	subs_by_rateVector[rates[pos]][dec.at(pos)] += 1;	
-      }
+  for(unsigned int pos = 0; pos < anc.size(); pos++) {
+    if(substitutions[pos] == true and dec.at(pos) != -1) {
+      // Adds both virtual substitutions and normal substitutions.
+      subs_by_branch.num1subs += 1;
+      subs_by_rateVector[rates[pos]][dec.at(pos)] += 1;
+    } else {
+      subs_by_branch.num0subs += 1;
     }
   } 
 }
@@ -136,6 +124,63 @@ TreeNode::TreeNode() {
 }
 
 // Sampling.
+void TreeNode::sample_sequence() {
+  if(right) {
+    // Sample branch point node.
+    for(unsigned int pos = 0; pos < sequence->size(); pos++) {
+      if((*sequence)[pos] == -1) {
+	continue;
+      } else {
+	if(left->substitutions[pos] == true or right->substitutions[pos]) {
+	  (*sequence)[pos] = sample_single_position(pos);
+	} else {
+	  int left_dec = left->decendant->sequence->at(pos);
+	  if(left_dec and right->decendant->sequence->at(pos)) {
+	    (*sequence)[pos] = left_dec;
+	  } else {
+	    (*sequence)[pos] = sample_single_position(pos);
+	  }
+	}
+      }
+    }
+  } else {
+    // Only left decendant.
+    for(unsigned int pos = 0; pos < sequence->size(); pos++) {
+      // Skip sampling if gap.
+      if((*sequence)[pos] == -1) {
+	continue;
+      } else {
+	if(left->substitutions[pos] == true) {
+	  (*sequence)[pos] = sample_single_position(pos);
+	} else {
+	  (*sequence)[pos] = left->decendant->sequence->at(pos);
+	}
+      }
+    }
+  }
+}
+
+TreeNode* TreeNode::sample() {
+  // std::cout << "Name: " << name << " left: " << (bool)left << " right: " << (bool)right << std::endl;
+  // Left has always been sampled, as intermediate nodes are connected by left and top.
+  // Check right has been sampled.
+  if(right) {
+    if(not right->decendant->sampled) {
+      return(this);
+    }
+  }
+
+  sample_sequence();  
+  sampled = true;
+
+  if(up) {
+    return(up->ancestral->sample());
+  } else {
+    // If at the root of the tree, return sampled node to end recurrsion.
+    return(this);
+  }
+}
+
 void branchLikelihood(double &l, int anc, int dec, float t_b, SubstitutionModel* SM) {
   /*
    * Calculates the likelihood of a branch, and adds it to the vector l.
@@ -162,23 +207,17 @@ std::vector<double> normalizeLikelihoods(std::vector<double> &l) {
   return(l);
 }
 
-void TreeNode::sampleSinglePosition(int pos) {
+int TreeNode::sample_single_position(int pos) {
   int n = env.num_states;
   std::vector<double> l(n, 1.0);
   for(int state = 0; state < n; state++) {
-    if(up) {
-      int anc = up->ancestral->sequence->at(pos);
-      if(anc == -1) {
-	std::cout << "Gap." << std::endl;
-      }
-      branchLikelihood(l[state], anc, state, up->distance, SM);
-    }
     if(left) {
       int dec = left->decendant->sequence->at(pos);
       if(dec != -1) {
 	branchLikelihood(l[state], state, dec, left->distance, SM);
       }
     }
+
     if(right) {
       int dec = right->decendant->sequence->at(pos);
       if(dec != -1) {
@@ -192,17 +231,13 @@ void TreeNode::sampleSinglePosition(int pos) {
   double r = Random();
   int i = 0;
   double c = l[0];
+
   while(r > c) {
     i++;
     c += l[i];
   }
-	
-  (*sequence)[pos] = i;
 
-  // Taken to another function
-  // RateVector* rv = SM->selectRateVector(i);
-  // if(left) left->set_rate_vector(pos, rv);
-  // if(right) right->set_rate_vector(pos, rv);	
+  return(i);
 }
 
 std::string TreeNode::toString() {
@@ -215,36 +250,6 @@ std::string TreeNode::toString() {
     return("(" + left->decendant->toString() + ")" + n);
   } else {
     return("(" + left->decendant->toString() + "," + right->decendant->toString() + ")" + n);
-  }
-}
-
-void TreeNode::sample() {
-  if(sampled == false) {
-    sampled = true;
-    sampleSequence();
-
-    if(left != 0) {
-      left->decendant->sample();
-    }
-
-    if(right != 0) {
-      right->decendant->sample();
-    }
-
-    if(up != 0) {
-      up->ancestral->sample();
-    }
-  }
-}
-
-void TreeNode::sampleSequence() {
-  if(!isTip()) {
-    for(int pos = 0; pos < sequence->size(); pos++) {
-      // Skip sampling if gap.
-      if((*sequence)[pos] != -1) {
-	sampleSinglePosition(pos);
-      }
-    }
   }
 }
 

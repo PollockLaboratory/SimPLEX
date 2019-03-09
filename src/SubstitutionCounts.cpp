@@ -17,7 +17,7 @@ SubstitutionCounts::SubstitutionCounts(std::vector<RateVector*> rvs, std::list<f
   }
 
   for(auto it = b_lens.begin(); it != b_lens.end(); ++it) {
-    subs_by_branch[*it] = std::pair<int, int>(0,0);
+    subs_by_branch[*it] = {0,0};
   }
 }
 
@@ -32,6 +32,6 @@ void SubstitutionCounts::print() {
   }
   std::cout << "Substitutions by Branch Length:" << std::endl;
   for(auto it = subs_by_branch.begin(); it != subs_by_branch.end(); ++it) {
-    std::cout << it->first << " :\t[ 0: " << it->second.first << ", 1: " << it->second.second << " ]" << std::endl;
+    std::cout << it->first << " :\t[ 0: " << it->second.num0subs << ", 1: " << it->second.num1subs << " ]" << std::endl;
   }
 }

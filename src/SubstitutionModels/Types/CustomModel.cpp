@@ -22,7 +22,6 @@ void CustomModel::set_name(std::string n) {
 void CustomModel::set_states(sol::table tbl) {
   std::list<std::string> states = {};
   for(auto kvp : tbl) {
-    const sol::object& key = kvp.first;
     const sol::object& val = kvp.second;
 
     sol::optional<std::string> maybe_str = val.as<sol::optional<std::string>>();
@@ -45,7 +44,6 @@ RateVector* lua_RateVector_cstr(std::string name, int state, sol::table tbl) {
 
   std::vector<AbstractValue*> rates = {};
   for(auto kvp : tbl) {
-    const sol::object& key = kvp.first;
     const sol::object& val = kvp.second;
 
     sol::optional<AbstractValue*> maybe_val = val.as<sol::optional<AbstractValue*>>();
@@ -66,7 +64,6 @@ CategoryFloat* lua_CategoryFloat_cstr(std::string name, sol::table tbl) {
   std::vector<float> categories = {};
 
   for(auto kvp : tbl) {
-    const sol::object& key = kvp.first;
     const sol::object& val = kvp.second;
 
     sol::optional<float> maybe_val = val.as<sol::optional<float>>();
@@ -88,7 +85,7 @@ void CustomModel::Initialize(int number_of_sites, std::vector<std::string> state
 }
 
 void CustomModel::Initialize() {
-  float u = env.u;
+  // float u = env.u;
 
   sol::state lua;
   lua.open_libraries(sol::lib::base);

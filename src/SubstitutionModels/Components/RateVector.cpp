@@ -17,7 +17,7 @@ RateVector::RateVector(std::string name, int state, std::vector<AbstractValue*> 
   counts = std::vector<int>(env.num_states, 0);
   logLikelihoods = std::vector<double>(env.num_states, 0);
 
-  for(int i = 0; i < rates.size(); i++) {
+  for(unsigned int i = 0; i < rates.size(); i++) {
     valueID_to_state[rates[i]->get_ID()] = i;
   }
 }
@@ -82,7 +82,6 @@ void RateVectorSet::Initialize() {
 }
 
 RateVector*& RateVectorSet::operator[] (const int i) {
-  RateVector* rv = col[i];
   if(col[i]->state != i) {
     std::cerr << "Error: RateVectorSet dispatching incorrect rate vector. " << std::endl;
     exit(EXIT_FAILURE);
@@ -91,7 +90,7 @@ RateVector*& RateVectorSet::operator[] (const int i) {
 }
 
 void RateVectorSet::add(RateVector* rv) {
-  for(int i = 0; i < rv->rates.size(); i++) {
+  for(unsigned int i = 0; i < rv->rates.size(); i++) {
     // Set up the AbstractValues themselves.
     rv->rates[i]->add_host_vector(rv, i);
   }

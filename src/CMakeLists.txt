@@ -28,6 +28,7 @@ set(SRCS
 add_executable( simPLEX SimPLEX.cpp)
 target_sources( simPLEX PUBLIC ${SRCS} )
 target_link_libraries( simPLEX ${LUA_LIBRARIES} )
+target_link_libraries( simPLEX ${Boost_LIBRARIES})
 
 include_directories( ../libs )
 

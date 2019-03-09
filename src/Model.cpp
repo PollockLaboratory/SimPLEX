@@ -23,17 +23,7 @@ Model::Model() {
    * The default contructor.
    */
   tree = NULL;
-  SubstitutionModel* substitution_model = NULL;
   ready = true;
-}
-
-Model::~Model() {
-  /*
-   * The destructor function.
-   * Note: we should not be destructing manually.
-   */
-  delete tree;
-  delete substitution_model;
 }
 
 SubstitutionModel* Model::InitializeSubstitutionModel(int num_sites, vector<string> states) {
@@ -55,7 +45,6 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA, Subs
    * - the substitution model class - which contains all the rate matrices.
    */
   u = env.u;
-  int num_sites = (MSA->taxa_names_to_sequences).begin()->second.size();
   substitution_model = sm;
   num_parameters = substitution_model->getNumberOfParameters();
 
@@ -118,8 +107,8 @@ double Model::CalculateLikelihood() {
 
   for(auto it = counts.subs_by_branch.begin(); it != counts.subs_by_branch.end(); ++it) {
     t = it->first;
-    num0subs = it->second.first;
-    num1subs = it->second.second;
+    num0subs = it->second.num0subs;
+    num1subs = it->second.num1subs;
     logL_waiting += num0subs * log(1/(1 + u*t)) + num1subs * log(t/(1 + u*t));
   }
 
@@ -133,7 +122,6 @@ double Model::CalculateLikelihood() {
 
   logL = logL_waiting + logL_subs;
 
-  // double l = tree->calculate_likelihood();
   return(logL);
 }
 
@@ -155,10 +143,6 @@ double Model::updateLikelihood(){
   logL += delta_logL;
   return(logL);
 }
-
-// double Model::PartialCalculateLikelihood(const double lnL) {
-// return(tree->partial_calculate_likelihood());
-//}
 
 // Printing/Recording
 void Model::RecordState(int gen, double l) {

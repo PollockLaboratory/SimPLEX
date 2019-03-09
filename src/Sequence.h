@@ -46,7 +46,6 @@ class SequenceAlignment {
   std::string decodeChar(int &c);
   std::string decodeSequence(std::vector<int> &enc_seq);
   static std::vector<int> findParsimony(const std::vector<int> &s1, const std::vector<int> &s2);
-  static std::list<substitution> findSubstitutions(const std::vector<int> &anc, const std::vector<int> &dec);
   std::list<std::string> getNodeNames();
  private:
   // Processing input sequences - fasta.

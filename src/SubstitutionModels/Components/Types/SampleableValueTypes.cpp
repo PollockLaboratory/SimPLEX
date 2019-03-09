@@ -81,6 +81,7 @@ void ContinuousFloat::refresh() {
 
 std::ostream& operator<<(std::ostream& os, const ContinuousFloat& cf) {
   os << "[ContinuousFloat-" << cf.name << "]";
+  return(os);
 }
 
 // CATEGORY FLOAT

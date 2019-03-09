@@ -53,12 +53,20 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
 
   std::cout << "Attaching sequences to tree." << std::endl;
   configureSequences(root);
+  
+  for(auto t = nodeList.begin(); t != nodeList.end(); ++t) {
+    if((*t)->isTip()) {
+      tipList.push_back(*t);
+    }
+  }
+
+  // Initial sample to get counts.
+  sample_ancestral_states();
 
   for(auto b = branchList.begin(); b != branchList.end(); ++b) {
   	(*b)->update();
   }
 
-  // find_substitution_counts();
   initialize_output_streams();	
 
   std::cout << std::endl;
@@ -174,7 +182,7 @@ void Tree::update_counts(SubstitutionCounts& counts) {
 std::list<float> Tree::get_branch_lengths() {
   // Maybe Tree should just hold onto all the branch lengths in play?
   std::list<float> lens = {};
- std:unordered_set<float> lens_set = {};
+  std::unordered_set<float> lens_set = {};
   BranchSegment* b;
   for(auto it = branchList.begin(); it != branchList.end(); ++it) {
     b = *it;
@@ -202,28 +210,46 @@ bool Tree::sample() {
   return(s);
 }
 
+//
 // Two options for changing ancestral states.
 //
 
-bool Tree::sample_ancestral_states() {
-  // Find Random Node to start sampling.
-  double r = Random();
-  float s = 1.0 / nodeList.size();
-  int i = 0;
-  while(r > (i+1)*s) {
-		i++;
+void Tree::traverse_find_ancestral_sequences() {
+  std::queue<TreeNode*> nodes = {};
+  for(auto t = tipList.begin(); t != tipList.end(); ++t) {
+    (*t)->sampled = true;
+    nodes.push((*t)->up->ancestral);
   }
 
-  // std::cout << "Starting node: " << i << " " <<  std::endl;
-  nodeList[i]->sample();
+  while(not nodes.empty()) {
+    if(not nodes.front()->sampled) {
+      nodes.push(nodes.front()->sample());
+    }
+
+    nodes.pop();
+  }
 
   for(auto n = nodeList.begin(); n != nodeList.end(); ++n) {
     (*n)->sampled = false;
   }
+}
+
+bool Tree::sample_ancestral_states() {
+  /*
+   * Both recalculates substitutions and recalculates the ancestral sequences.
+   */
+
+  for(auto b = branchList.begin(); b != branchList.end(); ++b) {
+    (*b)->set_new_substitutions();
+  }
+
+  traverse_find_ancestral_sequences();
+
   return(false);
 }
 
 bool Tree::step_through_MSAs() {
+  // This is not going to work anymore as the tree resampling algorithm has changed.
   MSA->step_to_next_MSA();
   return(false);
 }

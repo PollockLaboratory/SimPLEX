@@ -31,6 +31,7 @@ class Tree {
 
   std::list<BranchSegment*> branchList; // Potentially should be vectors.
   std::vector<TreeNode*> nodeList;
+  std::list<TreeNode*> tipList;
 
   // Constructing/Initializing.
   Tree();
@@ -42,6 +43,7 @@ class Tree {
 
   // Sampling.
   bool sample();
+  void traverse_find_ancestral_sequences();
 
   // Possible sampling methods.
   bool(Tree::*treeSamplingMethod)(); 

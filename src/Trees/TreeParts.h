@@ -11,6 +11,7 @@
 #include "../Sequence.h"
 #include "Components/RateVector.h"
 #include "../SubstitutionModels/SubstitutionModel.h"
+#include "../SubstitutionCounts.h"
 
 class TreeNode;
 
@@ -27,13 +28,16 @@ class BranchSegment {
 
   // Key statistics.
   inline void update_rate_vectors();
-  bool virtualSubstituionQ(int state);
+  void set_new_substitutions();
 
-  void update_counts(std::map<RateVector*, std::vector<int>>& subs_by_rateVector, std::pair<int, int>& subs_by_branch);
+  void update_counts(std::map<RateVector*, std::vector<int>>& subs_by_rateVector,
+		       raw_counts& subs_by_branch);
 
   void update();
  
   friend std::ostream& operator<< (std::ostream &out, const BranchSegment &b);
+
+  std::vector<bool> substitutions;
  private:
   std::vector<RateVector*> rates; //By site.
 };
@@ -57,9 +61,9 @@ class TreeNode {
   TreeNode(IO::RawTreeNode* raw_tree);
   TreeNode(std::string n);
 
-  void sample();
-  void sampleSequence();
-  void sampleSinglePosition(int pos);
+  TreeNode* sample();
+  void sample_sequence();
+  int sample_single_position(int pos);
   std::string toString();
 
   bool isTip();

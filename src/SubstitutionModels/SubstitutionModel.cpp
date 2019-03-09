@@ -133,6 +133,7 @@ inline bool SubstitutionModel::iterator::step_to_next_component() {
     }
     location = cq.front()->host_vectors.begin();
     location_iter_end = cq.front()->host_vectors.end();
+    return(false);
   }
 }
 
@@ -165,10 +166,6 @@ SubstitutionModel::iterator::iterator(SubstitutionModel& s, bool e) : sub_model(
 SubstitutionModel::iterator& SubstitutionModel::iterator::operator++() {
   step_to_next_location();
   return(*this);
-}
-
-SubstitutionModel::iterator& SubstitutionModel::iterator::operator++(int i) {
-  return(++(*this));
 }
 
 const std::pair<RateVector*, int>& SubstitutionModel::iterator::operator*() const {

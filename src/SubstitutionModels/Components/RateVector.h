@@ -29,7 +29,12 @@ struct bpos {
 	return(false);
       }
     }
-    if(branch < x.branch) return(true);
+
+    if(branch < x.branch){
+      return(true);
+    } else {
+      return(false);
+    }
   }
 
   bool operator==(const bpos& x) const {

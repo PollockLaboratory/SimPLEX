@@ -66,14 +66,13 @@ class SubstitutionModel {
     explicit iterator(SubstitutionModel&, bool);
     const std::pair<RateVector*, int>& operator*() const;
     iterator& operator++();
-    iterator& operator++(int);
     bool operator!=(const iterator &) const;
     bool at_end() const;
   private:
     inline void step_to_next_location();
     inline bool step_to_next_component();
-    bool endQ;
     SubstitutionModel& sub_model;
+    bool endQ;
     std::list<AbstractComponent*> changed_comps; // List of the components that have changes with recent sampling.
     std::queue<AbstractComponent*> cq;
     std::list<std::pair<RateVector*, int>>::iterator location; // The location within a rate vector that has changed.
