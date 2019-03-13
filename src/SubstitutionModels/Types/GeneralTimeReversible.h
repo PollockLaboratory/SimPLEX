@@ -6,8 +6,8 @@
 #include "SubstitutionModel.h"
 #include "../Components/ComponentSet.h"
 
-#include "../Components/Types/AbstractValueTypes.h"
-#include "../Components/Types/SampleableValueTypes.h"
+#include "../Components/AbstractValueTypes.h"
+#include "../Components/SampleableValueTypes.h"
 
 #include "../Components/AbstractComponent.h"
 #include "../Components/RateVector.h"

@@ -16,8 +16,8 @@ set(SRCS
   SubstitutionModels/Components/ComponentSet.cpp
   SubstitutionModels/Components/ComponentTypes.cpp
   SubstitutionModels/Components/RateVector.cpp
-  SubstitutionModels/Components/Types/AbstractValueTypes.cpp
-  SubstitutionModels/Components/Types/SampleableValueTypes.cpp
+  SubstitutionModels/Components/AbstractValueTypes.cpp
+  SubstitutionModels/Components/SampleableValueTypes.cpp
   SubstitutionModels/Types/GeneralTimeReversible.cpp
   SubstitutionModels/Types/CustomModel.cpp
   Trees/Tree.cpp

@@ -1,8 +1,8 @@
 #ifndef SampleableValueTypes_h
 #define SampleableValueTypes_h
 
-#include "../AbstractComponent.h"
-#include "../ComponentTypes.h"
+#include "AbstractComponent.h"
+#include "ComponentTypes.h"
 
 #include <string>
 #include <list>

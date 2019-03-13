@@ -13,7 +13,7 @@ int RateVector::IDc = 0;
 RateVector::RateVector(std::string name, int state, std::vector<AbstractValue*> params) : name(name), state(state) {
   size = params.size();
   rates = params;	
-  locations = {};
+  //locations = {};
   counts = std::vector<int>(env.num_states, 0);
   logLikelihoods = std::vector<double>(env.num_states, 0);
 
@@ -28,31 +28,6 @@ float RateVector::operator[](int i) {
 
 float RateVector::get_rate_ratio(int i) {
   return(rates[i]->getValue() / rates[i]->getOldValue());
-}
-
-void RateVector::add_location(int pos, BranchSegment* bs) {
-  bpos loc = {bs, pos};
-  locations.insert(loc);
-}
-
-void RateVector::remove_location(int pos, BranchSegment* bs) {
-  bpos loc = {bs, pos};
-  locations.erase(loc);
-}
-
-void RateVector::clear_locations() {
-  locations = {};
-}
-
-std::unordered_set<bpos> RateVector::get_locations() {
-  return(locations);
-}
-
-void RateVector::update() {
-  /*
-   * Updates the substitution counts associtated with each RateParameter(AbstractValue) and the
-   * LogLikelihood scores.
-   */
 }
 
 // Util.
@@ -96,45 +71,6 @@ void RateVectorSet::add(RateVector* rv) {
   }
   // Add RateVector to collection in RateVectorSet. 
   col.push_back(rv);
-}
-
-void RateVectorSet::get_counts() {
-  // Calls get_counts in each rate vector.
-  for(auto r = col.begin(); r != col.end(); ++r) {
-    (*r)->update();
-  }
-}
-
-void RateVectorSet::clear_locations() {
-  for(auto r = col.begin(); r != col.end(); ++r) {
-    (*r)->clear_locations();
-  }
-}
-
-void RateVectorSet::check_duplicate_locations() {
-  std::set<bpos> locs = {};
-  std::set<bpos> duplicates = {};
-  std::cout << "Checking for duplicate locations." << std::endl;
-  for(auto r = col.begin(); r != col.end(); ++r) {
-    std::cout << (*r)->locations.size() << std::endl;
-    for(auto it = (*r)->locations.begin(); it != (*r)->locations.end(); ++it) {
-      if(locs.find(*it) == locs.end()) {
-	locs.insert(*it);
-      } else {
-	duplicates.insert(*it);
-      }
-    }
-  }
-  std::set<BranchSegment*> b = {};
-  std::set<int> p = {};
-  std::cout << "Number of non duplicates: " << locs.size() << std::endl;
-  for(auto it = locs.begin(); it != locs.end(); ++it) {
-    b.insert(it->branch);
-    p.insert(it->pos);
-  }
-  std::cout << "b size: " << b.size() << std::endl;
-  std::cout << "p size: " << p.size() << std::endl;
-  std::cout << "Number of duplicates: " << duplicates.size() << std::endl;
 }
 
 void RateVectorSet::print() {

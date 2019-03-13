@@ -20,8 +20,9 @@ extern Environment env;
 
 IO::Files::Files() {
   total_files = 0;
-  defaultfile = "../resources/defaults.ctrl"; // where to find default settings
-  optionsfile = "../resources/options.ctrl"; // where to find optional control settings
+  // Remember to make this relative.
+  defaultfile = "/home/hamish/Documents/Code/simplex0_0/resources/defaults.ctrl"; // where to find default settings
+  optionsfile = "/home/hamish/Documents/Code/simplex0_0/resources/options.ctrl"; // where to find optional control settings
 }
 
 void IO::Files::setupOutputDirectory() {

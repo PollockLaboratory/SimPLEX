@@ -1,7 +1,7 @@
 #ifndef AbstractValueTypes_h
 #define AbstractValueTypes_h
 
-#include"../AbstractComponent.h"
+#include"AbstractComponent.h"
 #include <string>
 #include <list>
 #include <iostream>
