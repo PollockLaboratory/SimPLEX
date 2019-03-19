@@ -18,8 +18,6 @@ void GeneralTimeReversible::Initialize(int number_of_sites, std::vector<std::str
 	 * std::cout << "Initializing Single Probability Model" << std::endl;
 	 */
 
-  float u = env.u;
-
   std::cout << "Protein General Time Reversible Model (GTR)." << std::endl;
 
   std::array<std::string, 20> aa = {"A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"};
@@ -29,7 +27,7 @@ void GeneralTimeReversible::Initialize(int number_of_sites, std::vector<std::str
   for(int i = 0; i < 20; i++) {
     for(int j = 0; j < 20; j++) {
       if(i == j) {
-	Q[i][j] = new VirtualSubstitutionRate(aa[i] + aa[j], u);
+	Q[i][j] = new VirtualSubstitutionRate(aa[i] + aa[j], this->u);
       } else if(i < j) {
 	Q[i][j] = new ContinuousFloat(aa[i] + aa[j], 0.01, 0.001, 0.0);
       } else {

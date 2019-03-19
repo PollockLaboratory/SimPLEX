@@ -32,6 +32,6 @@ void utils::Terminate(time_t start_time) {
 	// std::ofstream time_out = files.get_ofstream("time");
 	// time_out << result << std::endl;
 
-	std::cout << std::endl << "Output placed in " << env.get("output_directory") << std::endl;
+	std::cout << std::endl << "Output placed in " << env.get<std::string>("OUTPUT.output_directory") << std::endl;
 }
 

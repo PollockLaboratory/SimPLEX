@@ -36,10 +36,10 @@ Environment env;
 IO::Files files;
 
 double Random() {
-  boost::mt19937 rng(time(NULL));
-  static boost::random::uniform_01<boost::mt19937> dist(rng);
-  return(dist());
-  //return (std::rand() % 10000) / 10000.0;
+  //boost::mt19937 rng(time(NULL));
+  //static boost::random::uniform_01<boost::mt19937> dist(rng);
+  //return(dist());
+  return (std::rand() % 10000) / 10000.0;
 }
 
 //Entry point for SimPLEX.
@@ -50,11 +50,7 @@ int main(int argc, char* argv[]) {
   utils::printHeader();
 
   //Establish environment and files.
-  if(argc == 2) files.set_options_file(argv);
-  files.initialize();
-  std::ifstream default_file_stream = files.get_ifstream("default");
-  std::ifstream options_file_stream = files.get_ifstream("options");
-  env.ReadOptions(default_file_stream, options_file_stream);
+  env.ReadOptions(argc, argv);
 
   files.setupOutputDirectory();
 

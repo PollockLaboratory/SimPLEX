@@ -5,7 +5,7 @@ extern Environment env;
 
 // Dispatch function.
 std::function< std::pair<BranchSegment*, BranchSegment*>(float)> pickBranchSplitAlgorithm() {
-  int option = env.get_int("branch_split_algorithm");
+  int option = env.get<int>("TREE.branch_split_algorithm");
   std::function< std::pair<BranchSegment*, BranchSegment*>(float)> f;
   if(option == 0) {
     f = noSplitMethod;
@@ -36,7 +36,7 @@ std::pair<BranchSegment*, BranchSegment*> splitHalfMethod(float distance) {
 
   // Calculate how many internal nodes are needed for given branch.
   int extraNodes = 0;
-  float max_seg_len = env.get_float("max_segment_length");
+  double max_seg_len = env.get<double>("TREE.max_segment_length");
   for(int i = 0; dist > max_seg_len; i++) {
     dist = dist/2.0;
     extraNodes += pow(2, i);

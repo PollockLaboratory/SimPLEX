@@ -23,21 +23,23 @@ void FixedFloat::refresh() {
 
 // VIRTUAL SUBSTITUTION RATE
 
-VirtualSubstitutionRate::VirtualSubstitutionRate(std::string parameter_name, double unif) : AbstractValue(parameter_name) {
-	u = unif;
-	value = 0.232323;
+VirtualSubstitutionRate::VirtualSubstitutionRate(std::string parameter_name, UniformizationConstant* unif) : AbstractValue(parameter_name), u(unif) {
+  u = unif;
+  u->add_VirtualSubstitutionRate(this);
+  this->add_dependancy(u);
+  value = 0.232323;
 }
 
 const double& VirtualSubstitutionRate::getValue() {
-	return(value);
+  return(value);
 }
 
 const double& VirtualSubstitutionRate::getOldValue() {
-	return(previous_value);
+  return(previous_value);
 }
 
 void VirtualSubstitutionRate::print() {
-	std::cout << "VirtualSubstitutionRate - " << name << ": " << value << std::endl;
+  std::cout << "VirtualSubstitutionRate - " << name << ": " << value << std::endl;
 }
 
 void VirtualSubstitutionRate::refresh() {
@@ -48,7 +50,7 @@ void VirtualSubstitutionRate::refresh() {
     total += (*it)->getValue();
   }
 
-  value = u - total;
+  value = u->getValue() - total;
 
   if(value < 0.0 || value > 1.0) {
     throw OutOfBoundsException("VirtualSubstitutionRate out of bounds.");
@@ -56,7 +58,7 @@ void VirtualSubstitutionRate::refresh() {
 }
 
 void VirtualSubstitutionRate::add_rate(AbstractValue* v) {
-  add_dependancy(v);
+  this->add_dependancy(v);
   dependent_rates.push_back(v);
 }
 

@@ -28,8 +28,7 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
   std::cout << "Creating MCMC tree structure." << std::endl;
 
   // Configuration
-  max_seg_len = env.get_float("max_segment_length");
-  u = env.get_float("uniformization_constant");
+  max_seg_len = env.get<double>("TREE.max_segment_length");
 
   // Dynamicly chosen functions.
   splitBranchMethod = pickBranchSplitAlgorithm();
@@ -256,9 +255,9 @@ bool Tree::step_through_MSAs() {
 
 // Record State data.
 void Tree::initialize_output_streams() {
-  files.add_file("tree", env.get("tree_out_file"), IOtype::OUTPUT);
+  files.add_file("tree", env.get<std::string>("OUTPUT.tree_out_file"), IOtype::OUTPUT);
   tree_out = files.get_ofstream("tree");
-  files.add_file("substitutions", env.get("substitutions_out_file"), IOtype::OUTPUT);
+  files.add_file("substitutions", env.get<std::string>("OUTPUT.substitutions_out_file"), IOtype::OUTPUT);
   substitutions_out = files.get_ofstream("substitutions");
 
   substitutions_out << "Branch\tSubstitutions" << endl;

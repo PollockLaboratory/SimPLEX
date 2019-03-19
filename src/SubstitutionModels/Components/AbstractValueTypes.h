@@ -28,16 +28,16 @@ class OutOfBoundsException: public std::exception {
 
 class VirtualSubstitutionRate : public AbstractValue {
  public:
-  VirtualSubstitutionRate(std::string parameter_name, double unif);
+  VirtualSubstitutionRate(std::string parameter_name, UniformizationConstant* unif);
   virtual const double& getValue();
   virtual const double& getOldValue();
   virtual void print();
   void refresh();
   void add_rate(AbstractValue*);
  private:
+  UniformizationConstant* u;
   double value;
   double previous_value;
-  double u; //Uniformization constant.
   std::list<AbstractValue*> dependent_rates;
 };
 

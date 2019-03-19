@@ -46,7 +46,7 @@ RateVectorSet::RateVectorSet() {
 }
 
 void RateVectorSet::Initialize() {
-  files.add_file("rate_vectors", env.get("rate_vectors_out_file"), IOtype::OUTPUT);
+  files.add_file("rate_vectors", env.get<std::string>("OUTPUT.rate_vectors_out_file"), IOtype::OUTPUT);
   out_file = files.get_ofstream("rate_vectors");
 		
   out_file << "I,GEN,LogL,NAME,ANC";

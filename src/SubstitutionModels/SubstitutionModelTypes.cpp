@@ -23,7 +23,7 @@ SubstitutionModel* GetSubstitutionModel() {
    */
 
   SubstitutionModel* substitution_model = NULL;
-  int next_model_type = env.get_int("substitution_model_type");
+  int next_model_type = env.get<int>("DATA.substitution_model_type");
 
   if (next_model_type == general_time_reversible_model_type) {
     substitution_model = new GeneralTimeReversible();

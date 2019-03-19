@@ -26,11 +26,14 @@ class ComponentSet {
   std::list<AbstractComponent*> get_current_parameters();
 
   void print();
+  void print_dependencies();
+  void refresh_dependencies();
+
   double get(const std::string &name);
   int size();
 
   void saveToFile(int gen, double l);
-  std::map<AbstractComponent*, std::list<AbstractComponent*>> value_to_dependents; // Maps AbstractValues to AbstractDependentParameters that depend on them.
+  std::map<AbstractComponent*, std::list<AbstractComponent*>> value_to_dependents; // Maps AbstractComponent to AbstractComponent that depend on them.
  private:
   void stepToNextParameter();
 

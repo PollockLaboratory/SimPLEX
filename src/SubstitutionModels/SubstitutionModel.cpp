@@ -10,6 +10,8 @@ extern IO::Files files;
 SubstitutionModel::SubstitutionModel() {
 	substitution_model_out = 0;
 	states.n = 0;
+	u = new UniformizationConstant();
+	components.add_parameter(u);
 }
 
 void SubstitutionModel::add_state(std::string s) {
@@ -39,6 +41,8 @@ RateVector* SubstitutionModel::selectRateVector(int state) {
   return(rateVectors[state]);
 }
 
+// Sampling
+
 bool SubstitutionModel::SampleParameters() {
   /*
    * Samples a single parameter within the parameter set();
@@ -61,8 +65,16 @@ void SubstitutionModel::reject() {
 	components.reject();
 }
 
+// Printing.
+
 void SubstitutionModel::printParameters() {
 	components.print();
+}
+
+// Getters
+
+const double& SubstitutionModel::get_u() {
+  return(u->getValue());
 }
 
 int SubstitutionModel::getNumberOfParameters() {
@@ -76,7 +88,7 @@ std::vector<RateVector*> SubstitutionModel::get_RateVectors() {
   return(rateVectors.col);
 }
 
-void SubstitutionModel::get_current_parameters(std::list<std::pair<RateVector*, int>>& vector_changes) {
+void SubstitutionModel::get_current_parameters(std::list<rv_loc>& vector_changes) {
   std::list<AbstractComponent*> cur_params = components.get_current_parameters();
   AbstractValue* v;
   for(auto it = cur_params.begin(); it != cur_params.end(); ++it) {
@@ -106,6 +118,8 @@ void SubstitutionModel::finalize() {
   states.state_to_int["-"] = -1;
   states.int_to_state[-1] = "-";
 
+  components.refresh_dependencies();
+  u->set_initial();
   components.Initialize();
   rateVectors.Initialize();
 }
@@ -168,7 +182,7 @@ SubstitutionModel::iterator& SubstitutionModel::iterator::operator++() {
   return(*this);
 }
 
-const std::pair<RateVector*, int>& SubstitutionModel::iterator::operator*() const {
+const rv_loc& SubstitutionModel::iterator::operator*() const {
   return(*location);
 }
 

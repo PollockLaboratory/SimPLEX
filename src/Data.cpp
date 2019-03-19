@@ -21,7 +21,7 @@ Data::~Data() {
 }
 
 void Data::Initialize(const States* states) {
-  files.add_file("sequences_in", env.get("sequences_file"), IOtype::INPUT);
+  files.add_file("sequences_in", env.get<std::string>("DATA.sequences_file"), IOtype::INPUT);
   ifstream sequences_in = files.get_ifstream("sequences_in");
 
   if(env.ancestral_sequences == false) {
@@ -133,7 +133,7 @@ SequenceAlignment* Data::ReadSequences(list<string> fasta_lines, const States* s
 // Trees
 
 IO::RawTreeNode* Data::ReadTree() {
-  std::string treefile = env.get("tree_file");
+  std::string treefile = env.get<std::string>("DATA.tree_file");
   files.add_file("tree_input", treefile, IOtype::INPUT);
 
   std::cout << "Reading tree from:\t" << files.get_file_path("tree_input") << std::endl;

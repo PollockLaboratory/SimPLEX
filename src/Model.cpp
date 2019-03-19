@@ -44,7 +44,6 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA, Subs
    * - the tree class - contains the tree topology as well as the sequences.
    * - the substitution model class - which contains all the rate matrices.
    */
-  u = env.u;
   substitution_model = sm;
   num_parameters = substitution_model->getNumberOfParameters();
 
@@ -105,6 +104,8 @@ double Model::CalculateLikelihood() {
   int num0subs;
   int num1subs;
 
+  double u = substitution_model->get_u();
+
   for(auto it = counts.subs_by_branch.begin(); it != counts.subs_by_branch.end(); ++it) {
     t = it->first;
     num0subs = it->second.num0subs;
@@ -135,9 +136,9 @@ double Model::updateLikelihood(){
   int C_xy;
 
   for(auto it = substitution_model->changed_vectors_begin(); it.at_end() == false; ++it) {
-    rv = (*it).first;
-    C_xy = counts.subs_by_rateVector[rv][(*it).second];
-    delta_logL += C_xy * log(rv->get_rate_ratio((*it).second)); // Should be ratio;
+    rv = (*it).rv;
+    C_xy = counts.subs_by_rateVector[rv][(*it).pos];
+    delta_logL += C_xy * log(rv->get_rate_ratio((*it).pos)); // Should be ratio;
   }
 
   logL += delta_logL;

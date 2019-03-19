@@ -4,6 +4,7 @@ Simplex is a tool for phylogenetic analysis, focussing on fitting complex substi
 It takes the input of a rooted tree, sequences for the node tips and a substitution model, and returns the posterior distribution of the parameters inside that substitution model.
 
 ## Installation
+simPLEX has a number of external dependancies that can sometimes to be challenging to link/compile into the final binary. These include lua5.2 and the C++ boost library.
 
 	$ cd build/
 
@@ -23,7 +24,8 @@ When configuring simPLEX there are 3 main core input files.
 * **debug** - bool - when true(1) will print extra error messages. This is not really that widely used at the moment.
 * **max_segment_length**- float - the maximum length of a branch segment. The branch splitting algorithm will split branches til all segments are below this length.
 * **branch_split_algorithm** - int - options: 0 for no branch splitting (not reccommended), 1 for split in half til under max_segment_length.
-* **uniformization_constant** - float - the uniformatization constant, must be between 0 and 1.
+* **threshold** - the smallest size that a virtual substitution rate can be - related to the uniformization constant.
+* **step_size** - the maximum size step the uniformization constant can be.
 * **ancestral_sequences** - bool - if the ancestral sequences have already been calculated. TRUE(1) if they have, OFF(0) if they have not.
 * **substitution_model_type** - int - select the substitution model type.
 * **custom_model** - file path - location of the lua file of the custom model, will only be read if custom_model is selected through substitution_model_type.
@@ -58,9 +60,9 @@ This is where most of the configuration is done. The model is constructed as a s
 * **Fixed Float**
 * **Rate Vector**
 
-# Structure of the program
+# Implimentation details of simPLEX
 
-Here is a description of the implimentation of the program. The main intent of this section is to assist anyone who might be interested in editing the code, it is not neccesary for a end user to know this infomation.
+This sections intent is to assist anyone who might be interested in editing the code, it is not neccesary for a end user to know this infomation. It is also for me to keep track of all the quirks of each of the more important classes, and remind me exactly what each class was intended for.
 
 ## Tree
 The tree structure has two type of nodemplimented as two separate classes:
@@ -71,3 +73,21 @@ The tree structure has two type of nodemplimented as two separate classes:
   * Link Internal Node - Only LEFT and UP are connected.
   * Root - Only the LEFT and RIGHT pointers are connected.
 * BranchSegements - These have the lengths, substitutions and pointers to the ratevector that apply. They also have pointers to the ancestral and decendant nodes.
+
+## Substitution Model
+The substitution model specifies the pattern of substitutions across the tree. At ts simplest the substitution model manages the set of rate parameters. The rate parameters are sorted into two sets of containers:
+
+* Rate Vectors - these are attached to each position and branch on the tree and specifiy the pattern of substitutions. Not all parameters will be in a rate vector, as some parameters act as hyper parameters.
+* List - All parameters are collected into a single list. During sampling this list will be iterated through and each parameter sampled separately.
+
+## Parameter classes
+Parameters classes represent any aspect of the subtitution model that is sampled during MCMC or is unique to a particular substitution model. There are 3 Abstract Base classes that define the types of parameter:
+
+* AbstractComponent - the base of all parameter classes. It can change if parameters it is dependent upon change, however it cannot itself be sampled. An example of this class is the rate categories parameter.
+* AbstractValue - This class represents a value, but cannot itself be sampled. An example of this is the VirtualSubstitutionRate. Its value will change as other parameters are sampled.
+* SampleableValue - same as the AbstractValue, however this class can also be sampled.
+
+Important members of the above classes includes:
+
+* dependent_values - std::list<AbstractComponent*> - list of pointers to all the other parameters a parameter is dependent upon.
+* sample() - bool - the sample function for a parameter. If return TRUE will run metropolis hasting algorithm if FALSE then automatically accept.

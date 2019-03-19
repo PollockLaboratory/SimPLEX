@@ -53,7 +53,7 @@ inline void BranchSegment::update_rate_vectors() {
 }
 
 void BranchSegment::set_new_substitutions() {
-  float u = env.u;
+  double u = decendant->SM->get_u();
   for(auto it = substitutions.begin(); it != substitutions.end(); ++it) {
     if(Random() < u) {
       *it = true;
@@ -186,7 +186,7 @@ void branchLikelihood(double &l, int anc, int dec, float t_b, SubstitutionModel*
    * Calculates the likelihood of a branch, and adds it to the vector l.
    */
   // Doesn't take into account virtual substitutions.
-  float u = env.u;
+  double u = SM->get_u();
   if(anc == dec) {
     l *= 1.0/(1.0 + t_b *u);
   } else {

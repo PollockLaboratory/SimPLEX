@@ -38,10 +38,10 @@ void MCMC::initialize(Model* model) {
   this->model = model; // associate the pointer with the MCMC
 
   // Env settings.
-  out_freq = env.get_int("output_frequency");
-  print_freq = env.get_int("print_frequency");
-  gens = env.get_int("generations");
-  tree_sample_freq = env.get_int("tree_sample_frequency");
+  out_freq = env.get<int>("MCMC.output_frequency");
+  print_freq = env.get<int>("MCMC.print_frequency");
+  gens = env.get<int>("MCMC.generations");
+  tree_sample_freq = env.get<int>("MCMC.tree_sample_frequency");
 
   //Calculate initial likelihood.
   lnL = model->CalculateLikelihood();
@@ -49,11 +49,11 @@ void MCMC::initialize(Model* model) {
   RecordState();
 
   //Initialize output file.
-  files.add_file("likelihoods", env.get("likelihood_out_file"), IOtype::OUTPUT);
+  files.add_file("likelihoods", env.get<std::string>("OUTPUT.likelihood_out_file"), IOtype::OUTPUT);
   lnlout = files.get_ofstream("likelihoods");
   lnlout << "I,GEN,LogL" << std::endl;
 
-  files.add_file("time", env.get("time_out_file"), IOtype::OUTPUT);
+  files.add_file("time", env.get<std::string>("OUTPUT.time_out_file"), IOtype::OUTPUT);
   time_out = files.get_ofstream("time");
 
   model->printParameters();
@@ -73,7 +73,7 @@ void MCMC::sample() {
     newLnL = model->updateLikelihood();
     if(sampleType) {
       //Metropolis-Hasting method.
-      if (log(Random()) < (newLnL - lnL)) {
+      if (log(Random()) <= (newLnL - lnL)) {
 	lnL = newLnL;
 	model->accept();
       } else {
@@ -82,6 +82,7 @@ void MCMC::sample() {
     } else {
       // No Metropolis Hastings needed - Gibbs sampling.
       lnL = newLnL;
+      model->accept();
     }
   }
   i++;

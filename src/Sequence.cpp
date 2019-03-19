@@ -65,7 +65,7 @@ void SequenceAlignment::Initialize(std::list<SequenceAlignment*>* msa_List) {
   // current_MSA = MSA_list->begin();
 
   // Setup output.
-  files.add_file("sequences", env.get("sequences_out_file"), IOtype::OUTPUT);
+  files.add_file("sequences", env.get<std::string>("OUTPUT.sequences_out_file"), IOtype::OUTPUT);
   sequences_out = files.get_ofstream("sequences");
 
   // Setup Environment.

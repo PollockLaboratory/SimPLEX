@@ -3,6 +3,7 @@
 
 #include "IO.h"
 #include "Environment.h"
+#include "cpptoml/cpptoml.h"
 
 #include <iostream>
 #include <string.h>
@@ -26,7 +27,7 @@ IO::Files::Files() {
 }
 
 void IO::Files::setupOutputDirectory() {
-  outdir = env.get("output_directory");
+  outdir = env.get<std::string>("OUTPUT.output_directory");
   ConfigureOutputDirectory();
 }
 
@@ -38,7 +39,7 @@ void IO::Files::set_options_file(char* argv[]) {
 
 void IO::Files::initialize() {
   add_file("default", defaultfile, IOtype::INPUT);
-  add_file("options", optionsfile, IOtype::INPUT);
+  add_file("options", optionsfile, IOtype::INPUT); 
 }
 
 void IO::Files::add_file(std::string name, std::string path, IOtype t) {

@@ -25,6 +25,7 @@ class CustomModel: public SubstitutionModel {
 
   void set_name(std::string);
   void set_states(sol::table);
+
  private:
   std::string name;
 };

@@ -41,7 +41,6 @@ void CustomModel::set_states(sol::table tbl) {
 }
 
 RateVector* lua_RateVector_cstr(std::string name, int state, sol::table tbl) {
-
   std::vector<AbstractValue*> rates = {};
   for(auto kvp : tbl) {
     const sol::object& val = kvp.second;
@@ -57,7 +56,7 @@ RateVector* lua_RateVector_cstr(std::string name, int state, sol::table tbl) {
     }
   }
   // State decreased by one to reflect differance in indexing between lua and C++.
-  return(new RateVector(name, state - 1, rates));
+  return(new RateVector(name, state, rates));
 }
 
 CategoryFloat* lua_CategoryFloat_cstr(std::string name, sol::table tbl) {
@@ -85,8 +84,6 @@ void CustomModel::Initialize(int number_of_sites, std::vector<std::string> state
 }
 
 void CustomModel::Initialize() {
-  // float u = env.u;
-
   sol::state lua;
   lua.open_libraries(sol::lib::base);
 
@@ -104,8 +101,8 @@ void CustomModel::Initialize() {
   // Defining Usertypes - differant parameter types.
   lua.new_usertype<VirtualSubstitutionRate>("VirtualSubstitutionRate",
 					    sol::base_classes, sol::bases<AbstractValue>(),
-					    "new", [](std::string name) -> VirtualSubstitutionRate* {
-					      return(new VirtualSubstitutionRate(name, env.u));},
+					    "new", [this](std::string name) -> VirtualSubstitutionRate* {
+					      return(new VirtualSubstitutionRate(name, u));},
 					    "add_rate", &VirtualSubstitutionRate::add_rate);
 
   lua.new_usertype<ContinuousFloat>("ContinuousFloat",
@@ -124,11 +121,14 @@ void CustomModel::Initialize() {
 			       "new", [](std::string name, double value) -> FixedFloat* { return(new FixedFloat(name, value)); });
 
   lua.new_usertype<RateVector>("RateVector",
-			       "new", &lua_RateVector_cstr);
+			       "new", [this](std::string name, std::string str_state, sol::table tbl) -> RateVector* {
+				 int state = this->states.state_to_int[str_state];
+				 return(lua_RateVector_cstr(name, state, tbl));});
 
   // Read the Lua file.
-  files.add_file("lua_model", env.get("custom_model"), IOtype::INPUT);
-  std::cout << "Custom model.\n== Reading from file: " << env.get("custom_model") << " ==" << std::endl;
+  std::string name = env.get<std::string>("DATA.substitution_model_file");
+  files.add_file("lua_model", name, IOtype::INPUT);
+  std::cout << "Custom model.\n== Reading from file: " << name << " ==" << std::endl;
 
   std::ifstream lua_file = files.get_ifstream("lua_model");
 

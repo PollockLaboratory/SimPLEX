@@ -26,7 +26,7 @@ void ComponentSet::Initialize() {
     refreshDependancies(*p);
   }
 
-  files.add_file("parameters", env.get("parameters_out_file"), IOtype::OUTPUT);
+  files.add_file("parameters", env.get<std::string>("OUTPUT.parameters_out_file"), IOtype::OUTPUT);
   out_file = files.get_ofstream("parameters");
 
   out_file << "I,GEN,LogL";
@@ -92,12 +92,6 @@ bool ComponentSet::sample() {
    * Sample the current parameters.
    */
 
-  // If no samplable parameters.
-  if(samplable_parameters_list.empty()) {
-    // Returning false will skip Metropolis Hastings step.
-    return(false);
-  }
-
   bool sampleType = (*current_parameter)->sample();
 
   try {
@@ -110,11 +104,10 @@ bool ComponentSet::sample() {
     (*current_parameter)->undo();
     refreshDependancies(*current_parameter);
 
-    // Test here.
     stepToNextParameter();
     sampleType = sample();
   }
-  
+
   return (sampleType);
 }
 
@@ -174,6 +167,30 @@ void ComponentSet::print() {
   std::cout << "Parameter Set - size: " << all_parameters_list.size() << std::endl;
   for(auto iter = all_parameters_list.begin(); iter != all_parameters_list.end(); ++iter) {
     (*iter)->print();
+  }
+}
+
+void ComponentSet::print_dependencies() {
+  std::cout << "Printing Dependencies." << std::endl;
+  for(auto it = value_to_dependents.begin(); it != value_to_dependents.end(); ++it) {
+    std::cout << (*it).first->get_name() << " [ ";
+    for(auto jt = (*it).second.begin(); jt != (*it).second.end(); ++jt) {
+      std::cout << (*jt)->get_name() << " ";
+    }
+    std::cout << "]" << std::endl;
+  }
+
+  std::cout << "SampleableParameters: " << std::endl;
+  for(auto it = samplable_parameters_list.begin(); it != samplable_parameters_list.end(); ++it) {
+    std::cout << (*it)->get_name() << " ";
+  }
+  std::cout << std::endl;
+}
+
+void ComponentSet::refresh_dependencies() {
+  for(auto p = all_parameters_list.begin(); p != all_parameters_list.end(); ++p) {
+    (*p)->refresh(); // This will need some exception handeling - Virtual Sub Rate OutOfBounds etc.
+    refreshDependancies(*p);
   }
 }
 

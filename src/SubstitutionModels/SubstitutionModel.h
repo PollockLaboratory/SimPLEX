@@ -42,9 +42,12 @@ class SubstitutionModel {
   SubstitutionModel::iterator changed_vectors_begin();
 
   // Parameters.
+  UniformizationConstant* u;
+  const double& get_u();
+
   void printParameters();
   int getNumberOfParameters();
-  void get_current_parameters(std::list<std::pair<RateVector*, int>>&);
+  void get_current_parameters(std::list<rv_loc>&); // I think this is redundant now.
 
   // Sample.
   bool SampleParameters();
@@ -62,9 +65,9 @@ class SubstitutionModel {
   RateVectorSet rateVectors;
 
   class iterator:public std::iterator<std::output_iterator_tag, std::pair<RateVector*, int>> {
-   public:
+  public:
     explicit iterator(SubstitutionModel&, bool);
-    const std::pair<RateVector*, int>& operator*() const;
+    const rv_loc& operator*() const;
     iterator& operator++();
     bool operator!=(const iterator &) const;
     bool at_end() const;
@@ -75,8 +78,8 @@ class SubstitutionModel {
     bool endQ;
     std::list<AbstractComponent*> changed_comps; // List of the components that have changes with recent sampling.
     std::queue<AbstractComponent*> cq;
-    std::list<std::pair<RateVector*, int>>::iterator location; // The location within a rate vector that has changed.
-    std::list<std::pair<RateVector*, int>>::iterator location_iter_end;
+    std::list<rv_loc>::iterator location; // The location within a rate vector that has changed.
+    std::list<rv_loc>::iterator location_iter_end;
   };
 };
 

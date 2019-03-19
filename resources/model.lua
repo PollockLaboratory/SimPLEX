@@ -25,6 +25,6 @@ for i = 1, 20 do
       end
    end
 
-   model.add_rate_vector(RateVector.new("RV-"..states.to_str(i), i, Q[i]))
+   model.add_rate_vector(RateVector.new("RV-"..states.to_str(i), states.to_str(i), Q[i]))
 
 end
