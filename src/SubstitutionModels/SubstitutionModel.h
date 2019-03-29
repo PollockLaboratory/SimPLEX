@@ -14,20 +14,23 @@
 #include "Components/AbstractComponent.h"
 #include "Components/ComponentSet.h"
 #include "Components/RateVector.h"
+#include "SubstitutionModelParser.h"
 
-struct States {
-  int n;
-  std::set<std::string> possible;
-  std::map<std::string, int> state_to_int;
-  std::map<int, std::string> int_to_state;
-};
+// Temparily defined in Component set before it fidns a better home.
+//struct States {
+// int n;
+// std::set<std::string> possible;
+// std::map<std::string, int> state_to_int;
+// std::map<int, std::string> int_to_state;
+//};
 
 class SubstitutionModel {
   class iterator;
  public:
   SubstitutionModel();
-  virtual void Initialize() = 0;
-  virtual void Initialize(int number_of_sites, std::vector<std::string> states) = 0;
+  //virtual void Initialize() = 0;
+  //virtual void Initialize(int number_of_sites, std::vector<std::string> states) = 0;
+  void from_raw_model(IO::raw_substitution_model*);
 
   // States.
   States states;
@@ -56,7 +59,6 @@ class SubstitutionModel {
 
   void saveToFile(int gen, double l);
   virtual void Terminate();
- protected:
   void finalize();
  private:
   std::ofstream* substitution_model_out;

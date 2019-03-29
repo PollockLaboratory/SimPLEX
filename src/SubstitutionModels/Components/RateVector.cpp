@@ -23,6 +23,7 @@ RateVector::RateVector(std::string name, int state, std::vector<AbstractValue*> 
 }
 
 float RateVector::operator[](int i) {
+  
   return(rates[i]->getValue());
 }
 

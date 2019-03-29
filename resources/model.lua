@@ -1,30 +1,22 @@
 model.set_name("General Time Reversible")
 
-states.set({"A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"})
-states.print()
+states.set(config.get_string_array("MODEL.states"))
+
+param_template = {type = "float", initial_value = 0.01}
 
 Q = {}
 
-for i = 1, 20 do
+for i = 1, states.count do
    Q[i] = {}
-   for j = 1, 20 do
-      if i == j then
-	 Q[i][j] = VirtualSubstitutionRate.new(states.to_str(i) .. states.to_str(j))
-      elseif i < j then
-	 Q[i][j] = ContinuousFloat.new(states.to_str(i) .. states.to_str(j), 0.01, 0.001, 0.0)
-	 -- Q[i][j] = CategoryFloat.new(states.to_str(i) .. states.to_str(j), {0.01, 0.02, 0.03, 0.04})
-	 -- Q[i][j] = FixedFloat.new(states.to_str(i) .. states.to_str(j), 0.01)
+   for j = 1, states.count do
+      --print(i, j, states[i], states[j])
+      if i <= j then
+	 Q[i][j] = Parameter.new(states[i]..states[j], param_template)
       else
 	 Q[i][j] = Q[j][i]
       end
    end
 
-   for j = 1, 20 do
-      if i ~= j then
-	 Q[i][i]:add_rate(Q[i][j])
-      end
-   end
-
-   model.add_rate_vector(RateVector.new("RV-"..states.to_str(i), states.to_str(i), Q[i]))
+   model.add_rate_vector(RateVector.new("RV-"..states[i], {state = states[i]}, Q[i]))
 
 end

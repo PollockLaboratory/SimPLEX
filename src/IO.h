@@ -7,7 +7,7 @@
 
 enum class IOtype {
   INPUT,
-    OUTPUT
+  OUTPUT
 };
 
 struct fileInfo {

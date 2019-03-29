@@ -6,7 +6,7 @@
 
 double inf = std::numeric_limits<double>::infinity();
 
-ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, double initial_std_dev = 1.0) : SampleableValue(name), value(initial_value), std_dev(initial_std_dev) {
+ContinuousFloat::ContinuousFloat(std::string name, int id, double initial_value = 0.0, double initial_std_dev = 1.0) : SampleableValue(name, id), value(initial_value), std_dev(initial_std_dev) {
   /*
    * The default constructor for the Continuous Float parameter class.
    */
@@ -16,7 +16,7 @@ ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, d
   previous_value = initial_value;
 }
 
-ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, double initial_std_dev = 1.0, double lower_bound = -inf) : SampleableValue(name), value(initial_value), std_dev(initial_std_dev), lower_bound(lower_bound) {
+ContinuousFloat::ContinuousFloat(std::string name, int id, double initial_value = 0.0, double initial_std_dev = 1.0, double lower_bound = -inf) : SampleableValue(name, id), value(initial_value), std_dev(initial_std_dev), lower_bound(lower_bound) {
   /*
    * The default constructor for the Continuous Float parameter class - with bounds
    */
@@ -25,7 +25,7 @@ ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, d
   previous_value = initial_value;
 }
 
-ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, double initial_std_dev = 1.0, double lower_bound = -inf, double upper_bound = inf) : SampleableValue(name), value(initial_value), std_dev(initial_std_dev), lower_bound(lower_bound), upper_bound(upper_bound) {
+ContinuousFloat::ContinuousFloat(std::string name, int id, double initial_value = 0.0, double initial_std_dev = 1.0, double lower_bound = -inf, double upper_bound = inf) : SampleableValue(name, id), value(initial_value), std_dev(initial_std_dev), lower_bound(lower_bound), upper_bound(upper_bound) {
   /*
    * The default constructor for the Continuous Float parameter class - with bounds
    */
@@ -86,7 +86,7 @@ std::ostream& operator<<(std::ostream& os, const ContinuousFloat& cf) {
 
 // CATEGORY FLOAT
 
-CategoryFloat::CategoryFloat(std::string name, RateCategories* categories) : SampleableValue(name) {
+CategoryFloat::CategoryFloat(std::string name, int id, RateCategories* categories) : SampleableValue(name, id) {
   /*
    * The default constructor for the Continuous Float parameter class.
    */

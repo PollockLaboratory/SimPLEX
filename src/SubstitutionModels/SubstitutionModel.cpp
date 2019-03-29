@@ -15,10 +15,28 @@ SubstitutionModel::SubstitutionModel() {
 }
 
 void SubstitutionModel::add_state(std::string s) {
+  // Check if state is gap.
   states.possible.insert(s);
   states.state_to_int[s] = states.n;
   states.int_to_state[states.n] = s;
   states.n++;
+}
+
+void SubstitutionModel::from_raw_model(IO::raw_substitution_model* raw_sm) {
+  std::cout << "Making sub model." << std::endl;
+  for(auto it = raw_sm->states.begin(); it != raw_sm->states.end(); ++it) {
+	add_state(*it);
+	std::cout << *it;
+  }
+
+  std::cout << std::endl;
+  std::list<IO::raw_param> params = raw_sm->get_parameters();
+  std::cout << params.size() << std::endl;
+  components.create_parameters(params);
+  for(auto it = raw_sm->rv_list.begin(); it != raw_sm->rv_list.end(); ++it) {
+    RateVector* rv = components.create_rate_vector(states, *it, u);
+    rateVectors.add(rv);
+  }
 }
 
 void SubstitutionModel::print_states() {

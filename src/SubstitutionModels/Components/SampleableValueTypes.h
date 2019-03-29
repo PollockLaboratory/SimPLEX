@@ -11,9 +11,9 @@
 
 class ContinuousFloat : public SampleableValue {
  public:
-  ContinuousFloat(std::string, double, double);
-  ContinuousFloat(std::string, double, double, double);
-  ContinuousFloat(std::string, double, double, double, double);
+  ContinuousFloat(std::string, int, double, double);
+  ContinuousFloat(std::string, int, double, double, double);
+  ContinuousFloat(std::string, int, double, double, double, double);
 
   virtual void print();
   virtual bool sample();
@@ -38,7 +38,7 @@ class ContinuousFloat : public SampleableValue {
 
 class CategoryFloat : public SampleableValue {
  public:
-  CategoryFloat(std::string, RateCategories*);
+  CategoryFloat(std::string, int id, RateCategories*);
   virtual void print();
   virtual bool sample();
 

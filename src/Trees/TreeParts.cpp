@@ -135,10 +135,11 @@ void TreeNode::sample_sequence() {
 	  (*sequence)[pos] = sample_single_position(pos);
 	} else {
 	  int left_dec = left->decendant->sequence->at(pos);
-	  if(left_dec and right->decendant->sequence->at(pos)) {
+	  if(left_dec == right->decendant->sequence->at(pos)) {
 	    (*sequence)[pos] = left_dec;
 	  } else {
 	    (*sequence)[pos] = sample_single_position(pos);
+	    // One of the substitutions vectors need to be updated.
 	  }
 	}
       }

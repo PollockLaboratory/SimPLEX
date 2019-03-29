@@ -17,11 +17,8 @@
 #include "MCMC.h"
 #include "utils.h"
 
-#include "SubstitutionModels/SubstitutionModelTypes.h"
+#include "SubstitutionModels/SubstitutionModelParser.h"
 #include "SubstitutionModels/SubstitutionModel.h"
-
-#include <boost/random/uniform_01.hpp>
-#include <boost/random/mersenne_twister.hpp>
 
 #include "sol2/sol.hpp"
 
@@ -36,9 +33,6 @@ Environment env;
 IO::Files files;
 
 double Random() {
-  //boost::mt19937 rng(time(NULL));
-  //static boost::random::uniform_01<boost::mt19937> dist(rng);
-  //return(dist());
   return (std::rand() % 10000) / 10000.0;
 }
 
@@ -55,8 +49,10 @@ int main(int argc, char* argv[]) {
   files.setupOutputDirectory();
 
   // Initiating program.
-  SubstitutionModel* sm = GetSubstitutionModel();
-  sm->Initialize();
+  IO::raw_substitution_model* raw_sm = IO::read_substitution_model(env.get<std::string>("DATA.substitution_model_file"));
+  SubstitutionModel* sm = new SubstitutionModel();
+  sm->from_raw_model(raw_sm);
+  sm->finalize();
   
   Data data;
   data.Initialize(sm->get_states());

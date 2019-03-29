@@ -19,7 +19,7 @@ struct rv_loc {
 
 class AbstractComponent {
  public:
-  AbstractComponent(std::string name);
+  AbstractComponent(std::string name, int id);
 
   void add_dependancy(AbstractComponent*);
   const std::list<AbstractComponent*>& get_dependancies();
@@ -30,15 +30,15 @@ class AbstractComponent {
   virtual void refresh() = 0;
   virtual void print() = 0;
   std::list<rv_loc> host_vectors; // Abstract components do not use this but it is here to avoid dynamic_casting. Pointers to the host RateVectors that a parameter sits within.
- protected:
   int ID;
   std::string name;
+ protected:
   std::list<AbstractComponent*> dependent_values;
 };
 
 class AbstractValue : public AbstractComponent {
  public:
-  AbstractValue(std::string name);
+  AbstractValue(std::string name, int id);
   virtual const double& getValue() = 0;
   virtual const double& getOldValue() = 0;
 
@@ -48,7 +48,7 @@ class AbstractValue : public AbstractComponent {
 
 class SampleableValue : public AbstractValue {
  public:
-  SampleableValue(std::string parameter_name) : AbstractValue(parameter_name) { fixedQ = true; }
+  SampleableValue(std::string parameter_name, int id) : AbstractValue(parameter_name, id) { fixedQ = true; }
 
   virtual bool sample() = 0; // If return true Metropolis Hasting Sample, else Gibbs.
   virtual void undo() = 0;

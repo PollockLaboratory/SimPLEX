@@ -321,9 +321,33 @@ src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelTypes.cpp.o.provi
 src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelTypes.cpp.o.provides.build: src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelTypes.cpp.o
 
 
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.o: src/CMakeFiles/simPLEX.dir/flags.make
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.o: src/SubstitutionModels/SubstitutionModelParser.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.o"
+	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.o -c /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/SubstitutionModelParser.cpp
+
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.i"
+	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/SubstitutionModelParser.cpp > CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.i
+
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.s"
+	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/SubstitutionModelParser.cpp -o CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.s
+
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.o.requires:
+
+.PHONY : src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.o.requires
+
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.o.provides: src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.o.requires
+	$(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.o.provides.build
+.PHONY : src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.o.provides
+
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.o.provides.build: src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.o
+
+
 src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractComponent.cpp.o: src/CMakeFiles/simPLEX.dir/flags.make
 src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractComponent.cpp.o: src/SubstitutionModels/Components/AbstractComponent.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractComponent.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractComponent.cpp.o"
 	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractComponent.cpp.o -c /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Components/AbstractComponent.cpp
 
 src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractComponent.cpp.i: cmake_force
@@ -347,7 +371,7 @@ src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractComponent.cpp.o
 
 src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentSet.cpp.o: src/CMakeFiles/simPLEX.dir/flags.make
 src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentSet.cpp.o: src/SubstitutionModels/Components/ComponentSet.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentSet.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentSet.cpp.o"
 	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentSet.cpp.o -c /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Components/ComponentSet.cpp
 
 src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentSet.cpp.i: cmake_force
@@ -371,7 +395,7 @@ src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentSet.cpp.o.prov
 
 src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentTypes.cpp.o: src/CMakeFiles/simPLEX.dir/flags.make
 src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentTypes.cpp.o: src/SubstitutionModels/Components/ComponentTypes.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentTypes.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentTypes.cpp.o"
 	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentTypes.cpp.o -c /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Components/ComponentTypes.cpp
 
 src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentTypes.cpp.i: cmake_force
@@ -395,7 +419,7 @@ src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentTypes.cpp.o.pr
 
 src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/RateVector.cpp.o: src/CMakeFiles/simPLEX.dir/flags.make
 src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/RateVector.cpp.o: src/SubstitutionModels/Components/RateVector.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/RateVector.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/RateVector.cpp.o"
 	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simPLEX.dir/SubstitutionModels/Components/RateVector.cpp.o -c /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Components/RateVector.cpp
 
 src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/RateVector.cpp.i: cmake_force
@@ -417,105 +441,57 @@ src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/RateVector.cpp.o.provid
 src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/RateVector.cpp.o.provides.build: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/RateVector.cpp.o
 
 
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o: src/CMakeFiles/simPLEX.dir/flags.make
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o: src/SubstitutionModels/Components/Types/AbstractValueTypes.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o"
-	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o -c /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Components/Types/AbstractValueTypes.cpp
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.o: src/CMakeFiles/simPLEX.dir/flags.make
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.o: src/SubstitutionModels/Components/AbstractValueTypes.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.o"
+	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.o -c /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Components/AbstractValueTypes.cpp
 
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.i"
-	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Components/Types/AbstractValueTypes.cpp > CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.i
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.i"
+	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Components/AbstractValueTypes.cpp > CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.i
 
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.s"
-	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Components/Types/AbstractValueTypes.cpp -o CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.s
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.s"
+	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Components/AbstractValueTypes.cpp -o CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.s
 
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o.requires:
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.o.requires:
 
-.PHONY : src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o.requires
+.PHONY : src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.o.requires
 
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o.provides: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o.requires
-	$(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o.provides.build
-.PHONY : src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o.provides
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.o.provides: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.o.requires
+	$(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.o.provides.build
+.PHONY : src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.o.provides
 
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o.provides.build: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o
-
-
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o: src/CMakeFiles/simPLEX.dir/flags.make
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o: src/SubstitutionModels/Components/Types/SampleableValueTypes.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o"
-	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o -c /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Components/Types/SampleableValueTypes.cpp
-
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.i"
-	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Components/Types/SampleableValueTypes.cpp > CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.i
-
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.s"
-	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Components/Types/SampleableValueTypes.cpp -o CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.s
-
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o.requires:
-
-.PHONY : src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o.requires
-
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o.provides: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o.requires
-	$(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o.provides.build
-.PHONY : src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o.provides
-
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o.provides.build: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.o.provides.build: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.o
 
 
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.o: src/CMakeFiles/simPLEX.dir/flags.make
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.o: src/SubstitutionModels/Types/CategoryGTR.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.o"
-	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.o -c /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Types/CategoryGTR.cpp
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.o: src/CMakeFiles/simPLEX.dir/flags.make
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.o: src/SubstitutionModels/Components/SampleableValueTypes.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.o"
+	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.o -c /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Components/SampleableValueTypes.cpp
 
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.i"
-	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Types/CategoryGTR.cpp > CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.i
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.i"
+	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Components/SampleableValueTypes.cpp > CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.i
 
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.s"
-	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Types/CategoryGTR.cpp -o CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.s
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.s"
+	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Components/SampleableValueTypes.cpp -o CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.s
 
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.o.requires:
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.o.requires:
 
-.PHONY : src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.o.requires
+.PHONY : src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.o.requires
 
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.o.provides: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.o.requires
-	$(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.o.provides.build
-.PHONY : src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.o.provides
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.o.provides: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.o.requires
+	$(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.o.provides.build
+.PHONY : src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.o.provides
 
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.o.provides.build: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.o
-
-
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.o: src/CMakeFiles/simPLEX.dir/flags.make
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.o: src/SubstitutionModels/Types/FixedRate.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.o"
-	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.o -c /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Types/FixedRate.cpp
-
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.i"
-	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Types/FixedRate.cpp > CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.i
-
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.s"
-	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Types/FixedRate.cpp -o CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.s
-
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.o.requires:
-
-.PHONY : src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.o.requires
-
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.o.provides: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.o.requires
-	$(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.o.provides.build
-.PHONY : src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.o.provides
-
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.o.provides.build: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.o
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.o.provides.build: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.o
 
 
 src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/GeneralTimeReversible.cpp.o: src/CMakeFiles/simPLEX.dir/flags.make
 src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/GeneralTimeReversible.cpp.o: src/SubstitutionModels/Types/GeneralTimeReversible.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/GeneralTimeReversible.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/GeneralTimeReversible.cpp.o"
 	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simPLEX.dir/SubstitutionModels/Types/GeneralTimeReversible.cpp.o -c /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Types/GeneralTimeReversible.cpp
 
 src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/GeneralTimeReversible.cpp.i: cmake_force
@@ -537,33 +513,33 @@ src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/GeneralTimeReversible.cpp.o.
 src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/GeneralTimeReversible.cpp.o.provides.build: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/GeneralTimeReversible.cpp.o
 
 
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.o: src/CMakeFiles/simPLEX.dir/flags.make
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.o: src/SubstitutionModels/Types/SingleRate.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.o"
-	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.o -c /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Types/SingleRate.cpp
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.o: src/CMakeFiles/simPLEX.dir/flags.make
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.o: src/SubstitutionModels/Types/CustomModel.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.o"
+	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.o -c /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Types/CustomModel.cpp
 
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.i"
-	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Types/SingleRate.cpp > CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.i
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.i"
+	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Types/CustomModel.cpp > CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.i
 
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.s"
-	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Types/SingleRate.cpp -o CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.s
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.s"
+	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hamish/Documents/Code/simplex0_0/src/SubstitutionModels/Types/CustomModel.cpp -o CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.s
 
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.o.requires:
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.o.requires:
 
-.PHONY : src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.o.requires
+.PHONY : src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.o.requires
 
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.o.provides: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.o.requires
-	$(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.o.provides.build
-.PHONY : src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.o.provides
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.o.provides: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.o.requires
+	$(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.o.provides.build
+.PHONY : src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.o.provides
 
-src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.o.provides.build: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.o
+src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.o.provides.build: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.o
 
 
 src/CMakeFiles/simPLEX.dir/Trees/Tree.cpp.o: src/CMakeFiles/simPLEX.dir/flags.make
 src/CMakeFiles/simPLEX.dir/Trees/Tree.cpp.o: src/Trees/Tree.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object src/CMakeFiles/simPLEX.dir/Trees/Tree.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object src/CMakeFiles/simPLEX.dir/Trees/Tree.cpp.o"
 	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simPLEX.dir/Trees/Tree.cpp.o -c /home/hamish/Documents/Code/simplex0_0/src/Trees/Tree.cpp
 
 src/CMakeFiles/simPLEX.dir/Trees/Tree.cpp.i: cmake_force
@@ -587,7 +563,7 @@ src/CMakeFiles/simPLEX.dir/Trees/Tree.cpp.o.provides.build: src/CMakeFiles/simPL
 
 src/CMakeFiles/simPLEX.dir/Trees/TreeParts.cpp.o: src/CMakeFiles/simPLEX.dir/flags.make
 src/CMakeFiles/simPLEX.dir/Trees/TreeParts.cpp.o: src/Trees/TreeParts.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object src/CMakeFiles/simPLEX.dir/Trees/TreeParts.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object src/CMakeFiles/simPLEX.dir/Trees/TreeParts.cpp.o"
 	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simPLEX.dir/Trees/TreeParts.cpp.o -c /home/hamish/Documents/Code/simplex0_0/src/Trees/TreeParts.cpp
 
 src/CMakeFiles/simPLEX.dir/Trees/TreeParts.cpp.i: cmake_force
@@ -611,7 +587,7 @@ src/CMakeFiles/simPLEX.dir/Trees/TreeParts.cpp.o.provides.build: src/CMakeFiles/
 
 src/CMakeFiles/simPLEX.dir/Trees/BranchSplitting.cpp.o: src/CMakeFiles/simPLEX.dir/flags.make
 src/CMakeFiles/simPLEX.dir/Trees/BranchSplitting.cpp.o: src/Trees/BranchSplitting.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object src/CMakeFiles/simPLEX.dir/Trees/BranchSplitting.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object src/CMakeFiles/simPLEX.dir/Trees/BranchSplitting.cpp.o"
 	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simPLEX.dir/Trees/BranchSplitting.cpp.o -c /home/hamish/Documents/Code/simplex0_0/src/Trees/BranchSplitting.cpp
 
 src/CMakeFiles/simPLEX.dir/Trees/BranchSplitting.cpp.i: cmake_force
@@ -635,7 +611,7 @@ src/CMakeFiles/simPLEX.dir/Trees/BranchSplitting.cpp.o.provides.build: src/CMake
 
 src/CMakeFiles/simPLEX.dir/Trees/TreeParser.cpp.o: src/CMakeFiles/simPLEX.dir/flags.make
 src/CMakeFiles/simPLEX.dir/Trees/TreeParser.cpp.o: src/Trees/TreeParser.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object src/CMakeFiles/simPLEX.dir/Trees/TreeParser.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object src/CMakeFiles/simPLEX.dir/Trees/TreeParser.cpp.o"
 	cd /home/hamish/Documents/Code/simplex0_0/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simPLEX.dir/Trees/TreeParser.cpp.o -c /home/hamish/Documents/Code/simplex0_0/src/Trees/TreeParser.cpp
 
 src/CMakeFiles/simPLEX.dir/Trees/TreeParser.cpp.i: cmake_force
@@ -670,16 +646,15 @@ simPLEX_OBJECTS = \
 "CMakeFiles/simPLEX.dir/Model.cpp.o" \
 "CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModel.cpp.o" \
 "CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelTypes.cpp.o" \
+"CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.o" \
 "CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractComponent.cpp.o" \
 "CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentSet.cpp.o" \
 "CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentTypes.cpp.o" \
 "CMakeFiles/simPLEX.dir/SubstitutionModels/Components/RateVector.cpp.o" \
-"CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o" \
-"CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o" \
-"CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.o" \
-"CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.o" \
+"CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.o" \
+"CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.o" \
 "CMakeFiles/simPLEX.dir/SubstitutionModels/Types/GeneralTimeReversible.cpp.o" \
-"CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.o" \
+"CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.o" \
 "CMakeFiles/simPLEX.dir/Trees/Tree.cpp.o" \
 "CMakeFiles/simPLEX.dir/Trees/TreeParts.cpp.o" \
 "CMakeFiles/simPLEX.dir/Trees/BranchSplitting.cpp.o" \
@@ -699,23 +674,24 @@ bin/simPLEX: src/CMakeFiles/simPLEX.dir/SubstitutionCounts.cpp.o
 bin/simPLEX: src/CMakeFiles/simPLEX.dir/Model.cpp.o
 bin/simPLEX: src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModel.cpp.o
 bin/simPLEX: src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelTypes.cpp.o
+bin/simPLEX: src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.o
 bin/simPLEX: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractComponent.cpp.o
 bin/simPLEX: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentSet.cpp.o
 bin/simPLEX: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentTypes.cpp.o
 bin/simPLEX: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/RateVector.cpp.o
-bin/simPLEX: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o
-bin/simPLEX: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o
-bin/simPLEX: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.o
-bin/simPLEX: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.o
+bin/simPLEX: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.o
+bin/simPLEX: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.o
 bin/simPLEX: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/GeneralTimeReversible.cpp.o
-bin/simPLEX: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.o
+bin/simPLEX: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.o
 bin/simPLEX: src/CMakeFiles/simPLEX.dir/Trees/Tree.cpp.o
 bin/simPLEX: src/CMakeFiles/simPLEX.dir/Trees/TreeParts.cpp.o
 bin/simPLEX: src/CMakeFiles/simPLEX.dir/Trees/BranchSplitting.cpp.o
 bin/simPLEX: src/CMakeFiles/simPLEX.dir/Trees/TreeParser.cpp.o
 bin/simPLEX: src/CMakeFiles/simPLEX.dir/build.make
+bin/simPLEX: /usr/lib/i386-linux-gnu/liblua5.2.so
+bin/simPLEX: /usr/lib/i386-linux-gnu/libm.so
 bin/simPLEX: src/CMakeFiles/simPLEX.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Linking CXX executable ../bin/simPLEX"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/hamish/Documents/Code/simplex0_0/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Linking CXX executable ../bin/simPLEX"
 	cd /home/hamish/Documents/Code/simplex0_0/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/simPLEX.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -734,16 +710,15 @@ src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/SubstitutionCoun
 src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/Model.cpp.o.requires
 src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModel.cpp.o.requires
 src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelTypes.cpp.o.requires
+src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.o.requires
 src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractComponent.cpp.o.requires
 src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentSet.cpp.o.requires
 src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentTypes.cpp.o.requires
 src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/RateVector.cpp.o.requires
-src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o.requires
-src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o.requires
-src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.o.requires
-src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.o.requires
+src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.o.requires
+src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.o.requires
 src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/GeneralTimeReversible.cpp.o.requires
-src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.o.requires
+src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.o.requires
 src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/Trees/Tree.cpp.o.requires
 src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/Trees/TreeParts.cpp.o.requires
 src/CMakeFiles/simPLEX.dir/requires: src/CMakeFiles/simPLEX.dir/Trees/BranchSplitting.cpp.o.requires

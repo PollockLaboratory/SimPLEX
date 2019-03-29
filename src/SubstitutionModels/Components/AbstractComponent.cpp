@@ -8,10 +8,8 @@ extern Environment env;
 
 // ABSTRACT COMPONENT
 
-AbstractComponent::AbstractComponent(std::string name) : name(name) {
-  static int IDc = 0;
-  IDc++;
-  ID = IDc;
+AbstractComponent::AbstractComponent(std::string name, int id) : name(name) {
+  ID = id;
   host_vectors = {};
 }
 
@@ -33,7 +31,7 @@ const std::list<AbstractComponent*>& AbstractComponent::get_dependancies() {
 
 // ABSTRACT VALUES
 
-AbstractValue::AbstractValue(std::string name) : AbstractComponent(name) {
+AbstractValue::AbstractValue(std::string name, int id) : AbstractComponent(name, id) {
   host_vectors = {};
   dependent_values = {};
 }
@@ -49,7 +47,7 @@ std::list<rv_loc> AbstractValue::get_host_vectors() {
 // UniformizationConstant.
 // This is here because it is a special parameter.
 
-UniformizationConstant::UniformizationConstant() : SampleableValue("U"), value(1.0), previous_value(1.0) {
+UniformizationConstant::UniformizationConstant() : SampleableValue("U", 0), value(1.0), previous_value(1.0) {
   threshold = env.get<double>("UNIFORMIZATION.threshold");
   max_step = env.get<double>("UNIFORMIZATION.max_step");
 }

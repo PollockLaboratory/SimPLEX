@@ -39,6 +39,7 @@ void ComponentSet::Initialize() {
   out_file << std::endl;
 }
 
+// Setting up.
 void ComponentSet::add_parameter(AbstractComponent* param) {
   /* 
    * Adds the pointer to an actual parameter onto the parameter_list, and to the
@@ -46,33 +47,80 @@ void ComponentSet::add_parameter(AbstractComponent* param) {
    */
   if(value_to_dependents.find(param) == value_to_dependents.end()) {
     // Check if Parameter has already been seen.
-      SampleableValue* p = dynamic_cast<SampleableValue*> (param);
-      if(p != NULL) {
-	samplable_parameters_list.push_back(p);
+    SampleableValue* p = dynamic_cast<SampleableValue*> (param);
+    if(p != NULL) {
+      std::string name = param->get_name();
+      samplable_parameters_list.push_back(p);
+      name_to_address.insert(std::make_pair(name, p));
+    }
 
-	std::string name = p->get_name();
-	name_to_address.insert(std::make_pair(name, p));
-      }
+    value_to_dependents[param] = {};
+    all_parameters_list.push_back(param);
 
-      value_to_dependents[param] = {};
-      all_parameters_list.push_back(param);
-
-      // Add all deps
-      std::list<AbstractComponent*> deps = param->get_dependancies();
-      for(auto d = deps.begin(); d != deps.end(); ++d) {
-	add_parameter(*d);
-	value_to_dependents[*d].push_back(param);
-      }
+    // Add all deps.
+    std::list<AbstractComponent*> deps = param->get_dependancies();
+    for(auto d = deps.begin(); d != deps.end(); ++d) {
+      add_parameter(*d);
+      value_to_dependents[*d].push_back(param);
+    }
   }
 }
 
 void ComponentSet::add_rate_vector(RateVector* v) {
   std::vector<AbstractValue*> r = v->rates;
+
   for(std::vector<AbstractValue*>::iterator it = r.begin(); it != r.end(); ++it) {
     add_parameter(*it);
   }
 }
 
+AbstractValue* ComponentSet::realize_component(IO::raw_param param) {
+  AbstractValue* p;
+  if(id_to_address.find(param.ID) == id_to_address.end()) {
+    p = new ContinuousFloat(param.name, param.ID, param.init, 0.001, 0.0);
+  } else {
+    p = id_to_address[param.ID];
+  }
+  return(p);
+}
+
+void ComponentSet::create_parameters(std::list<IO::raw_param> params) {
+  // This needs to handle virtual substitutions better and dependancies.
+  for(auto it = params.begin(); it != params.end(); ++it) {
+	AbstractValue* p = realize_component(*it);
+	id_to_address.insert(std::make_pair(p->get_ID(), p));
+  }
+}
+
+RateVector* ComponentSet::create_rate_vector(States states, IO::raw_rate_vector rv, UniformizationConstant* u) {
+  std::vector<AbstractValue*> rates(states.n, nullptr);
+  int s = states.state_to_int[rv.uc.state];
+  VirtualSubstitutionRate* vir_rate = new VirtualSubstitutionRate("tmp", -1, u);
+  for(int i = 0; i < states.n; i++) {
+    IO::raw_param param = rv.rates.front();
+    if(i != s) {
+      rates[i] = id_to_address[param.ID];
+      // Add dependancies.
+      vir_rate->add_rate(id_to_address[param.ID]);
+    } else {
+      vir_rate->name = param.name;
+      vir_rate->ID = param.ID;
+      rates[i] = vir_rate;
+    }
+    rv.rates.pop_front();
+  }
+
+  if(not rv.rates.empty()) {
+    std::cerr << "Error: unexpected number of rates in raw_rate_vector - " << rv.rates.size() << "extra." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  RateVector* new_rv = new RateVector(rv.name, states.state_to_int[rv.uc.state], rates);
+  add_rate_vector(new_rv);
+  return(new_rv);
+}
+
+// Utils.
 
 AbstractComponent* ComponentSet::get_current_parameter() {
   return(*current_parameter);

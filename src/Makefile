@@ -368,6 +368,33 @@ SubstitutionModels/Components/AbstractComponent.cpp.s:
 	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractComponent.cpp.s
 .PHONY : SubstitutionModels/Components/AbstractComponent.cpp.s
 
+SubstitutionModels/Components/AbstractValueTypes.o: SubstitutionModels/Components/AbstractValueTypes.cpp.o
+
+.PHONY : SubstitutionModels/Components/AbstractValueTypes.o
+
+# target to build an object file
+SubstitutionModels/Components/AbstractValueTypes.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.o
+.PHONY : SubstitutionModels/Components/AbstractValueTypes.cpp.o
+
+SubstitutionModels/Components/AbstractValueTypes.i: SubstitutionModels/Components/AbstractValueTypes.cpp.i
+
+.PHONY : SubstitutionModels/Components/AbstractValueTypes.i
+
+# target to preprocess a source file
+SubstitutionModels/Components/AbstractValueTypes.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.i
+.PHONY : SubstitutionModels/Components/AbstractValueTypes.cpp.i
+
+SubstitutionModels/Components/AbstractValueTypes.s: SubstitutionModels/Components/AbstractValueTypes.cpp.s
+
+.PHONY : SubstitutionModels/Components/AbstractValueTypes.s
+
+# target to generate assembly for a file
+SubstitutionModels/Components/AbstractValueTypes.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.s
+.PHONY : SubstitutionModels/Components/AbstractValueTypes.cpp.s
+
 SubstitutionModels/Components/ComponentSet.o: SubstitutionModels/Components/ComponentSet.cpp.o
 
 .PHONY : SubstitutionModels/Components/ComponentSet.o
@@ -449,59 +476,32 @@ SubstitutionModels/Components/RateVector.cpp.s:
 	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/RateVector.cpp.s
 .PHONY : SubstitutionModels/Components/RateVector.cpp.s
 
-SubstitutionModels/Components/Types/AbstractValueTypes.o: SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o
+SubstitutionModels/Components/SampleableValueTypes.o: SubstitutionModels/Components/SampleableValueTypes.cpp.o
 
-.PHONY : SubstitutionModels/Components/Types/AbstractValueTypes.o
-
-# target to build an object file
-SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o
-.PHONY : SubstitutionModels/Components/Types/AbstractValueTypes.cpp.o
-
-SubstitutionModels/Components/Types/AbstractValueTypes.i: SubstitutionModels/Components/Types/AbstractValueTypes.cpp.i
-
-.PHONY : SubstitutionModels/Components/Types/AbstractValueTypes.i
-
-# target to preprocess a source file
-SubstitutionModels/Components/Types/AbstractValueTypes.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.i
-.PHONY : SubstitutionModels/Components/Types/AbstractValueTypes.cpp.i
-
-SubstitutionModels/Components/Types/AbstractValueTypes.s: SubstitutionModels/Components/Types/AbstractValueTypes.cpp.s
-
-.PHONY : SubstitutionModels/Components/Types/AbstractValueTypes.s
-
-# target to generate assembly for a file
-SubstitutionModels/Components/Types/AbstractValueTypes.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/AbstractValueTypes.cpp.s
-.PHONY : SubstitutionModels/Components/Types/AbstractValueTypes.cpp.s
-
-SubstitutionModels/Components/Types/SampleableValueTypes.o: SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o
-
-.PHONY : SubstitutionModels/Components/Types/SampleableValueTypes.o
+.PHONY : SubstitutionModels/Components/SampleableValueTypes.o
 
 # target to build an object file
-SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o
-.PHONY : SubstitutionModels/Components/Types/SampleableValueTypes.cpp.o
+SubstitutionModels/Components/SampleableValueTypes.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.o
+.PHONY : SubstitutionModels/Components/SampleableValueTypes.cpp.o
 
-SubstitutionModels/Components/Types/SampleableValueTypes.i: SubstitutionModels/Components/Types/SampleableValueTypes.cpp.i
+SubstitutionModels/Components/SampleableValueTypes.i: SubstitutionModels/Components/SampleableValueTypes.cpp.i
 
-.PHONY : SubstitutionModels/Components/Types/SampleableValueTypes.i
+.PHONY : SubstitutionModels/Components/SampleableValueTypes.i
 
 # target to preprocess a source file
-SubstitutionModels/Components/Types/SampleableValueTypes.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.i
-.PHONY : SubstitutionModels/Components/Types/SampleableValueTypes.cpp.i
+SubstitutionModels/Components/SampleableValueTypes.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.i
+.PHONY : SubstitutionModels/Components/SampleableValueTypes.cpp.i
 
-SubstitutionModels/Components/Types/SampleableValueTypes.s: SubstitutionModels/Components/Types/SampleableValueTypes.cpp.s
+SubstitutionModels/Components/SampleableValueTypes.s: SubstitutionModels/Components/SampleableValueTypes.cpp.s
 
-.PHONY : SubstitutionModels/Components/Types/SampleableValueTypes.s
+.PHONY : SubstitutionModels/Components/SampleableValueTypes.s
 
 # target to generate assembly for a file
-SubstitutionModels/Components/Types/SampleableValueTypes.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/Types/SampleableValueTypes.cpp.s
-.PHONY : SubstitutionModels/Components/Types/SampleableValueTypes.cpp.s
+SubstitutionModels/Components/SampleableValueTypes.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.s
+.PHONY : SubstitutionModels/Components/SampleableValueTypes.cpp.s
 
 SubstitutionModels/SubstitutionModel.o: SubstitutionModels/SubstitutionModel.cpp.o
 
@@ -530,6 +530,33 @@ SubstitutionModels/SubstitutionModel.cpp.s:
 	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModel.cpp.s
 .PHONY : SubstitutionModels/SubstitutionModel.cpp.s
 
+SubstitutionModels/SubstitutionModelParser.o: SubstitutionModels/SubstitutionModelParser.cpp.o
+
+.PHONY : SubstitutionModels/SubstitutionModelParser.o
+
+# target to build an object file
+SubstitutionModels/SubstitutionModelParser.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.o
+.PHONY : SubstitutionModels/SubstitutionModelParser.cpp.o
+
+SubstitutionModels/SubstitutionModelParser.i: SubstitutionModels/SubstitutionModelParser.cpp.i
+
+.PHONY : SubstitutionModels/SubstitutionModelParser.i
+
+# target to preprocess a source file
+SubstitutionModels/SubstitutionModelParser.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.i
+.PHONY : SubstitutionModels/SubstitutionModelParser.cpp.i
+
+SubstitutionModels/SubstitutionModelParser.s: SubstitutionModels/SubstitutionModelParser.cpp.s
+
+.PHONY : SubstitutionModels/SubstitutionModelParser.s
+
+# target to generate assembly for a file
+SubstitutionModels/SubstitutionModelParser.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.s
+.PHONY : SubstitutionModels/SubstitutionModelParser.cpp.s
+
 SubstitutionModels/SubstitutionModelTypes.o: SubstitutionModels/SubstitutionModelTypes.cpp.o
 
 .PHONY : SubstitutionModels/SubstitutionModelTypes.o
@@ -557,59 +584,32 @@ SubstitutionModels/SubstitutionModelTypes.cpp.s:
 	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelTypes.cpp.s
 .PHONY : SubstitutionModels/SubstitutionModelTypes.cpp.s
 
-SubstitutionModels/Types/CategoryGTR.o: SubstitutionModels/Types/CategoryGTR.cpp.o
+SubstitutionModels/Types/CustomModel.o: SubstitutionModels/Types/CustomModel.cpp.o
 
-.PHONY : SubstitutionModels/Types/CategoryGTR.o
-
-# target to build an object file
-SubstitutionModels/Types/CategoryGTR.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.o
-.PHONY : SubstitutionModels/Types/CategoryGTR.cpp.o
-
-SubstitutionModels/Types/CategoryGTR.i: SubstitutionModels/Types/CategoryGTR.cpp.i
-
-.PHONY : SubstitutionModels/Types/CategoryGTR.i
-
-# target to preprocess a source file
-SubstitutionModels/Types/CategoryGTR.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.i
-.PHONY : SubstitutionModels/Types/CategoryGTR.cpp.i
-
-SubstitutionModels/Types/CategoryGTR.s: SubstitutionModels/Types/CategoryGTR.cpp.s
-
-.PHONY : SubstitutionModels/Types/CategoryGTR.s
-
-# target to generate assembly for a file
-SubstitutionModels/Types/CategoryGTR.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CategoryGTR.cpp.s
-.PHONY : SubstitutionModels/Types/CategoryGTR.cpp.s
-
-SubstitutionModels/Types/FixedRate.o: SubstitutionModels/Types/FixedRate.cpp.o
-
-.PHONY : SubstitutionModels/Types/FixedRate.o
+.PHONY : SubstitutionModels/Types/CustomModel.o
 
 # target to build an object file
-SubstitutionModels/Types/FixedRate.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.o
-.PHONY : SubstitutionModels/Types/FixedRate.cpp.o
+SubstitutionModels/Types/CustomModel.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.o
+.PHONY : SubstitutionModels/Types/CustomModel.cpp.o
 
-SubstitutionModels/Types/FixedRate.i: SubstitutionModels/Types/FixedRate.cpp.i
+SubstitutionModels/Types/CustomModel.i: SubstitutionModels/Types/CustomModel.cpp.i
 
-.PHONY : SubstitutionModels/Types/FixedRate.i
+.PHONY : SubstitutionModels/Types/CustomModel.i
 
 # target to preprocess a source file
-SubstitutionModels/Types/FixedRate.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.i
-.PHONY : SubstitutionModels/Types/FixedRate.cpp.i
+SubstitutionModels/Types/CustomModel.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.i
+.PHONY : SubstitutionModels/Types/CustomModel.cpp.i
 
-SubstitutionModels/Types/FixedRate.s: SubstitutionModels/Types/FixedRate.cpp.s
+SubstitutionModels/Types/CustomModel.s: SubstitutionModels/Types/CustomModel.cpp.s
 
-.PHONY : SubstitutionModels/Types/FixedRate.s
+.PHONY : SubstitutionModels/Types/CustomModel.s
 
 # target to generate assembly for a file
-SubstitutionModels/Types/FixedRate.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/FixedRate.cpp.s
-.PHONY : SubstitutionModels/Types/FixedRate.cpp.s
+SubstitutionModels/Types/CustomModel.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.s
+.PHONY : SubstitutionModels/Types/CustomModel.cpp.s
 
 SubstitutionModels/Types/GeneralTimeReversible.o: SubstitutionModels/Types/GeneralTimeReversible.cpp.o
 
@@ -637,33 +637,6 @@ SubstitutionModels/Types/GeneralTimeReversible.s: SubstitutionModels/Types/Gener
 SubstitutionModels/Types/GeneralTimeReversible.cpp.s:
 	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/GeneralTimeReversible.cpp.s
 .PHONY : SubstitutionModels/Types/GeneralTimeReversible.cpp.s
-
-SubstitutionModels/Types/SingleRate.o: SubstitutionModels/Types/SingleRate.cpp.o
-
-.PHONY : SubstitutionModels/Types/SingleRate.o
-
-# target to build an object file
-SubstitutionModels/Types/SingleRate.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.o
-.PHONY : SubstitutionModels/Types/SingleRate.cpp.o
-
-SubstitutionModels/Types/SingleRate.i: SubstitutionModels/Types/SingleRate.cpp.i
-
-.PHONY : SubstitutionModels/Types/SingleRate.i
-
-# target to preprocess a source file
-SubstitutionModels/Types/SingleRate.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.i
-.PHONY : SubstitutionModels/Types/SingleRate.cpp.i
-
-SubstitutionModels/Types/SingleRate.s: SubstitutionModels/Types/SingleRate.cpp.s
-
-.PHONY : SubstitutionModels/Types/SingleRate.s
-
-# target to generate assembly for a file
-SubstitutionModels/Types/SingleRate.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/SingleRate.cpp.s
-.PHONY : SubstitutionModels/Types/SingleRate.cpp.s
 
 Trees/BranchSplitting.o: Trees/BranchSplitting.cpp.o
 
@@ -836,6 +809,9 @@ help:
 	@echo "... SubstitutionModels/Components/AbstractComponent.o"
 	@echo "... SubstitutionModels/Components/AbstractComponent.i"
 	@echo "... SubstitutionModels/Components/AbstractComponent.s"
+	@echo "... SubstitutionModels/Components/AbstractValueTypes.o"
+	@echo "... SubstitutionModels/Components/AbstractValueTypes.i"
+	@echo "... SubstitutionModels/Components/AbstractValueTypes.s"
 	@echo "... SubstitutionModels/Components/ComponentSet.o"
 	@echo "... SubstitutionModels/Components/ComponentSet.i"
 	@echo "... SubstitutionModels/Components/ComponentSet.s"
@@ -845,30 +821,24 @@ help:
 	@echo "... SubstitutionModels/Components/RateVector.o"
 	@echo "... SubstitutionModels/Components/RateVector.i"
 	@echo "... SubstitutionModels/Components/RateVector.s"
-	@echo "... SubstitutionModels/Components/Types/AbstractValueTypes.o"
-	@echo "... SubstitutionModels/Components/Types/AbstractValueTypes.i"
-	@echo "... SubstitutionModels/Components/Types/AbstractValueTypes.s"
-	@echo "... SubstitutionModels/Components/Types/SampleableValueTypes.o"
-	@echo "... SubstitutionModels/Components/Types/SampleableValueTypes.i"
-	@echo "... SubstitutionModels/Components/Types/SampleableValueTypes.s"
+	@echo "... SubstitutionModels/Components/SampleableValueTypes.o"
+	@echo "... SubstitutionModels/Components/SampleableValueTypes.i"
+	@echo "... SubstitutionModels/Components/SampleableValueTypes.s"
 	@echo "... SubstitutionModels/SubstitutionModel.o"
 	@echo "... SubstitutionModels/SubstitutionModel.i"
 	@echo "... SubstitutionModels/SubstitutionModel.s"
+	@echo "... SubstitutionModels/SubstitutionModelParser.o"
+	@echo "... SubstitutionModels/SubstitutionModelParser.i"
+	@echo "... SubstitutionModels/SubstitutionModelParser.s"
 	@echo "... SubstitutionModels/SubstitutionModelTypes.o"
 	@echo "... SubstitutionModels/SubstitutionModelTypes.i"
 	@echo "... SubstitutionModels/SubstitutionModelTypes.s"
-	@echo "... SubstitutionModels/Types/CategoryGTR.o"
-	@echo "... SubstitutionModels/Types/CategoryGTR.i"
-	@echo "... SubstitutionModels/Types/CategoryGTR.s"
-	@echo "... SubstitutionModels/Types/FixedRate.o"
-	@echo "... SubstitutionModels/Types/FixedRate.i"
-	@echo "... SubstitutionModels/Types/FixedRate.s"
+	@echo "... SubstitutionModels/Types/CustomModel.o"
+	@echo "... SubstitutionModels/Types/CustomModel.i"
+	@echo "... SubstitutionModels/Types/CustomModel.s"
 	@echo "... SubstitutionModels/Types/GeneralTimeReversible.o"
 	@echo "... SubstitutionModels/Types/GeneralTimeReversible.i"
 	@echo "... SubstitutionModels/Types/GeneralTimeReversible.s"
-	@echo "... SubstitutionModels/Types/SingleRate.o"
-	@echo "... SubstitutionModels/Types/SingleRate.i"
-	@echo "... SubstitutionModels/Types/SingleRate.s"
 	@echo "... Trees/BranchSplitting.o"
 	@echo "... Trees/BranchSplitting.i"
 	@echo "... Trees/BranchSplitting.s"

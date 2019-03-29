@@ -5,7 +5,6 @@
 
 #include "Model.h"
 #include "Trees/TreeParser.h"
-#include "SubstitutionModels/SubstitutionModelTypes.h"
 #include "SubstitutionModels/SubstitutionModel.h"
 
 #include "Environment.h"
@@ -24,17 +23,6 @@ Model::Model() {
    */
   tree = NULL;
   ready = true;
-}
-
-SubstitutionModel* Model::InitializeSubstitutionModel(int num_sites, vector<string> states) {
-  /*
-   * This is in the substituionModelType.h, can we make this more explicit?
-   */
-  std::cout << "Initializing Substitution Model: ";
-  SubstitutionModel* substitution_model = GetSubstitutionModel(); // In SubstituionModelTypes.h
-  substitution_model->Initialize(num_sites, states);
-  std::cout << std::endl;
-  return(substitution_model);
 }
 
 void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA, SubstitutionModel* &sm) {

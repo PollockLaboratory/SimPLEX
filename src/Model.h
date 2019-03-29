@@ -48,7 +48,6 @@ class Model {
   SubstitutionCounts counts;
 
   SubstitutionModel* substitution_model;
-  SubstitutionModel* InitializeSubstitutionModel(int number_of_sites, vector<string> states);
 
   double logL_waiting; // The likelihood of the waiting times.
   double logL_subs; // The likelihood of the waiting times.

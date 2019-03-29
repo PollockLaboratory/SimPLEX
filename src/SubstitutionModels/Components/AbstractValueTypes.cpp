@@ -2,7 +2,7 @@
 
 // FIXED FLOAT
 
-FixedFloat::FixedFloat(std::string parameter_name, double v) : AbstractValue(parameter_name) {
+FixedFloat::FixedFloat(std::string parameter_name, int id, double v) : AbstractValue(parameter_name, id) {
   value = v;
 }
 
@@ -23,7 +23,7 @@ void FixedFloat::refresh() {
 
 // VIRTUAL SUBSTITUTION RATE
 
-VirtualSubstitutionRate::VirtualSubstitutionRate(std::string parameter_name, UniformizationConstant* unif) : AbstractValue(parameter_name), u(unif) {
+VirtualSubstitutionRate::VirtualSubstitutionRate(std::string parameter_name, int id, UniformizationConstant* unif) : AbstractValue(parameter_name, id), u(unif) {
   u = unif;
   u->add_VirtualSubstitutionRate(this);
   this->add_dependancy(u);

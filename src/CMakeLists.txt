@@ -11,15 +11,13 @@ set(SRCS
   SubstitutionCounts.cpp
   Model.cpp
   SubstitutionModels/SubstitutionModel.cpp
-  SubstitutionModels/SubstitutionModelTypes.cpp
+  SubstitutionModels/SubstitutionModelParser.cpp
   SubstitutionModels/Components/AbstractComponent.cpp
   SubstitutionModels/Components/ComponentSet.cpp
   SubstitutionModels/Components/ComponentTypes.cpp
   SubstitutionModels/Components/RateVector.cpp
   SubstitutionModels/Components/AbstractValueTypes.cpp
   SubstitutionModels/Components/SampleableValueTypes.cpp
-  SubstitutionModels/Types/GeneralTimeReversible.cpp
-  SubstitutionModels/Types/CustomModel.cpp
   Trees/Tree.cpp
   Trees/TreeParts.cpp
   Trees/BranchSplitting.cpp
