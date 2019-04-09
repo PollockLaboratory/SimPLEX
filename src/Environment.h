@@ -4,41 +4,62 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <queue>
 #include <map>
+#include <iostream>
+
+#include "cpptoml/cpptoml.h"
 
 using std::string;
 
 class Environment {
 public:
-	Environment();
-	void PrintOptions();
-	void ReadOptions(std::ifstream &default_file_stream, std::ifstream &options_file_stream);         // read in default and control files
+  Environment();
+  void PrintOptions();
+  void ReadOptions(int argc, char* argv[]);         // read in default and control files
 
-	// Key values.
-	int seed;                   // random number generator seed
-    	bool debug;                 // turns debugging on or off
-	float u;		    // uniformization constant.
-	bool ancestral_sequences;   // true if the ancestral_sequences have already been sampled.
-	int n; 			    // sequence length.	
-	int num_states;		    // number of states, not including gap.
-	std::map<std::string, int> state_to_integer;
+  // Key values.
+  int seed;                   // random number generator seed
+  bool debug;                 // turns debugging on or off
+  bool ancestral_sequences;   // true if the ancestral_sequences have already been sampled.
+  int n; 			    // sequence length.
+  int num_states;		    // number of states, not including gap.
+  std::map<std::string, int> state_to_integer;
 
-	// Storing option values.
-	int total_options;
-	std::map<std::string, int> option_to_index;
-	std::map<int, std::string> option_values;
+  template<typename T>
+  T get(std::string);
 
-	// Retreiving option values.
-	void check_option_exists(std::string);
-	std::string get(std::string);
-	int get_int(std::string);
-	float get_float(std::string);
-
+  template<typename T>
+  std::vector<T> get_array(std::string);
 private:
-	void ReadControlFile(std::ifstream &file_stream);
-	void SetOption(string option, string value);
-	void InitializeRandomNumberGeneratorSeed();
+  void InitializeRandomNumberGeneratorSeed();
+  void ReadTOMLfile(std::string);
+  std::shared_ptr<cpptoml::table> config;
 };
+
+template<typename T>
+T Environment::get(std::string option) {
+  auto val = config->get_qualified_as<T>(option);
+  if(val) {
+    return(*val);
+  } else {
+    std::cerr << "Error: Option \"" << option << "\" was either not set or not the correct type." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+
+template<typename T>
+std::vector<T> Environment::get_array(std::string option) {
+ std::vector<T> ret = {};
+ auto nested = config;
+  while(option.find(".") != std::string::npos) {
+    nested = nested->get_table(option.substr(0, option.find(".")));
+    option = option.substr(option.find(".") + 1);
+  }
+ auto vals = nested->get_array_of<T>(option);
+ for(auto val : *vals) {
+   ret.push_back(val);
+ }
+ return(ret);
+}
 
 #endif

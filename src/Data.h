@@ -1,5 +1,5 @@
-#ifndef ObservedData_h_
-#define ObservedData_h_
+#ifndef Data_h_
+#define Data_h_
 
 #include <iostream>
 #include <fstream>
@@ -13,11 +13,14 @@
 
 #include "Sequence.h"
 #include "Trees/TreeParser.h"
+#include "SubstitutionModels/SubstitutionModel.h"
+#include "SubstitutionModels/SubstitutionModelParser.h"
 
 using namespace std;
 
 class Data {
  public:
+  SubstitutionModel* sm;
   SequenceAlignment* MSA;
   list<SequenceAlignment*> MSA_list;
   IO::RawTreeNode* raw_tree;
@@ -37,9 +40,10 @@ class Data {
   void validateInputData(list<SequenceAlignment*> MSA_list, IO::RawTreeNode* raw_tree);
   bool matchNodeNames(list<string> names1, list<string> names2);
 
-  SequenceAlignment* ReadSequences(list<string> fasta_lines);
+  SequenceAlignment* ReadSequences(list<string> fasta_lines, const States*);
 
   IO::RawTreeNode* ReadTree();
+  IO::raw_substitution_model* ReadSubstitutionModel();
 };
 
 #endif

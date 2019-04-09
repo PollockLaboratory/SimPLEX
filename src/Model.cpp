@@ -4,9 +4,7 @@
 #include <chrono>
 
 #include "Model.h"
-#include "Trees/TreeTypes.h"
 #include "Trees/TreeParser.h"
-#include "SubstitutionModels/SubstitutionModelTypes.h"
 #include "SubstitutionModels/SubstitutionModel.h"
 
 #include "Environment.h"
@@ -24,49 +22,36 @@ Model::Model() {
    * The default contructor.
    */
   tree = NULL;
-  SubstitutionModel* substitution_model = NULL;
   ready = true;
 }
 
-Model::~Model() {
-  /*
-   * The destructor function.
-   * Note: we should not be destructing manually.
-   */
-  delete tree;
-  delete substitution_model;
-}
-
-SubstitutionModel* Model::InitializeSubstitutionModel(int num_sites, vector<string> states) {
-  /*
-   * This is in the substituionModelType.h, can we make this more explicit?
-   */
-  std::cout << "Initializing Substitution Model: ";
-  SubstitutionModel* substitution_model = GetSubstitutionModel(); // In SubstituionModelTypes.h
-  substitution_model->Initialize(num_sites, states);
-  std::cout << std::endl;
-  return(substitution_model);
-}
-
-void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA) {
+void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA, SubstitutionModel* &sm) {
   /*
    * Initialize the model class.
    * There are two main components within the model class:
    * - the tree class - contains the tree topology as well as the sequences.
    * - the substitution model class - which contains all the rate matrices.
    */
-  int num_sites = (MSA->taxa_names_to_sequences).begin()->second.size();
-  substitution_model = InitializeSubstitutionModel(num_sites, MSA->states);
+  substitution_model = sm;
   num_parameters = substitution_model->getNumberOfParameters();
 
-  tree = TreeTypes::pickTreeType();
+  tree = new Tree();
   tree->Initialize(raw_tree, MSA, substitution_model);
+
+  // Sort out counts.
+  counts = SubstitutionCounts(substitution_model->get_RateVectors(), tree->get_branch_lengths());
+  tree->update_counts(counts);
+  counts.print();
 }
 
 // Sampling
 bool Model::SampleTree() {
   if(ready) {
-    return(tree->sample());
+    bool t = tree->sample();
+    counts = SubstitutionCounts(substitution_model->get_RateVectors(), tree->get_branch_lengths()); // Empty list of counts
+    tree->update_counts(counts);
+
+    return(t);
   } else {
     std::cout << "Error: Attempt to sample tree before accepting previous changes." << std::endl;
     exit(EXIT_FAILURE);
@@ -84,40 +69,76 @@ bool Model::SampleSubstitutionModel() {
 }
 
 void Model::accept() {
-	substitution_model->accept();
-	ready = true;
+  substitution_model->accept();
+  ready = true;
 }
 
 void Model::reject() {
-	substitution_model->reject();
-	ready = true;
+  substitution_model->reject();
+  logL -= delta_logL;
+  ready = true;
 }
 
 // Likelihood Calculations.
 double Model::CalculateLikelihood() {
-	/*
-	 * Calculates the likelihood of the current tree and substitution model.
-	 */
-	return(tree->calculate_likelihood());
+  /*
+   * Calculates the likelihood of the current tree and substitution model.
+   */
+
+  logL_waiting = 0.0;
+  logL_subs = 0.0;
+  logL = 0.0;
+  float t;
+  int num0subs;
+  int num1subs;
+
+  double u = substitution_model->get_u();
+
+  for(auto it = counts.subs_by_branch.begin(); it != counts.subs_by_branch.end(); ++it) {
+    t = it->first;
+    num0subs = it->second.num0subs;
+    num1subs = it->second.num1subs;
+    logL_waiting += num0subs * log(1/(1 + u*t)) + num1subs * log(t/(1 + u*t));
+  }
+
+  for(auto it = counts.subs_by_rateVector.begin(); it != counts.subs_by_rateVector.end(); ++it) {
+    RateVector* rv = it->first;
+    std::vector<int> C_xy = it->second;
+    for(int i = 0; i < env.num_states; i++) {
+      logL_subs += C_xy[i] * log((*rv)[i]);
+    }
+  }
+
+  logL = logL_waiting + logL_subs;
+
+  return(logL);
 }
 
 double Model::updateLikelihood(){
   /*
    * Rather recalculating the full likelihood, will modify logLikelihood only by what has changed. 
    */
-  return(tree->update_likelihood());
-}
+  delta_logL = 0.0;
+ 
+  RateVector* rv;
+  int C_xy;
 
-// double Model::PartialCalculateLikelihood(const double lnL) {
-// return(tree->partial_calculate_likelihood());
-//}
+  for(auto it = substitution_model->changed_vectors_begin(); it.at_end() == false; ++it) {
+    rv = (*it).rv;
+    C_xy = counts.subs_by_rateVector[rv][(*it).pos];
+    delta_logL += C_xy * log(rv->get_rate_ratio((*it).pos)); // Should be ratio;
+  }
+
+  logL += delta_logL;
+  return(logL);
+}
 
 // Printing/Recording
 void Model::RecordState(int gen, double l) {
 	/*
 	 * Records the state of both the tree and the substitution model.
 	 */
-	tree->RecordState(gen, l);
+	tree->record_state(gen, l);
 	substitution_model->saveToFile(gen, l);
 }
 
@@ -136,6 +157,7 @@ void Model::Terminate() {
 	 * Just terminates substitution_model.
 	 */
   // Save the tree data.
-  tree->RecordTree();
+  tree->record_tree();
   substitution_model->Terminate();
 }
+

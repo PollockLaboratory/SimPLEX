@@ -21,20 +21,29 @@ Data::~Data() {
 }
 
 void Data::Initialize() {
-  files.add_file("sequences_in", env.get("sequences_file"), IOtype::INPUT);
+  // Substitution Model.
+  IO::raw_substitution_model* raw_sm = ReadSubstitutionModel();
+  //std::cout << *raw_sm << std::endl;
+  sm = new SubstitutionModel();
+  sm->from_raw_model(raw_sm);
+  //exit(-1);
+
+  const States* states = sm->get_states();
+  
+  files.add_file("sequences_in", env.get<std::string>("DATA.sequences_file"), IOtype::INPUT);
   ifstream sequences_in = files.get_ifstream("sequences_in");
 
   if(env.ancestral_sequences == false) {
     // Fasta file only contains terminal sequences.
     list<string> fasta_lines = readFastaFile(sequences_in);
-    MSA = ReadSequences(fasta_lines);
+    MSA = ReadSequences(fasta_lines, states);
     MSA->Initialize(&MSA_list);
   } else {
     //Compound fasta with internal sequences - when ancestral states are already calculated.
     list<list<string>> fasta_blocks = readCompoundFastaFile(sequences_in);
  
     for(auto it = fasta_blocks.begin(); it != fasta_blocks.end(); ++it) {
-      SequenceAlignment* msa = ReadSequences(*it);
+      SequenceAlignment* msa = ReadSequences(*it, states);
       msa->Initialize(&MSA_list);
       MSA_list.push_back(msa);
     }
@@ -49,6 +58,13 @@ void Data::Initialize() {
   raw_tree = ReadTree();
 
   validateInputData(MSA_list, raw_tree);
+}
+
+// Substitution Model.
+
+IO::raw_substitution_model* Data::ReadSubstitutionModel() {
+  IO::raw_substitution_model* raw_sm = IO::read_substitution_model(env.get<std::string>("DATA.substitution_model_file"));
+  return(raw_sm);
 }
 
 // Sequences
@@ -99,12 +115,12 @@ list<list<string>> Data::readCompoundFastaFile(ifstream &sequences_file) {
   return(lf);
 }
 
-SequenceAlignment* Data::ReadSequences(list<string> fasta_lines) {
+SequenceAlignment* Data::ReadSequences(list<string> fasta_lines, const States* states) {
   /*
    * Given a list of lines that represent a fasta file, returns a pointer to a MSA object.
    */
   
-  MSA = new SequenceAlignment();
+  MSA = new SequenceAlignment(states);
 
   string line;
   string sequence = "";
@@ -133,7 +149,7 @@ SequenceAlignment* Data::ReadSequences(list<string> fasta_lines) {
 // Trees
 
 IO::RawTreeNode* Data::ReadTree() {
-  std::string treefile = env.get("tree_file");
+  std::string treefile = env.get<std::string>("DATA.tree_file");
   files.add_file("tree_input", treefile, IOtype::INPUT);
 
   std::cout << "Reading tree from:\t" << files.get_file_path("tree_input") << std::endl;

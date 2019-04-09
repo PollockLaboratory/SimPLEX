@@ -30,80 +30,62 @@ MCMC::MCMC() {
 } 
 
 void MCMC::initialize(Model* model) {
-	/*
-	 * Init MCMC with model, gens calculate lnL.
-	 */
+  /*
+   * Init MCMC with model, gens calculate lnL.
+   */
 
-	std::cout << "Initializing MCMC." << std::endl;
-	this->model = model; // associate the pointer with the MCMC
+  std::cout << "Initializing MCMC." << std::endl;
+  this->model = model; // associate the pointer with the MCMC
 
-	// Env settings.
-	out_freq = env.get_int("output_frequency");
-	print_freq = env.get_int("print_frequency");
-	gens = env.get_int("generations");
-	tree_sample_freq = env.get_int("tree_sample_frequency");
-	
-	//Calculate initial likelihood.
-	lnL = model->CalculateLikelihood();
-	RecordState();
+  // Env settings.
+  out_freq = env.get<int>("MCMC.output_frequency");
+  print_freq = env.get<int>("MCMC.print_frequency");
+  gens = env.get<int>("MCMC.generations");
+  tree_sample_freq = env.get<int>("MCMC.tree_sample_frequency");
 
-	//Initialize output file.
-	files.add_file("likelihoods", env.get("likelihood_out_file"), IOtype::OUTPUT);
-	lnlout = files.get_ofstream("likelihoods");
-	lnlout << "I,GEN,LogL" << std::endl;
+  //Calculate initial likelihood.
+  lnL = model->CalculateLikelihood();
 
-	files.add_file("time", env.get("time_out_file"), IOtype::OUTPUT);
-	time_out = files.get_ofstream("time");
+  RecordState();
 
-	model->printParameters();
+  //Initialize output file.
+  files.add_file("likelihoods", env.get<std::string>("OUTPUT.likelihood_out_file"), IOtype::OUTPUT);
+  lnlout = files.get_ofstream("likelihoods");
+  lnlout << "I,GEN,LogL" << std::endl;
 
-	// Track time.
-	n_tree_samples = 0;
-	total_time_tree_samples = 0;
-	n_parameter_samples = 0;
-	total_time_parameter_samples = 0;
+  files.add_file("time", env.get<std::string>("OUTPUT.time_out_file"), IOtype::OUTPUT);
+  time_out = files.get_ofstream("time");
+
+  model->printParameters();
 }
 
 void MCMC::sample() {
-	static int i = 1;
-	bool sampleType;
+  static int i = 1;
+  bool sampleType;
 
-	int time_taken;
-	std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+  if(i % tree_sample_freq == 0) {
+    sampleType = model->SampleTree(); // All tree sampling right now is Gibbs.
+    lnL = model->CalculateLikelihood();
+    i = 0;
+  } else {
 
-	if(i % tree_sample_freq == 0) {
-		sampleType = model->SampleTree(); // All tree sampling right now is Gibbs.
-		lnL = model->CalculateLikelihood();
-		i = 0;
-
-		time_taken = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count();
-		n_tree_samples++;
-		total_time_tree_samples += time_taken;
-	} else {
-		sampleType = model->SampleSubstitutionModel();
-		newLnL = model->updateLikelihood();
-		// newLnL_test = model->PartialCalculateLikelihood(lnL);
-		// std::cout << "Old LogL: " << lnL << " Proposed LogL: " << newLnL << " Partial LogL: " << lnL + newLnL_test << std::endl;
-		if(sampleType) {	
-			//Metropolis-Hasting method.
-			float r = log(Random());
-			accepted = r < (newLnL - lnL);
-			if (accepted) { 
-				lnL = newLnL;
-				model->accept();
-			} else {
-				model->reject();
-			}
-		} else {
-		  // No Metropolis Hastings needed - Gibbs sampling.
-			lnL = newLnL;
-		}
-
-		time_taken = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count();
-		n_parameter_samples++;
-		total_time_parameter_samples += time_taken;
-	}
-	i++;
+    sampleType = model->SampleSubstitutionModel();
+    newLnL = model->updateLikelihood();
+    if(sampleType) {
+      //Metropolis-Hasting method.
+      if (log(Random()) <= (newLnL - lnL)) {
+	lnL = newLnL;
+	model->accept();
+      } else {
+	model->reject();
+      }
+    } else {
+      // No Metropolis Hastings needed - Gibbs sampling.
+      lnL = newLnL;
+      model->accept();
+    }
+  }
+  i++;
 }
 
 void MCMC::Run() {
@@ -113,7 +95,6 @@ void MCMC::Run() {
 
   std::cout << "Starting MCMC:" << std::endl;
   for (gen = 1; gen <= gens; gen++) {
-
     sample();
 
     if(isnan(lnL)) {
@@ -132,9 +113,9 @@ void MCMC::Run() {
   }
 
   time_out << "SAMPLING TIME DATA" << std::endl;
-  time_out << "Tree Sampling: Total time: " << total_time_tree_samples << " us. Average time per sample: " << total_time_tree_samples/n_tree_samples << " us." << std::endl;
-  time_out << "Parameter Sampling: Total time: " << total_time_parameter_samples << " us. Average time per sample: " << total_time_parameter_samples/n_parameter_samples << " us." << std::endl;
-  float r = ((float)total_time_tree_samples)/(total_time_tree_samples + total_time_parameter_samples);time_out << r*100.0 << "\% of time spent sampling tree parameters." << std::endl;
+  // time_out << "Tree Sampling: Total time: " << total_time_tree_samples << " us. Average time per sample: " << total_time_tree_samples/n_tree_samples << " us." << std::endl;
+  // time_out << "Parameter Sampling: Total time: " << total_time_parameter_samples << " us. Average time per sample: " << total_time_parameter_samples/n_parameter_samples << " us." << std::endl;
+  // float r = ((float)total_time_tree_samples)/(total_time_tree_samples + total_time_parameter_samples);time_out << r*100.0 << "\% of time spent sampling tree parameters." << std::endl;
 }
 
 ///  Private Functions  ///

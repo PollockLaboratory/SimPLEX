@@ -7,6 +7,8 @@
 #include<list>
 #include<set>
 
+#include "SubstitutionModels/SubstitutionModel.h"
+
 struct substitution {
 	int pos;
 	int anc;
@@ -15,7 +17,7 @@ struct substitution {
 
 class SequenceAlignment {
  public:
-  SequenceAlignment();
+  SequenceAlignment(const States*);
   SequenceAlignment(const SequenceAlignment &msa);
   std::map<std::string, std::vector<int>> taxa_names_to_sequences;
 
@@ -44,7 +46,6 @@ class SequenceAlignment {
   std::string decodeChar(int &c);
   std::string decodeSequence(std::vector<int> &enc_seq);
   static std::vector<int> findParsimony(const std::vector<int> &s1, const std::vector<int> &s2);
-  static std::list<substitution> findSubstitutions(const std::vector<int> &anc, const std::vector<int> &dec);
   std::list<std::string> getNodeNames();
  private:
   // Processing input sequences - fasta.

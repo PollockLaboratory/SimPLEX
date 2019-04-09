@@ -3,6 +3,7 @@
 
 #include "IO.h"
 #include "Environment.h"
+#include "cpptoml/cpptoml.h"
 
 #include <iostream>
 #include <string.h>
@@ -20,12 +21,13 @@ extern Environment env;
 
 IO::Files::Files() {
   total_files = 0;
-  defaultfile = "resources/defaults.ctrl"; // where to find default settings
-  optionsfile = "resources/options.ctrl"; // where to find optional control settings
+  // Remember to make this relative.
+  defaultfile = "/home/hamish/Documents/Code/simplex0_0/resources/defaults.ctrl"; // where to find default settings
+  optionsfile = "/home/hamish/Documents/Code/simplex0_0/resources/options.ctrl"; // where to find optional control settings
 }
 
 void IO::Files::setupOutputDirectory() {
-  outdir = env.get("output_directory");
+  outdir = env.get<std::string>("OUTPUT.output_directory");
   ConfigureOutputDirectory();
 }
 
@@ -37,7 +39,7 @@ void IO::Files::set_options_file(char* argv[]) {
 
 void IO::Files::initialize() {
   add_file("default", defaultfile, IOtype::INPUT);
-  add_file("options", optionsfile, IOtype::INPUT);
+  add_file("options", optionsfile, IOtype::INPUT); 
 }
 
 void IO::Files::add_file(std::string name, std::string path, IOtype t) {

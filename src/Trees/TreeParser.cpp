@@ -1,6 +1,7 @@
 #include "TreeParser.h"
-#include "Environment.h"
-#include "IO.h"
+
+#include "../Environment.h"
+#include "../IO.h"
 
 #include <algorithm>
 
@@ -21,7 +22,7 @@ inline std::string& IO::cleanTreeString(std::string &tree_string) {
 std::pair<std::string, std::string> IO::splitBranchString(std::string branch_string) {
   std::pair<std::string, std::string> b;
   int tree_depth = 0;
-  for (int position = 0; position < branch_string.size(); position++) {
+  for (unsigned int position = 0; position < branch_string.size(); position++) {
     char character = branch_string.at(position);
     //std::cout << "Char: " << character << " Depth: " << tree_depth << std::endl;
     if (character == '(')
@@ -49,7 +50,7 @@ node_data IO::deconstructNodeString(std::string node_string) {
 
   std::string name;
   std::pair<std::string, std::string> branch_strings;
-  if (last_parens_position == string::npos) {
+  if (last_parens_position == (signed int)string::npos) {
     // Tip node.
     name = node_string.substr(0, last_colon_position);
     branch_strings = std::make_pair("", "");
@@ -69,6 +70,7 @@ node_data IO::deconstructNodeString(std::string node_string) {
 IO::RawTreeNode* IO::parseRawTreeNode(std::string node_string, RawTreeNode* up) {
   node_data n = deconstructNodeString(node_string);
 
+  // std::cout << node_string << std::endl;
   IO::RawTreeNode* t = new RawTreeNode;
   IO::RawTreeNode* left;
   IO::RawTreeNode* right;
@@ -76,6 +78,7 @@ IO::RawTreeNode* IO::parseRawTreeNode(std::string node_string, RawTreeNode* up) 
   left = (n.left != "") ? parseRawTreeNode(n.left, t) : 0;
   right = (n.right != "") ? parseRawTreeNode(n.right, t) : 0;
 
+  // std::cout << "Name: " << n.name << " Distance: " << n.distance << std::endl;
   *t = {n.name, n.distance, up, left, right};
   return(t);
 }

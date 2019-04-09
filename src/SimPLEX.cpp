@@ -17,6 +17,11 @@
 #include "MCMC.h"
 #include "utils.h"
 
+#include "SubstitutionModels/SubstitutionModelParser.h"
+#include "SubstitutionModels/SubstitutionModel.h"
+
+#include "sol2/sol.hpp"
+
 #ifdef _WIN32
 #include <sys/time.h>
 #else
@@ -39,11 +44,7 @@ int main(int argc, char* argv[]) {
   utils::printHeader();
 
   //Establish environment and files.
-  if(argc == 2) files.set_options_file(argv);
-  files.initialize();
-  std::ifstream default_file_stream = files.get_ifstream("default");
-  std::ifstream options_file_stream = files.get_ifstream("options");
-  env.ReadOptions(default_file_stream, options_file_stream);
+  env.ReadOptions(argc, argv);
 
   files.setupOutputDirectory();
 
@@ -52,7 +53,7 @@ int main(int argc, char* argv[]) {
   data.Initialize();
 
   Model model;
-  model.Initialize(data.raw_tree, data.MSA);
+  model.Initialize(data.raw_tree, data.MSA, data.sm);
 
   MCMC mcmc;
   mcmc.initialize(&model);
