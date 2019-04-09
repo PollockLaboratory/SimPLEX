@@ -58,10 +58,8 @@ void UniformizationConstant::print() {
 
 void UniformizationConstant::set_initial() {
   double min = 1.0;
-  std::cout << "Setting initial unif: " << std::endl;
   for(auto it = vsrs.begin(); it != vsrs.end(); ++it) {
     double v = (*it)->getValue();
-    std::cout << v << " ";
     if(v < min) {
       min = v;
     }

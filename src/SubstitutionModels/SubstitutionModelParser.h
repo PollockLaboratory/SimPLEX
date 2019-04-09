@@ -42,7 +42,7 @@ namespace IO {
     friend std::ostream& operator<<(std::ostream&, const IO::raw_substitution_model&);
     std::list<std::string> states;
     std::list<raw_rate_vector> rv_list;
-	std::list<raw_param> get_parameters();
+    std::list<raw_param> get_parameters();
   private:
     IO::raw_param new_parameter(std::string, sol::table tbl);
     IO::raw_rate_vector new_rate_vector(std::string, sol::table, sol::table);

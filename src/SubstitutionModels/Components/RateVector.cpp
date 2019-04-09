@@ -66,6 +66,7 @@ RateVector*& RateVectorSet::operator[] (const int i) {
 }
 
 void RateVectorSet::add(RateVector* rv) {
+  // Set the pointer inside the AbstractValue to point to the host rate vector.
   for(unsigned int i = 0; i < rv->rates.size(); i++) {
     // Set up the AbstractValues themselves.
     rv->rates[i]->add_host_vector(rv, i);

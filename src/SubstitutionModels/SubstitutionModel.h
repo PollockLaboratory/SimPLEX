@@ -28,8 +28,6 @@ class SubstitutionModel {
   class iterator;
  public:
   SubstitutionModel();
-  //virtual void Initialize() = 0;
-  //virtual void Initialize(int number_of_sites, std::vector<std::string> states) = 0;
   void from_raw_model(IO::raw_substitution_model*);
 
   // States.
@@ -58,10 +56,10 @@ class SubstitutionModel {
   void reject();
 
   void saveToFile(int gen, double l);
-  virtual void Terminate();
-  void finalize();
+  void Terminate();
  private:
   std::ofstream* substitution_model_out;
+  void finalize();
 
   ComponentSet components;
   RateVectorSet rateVectors;

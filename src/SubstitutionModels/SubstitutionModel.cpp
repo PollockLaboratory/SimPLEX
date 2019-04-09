@@ -23,20 +23,23 @@ void SubstitutionModel::add_state(std::string s) {
 }
 
 void SubstitutionModel::from_raw_model(IO::raw_substitution_model* raw_sm) {
-  std::cout << "Making sub model." << std::endl;
+
+  // Read in states.
   for(auto it = raw_sm->states.begin(); it != raw_sm->states.end(); ++it) {
 	add_state(*it);
-	std::cout << *it;
   }
 
-  std::cout << std::endl;
+  // Get the list of naive list of parameters.
   std::list<IO::raw_param> params = raw_sm->get_parameters();
-  std::cout << params.size() << std::endl;
   components.create_parameters(params);
+
+  // Put them into rate vectors.
   for(auto it = raw_sm->rv_list.begin(); it != raw_sm->rv_list.end(); ++it) {
     RateVector* rv = components.create_rate_vector(states, *it, u);
     rateVectors.add(rv);
   }
+
+  finalize();
 }
 
 void SubstitutionModel::print_states() {

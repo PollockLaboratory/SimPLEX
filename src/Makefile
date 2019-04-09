@@ -557,87 +557,6 @@ SubstitutionModels/SubstitutionModelParser.cpp.s:
 	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.s
 .PHONY : SubstitutionModels/SubstitutionModelParser.cpp.s
 
-SubstitutionModels/SubstitutionModelTypes.o: SubstitutionModels/SubstitutionModelTypes.cpp.o
-
-.PHONY : SubstitutionModels/SubstitutionModelTypes.o
-
-# target to build an object file
-SubstitutionModels/SubstitutionModelTypes.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelTypes.cpp.o
-.PHONY : SubstitutionModels/SubstitutionModelTypes.cpp.o
-
-SubstitutionModels/SubstitutionModelTypes.i: SubstitutionModels/SubstitutionModelTypes.cpp.i
-
-.PHONY : SubstitutionModels/SubstitutionModelTypes.i
-
-# target to preprocess a source file
-SubstitutionModels/SubstitutionModelTypes.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelTypes.cpp.i
-.PHONY : SubstitutionModels/SubstitutionModelTypes.cpp.i
-
-SubstitutionModels/SubstitutionModelTypes.s: SubstitutionModels/SubstitutionModelTypes.cpp.s
-
-.PHONY : SubstitutionModels/SubstitutionModelTypes.s
-
-# target to generate assembly for a file
-SubstitutionModels/SubstitutionModelTypes.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelTypes.cpp.s
-.PHONY : SubstitutionModels/SubstitutionModelTypes.cpp.s
-
-SubstitutionModels/Types/CustomModel.o: SubstitutionModels/Types/CustomModel.cpp.o
-
-.PHONY : SubstitutionModels/Types/CustomModel.o
-
-# target to build an object file
-SubstitutionModels/Types/CustomModel.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.o
-.PHONY : SubstitutionModels/Types/CustomModel.cpp.o
-
-SubstitutionModels/Types/CustomModel.i: SubstitutionModels/Types/CustomModel.cpp.i
-
-.PHONY : SubstitutionModels/Types/CustomModel.i
-
-# target to preprocess a source file
-SubstitutionModels/Types/CustomModel.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.i
-.PHONY : SubstitutionModels/Types/CustomModel.cpp.i
-
-SubstitutionModels/Types/CustomModel.s: SubstitutionModels/Types/CustomModel.cpp.s
-
-.PHONY : SubstitutionModels/Types/CustomModel.s
-
-# target to generate assembly for a file
-SubstitutionModels/Types/CustomModel.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/CustomModel.cpp.s
-.PHONY : SubstitutionModels/Types/CustomModel.cpp.s
-
-SubstitutionModels/Types/GeneralTimeReversible.o: SubstitutionModels/Types/GeneralTimeReversible.cpp.o
-
-.PHONY : SubstitutionModels/Types/GeneralTimeReversible.o
-
-# target to build an object file
-SubstitutionModels/Types/GeneralTimeReversible.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/GeneralTimeReversible.cpp.o
-.PHONY : SubstitutionModels/Types/GeneralTimeReversible.cpp.o
-
-SubstitutionModels/Types/GeneralTimeReversible.i: SubstitutionModels/Types/GeneralTimeReversible.cpp.i
-
-.PHONY : SubstitutionModels/Types/GeneralTimeReversible.i
-
-# target to preprocess a source file
-SubstitutionModels/Types/GeneralTimeReversible.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/GeneralTimeReversible.cpp.i
-.PHONY : SubstitutionModels/Types/GeneralTimeReversible.cpp.i
-
-SubstitutionModels/Types/GeneralTimeReversible.s: SubstitutionModels/Types/GeneralTimeReversible.cpp.s
-
-.PHONY : SubstitutionModels/Types/GeneralTimeReversible.s
-
-# target to generate assembly for a file
-SubstitutionModels/Types/GeneralTimeReversible.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Types/GeneralTimeReversible.cpp.s
-.PHONY : SubstitutionModels/Types/GeneralTimeReversible.cpp.s
-
 Trees/BranchSplitting.o: Trees/BranchSplitting.cpp.o
 
 .PHONY : Trees/BranchSplitting.o
@@ -830,15 +749,6 @@ help:
 	@echo "... SubstitutionModels/SubstitutionModelParser.o"
 	@echo "... SubstitutionModels/SubstitutionModelParser.i"
 	@echo "... SubstitutionModels/SubstitutionModelParser.s"
-	@echo "... SubstitutionModels/SubstitutionModelTypes.o"
-	@echo "... SubstitutionModels/SubstitutionModelTypes.i"
-	@echo "... SubstitutionModels/SubstitutionModelTypes.s"
-	@echo "... SubstitutionModels/Types/CustomModel.o"
-	@echo "... SubstitutionModels/Types/CustomModel.i"
-	@echo "... SubstitutionModels/Types/CustomModel.s"
-	@echo "... SubstitutionModels/Types/GeneralTimeReversible.o"
-	@echo "... SubstitutionModels/Types/GeneralTimeReversible.i"
-	@echo "... SubstitutionModels/Types/GeneralTimeReversible.s"
 	@echo "... Trees/BranchSplitting.o"
 	@echo "... Trees/BranchSplitting.i"
 	@echo "... Trees/BranchSplitting.s"

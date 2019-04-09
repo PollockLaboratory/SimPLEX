@@ -49,16 +49,11 @@ int main(int argc, char* argv[]) {
   files.setupOutputDirectory();
 
   // Initiating program.
-  IO::raw_substitution_model* raw_sm = IO::read_substitution_model(env.get<std::string>("DATA.substitution_model_file"));
-  SubstitutionModel* sm = new SubstitutionModel();
-  sm->from_raw_model(raw_sm);
-  sm->finalize();
-  
   Data data;
-  data.Initialize(sm->get_states());
+  data.Initialize();
 
   Model model;
-  model.Initialize(data.raw_tree, data.MSA, sm);
+  model.Initialize(data.raw_tree, data.MSA, data.sm);
 
   MCMC mcmc;
   mcmc.initialize(&model);

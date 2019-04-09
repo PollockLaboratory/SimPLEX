@@ -20,7 +20,16 @@ Data::~Data() {
 //	cout << "Data destructor" << endl;
 }
 
-void Data::Initialize(const States* states) {
+void Data::Initialize() {
+  // Substitution Model.
+  IO::raw_substitution_model* raw_sm = ReadSubstitutionModel();
+  //std::cout << *raw_sm << std::endl;
+  sm = new SubstitutionModel();
+  sm->from_raw_model(raw_sm);
+  //exit(-1);
+
+  const States* states = sm->get_states();
+  
   files.add_file("sequences_in", env.get<std::string>("DATA.sequences_file"), IOtype::INPUT);
   ifstream sequences_in = files.get_ifstream("sequences_in");
 
@@ -49,6 +58,13 @@ void Data::Initialize(const States* states) {
   raw_tree = ReadTree();
 
   validateInputData(MSA_list, raw_tree);
+}
+
+// Substitution Model.
+
+IO::raw_substitution_model* Data::ReadSubstitutionModel() {
+  IO::raw_substitution_model* raw_sm = IO::read_substitution_model(env.get<std::string>("DATA.substitution_model_file"));
+  return(raw_sm);
 }
 
 // Sequences

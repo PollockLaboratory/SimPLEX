@@ -191,6 +191,7 @@ void branchLikelihood(double &l, int anc, int dec, float t_b, SubstitutionModel*
   if(anc == dec) {
     l *= 1.0/(1.0 + t_b *u);
   } else {
+    // TODO - This should not be selecting a rate vector. This should be looking up the rate vector that applies.
     double rate = SM->selectRateVector(anc)->rates[dec]->getValue();
     l *= (rate*t_b)/(1.0 + t_b *u);
   }
