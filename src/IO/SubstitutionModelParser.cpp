@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "../Environment.h"
-#include "../IO.h"
+#include "Files.h"
 
 extern IO::Files files;
 extern Environment env;
@@ -24,7 +24,7 @@ namespace IO {
     return(os);  
   }
 
-  raw_rate_vector::raw_rate_vector(std::string name, use_class uc, std::list<raw_param> rates) : name(name), uc(uc), rates(rates) {
+  raw_rate_vector::raw_rate_vector(std::string name, rv_use_class uc, std::list<raw_param> rates) : name(name), uc(uc), rates(rates) {
     static int i = -1;
     i++;
     ID = i;
@@ -108,9 +108,29 @@ namespace IO {
     return(p);
   }
 
+  std::list<int> get_positions(sol::table pos_tbl) {
+    std::list<int> out = {};
+
+    for(auto kvp : pos_tbl) {
+      const sol::object& val = kvp.second;
+
+      sol::optional<int> maybe_param = val.as<sol::optional<int>>();
+
+      if(maybe_param) {
+	int p = maybe_param.value();
+	out.push_back(p);
+      } else {
+	std::cerr << "Error: expecting a integer in pos table for new rate vector."  << std::endl;
+	exit(EXIT_FAILURE);
+      }
+    }
+    return(out);
+  }
+
   raw_rate_vector raw_substitution_model::new_rate_vector(std::string name, sol::table info_tbl, sol::table params_tbl) {
     std::string state = info_tbl["state"];
-    use_class uc = {state};
+    std::list<int> possible_pos = get_positions(info_tbl["pos"]);
+    rv_use_class uc = {state, possible_pos};
     std::list<raw_param> rates = {};
 
     for(auto kvp : params_tbl) {
@@ -146,7 +166,7 @@ namespace IO {
     rv_list.push_back(rv);
   }
 
-  void raw_substitution_model::read_from_file(std::string file_name) {
+  void raw_substitution_model::read_from_file(std::ifstream& lua_sm_in) {
     lua.open_libraries(sol::lib::base);
 
     //Main tables.
@@ -167,18 +187,15 @@ namespace IO {
 				      "new", [this](std::string name, sol::table info_tbl, sol::table param_tbl) -> raw_rate_vector { return(this->new_rate_vector(name, info_tbl, param_tbl)); });
 
     // Read the file.
-    files.add_file("lua_model", file_name, IOtype::INPUT);
-    std::ifstream lua_file = files.get_ifstream("lua_model");
-
     std::stringstream buffer;
-    buffer << lua_file.rdbuf();
+    buffer << lua_sm_in.rdbuf();
 
     lua.script(buffer.str());
   }
 
-  raw_substitution_model* read_substitution_model(std::string file_name) {
+  raw_substitution_model* read_substitution_model(std::ifstream& lua_sm_in) {
     raw_substitution_model* raw_model = new raw_substitution_model();
-    raw_model->read_from_file(file_name);
+    raw_model->read_from_file(lua_sm_in);
     return(raw_model);
   }
 

@@ -14,9 +14,9 @@
 #include "Components/AbstractComponent.h"
 #include "Components/ComponentSet.h"
 #include "Components/RateVector.h"
-#include "SubstitutionModelParser.h"
+#include "../IO/SubstitutionModelParser.h"
 
-// Temparily defined in Component set before it fidns a better home.
+// Temparily defined in Component set before it finds a better home.
 //struct States {
 // int n;
 // std::set<std::string> possible;
@@ -37,8 +37,8 @@ class SubstitutionModel {
   const States* get_states();
 
   // Rate Vectors.
-  RateVector* selectRateVector(int state);
-  void add_rate_vector(RateVector* v);
+  void organizeRateVectors(int seqLen, int numStates);
+  RateVector* selectRateVector(rv_request);
   std::vector<RateVector*> get_RateVectors();
   SubstitutionModel::iterator changed_vectors_begin();
 

@@ -1,4 +1,4 @@
-model.set_name("General Time Reversible")
+model.set_name("Mixture Model")
 
 states.set(config.get_string_array("MODEL.states"))
 
@@ -21,7 +21,7 @@ for i = 1, states.count do
       end
    end
 
-   model.add_rate_vector(RateVector.new("RV1-"..states[i], {state = states[i]}, Q1[i]))
-   --model.add_rate_vector(RateVector.new("RV2-"..states[i], {state = states[i]}, Q2[i]))
+   model.add_rate_vector(RateVector.new("RV1-"..states[i], {state = states[i], pos = {}}, Q1[i]))
+   -- model.add_rate_vector(RateVector.new("RV2-"..states[i], {state = states[i], pos = {}}, Q2[i]))
 
 end

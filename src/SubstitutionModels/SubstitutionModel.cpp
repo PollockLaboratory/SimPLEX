@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "../Environment.h"
-#include "../IO.h"
+#include "../IO/Files.h"
 #include "SubstitutionModel.h"
 
 extern Environment env;
@@ -36,7 +36,7 @@ void SubstitutionModel::from_raw_model(IO::raw_substitution_model* raw_sm) {
   // Put them into rate vectors.
   for(auto it = raw_sm->rv_list.begin(); it != raw_sm->rv_list.end(); ++it) {
     RateVector* rv = components.create_rate_vector(states, *it, u);
-    rateVectors.add(rv);
+    rateVectors.add(rv, (*it).uc);
   }
 
   finalize();
@@ -54,12 +54,16 @@ const States* SubstitutionModel::get_states() {
   return(&states);
 }
 
-RateVector* SubstitutionModel::selectRateVector(int state) {
+void SubstitutionModel::organizeRateVectors(int seqLen, int numStates) {
+  rateVectors.organize(seqLen, numStates);
+}
+
+RateVector* SubstitutionModel::selectRateVector(rv_request rq) {
   /*
    * This is a simple function right now but it will become hugely complex.
    * Given infomation about a BranchSegment and state of interest will return the corresponding rate vector.
    */
-  return(rateVectors[state]);
+  return(rateVectors.select(rq));
 }
 
 // Sampling
@@ -127,11 +131,6 @@ void SubstitutionModel::saveToFile(int gen, double l) {
 
 void SubstitutionModel::Terminate() {
   delete substitution_model_out;
-}
-
-void SubstitutionModel::add_rate_vector(RateVector* v) {
-  components.add_rate_vector(v);
-  rateVectors.add(v);
 }
 
 void SubstitutionModel::finalize() {

@@ -20,16 +20,18 @@ namespace IO {
     friend std::ostream& operator<<(std::ostream&, const IO::raw_param&);
   };
 
-  struct use_class {
+  struct rv_use_class {
+    // Structure describing where a rate vector can apply.
     std::string state;
+    std::list<int> pos;
   };
 
   class raw_rate_vector {
   public:
-    raw_rate_vector(std::string, use_class, std::list<raw_param>);
+    raw_rate_vector(std::string, rv_use_class, std::list<raw_param>);
     int ID;
     std::string name;
-    use_class uc;
+    rv_use_class uc;
     std::list<raw_param> rates;
     friend std::ostream& operator<<(std::ostream&, const IO::raw_rate_vector&);
   };
@@ -38,7 +40,7 @@ namespace IO {
   public:
     std::string name;
     raw_substitution_model();
-    void read_from_file(std::string);
+    void read_from_file(std::ifstream&);
     friend std::ostream& operator<<(std::ostream&, const IO::raw_substitution_model&);
     std::list<std::string> states;
     std::list<raw_rate_vector> rv_list;
@@ -50,6 +52,6 @@ namespace IO {
     void add_rate_vector(raw_rate_vector rv);
   };
 
-  raw_substitution_model* read_substitution_model(std::string);
+  raw_substitution_model* read_substitution_model(std::ifstream&);
 }
 #endif

@@ -2,7 +2,7 @@
 #include <iostream>
 #include "Environment.h"
 #include <algorithm>
-#include "IO.h"
+#include "IO/Files.h"
 
 extern double Random();
 extern Environment env;
@@ -62,7 +62,22 @@ void SequenceAlignment::Initialize(std::list<SequenceAlignment*>* msa_List) {
   DetermineColumnsWithoutGaps();
   RemoveColumnsWithGapsFromSequences();
   MSA_list = msa_List;
-  // current_MSA = MSA_list->begin();
+
+  // Setup output.
+  files.add_file("sequences", env.get<std::string>("OUTPUT.sequences_out_file"), IOtype::OUTPUT);
+  sequences_out = files.get_ofstream("sequences");
+
+  // Setup Environment.
+  env.n = (*taxa_names_to_sequences.begin()).second.size();
+}
+
+void SequenceAlignment::Initialize(IO::RawMSA* &raw_msa) {
+  for(auto it = raw_msa->seqs.begin(); it != raw_msa->seqs.end(); ++it) {
+    add((*it).first, (*it).second);
+  }
+
+  DetermineColumnsWithoutGaps();
+  RemoveColumnsWithGapsFromSequences();
 
   // Setup output.
   files.add_file("sequences", env.get<std::string>("OUTPUT.sequences_out_file"), IOtype::OUTPUT);

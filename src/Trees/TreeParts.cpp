@@ -47,7 +47,8 @@ inline void BranchSegment::update_rate_vectors() {
     if((*seq)[pos] == -1) {
       rates[pos] = NULL;
     } else {
-      rates[pos] = ancestral->SM->selectRateVector((*seq)[pos]);
+      rv_request rq = {pos, (*seq)[pos]};
+      rates[pos] = ancestral->SM->selectRateVector(rq);
     }
   }
 }
@@ -182,7 +183,7 @@ TreeNode* TreeNode::sample() {
   }
 }
 
-void branchLikelihood(double &l, int anc, int dec, float t_b, SubstitutionModel* SM) {
+void branchLikelihood(double &l, int anc, int dec, float t_b, RateVector* rv, SubstitutionModel* SM) {
   /*
    * Calculates the likelihood of a branch, and adds it to the vector l.
    */
@@ -192,7 +193,7 @@ void branchLikelihood(double &l, int anc, int dec, float t_b, SubstitutionModel*
     l *= 1.0/(1.0 + t_b *u);
   } else {
     // TODO - This should not be selecting a rate vector. This should be looking up the rate vector that applies.
-    double rate = SM->selectRateVector(anc)->rates[dec]->getValue();
+    double rate = rv->rates[dec]->getValue();
     l *= (rate*t_b)/(1.0 + t_b *u);
   }
 }
@@ -216,14 +217,14 @@ int TreeNode::sample_single_position(int pos) {
     if(left) {
       int dec = left->decendant->sequence->at(pos);
       if(dec != -1) {
-	branchLikelihood(l[state], state, dec, left->distance, SM);
+	branchLikelihood(l[state], state, dec, left->distance, left->rates[pos], SM);
       }
     }
 
     if(right) {
       int dec = right->decendant->sequence->at(pos);
       if(dec != -1) {
-	branchLikelihood(l[state], state, dec, right->distance, SM);
+	branchLikelihood(l[state], state, dec, right->distance,right->rates[pos], SM);
       }
     }
   }

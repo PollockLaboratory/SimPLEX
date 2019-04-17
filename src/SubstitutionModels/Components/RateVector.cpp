@@ -2,7 +2,7 @@
 #include "../../Sequence.h"
 #include "../../Trees/TreeParts.h"
 #include "../../Environment.h"
-#include "../../IO.h"
+#include "../../IO/Files.h"
 
 extern Environment env;
 extern IO::Files files;
@@ -11,6 +11,8 @@ int RateVector::IDc = 0;
 
 // Figure out locations Data Structure.
 RateVector::RateVector(std::string name, int state, std::vector<AbstractValue*> params) : name(name), state(state) {
+  id = IDc;
+  IDc++;
   size = params.size();
   rates = params;	
   //locations = {};
@@ -31,6 +33,10 @@ float RateVector::get_rate_ratio(int i) {
   return(rates[i]->getValue() / rates[i]->getOldValue());
 }
 
+const int& RateVector::getID() {
+  return(id);
+}
+
 // Util.
 void RateVector::print() {
   std::cout << "RateVector:\t" << name << "\t";
@@ -47,6 +53,7 @@ RateVectorSet::RateVectorSet() {
 }
 
 void RateVectorSet::Initialize() {
+  // Output file.
   files.add_file("rate_vectors", env.get<std::string>("OUTPUT.rate_vectors_out_file"), IOtype::OUTPUT);
   out_file = files.get_ofstream("rate_vectors");
 		
@@ -55,24 +62,68 @@ void RateVectorSet::Initialize() {
     out_file << "," << it->first;
   }
   out_file << std::endl;
+
+  // Collection of Rate Vectors.
+
 }
 
-RateVector*& RateVectorSet::operator[] (const int i) {
-  if(col[i]->state != i) {
-    std::cerr << "Error: RateVectorSet dispatching incorrect rate vector. " << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  return(col[i]);
-}
-
-void RateVectorSet::add(RateVector* rv) {
+void RateVectorSet::add(RateVector* rv, IO::rv_use_class uc) {
   // Set the pointer inside the AbstractValue to point to the host rate vector.
   for(unsigned int i = 0; i < rv->rates.size(); i++) {
     // Set up the AbstractValues themselves.
     rv->rates[i]->add_host_vector(rv, i);
   }
-  // Add RateVector to collection in RateVectorSet. 
+  // Add RateVector to collection in RateVectorSet.
+  id_to_uc[rv->getID()] = uc;
   col.push_back(rv);
+}
+
+RateVector* RateVectorSet::select(rv_request rq) {
+  std::list<RateVector*> possible_rv = rv_tree[rq.pos][rq.state];
+  if(possible_rv.size() != 1) {
+    std::cerr << "Error: Incorrect number of possible rate vectors." << std::endl;
+    exit(EXIT_FAILURE);
+  } else {
+    RateVector* rv = possible_rv.front();
+    if(rv->state != rq.state) {
+      std::cerr << "Error: Trying to dispatch incorrect rate vector." << std::endl;
+      exit(EXIT_FAILURE); 
+    }
+    return(possible_rv.front());
+  }
+}
+
+void RateVectorSet::organize(int seqLen, int numStates) {
+  /*
+   * Organizes RateVectors into logical structure now tree data is known.
+   */
+
+  // Establish structure.
+  rv_tree = std::vector<std::vector<std::list<RateVector*>>>(seqLen, std::vector<std::list<RateVector*>>(numStates));
+  std::cout << seqLen << " " << numStates << std::endl;
+  for(int l = 0; l < seqLen; l++) {
+    for(int s = 0; s < numStates; s++) {
+      //std::cout << l << " " << s << std::endl;
+      rv_tree[l][s] = {};
+    }
+  }
+
+  // Fill with pointers to RateVectors.
+  for(auto it = col.begin(); it != col.end(); ++it) {
+    // Add rate vector.
+    IO::rv_use_class uc = id_to_uc[(*it)->getID()];
+    std::cout << "RateVector: " << (*it)->getID() << " " << uc.pos.size() << std::endl;
+    // If no positions given then will apply to all positions.
+    if(uc.pos.size() == 0) {
+      for(int i = 0; i < seqLen; i++) {
+	rv_tree[i][(*it)->state].push_back(*it);
+      }
+    } else {
+      for(auto p = uc.pos.begin(); p != uc.pos.end(); ++p) {
+	rv_tree[*p][(*it)->state].push_back(*it);
+      }
+    }
+  }
 }
 
 void RateVectorSet::print() {

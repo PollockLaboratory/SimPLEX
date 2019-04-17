@@ -6,7 +6,7 @@
 #include <chrono>
 
 #include "Model.h"
-#include "IO.h"
+#include "IO/Files.h"
 
 
 std::ofstream MCMC::lnlout;

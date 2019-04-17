@@ -6,12 +6,14 @@ set(SRCS
   Data.cpp
   MCMC.cpp
   Environment.cpp
-  IO.cpp
+  IO/Files.cpp
+  IO/TreeParser.cpp
+  IO/SubstitutionModelParser.cpp
+  IO/SequencesParser.cpp
   Sequence.cpp
   SubstitutionCounts.cpp
   Model.cpp
   SubstitutionModels/SubstitutionModel.cpp
-  SubstitutionModels/SubstitutionModelParser.cpp
   SubstitutionModels/Components/AbstractComponent.cpp
   SubstitutionModels/Components/ComponentSet.cpp
   SubstitutionModels/Components/ComponentTypes.cpp
@@ -19,9 +21,8 @@ set(SRCS
   SubstitutionModels/Components/AbstractValueTypes.cpp
   SubstitutionModels/Components/SampleableValueTypes.cpp
   Trees/Tree.cpp
-  Trees/TreeParts.cpp
   Trees/BranchSplitting.cpp
-  Trees/TreeParser.cpp )
+  Trees/TreeParts.cpp )
 
 add_executable( simPLEX SimPLEX.cpp)
 target_sources( simPLEX PUBLIC ${SRCS} )

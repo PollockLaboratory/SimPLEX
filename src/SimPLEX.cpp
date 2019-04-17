@@ -11,13 +11,13 @@
 
 #include "SimPLEX.h"
 #include "Environment.h"
-#include "IO.h"
+#include "IO/Files.h"
 #include "Model.h"
 #include "Data.h"
 #include "MCMC.h"
 #include "utils.h"
 
-#include "SubstitutionModels/SubstitutionModelParser.h"
+#include "IO/SubstitutionModelParser.h"
 #include "SubstitutionModels/SubstitutionModel.h"
 
 #include "sol2/sol.hpp"
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
   data.Initialize();
 
   Model model;
-  model.Initialize(data.raw_tree, data.MSA, data.sm);
+  model.Initialize(data.raw_tree, data.raw_msa, data.raw_sm);
 
   MCMC mcmc;
   mcmc.initialize(&model);
