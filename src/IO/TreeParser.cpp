@@ -1,7 +1,7 @@
 #include "TreeParser.h"
 
 #include "../Environment.h"
-#include "../IO.h"
+#include "../IO/Files.h"
 
 #include <algorithm>
 
@@ -91,7 +91,7 @@ IO::RawTreeNode* IO::parseTree(std::string tree_string) {
 	return(t);
 }
 
-std::list<std::string> IO::getRawTreeNodeNames(IO::RawTreeNode* node) {
+std::list<std::string> IO::getRawTreeNodeNames(const IO::RawTreeNode* node) {
   std::list<std::string> node_names;
   node_names.push_back(node->name);
   if(node->left != 0) {

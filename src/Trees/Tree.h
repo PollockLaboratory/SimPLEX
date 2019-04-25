@@ -12,7 +12,7 @@
 
 #include "../Sequence.h"
 #include "../SubstitutionModels/SubstitutionModel.h"
-#include "TreeParser.h"
+#include "../IO/TreeParser.h"
 #include "TreeParts.h"
 #include "BranchSplitting.h"
 #include "../SubstitutionCounts.h"

@@ -12,9 +12,10 @@
 #include <algorithm>
 
 #include "Sequence.h"
-#include "Trees/TreeParser.h"
+#include "IO/TreeParser.h"
 #include "SubstitutionModels/SubstitutionModel.h"
-#include "SubstitutionModels/SubstitutionModelParser.h"
+#include "IO/SubstitutionModelParser.h"
+#include "IO/SequencesParser.h"
 
 using namespace std;
 
@@ -23,7 +24,9 @@ class Data {
   SubstitutionModel* sm;
   SequenceAlignment* MSA;
   list<SequenceAlignment*> MSA_list;
+  IO::RawMSA* raw_msa;
   IO::RawTreeNode* raw_tree;
+  IO::raw_substitution_model* raw_sm;
 
   Data();
   ~Data();
@@ -33,17 +36,12 @@ class Data {
   set<int> columns_with_gaps;
   vector<int> columns_without_gaps;
 
-  string cleanLine(string);
-  list<string> readFastaFile(ifstream &sequences_file);
-  list<list<string>> readCompoundFastaFile(ifstream &sequences_file);
-
-  void validateInputData(list<SequenceAlignment*> MSA_list, IO::RawTreeNode* raw_tree);
+  void validateInputData(const IO::RawMSA* raw_msa, const IO::RawTreeNode* raw_tree);
   bool matchNodeNames(list<string> names1, list<string> names2);
-
-  SequenceAlignment* ReadSequences(list<string> fasta_lines, const States*);
-
+  
   IO::RawTreeNode* ReadTree();
-  IO::raw_substitution_model* ReadSubstitutionModel();
+  IO::RawMSA* ReadMSA();
+  IO::raw_substitution_model* ReadSubstitutionModel(const IO::RawMSA*, const IO::RawTreeNode*);
 };
 
 #endif

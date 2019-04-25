@@ -5,7 +5,7 @@
 #include <list>
 
 #include "Environment.h"
-#include "IO.h"
+#include "IO/Files.h"
 
 extern Environment env;
 extern IO::Files files;
@@ -21,132 +21,12 @@ Data::~Data() {
 }
 
 void Data::Initialize() {
-  // Substitution Model.
-  IO::raw_substitution_model* raw_sm = ReadSubstitutionModel();
-  //std::cout << *raw_sm << std::endl;
-  sm = new SubstitutionModel();
-  sm->from_raw_model(raw_sm);
-  //exit(-1);
-
-  const States* states = sm->get_states();
-  
-  files.add_file("sequences_in", env.get<std::string>("DATA.sequences_file"), IOtype::INPUT);
-  ifstream sequences_in = files.get_ifstream("sequences_in");
-
-  if(env.ancestral_sequences == false) {
-    // Fasta file only contains terminal sequences.
-    list<string> fasta_lines = readFastaFile(sequences_in);
-    MSA = ReadSequences(fasta_lines, states);
-    MSA->Initialize(&MSA_list);
-  } else {
-    //Compound fasta with internal sequences - when ancestral states are already calculated.
-    list<list<string>> fasta_blocks = readCompoundFastaFile(sequences_in);
- 
-    for(auto it = fasta_blocks.begin(); it != fasta_blocks.end(); ++it) {
-      SequenceAlignment* msa = ReadSequences(*it, states);
-      msa->Initialize(&MSA_list);
-      MSA_list.push_back(msa);
-    }
-
-    // The MSA_list should be checked here. That all the MSAs have the same node names.
-    // MSA = new SequenceAlignment(*(MSA_list.front()));
-    std::cout << "MSA_list length: " << MSA_list.size() << std::endl;
-    MSA = new SequenceAlignment(*MSA_list.front());
-    // MSA->Initialize(&MSA_list);
-  }
-
+  raw_msa = ReadMSA();
   raw_tree = ReadTree();
+  raw_sm = ReadSubstitutionModel(raw_msa, raw_tree);
 
-  validateInputData(MSA_list, raw_tree);
+  validateInputData(raw_msa, raw_tree);  
 }
-
-// Substitution Model.
-
-IO::raw_substitution_model* Data::ReadSubstitutionModel() {
-  IO::raw_substitution_model* raw_sm = IO::read_substitution_model(env.get<std::string>("DATA.substitution_model_file"));
-  return(raw_sm);
-}
-
-// Sequences
-string Data::cleanLine(string line) {
-  /* 
-   * Cleans up the a line to remove blank spaces a line returns.
-   */
-  //Remove spaces and concatenate words
-  line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
-  //This removes the carriage return in Windows files
-  line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
-  return(line);
-}
-
-list<string> Data::readFastaFile(ifstream &sequences_file) {
-  list<string> f;
-  string line;
-  while(sequences_file.good()) {
-    getline(sequences_file, line);
-    f.push_back(cleanLine(line));
-  }
-  return(f);
-}
-
-list<list<string>> Data::readCompoundFastaFile(ifstream &sequences_file) {
-  list<list<string>> lf;
-  list<string> f;
-  string line;
-
-  while(sequences_file.good()) {
-    getline(sequences_file, line);
-    line = cleanLine(line);
-
-    // Just ignore empty lines.
-    if(line != "") {
-      if(line.at(0) == '#') {
-	// Next fasta block.
-	if(!f.empty()) {
-	  lf.push_back(f);
-	  f.clear();
-	}
-      }
-      f.push_back(line);
-    }
-  }
-  // Add last block.
-  lf.push_back(f);
-  return(lf);
-}
-
-SequenceAlignment* Data::ReadSequences(list<string> fasta_lines, const States* states) {
-  /*
-   * Given a list of lines that represent a fasta file, returns a pointer to a MSA object.
-   */
-  
-  MSA = new SequenceAlignment(states);
-
-  string line;
-  string sequence = "";
-  string name;
-
-  for(auto it = fasta_lines.begin(); it != fasta_lines.end(); ++it) {
-    line = *it;
-    if(line == "" or line.at(0) == '#') {
-      continue;
-    }
-    if(line.at(0) == '>') {
-      if (sequence != "") {
-	MSA->add(name, sequence);
-      }
-      name = line.substr(1);
-      sequence = "";
-    } else {
-      sequence += line;
-    }
-  }
-  // Add final sequence
-  MSA->add(name, sequence);
-  return(MSA);
-}
-
-// Trees
 
 IO::RawTreeNode* Data::ReadTree() {
   std::string treefile = env.get<std::string>("DATA.tree_file");
@@ -164,8 +44,42 @@ IO::RawTreeNode* Data::ReadTree() {
   return(raw_tree);
 }
 
-// Validate data
+IO::RawMSA* Data::ReadMSA() {
+  files.add_file("sequences_in", env.get<std::string>("DATA.sequences_file"), IOtype::INPUT);
+  ifstream sequences_in = files.get_ifstream("sequences_in");
+
+  std::cout << "Reading sequences from:\t" << files.get_file_path("sequences_in") << std::endl;
+
+  IO::RawMSA* raw_msa = IO::readRawMSA(sequences_in);
+
+  return(raw_msa);  
+}
+
+IO::raw_substitution_model* Data::ReadSubstitutionModel(const IO::RawMSA* raw_msa, const IO::RawTreeNode* raw_tree) {
+  files.add_file("lua_model", env.get<std::string>("DATA.substitution_model_file"), IOtype::INPUT);
+  std::ifstream lua_sm_in = files.get_ifstream("lua_model");
+
+  std::cout << "Reading Substitution model from:\t" << files.get_file_path("lua_model") << std::endl;
+
+  IO::raw_substitution_model* raw_sm = IO::read_substitution_model(lua_sm_in);
+  return(raw_sm);
+}
+
+// Validate data.
+
 bool Data::matchNodeNames(list<string> names1, list<string> names2) {
+  auto n1 = names1.begin();
+  auto n2 = names2.begin();
+  std::cout << names1.size() << " " << names2.size() << std::endl;
+  for(int i = 0; i < names1.size(); i++) {
+    std::cout << *n1 << " " << *n2 << std::endl;
+    ++n1;
+    ++n2;
+    if(n1 == names1.end() or n2 == names2.end()) {
+      break;
+    }
+  }
+  
   for(auto name_it = names1.begin(); name_it != names1.end(); ++name_it) {
     auto it = std::find(names2.begin(), names2.end(), *name_it);
     if(it == names2.end()) {
@@ -176,20 +90,17 @@ bool Data::matchNodeNames(list<string> names1, list<string> names2) {
   return(names2.empty());
 }
 
-void Data::validateInputData(list<SequenceAlignment*> MSA_list, IO::RawTreeNode* raw_tree) {
+void Data::validateInputData(const IO::RawMSA* raw_msa, const IO::RawTreeNode* raw_tree) {
   /* 
    * Check that the node names match between the tree and MSAs.
    */
   // Need to impliment for non-ancestral sequences case.
-  if(env.ancestral_sequences) {
-    list<string> tree_names = IO::getRawTreeNodeNames(raw_tree);
-    list<string> MSA_names;
-    for(auto it = MSA_list.begin(); it != MSA_list.end(); ++it) {
-      MSA_names = (*it)->getNodeNames();
-      if(matchNodeNames(tree_names, MSA_names) == false) {
-	std::cerr << "Error: Node names in Multiple Sequence Alignments and tree do not match." << std::endl;
-	exit(EXIT_FAILURE);
-      }
-    }
-  }
+  std::list<std::string> tree_names = IO::getRawTreeNodeNames(raw_tree);
+  std::list<std::string> MSA_names = IO::getRawMSANames(*raw_msa);
+   //for(auto it = MSA_list.begin(); it != MSA_list.end(); ++it) {
+   //MSA_names = (*it)->getNodeNames();
+  //   if(matchNodeNames(tree_names, MSA_names) == false) {
+  //   std::cerr << "Error: Node names in MSA and tree do not match." << std::endl;
+  //   exit(EXIT_FAILURE);
+  //}
 }

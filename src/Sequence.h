@@ -8,6 +8,7 @@
 #include<set>
 
 #include "SubstitutionModels/SubstitutionModel.h"
+#include "IO/SequencesParser.h"
 
 struct substitution {
 	int pos;
@@ -39,6 +40,7 @@ class SequenceAlignment {
 
   void print();
   void Initialize(std::list<SequenceAlignment*>*);
+  void Initialize(IO::RawMSA* &raw_msa);
   void saveToFile(int gen, double l);
 
   // Utilities

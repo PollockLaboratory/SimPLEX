@@ -10,7 +10,7 @@
 
 #include "AbstractComponent.h"
 #include "RateVector.h"
-#include "../SubstitutionModelParser.h"
+#include "../../IO/SubstitutionModelParser.h"
 
 struct States {
   int n; // Careful about indels.

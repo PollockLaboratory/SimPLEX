@@ -7,7 +7,7 @@
 
 #include "../Sequence.h"
 #include "../Environment.h"
-#include "../IO.h"
+#include "../IO/Files.h"
 #include "../utils.h"
 
 extern double Random();
@@ -42,6 +42,7 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
   this->MSA = MSA;
   seqLen = MSA->numCols();
   this->SM = SM;
+  SM->organizeRateVectors(MSA->numCols(), SM->get_states()->n);
 
   // Proxys are created to correctly create root node.
   BranchSegment* proxyBranch = new BranchSegment(0.0);
@@ -52,7 +53,7 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
 
   std::cout << "Attaching sequences to tree." << std::endl;
   configureSequences(root);
-  
+
   for(auto t = nodeList.begin(); t != nodeList.end(); ++t) {
     if((*t)->isTip()) {
       tipList.push_back(*t);
@@ -60,12 +61,12 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
   }
 
   // Initial sample to get counts.
-  sample_ancestral_states();
-
   for(auto b = branchList.begin(); b != branchList.end(); ++b) {
   	(*b)->update();
   }
 
+  sample_ancestral_states();
+  
   initialize_output_streams();	
 
   std::cout << std::endl;
@@ -233,6 +234,7 @@ void Tree::traverse_find_ancestral_sequences() {
   }
 }
 
+// Option 1.
 bool Tree::sample_ancestral_states() {
   /*
    * Both recalculates substitutions and recalculates the ancestral sequences.
@@ -247,6 +249,7 @@ bool Tree::sample_ancestral_states() {
   return(false);
 }
 
+// Option 2.
 bool Tree::step_through_MSAs() {
   // This is not going to work anymore as the tree resampling algorithm has changed.
   MSA->step_to_next_MSA();

@@ -25,8 +25,7 @@
 class Model {
  public:
   Model();
-  void Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA, SubstitutionModel* &sm);
-
+  void Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &MSA, IO::raw_substitution_model* &sm);
   bool SampleTree();
   bool SampleSubstitutionModel();
 

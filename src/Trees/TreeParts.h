@@ -7,7 +7,7 @@
 #include <iostream>
 #include <math.h>
 
-#include "TreeParser.h"
+#include "../IO/TreeParser.h"
 #include "../Sequence.h"
 #include "Components/RateVector.h"
 #include "../SubstitutionModels/SubstitutionModel.h"
@@ -38,7 +38,6 @@ class BranchSegment {
   friend std::ostream& operator<< (std::ostream &out, const BranchSegment &b);
 
   std::vector<bool> substitutions;
- private:
   std::vector<RateVector*> rates; //By site.
 };
 

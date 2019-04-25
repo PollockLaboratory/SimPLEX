@@ -6,9 +6,25 @@ It takes the input of a rooted tree, sequences for the node tips and a substitut
 ## Installation
 simPLEX has a number of external dependancies that can sometimes to be challenging to link/compile into the final binary. These include lua5.2 and the C++ boost library.
 
+	$ mkdir build
+	
 	$ cd build/
 
-	$ cmake ..
+Set compiler options.
+
+	$ cmake .. -DCMAKE_BUILD_TYPE=DEBUG	
+
+or, for full optimizations:
+	
+	$ cmake .. -DCMAKE_BUILD_TYPE=RELEASE
+
+Actually compile:
+
+	$ make
+	
+Test that everything is working:
+
+	$ ./bin/simPLEX ../resources/options.toml
 
 ## Usage
 

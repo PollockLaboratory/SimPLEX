@@ -4,11 +4,11 @@
 #include <chrono>
 
 #include "Model.h"
-#include "Trees/TreeParser.h"
 #include "SubstitutionModels/SubstitutionModel.h"
 
 #include "Environment.h"
-#include "IO.h"
+#include "IO/Files.h"
+#include "IO/TreeParser.h"
 
 extern Environment env;
 extern IO::Files files;
@@ -25,20 +25,18 @@ Model::Model() {
   ready = true;
 }
 
-void Model::Initialize(IO::RawTreeNode* &raw_tree, SequenceAlignment* &MSA, SubstitutionModel* &sm) {
-  /*
-   * Initialize the model class.
-   * There are two main components within the model class:
-   * - the tree class - contains the tree topology as well as the sequences.
-   * - the substitution model class - which contains all the rate matrices.
-   */
-  substitution_model = sm;
-  num_parameters = substitution_model->getNumberOfParameters();
+void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw_substitution_model* &raw_sm) {
+  substitution_model = new SubstitutionModel();
+  substitution_model->from_raw_model(raw_sm);
+
+  const States* states = substitution_model->get_states();
+
+  SequenceAlignment* MSA = new SequenceAlignment(states);
+  MSA->Initialize(raw_msa);
 
   tree = new Tree();
   tree->Initialize(raw_tree, MSA, substitution_model);
 
-  // Sort out counts.
   counts = SubstitutionCounts(substitution_model->get_RateVectors(), tree->get_branch_lengths());
   tree->update_counts(counts);
   counts.print();
