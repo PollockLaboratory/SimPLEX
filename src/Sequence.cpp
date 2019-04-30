@@ -106,8 +106,14 @@ std::vector<int> SequenceAlignment::EncodeSequence(const std::string &sequence) 
 
   for (unsigned int site = 0; site < sequence.length(); site++) {
     std::string current_pos = sequence.substr(site, 1);
-    encoded_sequence.at(site) = state_to_integer[current_pos];
+    try {
+      encoded_sequence.at(site) = state_to_integer.at(current_pos);
+    } catch(const std::out_of_range& e) {
+      std::cerr << "Error: state \"" << current_pos << "\" in sequence alignment is not recognised. " << std::endl;
+      exit(EXIT_FAILURE);
+    }
   }
+  
   return(encoded_sequence);
 }
 

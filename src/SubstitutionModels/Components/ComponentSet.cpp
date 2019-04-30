@@ -30,12 +30,10 @@ void ComponentSet::Initialize() {
   out_file = files.get_ofstream("parameters");
 
   out_file << "I,GEN,LogL";
-  for(auto it = samplable_parameters_list.begin(); it != samplable_parameters_list.end(); ++it) {
-    out_file << "," << (*it)->get_name();
-  }
   for(auto it = all_parameters_list.begin(); it != all_parameters_list.end(); ++it) {
     out_file << "," << (*it)->get_name();
   }
+
   out_file << std::endl;
 }
 
@@ -259,16 +257,19 @@ void ComponentSet::saveToFile(int gen, double l) {
    * Saves the current parameter values to the output csv file, contained
    * in the out_file.
    */
+
+  // This is not super efficient.
   static int i = -1;
   ++i;
   out_file << i << "," << gen << "," << l;
 
-  for(auto it = samplable_parameters_list.begin(); it != samplable_parameters_list.end(); ++it) {
-    out_file << "," << (*it)->getValue();
-  }
-
   for(auto it = all_parameters_list.begin(); it != all_parameters_list.end(); ++it) {
-    out_file << "," << 0.0; //(*it)->getValue();
+    AbstractValue* val = dynamic_cast<AbstractValue*>(*it);
+    if(val != nullptr) {
+      out_file << "," << val->getValue();
+    } else {
+      out_file << ",NA";
+    }
   }
   out_file << std::endl;
 }

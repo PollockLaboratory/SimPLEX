@@ -33,14 +33,14 @@ void Environment::ReadOptions(int argc, char* argv[]) {
 }
 
 void Environment::ReadTOMLfile(std::string file_name) {
-  std::string tomlfile = "/home/hamish/Documents/Code/simplex0_0/resources/options.toml";
-
   try {
     config = cpptoml::parse_file(file_name);
   } catch(const cpptoml::parse_exception& e) {
     std::cerr << "Error: failed to parse TOML configuration file: " << e.what() << std::endl;
+    exit(EXIT_FAILURE);
   }
 }
+
 void Environment::InitializeRandomNumberGeneratorSeed() {
   seed = get<int>("seed");
 

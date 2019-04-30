@@ -7,16 +7,15 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra")
+set(CMAKE_CXX_FLAGS_RELEASE "-w -O3")
 
-find_package(Boost 1.56 REQUIRED)
+find_package(Boost 1.5 REQUIRED)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
-find_package(Lua 5.2 REQUIRED)
+find_package(Lua 5 REQUIRED)
 include_directories(${LUA_INCLUDE_DIR})
 
 add_subdirectory( src )
