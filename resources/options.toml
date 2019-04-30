@@ -14,15 +14,9 @@ seed = 0
 [DATA]
   # This should be TRUE or FALSE
   ancestral_sequences = false
-
-  # Substitution Model types
-  # 0 General Time Reversible.
-  # 1 Custom Model.
-
-  substitution_model_type = 1
   substitution_model_file = "../resources/model.lua"
 
-  sequences_file = "../resources/test_data/5taxon.fasta"
+  sequences_file = "../resources/test_data/5taxon_tf.fasta"
   tree_file = "../resources/test_data/5taxon.tree"
 
   #sequences_file	resources/test_data/Species_alignment_BLVRB.fasta

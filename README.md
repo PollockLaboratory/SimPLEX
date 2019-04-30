@@ -4,7 +4,24 @@ Simplex is a tool for phylogenetic analysis, focussing on fitting complex substi
 It takes the input of a rooted tree, sequences for the node tips and a substitution model, and returns the posterior distribution of the parameters inside that substitution model.
 
 ## Installation
-simPLEX has a number of external dependancies that can sometimes to be challenging to link/compile into the final binary. These include lua5.2 and the C++ boost library.
+
+### Get the newest version of PLEX from github
+
+	$ git pull origin master
+
+### Dependancies
+simPLEX has a number of external dependancies that can sometimes to be challenging to link/compile into the final binary. These include lua5.2 and the C++ boost library. To install them on Ubuntu/Debian based linux distributions use:
+
+	$ sudo apt update
+	
+	$ sudo apt install liblua5.2-dev libboost-all-dev
+	
+### Compilation
+The simplest way to install this script is to use the install script. This will automatically carry out the following commands and copy the simPLEX binary to the /usr/bin directory on the user PATH.
+
+	$ sudo ./install.sh
+	
+To install simPLEX manually, use the following commands: 
 
 	$ mkdir build
 	
@@ -25,6 +42,10 @@ Actually compile:
 Test that everything is working:
 
 	$ ./bin/simPLEX ../resources/options.toml
+	
+Copy the simPLEX binary to a location on your path so simPLEX can be used in any directory:
+
+	$ cp ./bin/simPLEX /usr/bin/simPLEX
 
 ## Usage
 

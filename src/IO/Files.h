@@ -22,7 +22,6 @@ namespace IO {
     Files();
     void setupOutputDirectory();
     void set_options_file(char* argv[]);
-    void initialize();
     void add_file(std::string name, std::string path, IOtype);
 
     std::ifstream get_ifstream(std::string name);
@@ -37,8 +36,7 @@ namespace IO {
     std::map<std::string, int> file_to_index;
     std::map<int, fileInfo> file_values;
 
-    std::string defaultfile;
-    std::string optionsfile;
+    std::string tomlfile;
     std::string outdir;
 
     void check_stream(const std::string&, const std::string&, std::ifstream&);

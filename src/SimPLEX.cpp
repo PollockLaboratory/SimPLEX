@@ -47,6 +47,7 @@ int main(int argc, char* argv[]) {
   env.ReadOptions(argc, argv);
 
   files.setupOutputDirectory();
+  files.set_options_file(argv);
 
   // Initiating program.
   Data data;

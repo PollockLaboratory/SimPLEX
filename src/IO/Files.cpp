@@ -22,8 +22,8 @@ extern Environment env;
 IO::Files::Files() {
   total_files = 0;
   // Remember to make this relative.
-  defaultfile = "/home/hamish/Documents/Code/simplex0_0/resources/defaults.ctrl"; // where to find default settings
-  optionsfile = "/home/hamish/Documents/Code/simplex0_0/resources/options.ctrl"; // where to find optional control settings
+  // defaultfile = "/home/hamish/Documents/Code/simplex0_0/resources/defaults.ctrl"; // where to find default settings
+  // optionsfile = "/home/hamish/Documents/Code/simplex0_0/resources/options.ctrl"; // where to find optional control settings
 }
 
 void IO::Files::setupOutputDirectory() {
@@ -32,14 +32,10 @@ void IO::Files::setupOutputDirectory() {
 }
 
 void IO::Files::set_options_file(char* argv[]) {
-  std::string s(argv[1]);
-  optionsfile = s;
-  std::cout << "Command line specified options file used: " << optionsfile << std::endl;
-}
-
-void IO::Files::initialize() {
-  add_file("default", defaultfile, IOtype::INPUT);
-  add_file("options", optionsfile, IOtype::INPUT); 
+  std::string path(argv[1]);
+  tomlfile = path;
+  add_file("options_file", path, IOtype::INPUT);
+  std::cout << "Command line specified options file used: " << tomlfile << std::endl;
 }
 
 void IO::Files::add_file(std::string name, std::string path, IOtype t) {
