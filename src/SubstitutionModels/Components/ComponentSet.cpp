@@ -93,7 +93,7 @@ void ComponentSet::create_parameters(std::list<IO::raw_param> params) {
 RateVector* ComponentSet::create_rate_vector(States states, IO::raw_rate_vector rv, UniformizationConstant* u) {
   std::vector<AbstractValue*> rates(states.n, nullptr);
   int s = states.state_to_int[rv.uc.state];
-  VirtualSubstitutionRate* vir_rate = new VirtualSubstitutionRate("tmp_name", -1, u);
+  VirtualSubstitutionRate* vir_rate = new VirtualSubstitutionRate("tmp_name", -1, u); 
   for(int i = 0; i < states.n; i++) {
     IO::raw_param param = rv.rates.front();
     if(i != s) {
@@ -110,7 +110,7 @@ RateVector* ComponentSet::create_rate_vector(States states, IO::raw_rate_vector 
   }
 
   if(not rv.rates.empty()) {
-    std::cerr << "Error: unexpected number of rates in raw_rate_vector - " << rv.rates.size() << "extra." << std::endl;
+    std::cerr << "Error: unexpected number of rates - " << states.n << " is expected (given the number of states), however " << rv.rates.size() << " additional rate is found." << std::endl;
     exit(EXIT_FAILURE);
   }
 

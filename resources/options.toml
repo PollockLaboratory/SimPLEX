@@ -19,16 +19,16 @@ seed = 0
   sequences_file = "../resources/test_data/5taxon_tf.fasta"
   tree_file = "../resources/test_data/5taxon.tree"
 
-  #sequences_file	resources/test_data/Species_alignment_BLVRB.fasta
-  #tree_file	resources/test_data/BLVRB_subtree_MLbranches.nh
+  #sequences_file = "../resources/test_data/Species_alignment_BLVRB.fasta"
+  #tree_file = "../resources/test_data/BLVRB_subtree_MLbranches.nh"
 
 [OUTPUT]
   output_directory = "../testing/s1_test_run/"
   tree_out_file = "tree_out.newick"
-  sequences_out_file = "s1_sequences_out.fasta"
-  parameters_out_file = "s1_parameters_out.csv"
-  rate_vectors_out_file = "s1_rate_vectors_out.csv"
-  likelihood_out_file = "s1_likelihoods_out.csv"
+  sequences_out_file = "sequences_out.fasta"
+  parameters_out_file = "parameters_out.csv"
+  rate_vectors_out_file = "rate_vectors_out.csv"
+  likelihood_out_file = "likelihoods_out.csv"
   substitutions_out_file = "substitutions.out"
   time_out_file = "time.out"
 
@@ -39,6 +39,6 @@ seed = 0
   print_frequency = 5000
 
 [MODEL]
-  states = ["A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"]
-
+  #states = ["A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"]
+  states = ["N", "F"]
 

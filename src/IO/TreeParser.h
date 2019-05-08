@@ -29,6 +29,8 @@ namespace IO {
   RawTreeNode* parseRawTreeNode(std::string node_string, RawTreeNode* up);
   RawTreeNode* parseTree(std::string tree_string);
   std::list<std::string> getRawTreeNodeNames(const RawTreeNode* node);
+
+  void printRawTree(const RawTreeNode* node);
 }
 
 #endif

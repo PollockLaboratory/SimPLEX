@@ -22,6 +22,7 @@ inline std::string& IO::cleanTreeString(std::string &tree_string) {
 std::pair<std::string, std::string> IO::splitBranchString(std::string branch_string) {
   std::pair<std::string, std::string> b;
   int tree_depth = 0;
+  int comma_position = -1;
   for (unsigned int position = 0; position < branch_string.size(); position++) {
     char character = branch_string.at(position);
     //std::cout << "Char: " << character << " Depth: " << tree_depth << std::endl;
@@ -30,14 +31,23 @@ std::pair<std::string, std::string> IO::splitBranchString(std::string branch_str
     else if (character == ')')
       tree_depth--;
     else if (character == ',' and tree_depth == 0) {
-      b.first = branch_string.substr(0, position);
-      b.second = branch_string.substr(position + 1, branch_string.size() - position + 1);
-      return(b);
+      if(comma_position == -1) {
+	comma_position = position;
+      } else {
+	std::cerr << "Error: in tree parsing. Suspected unrooted tree." << std::endl;
+	exit(EXIT_FAILURE);
+      }
     }
   }
-  // Node with a single decendent.
-  b.first = branch_string;
-  b.second = "";
+
+  if(comma_position == -1) {
+    // Node with a single decendent.
+    b.first = branch_string;
+    b.second = "";
+  } else {
+    b.first = branch_string.substr(0, comma_position);
+    b.second = branch_string.substr(comma_position + 1, branch_string.size() - comma_position + 1);
+  }
   return(b);
 }
 
@@ -88,6 +98,7 @@ IO::RawTreeNode* IO::parseTree(std::string tree_string) {
 	IO::RawTreeNode* root = new RawTreeNode;
 	*root = {"Root", 0, NULL, NULL, NULL};
 	IO::RawTreeNode* t = parseRawTreeNode(tree_string, root);
+	printRawTree(t);
 	return(t);
 }
 
@@ -101,4 +112,16 @@ std::list<std::string> IO::getRawTreeNodeNames(const IO::RawTreeNode* node) {
     node_names.splice(node_names.begin(), getRawTreeNodeNames(node->right));
   }
   return(node_names);
+}
+
+// Utils
+
+void IO::printRawTree(const RawTreeNode* node) {
+  std::cout << "Node: " << node->name << " " << node->distance << std::endl;
+  if(node->left != nullptr) {
+    printRawTree(node->left);
+  }
+  if(node->right != nullptr) {
+    printRawTree(node->right);
+  }
 }
