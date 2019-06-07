@@ -63,7 +63,11 @@ class TreeNode {
   TreeNode* sample();
   void sample_sequence();
   int sample_single_position(int pos);
+
+  // Printing/Display
   std::string toString();
+  std::string get_sequence();
+  std::string state_at_pos(int i);
 
   bool isTip();
   bool sampled;

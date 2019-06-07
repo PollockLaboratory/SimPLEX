@@ -229,6 +229,7 @@ void Tree::traverse_find_ancestral_sequences() {
     nodes.pop();
   }
 
+  // Reset all nodes such that the sampled flag is false.
   for(auto n = nodeList.begin(); n != nodeList.end(); ++n) {
     (*n)->sampled = false;
   }
@@ -260,10 +261,11 @@ bool Tree::step_through_MSAs() {
 void Tree::initialize_output_streams() {
   files.add_file("tree", env.get<std::string>("OUTPUT.tree_out_file"), IOtype::OUTPUT);
   tree_out = files.get_ofstream("tree");
+
   files.add_file("substitutions", env.get<std::string>("OUTPUT.substitutions_out_file"), IOtype::OUTPUT);
   substitutions_out = files.get_ofstream("substitutions");
 
-  substitutions_out << "Branch\tSubstitutions" << endl;
+  substitutions_out << "I,GEN,LogL,Ancestral,Decendant,Substitutions" << endl;
 }
 
 void Tree::record_tree() {
@@ -273,9 +275,34 @@ void Tree::record_tree() {
   tree_out << root->toString();
 }
 
+void Tree::record_substitutions(int gen, double l) {
+  static int index = -1;
+  index++;
+  for(auto it = branchList.begin(); it != branchList.end(); ++it) {
+    substitutions_out << index << "," << gen << "," << l << ",";
+    substitutions_out << (*it)->ancestral->name << "," << (*it)->decendant->name << ",[ ";
+    for(int i = 0; i < (*it)->substitutions.size(); i++) {
+	TreeNode* anc = (*it)->ancestral;
+	TreeNode* dec = (*it)->decendant;
+
+	if((*anc->sequence)[i] != (*dec->sequence)[i] and (*it)->substitutions[i] == false) {
+	  std::cerr << "Error: counting substitutions has gone wrong." << std::endl;
+	  exit(EXIT_FAILURE);
+	}
+
+	if((*it)->substitutions[i] == true) {
+	  substitutions_out << (*it)->ancestral->state_at_pos(i) << i << (*it)->decendant->state_at_pos(i) << " ";
+	}
+    }
+    substitutions_out << "]\n";
+  }
+}
+
 void Tree::record_state(int gen, double l) {
   MSA->saveToFile(gen, l);
-  //RecordSubtreeState();
+  if(files.check_file("substitutions")) {
+      record_substitutions(gen, l);
+  }
 }
 
 // Debug tools.

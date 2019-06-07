@@ -13,18 +13,60 @@ sol::state lua;
 
 namespace IO {
 
-  raw_param::raw_param(std::string name, param_type t, double init) : name(name), t(t), init(init) {
+  // RAW PARAMETERS.
+  raw_param::raw_param(std::string name, param_type t) : name(name), t(t) {
     static int i = 0;
     i++;
     ID = i;
   }
 
   std::ostream& operator<<(std::ostream& os, const raw_param& param) {
-    os << "[" << param.ID << " " << param.name << "]";
-    return(os);  
+   os << "[" << param.ID << " " << param.name << "]";
+   return(os);  
   }
 
-  raw_rate_vector::raw_rate_vector(std::string name, rv_use_class uc, std::list<raw_param> rates) : name(name), uc(uc), rates(rates) {
+  raw_param_wrapper::raw_param_wrapper(raw_param* ptr) : ptr(ptr) {
+  }
+
+  void raw_ContinuousFloat::read_options_table(sol::table tbl) {
+    sol::optional<double> initial_value = tbl["initial_value"];
+    if(initial_value) {
+      init = initial_value.value();
+    } else{
+      std::cerr << "Error: initial_value is not set or is not a double for float parameter \"" << name << "\"" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+  }
+  
+  raw_ContinuousFloat::raw_ContinuousFloat(std::string name, param_type t, sol::table tbl) : raw_param(name, t) {
+    read_options_table(tbl);
+  }
+
+  void raw_CategoryFloat::read_options_table(sol::table tbl) {
+    sol::optional<sol::table> cats = tbl["categories"];
+    if(cats) {
+      for(auto kvp : cats.value()) {
+	const sol::object& val = kvp.second;
+	sol::optional<float> maybe_float = val.as<sol::optional<float>>();
+	if(maybe_float) {
+	  categories.push_back(maybe_float.value());
+	} else {
+	  std::cerr << "Error: expecting elements of type float in categories list in parameter \"" << name << "\"" << std::endl;
+	}	
+      }
+    } else {
+      std::cerr << "Error: categories is not set or is not a table for Categories parameter \"" << name << "\"" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+  }
+  
+  raw_CategoryFloat::raw_CategoryFloat(std::string name, param_type t, sol::table tbl) : raw_param(name, t) {
+    read_options_table(tbl);
+  }
+
+  // RAW RATE VECTORS.
+
+  raw_rate_vector::raw_rate_vector(std::string name, rv_use_class uc, std::list<raw_param*> rates) : name(name), uc(uc), rates(rates) {
     static int i = -1;
     i++;
     ID = i;
@@ -44,8 +86,8 @@ namespace IO {
     states = {};
   }
 
-  std::list<raw_param> raw_substitution_model::get_parameters() {
-	std::list<raw_param> ret;
+  std::list<raw_param*> raw_substitution_model::get_parameters() {
+	std::list<raw_param*> ret;
 	for(auto it = rv_list.begin(); it != rv_list.end(); ++it) {
 	  for(auto jt = (*it).rates.begin(); jt != (*it).rates.end(); ++jt) {
 		ret.push_back(*jt);
@@ -84,27 +126,16 @@ namespace IO {
     }
   }
 
-  raw_param raw_substitution_model::new_parameter(std::string name, sol::table tbl) {
-    std::string type = tbl["type"];
-    sol::optional<double> initial_value = tbl["initial_value"];
-    double init;
-    if(initial_value) {
-      init = initial_value.value();
-    } else{
-      std::cerr << "Error: initial_value is not set or is not a double." << std::endl;
-      exit(EXIT_FAILURE);
-    }
-
-    param_type pt;
-    if(type == "float") {
-      pt = FLOAT;
-    } else if(type == "int") {
-      pt = INT;
+  raw_param* raw_substitution_model::new_parameter(std::string name, std::string parameter_type, sol::table tbl) {
+    raw_param* p;
+    if(parameter_type == "float") {
+      p = new raw_ContinuousFloat(name, FLOAT, tbl);
+    } else if(parameter_type == "category") {
+      p = new raw_CategoryFloat(name, CATEGORY, tbl);
     } else {
-      std::cerr << "Error: " << type << " is not recognizes as a type of parameter." << std::endl;
+      std::cerr << "Error: " << parameter_type << " is not recognizes as a type of parameter." << std::endl;
       exit(EXIT_FAILURE);
     }
-    raw_param p(name, pt, init);
     return(p);
   }
 
@@ -131,15 +162,15 @@ namespace IO {
     std::string state = info_tbl["state"];
     std::list<int> possible_pos = get_positions(info_tbl["pos"]);
     rv_use_class uc = {state, possible_pos};
-    std::list<raw_param> rates = {};
+    std::list<raw_param*> rates = {};
 
     for(auto kvp : params_tbl) {
       const sol::object& val = kvp.second;
 
-      sol::optional<raw_param> maybe_param = val.as<sol::optional<raw_param>>();
+      sol::optional<raw_param_wrapper> maybe_param = val.as<sol::optional<raw_param_wrapper>>();
 
       if(maybe_param) {
-	raw_param p = maybe_param.value();
+	raw_param* p = maybe_param.value().ptr;
 	rates.push_back(p);
       } else {
 	std::cerr << "Error: expecting a Parameter."  << std::endl;
@@ -167,7 +198,7 @@ namespace IO {
   }
 
   void raw_substitution_model::read_from_file(std::ifstream& lua_sm_in) {
-    lua.open_libraries(sol::lib::base);
+    lua.open_libraries(sol::lib::base, sol::lib::table);
 
     //Main tables.
     auto model_table = lua["model"].get_or_create<sol::table>();
@@ -179,12 +210,13 @@ namespace IO {
 
     auto config_table = lua["config"].get_or_create<sol::table>();
     config_table.set_function("get_int", [](std::string key) -> int { return(env.get<int>(key)); });
+    config_table.set_function("get_str", [](std::string key) -> std::string { return(env.get<std::string>(key)); });
     config_table.set_function("get_string_array", &get_string_tbl);
 
-    lua.new_usertype<raw_param>("Parameter",
-				"new", [this](std::string name, sol::table tbl) -> raw_param {return(this->new_parameter(name, tbl));});
+    lua.new_usertype<raw_param_wrapper>("Parameter",
+					"new", [this](std::string name, std::string parameter_type, sol::table tbl) -> raw_param_wrapper {return(raw_param_wrapper(this->new_parameter(name, parameter_type, tbl)));});
     lua.new_usertype<raw_rate_vector>("RateVector",
-				      "new", [this](std::string name, sol::table info_tbl, sol::table param_tbl) -> raw_rate_vector { return(this->new_rate_vector(name, info_tbl, param_tbl)); });
+    			      "new", [this](std::string name, sol::table info_tbl, sol::table param_tbl) -> raw_rate_vector { return(this->new_rate_vector(name, info_tbl, param_tbl)); });
 
     // Read the file.
     std::stringstream buffer;

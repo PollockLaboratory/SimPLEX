@@ -51,8 +51,14 @@ void IO::Files::add_file(std::string name, std::string path, IOtype t) {
     break;
   }
   case IOtype::OUTPUT : {
-    path = findFullFilePath(file_name);
-    file_values[total_files] = {path, file_name, t};
+    if(path != "") {
+      path = findFullFilePath(file_name);
+      file_values[total_files] = {path, file_name, t};
+      ofstream_map[total_files] = get_ofstream(name);
+    } else {
+      // If no path is given then do not save data.
+      file_values[total_files] = {"", "", t};
+    }
     break;
   }
   }
@@ -92,11 +98,24 @@ std::string IO::Files::get_file_path(std::string name) {
   return(file_values[i].path);
 }
 
+bool IO::Files::check_file(std::string name) {
+  // Check if an output file is configured.
+  int i = file_to_index[name];
+  std::string path = file_values[i].path;
+  return(path != "");
+}
+
 void IO::Files::print() {
   std::cout << std::endl << "Files:" << std::endl;
 
   for(std::map<std::string, int>::iterator it = file_to_index.begin(); it != file_to_index.end(); ++it) {
-    std::cout << it->first << " : " << file_values[it->second].file_name << " " << file_values[it->second].path << " ";
+    if(file_values[it->second].path != "") {
+      std::cout << it->first << " : " << file_values[it->second].file_name << " " << file_values[it->second].path << " ";
+    } else {
+      // When empty path is specified.
+      std::cout << it->first << " : None None ";
+    }
+
     if(file_values[it->second].t == IOtype::INPUT) {
       std::cout << "INPUT" << std::endl;
     } else {

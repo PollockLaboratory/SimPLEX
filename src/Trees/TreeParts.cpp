@@ -132,15 +132,32 @@ void TreeNode::sample_sequence() {
       if((*sequence)[pos] == -1) {
 	continue;
       } else {
-	if(left->substitutions[pos] == true or right->substitutions[pos]) {
+	if(left->substitutions[pos] == true or right->substitutions[pos] == true) {
 	  (*sequence)[pos] = sample_single_position(pos);
+	  // One of the substitutions vectors need to be updated.
+	  // Make sure substitutions vectors are correct.
+	  if((*sequence)[pos] != left->decendant->sequence->at(pos)) {
+	    left->substitutions[pos] = true;
+	  }
+
+	  if((*sequence)[pos] != right->decendant->sequence->at(pos)) {
+	    right->substitutions[pos] = true;
+	  }
+
 	} else {
 	  int left_dec = left->decendant->sequence->at(pos);
 	  if(left_dec == right->decendant->sequence->at(pos)) {
 	    (*sequence)[pos] = left_dec;
 	  } else {
 	    (*sequence)[pos] = sample_single_position(pos);
-	    // One of the substitutions vectors need to be updated.
+	    // Make sure substitutions vectors are correct.
+	    if((*sequence)[pos] != left->decendant->sequence->at(pos)) {
+	      left->substitutions[pos] = true;
+	    }
+
+	    if((*sequence)[pos] != right->decendant->sequence->at(pos)) {
+	      right->substitutions[pos] = true;
+	    }
 	  }
 	}
       }
@@ -254,6 +271,18 @@ std::string TreeNode::toString() {
   } else {
     return("(" + left->decendant->toString() + "," + right->decendant->toString() + ")" + n);
   }
+}
+
+std::string TreeNode::get_sequence() {
+  std::string seq = "";
+  for(unsigned int i = 0; i < sequence->size(); i++) {
+    seq.append(MSA->integer_to_state[(*sequence)[i]]);
+  }
+  return(seq);
+}
+
+std::string TreeNode::state_at_pos(int i) {
+  return(MSA->integer_to_state[(*sequence)[i]]);
 }
 
 bool TreeNode::isTip() {

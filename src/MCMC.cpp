@@ -53,9 +53,6 @@ void MCMC::initialize(Model* model) {
   lnlout = files.get_ofstream("likelihoods");
   lnlout << "I,GEN,LogL" << std::endl;
 
-  files.add_file("time", env.get<std::string>("OUTPUT.time_out_file"), IOtype::OUTPUT);
-  time_out = files.get_ofstream("time");
-
   model->printParameters();
 }
 
@@ -111,11 +108,6 @@ void MCMC::Run() {
       RecordState();
     }
   }
-
-  time_out << "SAMPLING TIME DATA" << std::endl;
-  // time_out << "Tree Sampling: Total time: " << total_time_tree_samples << " us. Average time per sample: " << total_time_tree_samples/n_tree_samples << " us." << std::endl;
-  // time_out << "Parameter Sampling: Total time: " << total_time_parameter_samples << " us. Average time per sample: " << total_time_parameter_samples/n_parameter_samples << " us." << std::endl;
-  // float r = ((float)total_time_tree_samples)/(total_time_tree_samples + total_time_parameter_samples);time_out << r*100.0 << "\% of time spent sampling tree parameters." << std::endl;
 }
 
 ///  Private Functions  ///

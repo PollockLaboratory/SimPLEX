@@ -72,17 +72,28 @@ void ComponentSet::add_rate_vector(RateVector* v) {
   }
 }
 
-AbstractValue* ComponentSet::realize_component(IO::raw_param param) {
+AbstractValue* ComponentSet::realize_component(IO::raw_param* param) {
   AbstractValue* p;
-  if(id_to_address.find(param.ID) == id_to_address.end()) {
-    p = new ContinuousFloat(param.name, param.ID, param.init, 0.001, 0.0);
+  if(id_to_address.find(param->ID) == id_to_address.end()) {
+    if(param->t == IO::FLOAT) {
+      IO::raw_ContinuousFloat* float_param = dynamic_cast<IO::raw_ContinuousFloat*>(param);
+      p = new ContinuousFloat(float_param->name, float_param->ID, float_param->init, 0.001, 0.0);
+    } else if(param->t == IO::CATEGORY) {
+      IO::raw_CategoryFloat* cat_param = dynamic_cast<IO::raw_CategoryFloat*>(param);
+      // Need to sort duplicate rate categories out here.
+      RateCategories* cats = new RateCategories("cats", 0, cat_param->categories);
+      p = new CategoryFloat(cat_param->name, cat_param->ID, cats);
+    } else {
+      std::cerr << "Error: unknown parameter type for parameter \"" << param->name << "\"." << std::endl;
+      exit(EXIT_FAILURE);
+    }
   } else {
-    p = id_to_address[param.ID];
+    p = id_to_address[param->ID];
   }
   return(p);
 }
 
-void ComponentSet::create_parameters(std::list<IO::raw_param> params) {
+void ComponentSet::create_parameters(std::list<IO::raw_param*> params) {
   // This needs to handle virtual substitutions better and dependancies.
   for(auto it = params.begin(); it != params.end(); ++it) {
 	AbstractValue* p = realize_component(*it);
@@ -95,15 +106,15 @@ RateVector* ComponentSet::create_rate_vector(States states, IO::raw_rate_vector 
   int s = states.state_to_int[rv.uc.state];
   VirtualSubstitutionRate* vir_rate = new VirtualSubstitutionRate("tmp_name", -1, u); 
   for(int i = 0; i < states.n; i++) {
-    IO::raw_param param = rv.rates.front();
+    IO::raw_param* param = rv.rates.front();
     if(i != s) {
-      rates[i] = id_to_address[param.ID];
+      rates[i] = id_to_address[param->ID];
       // Add dependancies.
-      vir_rate->add_rate(id_to_address[param.ID]);
+      vir_rate->add_rate(id_to_address[param->ID]);
     } else {
       // Virtual Substitution rate.
-      vir_rate->name = param.name;
-      vir_rate->ID = param.ID;
+      vir_rate->name = param->name;
+      vir_rate->ID = param->ID;
       rates[i] = vir_rate;
     }
     rv.rates.pop_front();

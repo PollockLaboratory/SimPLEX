@@ -28,6 +28,8 @@ namespace IO {
     std::ofstream get_ofstream(std::string name);
 
     std::string get_file_path(std::string name);
+    bool check_file(std::string name);
+
     void print();
     void close();
 
@@ -35,6 +37,7 @@ namespace IO {
     int total_files;
     std::map<std::string, int> file_to_index;
     std::map<int, fileInfo> file_values;
+    std::map<int, std::ofstream> ofstream_map;
 
     std::string tomlfile;
     std::string outdir;

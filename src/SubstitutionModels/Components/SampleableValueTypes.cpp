@@ -97,6 +97,12 @@ CategoryFloat::CategoryFloat(std::string name, int id, RateCategories* categorie
   prev_i = 0;
   value = (*rc)[i]; 
   previous_value = value;
+
+  if(value == 0) {
+    std::cerr << "Error: category value is 0." << std::endl;
+    std::cerr << value << " : " << i << std::endl;
+    exit(EXIT_FAILURE);
+  }
 }
 
 // Utils
@@ -123,6 +129,12 @@ bool CategoryFloat::sample() {
   }
 
   value = (*rc)[i];
+
+  if(value == 0) {
+    std::cerr << "Error: category value is 0." << std::endl;
+    std::cerr << value << " : " << i << std::endl;
+    exit(EXIT_FAILURE);
+  }
   
   return(true);
 }

@@ -8,7 +8,7 @@ seed = 0
 
 # Uniformization Constant
 [UNIFORMIZATION]
-  threshold = 0.002
+  threshold = 0.005
   max_step = 0.001
 
 [DATA]
@@ -23,17 +23,24 @@ seed = 0
   #tree_file = "../resources/test_data/BLVRB_subtree_MLbranches.nh"
 
 [OUTPUT]
+  # If an output file is given as "", then no data will be saved to that file.
+  # This can be useful as the output of simPLEX can get quite large.
   output_directory = "../testing/s1_test_run/"
   tree_out_file = "tree_out.newick"
+ # tree_out_file = ""
   sequences_out_file = "sequences_out.fasta"
+ # sequences_out_file = ""
   parameters_out_file = "parameters_out.csv"
-  rate_vectors_out_file = "rate_vectors_out.csv"
-  likelihood_out_file = "likelihoods_out.csv"
+  #parameters_out_file = ""
+  #rate_vectors_out_file = "rate_vectors_out.csv"
+  rate_vectors_out_file = ""
+  #likelihood_out_file = "likelihoods_out.csv"
+  likelihood_out_file = ""
   substitutions_out_file = "substitutions.out"
-  time_out_file = "time.out"
+  log_out_file = "run.log"
 
 [MCMC]
-  generations = 10001
+  generations = 100001
   tree_sample_frequency = 2000
   output_frequency = 2000
   print_frequency = 5000
@@ -41,4 +48,6 @@ seed = 0
 [MODEL]
   #states = ["A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"]
   states = ["N", "F"]
+  parameter_type = "float"
+  num_categories = 4
 

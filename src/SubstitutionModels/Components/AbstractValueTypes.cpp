@@ -27,6 +27,7 @@ VirtualSubstitutionRate::VirtualSubstitutionRate(std::string parameter_name, int
   u = unif;
   u->add_VirtualSubstitutionRate(this);
   this->add_dependancy(u);
+  // This should be more throughtfully set.
   value = 0.232323;
 }
 
@@ -52,7 +53,7 @@ void VirtualSubstitutionRate::refresh() {
 
   value = u->getValue() - total;
 
-  if(value < 0.0 || value > 1.0) {
+  if(value <= 0.0 || value > 1.0) {
     throw OutOfBoundsException("VirtualSubstitutionRate out of bounds.");
   }
 }

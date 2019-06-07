@@ -98,7 +98,6 @@ IO::RawTreeNode* IO::parseTree(std::string tree_string) {
 	IO::RawTreeNode* root = new RawTreeNode;
 	*root = {"Root", 0, NULL, NULL, NULL};
 	IO::RawTreeNode* t = parseRawTreeNode(tree_string, root);
-	printRawTree(t);
 	return(t);
 }
 

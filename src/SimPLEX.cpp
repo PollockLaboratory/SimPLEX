@@ -49,6 +49,9 @@ int main(int argc, char* argv[]) {
   files.setupOutputDirectory();
   files.set_options_file(argv);
 
+  files.add_file("log", env.get<std::string>("OUTPUT.log_out_file"), IOtype::OUTPUT);
+  // env.log_stream = files.get_ofstream("log");
+
   // Initiating program.
   Data data;
   data.Initialize();

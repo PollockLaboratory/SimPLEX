@@ -72,6 +72,9 @@ class Tree {
   std::function< std::pair<BranchSegment*, BranchSegment*>(float)> splitBranchMethod; // Algorithm for splitting branches.
 
   void configureSequences(TreeNode* n);
+
+  // Recording State.
+  void record_substitutions(int gen, double l);
 };
 
 #endif

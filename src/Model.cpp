@@ -51,7 +51,7 @@ bool Model::SampleTree() {
 
     return(t);
   } else {
-    std::cout << "Error: Attempt to sample tree before accepting previous changes." << std::endl;
+    std::cerr << "Error: Attempt to sample tree before accepting previous changes." << std::endl;
     exit(EXIT_FAILURE);
   }
 }
@@ -61,7 +61,7 @@ bool Model::SampleSubstitutionModel() {
     return(substitution_model->SampleParameters());
     ready = false;
   } else {
-    std::cout << "Error: Attempt to sample parameter before accepting previous changes." << std::endl;
+    std::cerr << "Error: Attempt to sample parameter before accepting previous changes." << std::endl;
     exit(EXIT_FAILURE);
   }
 }

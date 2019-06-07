@@ -5,7 +5,6 @@
 #include <vector>
 #include <map>
 #include <string>
-// #include <iostream>
 #include <fstream>
 
 #include "AbstractComponent.h"
@@ -26,8 +25,8 @@ class ComponentSet {
   void add_parameter(AbstractComponent* param);
   void add_rate_vector(RateVector* v);
 
-  AbstractValue* realize_component(IO::raw_param);
-  void create_parameters(std::list<IO::raw_param>);
+  AbstractValue* realize_component(IO::raw_param*);
+  void create_parameters(std::list<IO::raw_param*>);
   RateVector* create_rate_vector(struct States, IO::raw_rate_vector, UniformizationConstant*);
   
   bool sample();

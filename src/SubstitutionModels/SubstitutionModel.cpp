@@ -30,7 +30,7 @@ void SubstitutionModel::from_raw_model(IO::raw_substitution_model* raw_sm) {
   }
 
   // Get the list of naive list of parameters.
-  std::list<IO::raw_param> params = raw_sm->get_parameters();
+  std::list<IO::raw_param*> params = raw_sm->get_parameters();
   components.create_parameters(params);
 
   // Put them into rate vectors.
