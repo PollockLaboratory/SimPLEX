@@ -98,6 +98,12 @@ IO::RawTreeNode* IO::parseTree(std::string tree_string) {
 	IO::RawTreeNode* root = new RawTreeNode;
 	*root = {"Root", 0, NULL, NULL, NULL};
 	IO::RawTreeNode* t = parseRawTreeNode(tree_string, root);
+
+	if(t->distance > 0.0) {
+	  std::cout << "Warning: truncating the root branch node." << std::endl;
+	  t->distance = 0.0;
+	};
+	
 	return(t);
 }
 

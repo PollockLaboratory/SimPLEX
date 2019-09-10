@@ -46,18 +46,23 @@ int main(int argc, char* argv[]) {
   //Establish environment and files.
   env.ReadOptions(argc, argv);
 
-  files.setupOutputDirectory();
-  files.set_options_file(argv);
-
+  files.initialize(argv);
+  
   files.add_file("log", env.get<std::string>("OUTPUT.log_out_file"), IOtype::OUTPUT);
   // env.log_stream = files.get_ofstream("log");
+
+  std::cout << "Init complete." << std::endl;
 
   // Initiating program.
   Data data;
   data.Initialize();
 
+  std::cout << "Data complete." << std::endl;
+
   Model model;
   model.Initialize(data.raw_tree, data.raw_msa, data.raw_sm);
+
+  std::cout << "Model complete." << std::endl;
 
   MCMC mcmc;
   mcmc.initialize(&model);

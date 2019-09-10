@@ -53,10 +53,15 @@ RateVectorSet::RateVectorSet() {
 }
 
 void RateVectorSet::Initialize() {
+  std::cout << "Initializing rate vector" << std::endl;
+
   // Output file.
   files.add_file("rate_vectors", env.get<std::string>("OUTPUT.rate_vectors_out_file"), IOtype::OUTPUT);
+
+  std::cout << "1." << std::endl;
   out_file = files.get_ofstream("rate_vectors");
 		
+  std::cout << "2." << std::endl;
   out_file << "I,GEN,LogL,NAME,ANC";
   for(auto it = env.state_to_integer.begin(); it != env.state_to_integer.end(); ++it) {
     out_file << "," << it->first;

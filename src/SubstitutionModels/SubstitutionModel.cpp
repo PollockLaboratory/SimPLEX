@@ -23,7 +23,6 @@ void SubstitutionModel::add_state(std::string s) {
 }
 
 void SubstitutionModel::from_raw_model(IO::raw_substitution_model* raw_sm) {
-
   // Read in states.
   for(auto it = raw_sm->states.begin(); it != raw_sm->states.end(); ++it) {
 	add_state(*it);
@@ -38,7 +37,6 @@ void SubstitutionModel::from_raw_model(IO::raw_substitution_model* raw_sm) {
     RateVector* rv = components.create_rate_vector(states, *it, u);
     rateVectors.add(rv, (*it).uc);
   }
-
   finalize();
 }
 

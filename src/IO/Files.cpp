@@ -8,56 +8,210 @@
 #include <iostream>
 #include <string.h>
 
-#ifdef _WIN32
-#include <dir.h> // For mkdir()
-#include <ctime> // For time()
-#include <Windows.h> // For CreateDirectory. Can't use because of CopyFile
-#else
 #include <sys/stat.h> // For making directories in Linux and OS X
 #include <sys/times.h> // For time()
-#endif
+#include <unistd.h> // For getcwd.
 
 extern Environment env;
 
+std::vector<std::string> parse_path(std::string path) {
+  // This should error check that the path is correctly formatted.
+  std::string rem = path;
+  std::vector<std::string> dirs = {};
+  while(rem.size() > 0) {
+    size_t loc = rem.find("/");
+
+    if(loc == std::string::npos) {
+      dirs.push_back(rem);
+      break;
+    }
+
+    std::string dir = rem.substr(0, loc);
+    if(dir != "") {
+      dirs.push_back(dir);
+    }
+    rem = rem.substr(loc + 1, rem.size());
+  }
+  return(dirs);
+}
+
+Path::Path() {
+  route = {};
+  nullp = false;
+}
+
+Path::Path(std::string path) {
+  if(path == "") {
+    nullp = true;
+    route = {};
+  } else {
+    route = parse_path(path);
+    nullp = false;
+  }
+}
+
+Path::Path(std::vector<std::string> r) {
+  if(r.empty() == true) {
+    nullp = true;
+    route = {};
+  } else {
+    nullp = false;
+    route = r;
+  }
+}
+
+bool Path::null() {
+  return(nullp);
+}
+
+std::string Path::get_name() {
+  return(route.back());
+}
+
+std::vector<std::string> Path::get_route() const {
+  return(route);
+}
+
+Path Path::parent_dir() {
+  // Finds the directory path of the given path to a file.
+  std::vector<std::string> new_route = route;
+  new_route.pop_back();
+  return(Path(new_route));
+}
+
+std::string Path::as_str() const {
+  auto start = route.begin();
+  std::string path = "";
+  if(*start == "." or *start == "..") {
+    path += *start;
+    ++start;
+  }
+  for(auto it = start; it != route.end(); ++it) {
+    path += "/" + *it;
+  }
+  return(path);
+}
+
+std::ostream& operator<<(std::ostream& os, const Path& p) {
+  os << p.as_str();
+  return(os);
+}
+
+Path Path::operator+(const Path& p) {
+  if(nullp == true) {
+    return(Path(p.get_route()));
+  }
+
+  std::vector<std::string> new_route = this->route;
+  std::vector<std::string> appending_route = p.get_route();
+
+  for(auto it = appending_route.begin(); it != appending_route.end(); ++it) {
+    if(*it == "..") {
+      new_route.pop_back();
+    } else if(*it != ".") {
+      new_route.push_back(*it);
+    }
+  }
+
+  return(Path(new_route));
+}
+
+// Files
+
 IO::Files::Files() {
   total_files = 0;
-  // Remember to make this relative.
-  // defaultfile = "/home/hamish/Documents/Code/simplex0_0/resources/defaults.ctrl"; // where to find default settings
-  // optionsfile = "/home/hamish/Documents/Code/simplex0_0/resources/options.ctrl"; // where to find optional control settings
 }
 
-void IO::Files::setupOutputDirectory() {
-  outdir = env.get<std::string>("OUTPUT.output_directory");
-  ConfigureOutputDirectory();
+std::string get_current_directory() {
+  char cwd[512];
+  std::string dir;
+  if(getcwd(cwd, sizeof(cwd)) != NULL) {
+    dir = std::string(cwd);
+  } else {
+    std::cerr << "Error: unable to determine current directory." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  return(dir);
 }
 
-void IO::Files::set_options_file(char* argv[]) {
-  std::string path(argv[1]);
-  tomlfile = path;
-  add_file("options_file", path, IOtype::INPUT);
-  std::cout << "Command line specified options file used: " << tomlfile << std::endl;
+void configure_directory(Path dir_path) {
+  if(dir_path.null() == true) {
+    std::cerr << "Error: unable to configure null directory." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  
+  struct stat st;
+  if (stat(dir_path.as_str().c_str(), &st) == 0 && S_ISDIR(st.st_mode)) {
+    if (not env.debug) {
+      std::cout << "output dir " << dir_path << " exists. Overwrite? (Y/n)" << std::endl;
+      if (getchar() != 'Y') exit(1);
+    }
+  } else {
+    mkdir(dir_path.as_str().c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
+  }
+}
+
+void IO::Files::initialize(char* argv[]) {
+  // Set Options file.
+  // Find the absolute path to the options file.
+  Path cur_dir(get_current_directory());
+  Path options_path(argv[1]);
+
+  reference_dir = (cur_dir + options_path).parent_dir();
+
+  if(reference_dir.null() == true) {
+    std::cerr << "Error: error specifying reference directory." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  
+  std::cout << "Options file: " << reference_dir + options_path << std::endl;
+  add_file("options_file", options_path.get_name(), IOtype::INPUT);
+
+  std::cout << "Command line specified options file used: " << reference_dir + options_path << std::endl;
+
+  relative_outdir = Path(env.get<std::string>("OUTPUT.output_directory"));
+  absolute_outdir = reference_dir + relative_outdir;
+
+  std::cout << "Configuring output directory: " << absolute_outdir << std::endl;
+  configure_directory(absolute_outdir);
+}
+
+inline std::string IO::Files::path_to_file(int i) {
+  if(file_values[i].path.null() == true) {
+    std::cerr << "Error: trying to get path to NullPath." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  return((reference_dir + file_values[i].path).as_str());
 }
 
 void IO::Files::add_file(std::string name, std::string path, IOtype t) {
   file_to_index[name] = total_files;
-  std::string file_name = filename_from_path(path);
+  Path fp(path);
   switch(t) {
   case IOtype::INPUT : {
-    file_values[total_files] = {path, file_name, t};
+
+    if(fp.null() == true) {
+      std::cerr << "Error: location of required input file not specified." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    std::cout << "Input: " << name << " " << fp << std::endl;
+    file_values[total_files] = {fp, fp.get_name(), t};
     // Check file exists.
+    std::string path = path_to_file(total_files);
     std::ifstream file_stream(path);
     check_stream(name, path, file_stream);
     file_stream.close();
     break;
   }
   case IOtype::OUTPUT : {
+    std::cout << "Output: " << name << " " << path << " " << relative_outdir << std::endl;
     if(path != "") {
-      path = findFullFilePath(file_name);
-      file_values[total_files] = {path, file_name, t};
+      file_values[total_files] = {relative_outdir + fp, fp.get_name(), t};
       ofstream_map[total_files] = get_ofstream(name);
     } else {
       // If no path is given then do not save data.
-      file_values[total_files] = {"", "", t};
+      file_values[total_files] = {Path(""), "", t};
     }
     break;
   }
@@ -67,50 +221,51 @@ void IO::Files::add_file(std::string name, std::string path, IOtype t) {
 
 std::ifstream IO::Files::get_ifstream(std::string name) {
   int i = file_to_index[name];
-  std::string path = file_values[i].path;
 
   if(file_values[i].t != IOtype::INPUT) {
     std::cout << "Error: Attempting to read " << file_values[i].file_name << " that is not flagged as IOtype::INPUT." << std::endl;
     exit(EXIT_FAILURE);
   }
 
+  std::string path = path_to_file(i);
   std::ifstream file_stream(path);
-  check_stream(name, file_values[i].path, file_stream);
+  check_stream(name, path, file_stream);
 
   return(file_stream);
 }
 
 std::ofstream IO::Files::get_ofstream(std::string name) {
   int i = file_to_index[name];
-  std::string path = file_values[i].path;
 
   if(file_values[i].t != IOtype::OUTPUT) {
     std::cout << "Error: Attempting to read " << file_values[i].file_name << " that is not flagged as IOtype::OUTPUT." << std::endl;
     exit(EXIT_FAILURE);
   }
-
-  std::ofstream file_stream(path);
+  
+  //std::cout << "Path to file: " << path_to_file(i) << std::endl;
+  std::ofstream file_stream(path_to_file(i));
   return(file_stream);
 }
 
-std::string IO::Files::get_file_path(std::string name) {
-  int i = file_to_index[name];
-  return(file_values[i].path);
-}
-
+// Not quite sure what these are really doing.
 bool IO::Files::check_file(std::string name) {
-  // Check if an output file is configured.
+  // Check if an output file is configured not null.
   int i = file_to_index[name];
-  std::string path = file_values[i].path;
-  return(path != "");
+  Path p = file_values[i].path;
+  return(not p.null());
 }
 
 void IO::Files::print() {
-  std::cout << std::endl << "Files:" << std::endl;
+  std::cout << std::endl << "Files - relative to directory: " << reference_dir << std::endl;
 
   for(std::map<std::string, int>::iterator it = file_to_index.begin(); it != file_to_index.end(); ++it) {
-    if(file_values[it->second].path != "") {
-      std::cout << it->first << " : " << file_values[it->second].file_name << " " << file_values[it->second].path << " ";
+    if(file_values[it->second].file_name != "") {
+      std::cout << it->first << " : " << file_values[it->second].file_name << " ";
+      if(file_values[it->second].path.null() == false) {
+	std::cout << Path(".") + file_values[it->second].path << " ";
+      } else {
+	std::cout << ". ";
+      }
     } else {
       // When empty path is specified.
       std::cout << it->first << " : None None ";
@@ -125,99 +280,32 @@ void IO::Files::print() {
   std::cout << std::endl;
 }
 
+void copy_file(const Path &sourcefile, const Path &newfile) {
+  std::cout << "Copying: ";
+  std::cout << sourcefile << " -> " << newfile << std::endl;
+  std::ifstream source(sourcefile.as_str());
+  std::ofstream destination(newfile.as_str());
+  destination << source.rdbuf();
+}
+
 void IO::Files::close() {
   for(std::map<std::string, int>::iterator it = file_to_index.begin(); it != file_to_index.end(); ++it) {
     if(file_values[it->second].t == IOtype::INPUT) {
-      std::string new_path = findFullFilePath(file_values[it->second].file_name);
-      copyFile(file_values[it->second].path, new_path);
+      Path new_path = absolute_outdir + Path(file_values[it->second].file_name);
+      copy_file(reference_dir + file_values[it->second].path, new_path);
     }
   }
   print();
 }
 
-void IO::Files::check_stream(const std::string &name, const std::string &file_path, std::ifstream &s) {
+inline void IO::Files::check_stream(const std::string &name, const std::string &file_path, std::ifstream &s) {
   if (not s.good()) {
-    std::cerr << "Cannot read " << name << " file: \"" << file_path << "\"" << std::endl;
+    std::cerr << "Error: Cannot read " << name << " file: \"" << file_path << "\"" << std::endl;
     exit(EXIT_FAILURE);
   }
 }
 
-std::string IO::Files::filename_from_path(std::string path) {
-  char * cstr = new char[path.length() + 1];
-  strcpy(cstr, path.c_str());
-
-  char *pch;
-  pch = strtok(cstr, "/");
-  char *lastToken;
-
-  while(pch != NULL) {
-    lastToken = pch;
-    pch = strtok(NULL, "/");
-  }
-  return(std::string(lastToken));
+std::string IO::Files::get_file_info(std::string name) {
+  int i = file_to_index[name];
+  return(file_values[i].file_name);
 }
-
-void IO::Files::copyFile(const string &sourcefile, const string &newfile) {
-  std::cout << "Copying" << std::endl;
-  std::cout << sourcefile << " " << newfile << std::endl;
-  std::ifstream source(sourcefile);
-  std::ofstream destination(newfile);
-  destination << source.rdbuf();
-}
-
-inline std::string IO::Files::findFullFilePath(std::string parameter) {
-  /*
-   * Prepends the output directory path to the output file names, giving the full path name
-   * for the given file.
-   */
-  if (parameter == "") {
-    std::cerr << "Cannot prepend output directory to empty parameter" << std::endl;
-  }
-  parameter = outdir + parameter;
-  return parameter;
-}
-
-void IO::Files::ConfigureOutputDirectory() {
-  /*
-   * Configures the output directory and the file names of the output files.
-   * Creates the output directory and changes the file names of the output file to
-   * include to full path to the output directory.
-   *
-   * For example: "seq.out" -> "/output_dir/seq.out"
-   */
-
-  char lastchar = outdir.at(outdir.length() - 1);
-
-  if(lastchar != '/' && lastchar != '\\') {
-    if(env.debug) std::cout << "last char is not /" << std::endl;
-    outdir += '/';
-  }
-
-  // For Windows
-  // According to http://sourceforge.net/p/predef/wiki/OperatingSystems/
-  // TODO: double check this works on windows for directory that already exists
-#ifdef _WIN32
-  if (mkdir(outdir.c_str())) {
-    std::cout << "Could not make output directory " << output_directory << std::endl;
-  } else {
-    std::cout << "Making directory successful" << std::endl;
-  }
-#else	//ifdef __linux__ || __APPLE__
-  struct stat st;
-  if (stat(outdir.c_str(), &st) == 0 && S_ISDIR(st.st_mode)) {
-    if (not env.debug) {
-      std::cout << "output dir " << outdir << " exists. Overwrite? (Y/n)" << std::endl;
-      if (getchar() != 'Y') exit(1);
-    }
-  } else {
-    mkdir(outdir.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
-  }
-
-  /* Read, write, and search, or execute, for the file owner; S_IRWXU is the bitwise inclusive
-   * OR of S_IRUSR, S_IWUSR, and S_IXUSR.
-   * Read, write, and search or execute permission for the file's group. S_IRWXG is the
-   * bitwise inclusive OR of S_IRGRP, S_IWGRP, and S_IXGRP. Read, write, and search or
-   * execute permission for users other than the file owner. S_IRWXO is the bitwise inclusive
-   * OR of S_IROTH, S_IWOTH, and S_IXOTH.*/
-}
-#endif

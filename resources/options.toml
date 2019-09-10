@@ -14,10 +14,10 @@ seed = 0
 [DATA]
   # This should be TRUE or FALSE
   ancestral_sequences = false
-  substitution_model_file = "../resources/model.lua"
+  substitution_model_file = "model.lua"
 
-  sequences_file = "../resources/test_data/5taxon_tf.fasta"
-  tree_file = "../resources/test_data/5taxon.tree"
+  sequences_file = "test_data/5taxon_tf.fasta"
+  tree_file = "test_data/5taxon.tree"
 
   #sequences_file = "../resources/test_data/Species_alignment_BLVRB.fasta"
   #tree_file = "../resources/test_data/BLVRB_subtree_MLbranches.nh"
@@ -25,17 +25,17 @@ seed = 0
 [OUTPUT]
   # If an output file is given as "", then no data will be saved to that file.
   # This can be useful as the output of simPLEX can get quite large.
-  output_directory = "../testing/s1_test_run/"
+  output_directory = "./s1_test_run/"
   tree_out_file = "tree_out.newick"
  # tree_out_file = ""
   sequences_out_file = "sequences_out.fasta"
  # sequences_out_file = ""
   parameters_out_file = "parameters_out.csv"
   #parameters_out_file = ""
-  #rate_vectors_out_file = "rate_vectors_out.csv"
-  rate_vectors_out_file = ""
-  #likelihood_out_file = "likelihoods_out.csv"
-  likelihood_out_file = ""
+  rate_vectors_out_file = "rate_vectors_out.csv"
+  #rate_vectors_out_file = ""
+  likelihood_out_file = "likelihoods_out.csv"
+  #likelihood_out_file = ""
   substitutions_out_file = "substitutions.out"
   log_out_file = "run.log"
 

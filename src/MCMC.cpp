@@ -34,7 +34,7 @@ void MCMC::initialize(Model* model) {
    * Init MCMC with model, gens calculate lnL.
    */
 
-  std::cout << "Initializing MCMC." << std::endl;
+  std::cout << "\nInitializing MCMC." << std::endl;
   this->model = model; // associate the pointer with the MCMC
 
   // Env settings.

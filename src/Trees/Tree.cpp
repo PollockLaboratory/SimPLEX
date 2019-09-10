@@ -65,6 +65,7 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
   	(*b)->update();
   }
 
+  // This should depend on the method for ancestral state sampling.
   sample_ancestral_states();
   
   initialize_output_streams();	
@@ -115,6 +116,7 @@ void Tree::configureSequences(TreeNode* n) {
    * Traverses the tree attaching sequences to nodes.
    * Also adds all the Nodes and Branch segments to their corresponding lists.
    */
+
   n->MSA = MSA;
   n->SM = SM;
 
@@ -215,6 +217,7 @@ bool Tree::sample() {
 //
 
 void Tree::traverse_find_ancestral_sequences() {
+
   std::queue<TreeNode*> nodes = {};
   for(auto t = tipList.begin(); t != tipList.end(); ++t) {
     (*t)->sampled = true;
@@ -222,6 +225,7 @@ void Tree::traverse_find_ancestral_sequences() {
   }
 
   while(not nodes.empty()) {
+    //printf("Looping\n");
     if(not nodes.front()->sampled) {
       nodes.push(nodes.front()->sample());
     }
@@ -238,13 +242,15 @@ void Tree::traverse_find_ancestral_sequences() {
 // Option 1.
 bool Tree::sample_ancestral_states() {
   /*
-   * Both recalculates substitutions and recalculates the ancestral sequences.
+   * Both recalculates substitution events and recalculates the ancestral sequences.
    */
 
+  // Sprinkles substitutions across the tree.
   for(auto b = branchList.begin(); b != branchList.end(); ++b) {
     (*b)->set_new_substitutions();
   }
 
+  // Finds ancestral sequences.
   traverse_find_ancestral_sequences();
 
   return(false);
@@ -281,7 +287,7 @@ void Tree::record_substitutions(int gen, double l) {
   for(auto it = branchList.begin(); it != branchList.end(); ++it) {
     substitutions_out << index << "," << gen << "," << l << ",";
     substitutions_out << (*it)->ancestral->name << "," << (*it)->decendant->name << ",[ ";
-    for(int i = 0; i < (*it)->substitutions.size(); i++) {
+    for(unsigned int i = 0; i < (*it)->substitutions.size(); i++) {
 	TreeNode* anc = (*it)->ancestral;
 	TreeNode* dec = (*it)->decendant;
 

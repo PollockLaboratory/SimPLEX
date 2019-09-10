@@ -127,7 +127,7 @@ TreeNode::TreeNode() {
 // Sampling.
 void TreeNode::sample_sequence() {
   if(right) {
-    // Sample branch point node.
+    // Right banch present - indicating branching node.
     for(unsigned int pos = 0; pos < sequence->size(); pos++) {
       if((*sequence)[pos] == -1) {
 	continue;
@@ -163,7 +163,7 @@ void TreeNode::sample_sequence() {
       }
     }
   } else {
-    // Only left decendant.
+    // Only left decendant - therefore intermediate node.
     for(unsigned int pos = 0; pos < sequence->size(); pos++) {
       // Skip sampling if gap.
       if((*sequence)[pos] == -1) {
@@ -183,16 +183,19 @@ TreeNode* TreeNode::sample() {
   // std::cout << "Name: " << name << " left: " << (bool)left << " right: " << (bool)right << std::endl;
   // Left has always been sampled, as intermediate nodes are connected by left and top.
   // Check right has been sampled.
+
   if(right) {
     if(not right->decendant->sampled) {
+      // Pointer to this nod is returned indicating it should be put in the queue to be sampled later.
       return(this);
     }
   }
 
   sample_sequence();  
   sampled = true;
-
+ 
   if(up) {
+    // Returns pointer to node above to indicate it should be put on the queue ready to be sampled.
     return(up->ancestral->sample());
   } else {
     // If at the root of the tree, return sampled node to end recurrsion.

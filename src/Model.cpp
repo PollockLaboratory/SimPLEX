@@ -26,6 +26,7 @@ Model::Model() {
 }
 
 void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw_substitution_model* &raw_sm) {
+
   substitution_model = new SubstitutionModel();
   substitution_model->from_raw_model(raw_sm);
 
