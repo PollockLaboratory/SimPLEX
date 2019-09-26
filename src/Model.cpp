@@ -4,7 +4,7 @@
 #include <chrono>
 
 #include "Model.h"
-#include "SubstitutionModels/SubstitutionModel.h"
+#include "ModelParts/SubstitutionModels/SubstitutionModel.h"
 
 #include "Environment.h"
 #include "IO/Files.h"
@@ -27,14 +27,29 @@ Model::Model() {
 
 void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw_substitution_model* &raw_sm) {
 
-  substitution_model = new SubstitutionModel();
+  UniformizationConstant* u = new UniformizationConstant();
+  components.add_parameter(u);
+  
+  // Substitution model.
+  substitution_model = new SubstitutionModel(u);
   substitution_model->from_raw_model(raw_sm);
 
+  std::list<AbstractComponent*> sm_parameters = substitution_model->get_all_parameters();
+  for(auto it = sm_parameters.begin(); it != sm_parameters.end(); ++it) {
+    components.add_parameter(*it);
+  }
+
+  components.refresh_dependencies();
+  u->set_initial();
+  components.Initialize();
+
+  // Sequences.
   const States* states = substitution_model->get_states();
 
   SequenceAlignment* MSA = new SequenceAlignment(states);
   MSA->Initialize(raw_msa);
 
+  // Tree.
   tree = new Tree();
   tree->Initialize(raw_tree, MSA, substitution_model);
 
@@ -59,7 +74,7 @@ bool Model::SampleTree() {
 
 bool Model::SampleSubstitutionModel() {
   if(ready) {
-    return(substitution_model->SampleParameters());
+    return(components.sample());
     ready = false;
   } else {
     std::cerr << "Error: Attempt to sample parameter before accepting previous changes." << std::endl;
@@ -68,12 +83,12 @@ bool Model::SampleSubstitutionModel() {
 }
 
 void Model::accept() {
-  substitution_model->accept();
+  components.accept();
   ready = true;
 }
 
 void Model::reject() {
-  substitution_model->reject();
+  components.reject();
   logL -= delta_logL;
   ready = true;
 }
@@ -122,7 +137,7 @@ double Model::updateLikelihood(){
   RateVector* rv;
   int C_xy;
 
-  for(auto it = substitution_model->changed_vectors_begin(); it.at_end() == false; ++it) {
+  for(auto it = substitution_model->modified_begin(components.get_current_parameter()); it.at_end() == false; ++it) {
     rv = (*it).rv;
     C_xy = counts.subs_by_rateVector[rv][(*it).pos];
     delta_logL += C_xy * log(rv->get_rate_ratio((*it).pos)); // Should be ratio;
@@ -138,25 +153,25 @@ void Model::RecordState(int gen, double l) {
 	 * Records the state of both the tree and the substitution model.
 	 */
 	tree->record_state(gen, l);
+	components.saveToFile(gen, l);
 	substitution_model->saveToFile(gen, l);
 }
 
 void Model::print() {
-
 }
 
 void Model::printParameters() {
-  substitution_model->printParameters();
+  components.print();
+  //substitution_model->printParameters();
   //tree->printCounts();
 }
 
 // Tidying up
 void Model::Terminate() {
-	/*
-	 * Just terminates substitution_model.
-	 */
+  /*
+   * Just terminates substitution_model.
+   */
   // Save the tree data.
   tree->record_tree();
-  substitution_model->Terminate();
 }
 

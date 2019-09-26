@@ -195,7 +195,7 @@ void IO::Files::add_file(std::string name, std::string path, IOtype t) {
       exit(EXIT_FAILURE);
     }
 
-    std::cout << "Input: " << name << " " << fp << std::endl;
+    //std::cout << "Input: " << name << " " << fp << std::endl;
     file_values[total_files] = {fp, fp.get_name(), t};
     // Check file exists.
     std::string path = path_to_file(total_files);
@@ -205,7 +205,7 @@ void IO::Files::add_file(std::string name, std::string path, IOtype t) {
     break;
   }
   case IOtype::OUTPUT : {
-    std::cout << "Output: " << name << " " << path << " " << relative_outdir << std::endl;
+    //std::cout << "Output: " << name << " " << path << " " << relative_outdir << std::endl;
     if(path != "") {
       file_values[total_files] = {relative_outdir + fp, fp.get_name(), t};
       ofstream_map[total_files] = get_ofstream(name);
@@ -242,7 +242,6 @@ std::ofstream IO::Files::get_ofstream(std::string name) {
     exit(EXIT_FAILURE);
   }
   
-  //std::cout << "Path to file: " << path_to_file(i) << std::endl;
   std::ofstream file_stream(path_to_file(i));
   return(file_stream);
 }

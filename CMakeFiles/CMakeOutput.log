@@ -1,0 +1,1779 @@
+The system is: Linux - 4.15.0-64-generic - i686
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /usr/bin/cc 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/home/hamish/Documents/Code/simplex0_0/CMakeFiles/3.10.2/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /usr/bin/c++ 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/home/hamish/Documents/Code/simplex0_0/CMakeFiles/3.10.2/CompilerIdCXX/a.out"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_b3757/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_b3757.dir/build.make CMakeFiles/cmTC_b3757.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b3757.dir/testCCompiler.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_b3757.dir/testCCompiler.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_b3757
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b3757.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_b3757.dir/testCCompiler.c.o  -o cmTC_b3757 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_d1b60/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_d1b60.dir/build.make CMakeFiles/cmTC_d1b60.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d1b60.dir/CMakeCCompilerABI.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_d1b60.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.10/Modules/CMakeCCompilerABI.c
+Linking C executable cmTC_d1b60
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d1b60.dir/link.txt --verbose=1
+/usr/bin/cc     -v -rdynamic CMakeFiles/cmTC_d1b60.dir/CMakeCCompilerABI.c.o  -o cmTC_d1b60 
+Using built-in specs.
+COLLECT_GCC=/usr/bin/cc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper
+Target: i686-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.4.0-1ubuntu1~18.04.1' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=i686-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-targets=all --enable-multiarch --disable-werror --with-arch-32=i686 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=i686-linux-gnu
+Thread model: posix
+gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1) 
+COMPILER_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/../../../../lib/:/lib/i386-linux-gnu/:/lib/../lib/:/usr/lib/i386-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/i686-linux-gnu/7/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_d1b60' '-mtune=generic' '-march=i686'
+ /usr/lib/gcc/i686-linux-gnu/7/collect2 -plugin /usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/cc4FTJLX.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_i386 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib/ld-linux.so.2 -pie -z now -z relro -o cmTC_d1b60 /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o /usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/i686-linux-gnu/7 -L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu -L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib -L/lib/i386-linux-gnu -L/lib/../lib -L/usr/lib/i386-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/i686-linux-gnu/7/../../.. CMakeFiles/cmTC_d1b60.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib/gcc/i686-linux-gnu/7/crtendS.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_d1b60' '-mtune=generic' '-march=i686'
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_d1b60/fast"]
+  ignore line: [make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp']
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_d1b60.dir/build.make CMakeFiles/cmTC_d1b60.dir/build]
+  ignore line: [make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_d1b60.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/cc    -o CMakeFiles/cmTC_d1b60.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.10/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTC_d1b60]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d1b60.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/cc     -v -rdynamic CMakeFiles/cmTC_d1b60.dir/CMakeCCompilerABI.c.o  -o cmTC_d1b60 ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/bin/cc]
+  ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper]
+  ignore line: [Target: i686-linux-gnu]
+  ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.4.0-1ubuntu1~18.04.1' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=i686-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-targets=all --enable-multiarch --disable-werror --with-arch-32=i686 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=i686-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1) ]
+  ignore line: [COMPILER_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/]
+  ignore line: [LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/../../../../lib/:/lib/i386-linux-gnu/:/lib/../lib/:/usr/lib/i386-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/i686-linux-gnu/7/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_d1b60' '-mtune=generic' '-march=i686']
+  link line: [ /usr/lib/gcc/i686-linux-gnu/7/collect2 -plugin /usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/cc4FTJLX.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_i386 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib/ld-linux.so.2 -pie -z now -z relro -o cmTC_d1b60 /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o /usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/i686-linux-gnu/7 -L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu -L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib -L/lib/i386-linux-gnu -L/lib/../lib -L/usr/lib/i386-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/i686-linux-gnu/7/../../.. CMakeFiles/cmTC_d1b60.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib/gcc/i686-linux-gnu/7/crtendS.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o]
+    arg [/usr/lib/gcc/i686-linux-gnu/7/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/cc4FTJLX.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [--sysroot=/] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_i386] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib/ld-linux.so.2] ==> ignore
+    arg [-pie] ==> ignore
+    arg [-znow] ==> ignore
+    arg [-zrelro] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_d1b60] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o] ==> ignore
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7] ==> dir [/usr/lib/gcc/i686-linux-gnu/7]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../../../lib]
+    arg [-L/lib/i386-linux-gnu] ==> dir [/lib/i386-linux-gnu]
+    arg [-L/lib/../lib] ==> dir [/lib/../lib]
+    arg [-L/usr/lib/i386-linux-gnu] ==> dir [/usr/lib/i386-linux-gnu]
+    arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../..] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../..]
+    arg [CMakeFiles/cmTC_d1b60.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [--push-state] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--pop-state] ==> ignore
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [--push-state] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--pop-state] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/crtendS.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o] ==> ignore
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7] ==> [/usr/lib/gcc/i686-linux-gnu/7]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu] ==> [/usr/lib/i386-linux-gnu]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../../../lib] ==> [/usr/lib]
+  collapse library dir [/lib/i386-linux-gnu] ==> [/lib/i386-linux-gnu]
+  collapse library dir [/lib/../lib] ==> [/lib]
+  collapse library dir [/usr/lib/i386-linux-gnu] ==> [/usr/lib/i386-linux-gnu]
+  collapse library dir [/usr/lib/../lib] ==> [/usr/lib]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../..] ==> [/usr/lib]
+  implicit libs: [gcc;gcc_s;c;gcc;gcc_s]
+  implicit dirs: [/usr/lib/gcc/i686-linux-gnu/7;/usr/lib/i386-linux-gnu;/usr/lib;/lib/i386-linux-gnu;/lib]
+  implicit fwks: []
+
+
+
+
+Detecting C [-std=c11] compiler features compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_3b524/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_3b524.dir/build.make CMakeFiles/cmTC_3b524.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_3b524.dir/feature_tests.c.o
+/usr/bin/cc   -std=c11 -o CMakeFiles/cmTC_3b524.dir/feature_tests.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/feature_tests.c
+Linking C executable cmTC_3b524
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3b524.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_3b524.dir/feature_tests.c.o  -o cmTC_3b524 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:1c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c99] compiler features compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c1379/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_c1379.dir/build.make CMakeFiles/cmTC_c1379.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c1379.dir/feature_tests.c.o
+/usr/bin/cc   -std=c99 -o CMakeFiles/cmTC_c1379.dir/feature_tests.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/feature_tests.c
+Linking C executable cmTC_c1379
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c1379.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_c1379.dir/feature_tests.c.o  -o cmTC_c1379 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c90] compiler features compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_6d2b0/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_6d2b0.dir/build.make CMakeFiles/cmTC_6d2b0.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_6d2b0.dir/feature_tests.c.o
+/usr/bin/cc   -std=c90 -o CMakeFiles/cmTC_6d2b0.dir/feature_tests.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/feature_tests.c
+Linking C executable cmTC_6d2b0
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6d2b0.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_6d2b0.dir/feature_tests.c.o  -o cmTC_6d2b0 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:0c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:0c_variadic_macros
+Determining if the CXX compiler works passed with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_58b60/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_58b60.dir/build.make CMakeFiles/cmTC_58b60.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_58b60.dir/testCXXCompiler.cxx.o
+/usr/bin/c++     -o CMakeFiles/cmTC_58b60.dir/testCXXCompiler.cxx.o -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTC_58b60
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_58b60.dir/link.txt --verbose=1
+/usr/bin/c++       -rdynamic CMakeFiles/cmTC_58b60.dir/testCXXCompiler.cxx.o  -o cmTC_58b60 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_5fc2e/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_5fc2e.dir/build.make CMakeFiles/cmTC_5fc2e.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_5fc2e.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/c++     -o CMakeFiles/cmTC_5fc2e.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.10/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTC_5fc2e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5fc2e.dir/link.txt --verbose=1
+/usr/bin/c++      -v -rdynamic CMakeFiles/cmTC_5fc2e.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_5fc2e 
+Using built-in specs.
+COLLECT_GCC=/usr/bin/c++
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper
+Target: i686-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.4.0-1ubuntu1~18.04.1' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=i686-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-targets=all --enable-multiarch --disable-werror --with-arch-32=i686 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=i686-linux-gnu
+Thread model: posix
+gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1) 
+COMPILER_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/../../../../lib/:/lib/i386-linux-gnu/:/lib/../lib/:/usr/lib/i386-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/i686-linux-gnu/7/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_5fc2e' '-shared-libgcc' '-mtune=generic' '-march=i686'
+ /usr/lib/gcc/i686-linux-gnu/7/collect2 -plugin /usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/cci9ZcbT.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_i386 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib/ld-linux.so.2 -pie -z now -z relro -o cmTC_5fc2e /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o /usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/i686-linux-gnu/7 -L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu -L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib -L/lib/i386-linux-gnu -L/lib/../lib -L/usr/lib/i386-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/i686-linux-gnu/7/../../.. CMakeFiles/cmTC_5fc2e.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/i686-linux-gnu/7/crtendS.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_5fc2e' '-shared-libgcc' '-mtune=generic' '-march=i686'
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_5fc2e/fast"]
+  ignore line: [make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp']
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_5fc2e.dir/build.make CMakeFiles/cmTC_5fc2e.dir/build]
+  ignore line: [make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp']
+  ignore line: [Building CXX object CMakeFiles/cmTC_5fc2e.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/usr/bin/c++     -o CMakeFiles/cmTC_5fc2e.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.10/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTC_5fc2e]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5fc2e.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/c++      -v -rdynamic CMakeFiles/cmTC_5fc2e.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_5fc2e ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/bin/c++]
+  ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper]
+  ignore line: [Target: i686-linux-gnu]
+  ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.4.0-1ubuntu1~18.04.1' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=i686-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-targets=all --enable-multiarch --disable-werror --with-arch-32=i686 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=i686-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1) ]
+  ignore line: [COMPILER_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/]
+  ignore line: [LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/../../../../lib/:/lib/i386-linux-gnu/:/lib/../lib/:/usr/lib/i386-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/i686-linux-gnu/7/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_5fc2e' '-shared-libgcc' '-mtune=generic' '-march=i686']
+  link line: [ /usr/lib/gcc/i686-linux-gnu/7/collect2 -plugin /usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/cci9ZcbT.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_i386 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib/ld-linux.so.2 -pie -z now -z relro -o cmTC_5fc2e /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o /usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/i686-linux-gnu/7 -L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu -L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib -L/lib/i386-linux-gnu -L/lib/../lib -L/usr/lib/i386-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/i686-linux-gnu/7/../../.. CMakeFiles/cmTC_5fc2e.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/i686-linux-gnu/7/crtendS.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o]
+    arg [/usr/lib/gcc/i686-linux-gnu/7/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/cci9ZcbT.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [--sysroot=/] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_i386] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib/ld-linux.so.2] ==> ignore
+    arg [-pie] ==> ignore
+    arg [-znow] ==> ignore
+    arg [-zrelro] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_5fc2e] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o] ==> ignore
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7] ==> dir [/usr/lib/gcc/i686-linux-gnu/7]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../../../lib]
+    arg [-L/lib/i386-linux-gnu] ==> dir [/lib/i386-linux-gnu]
+    arg [-L/lib/../lib] ==> dir [/lib/../lib]
+    arg [-L/usr/lib/i386-linux-gnu] ==> dir [/usr/lib/i386-linux-gnu]
+    arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../..] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../..]
+    arg [CMakeFiles/cmTC_5fc2e.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [-lm] ==> lib [m]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lc] ==> lib [c]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [/usr/lib/gcc/i686-linux-gnu/7/crtendS.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o] ==> ignore
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7] ==> [/usr/lib/gcc/i686-linux-gnu/7]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu] ==> [/usr/lib/i386-linux-gnu]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../../../lib] ==> [/usr/lib]
+  collapse library dir [/lib/i386-linux-gnu] ==> [/lib/i386-linux-gnu]
+  collapse library dir [/lib/../lib] ==> [/lib]
+  collapse library dir [/usr/lib/i386-linux-gnu] ==> [/usr/lib/i386-linux-gnu]
+  collapse library dir [/usr/lib/../lib] ==> [/usr/lib]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../..] ==> [/usr/lib]
+  implicit libs: [stdc++;m;gcc_s;gcc;c;gcc_s;gcc]
+  implicit dirs: [/usr/lib/gcc/i686-linux-gnu/7;/usr/lib/i386-linux-gnu;/usr/lib;/lib/i386-linux-gnu;/lib]
+  implicit fwks: []
+
+
+
+
+Detecting CXX [-std=c++1z] compiler features compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_fe584/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_fe584.dir/build.make CMakeFiles/cmTC_fe584.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_fe584.dir/feature_tests.cxx.o
+/usr/bin/c++    -std=c++1z -o CMakeFiles/cmTC_fe584.dir/feature_tests.cxx.o -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_fe584
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_fe584.dir/link.txt --verbose=1
+/usr/bin/c++       -rdynamic CMakeFiles/cmTC_fe584.dir/feature_tests.cxx.o  -o cmTC_fe584 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+    Feature record: CXX_FEATURE:1cxx_aggregate_default_initializers
+    Feature record: CXX_FEATURE:1cxx_alias_templates
+    Feature record: CXX_FEATURE:1cxx_alignas
+    Feature record: CXX_FEATURE:1cxx_alignof
+    Feature record: CXX_FEATURE:1cxx_attributes
+    Feature record: CXX_FEATURE:1cxx_attribute_deprecated
+    Feature record: CXX_FEATURE:1cxx_auto_type
+    Feature record: CXX_FEATURE:1cxx_binary_literals
+    Feature record: CXX_FEATURE:1cxx_constexpr
+    Feature record: CXX_FEATURE:1cxx_contextual_conversions
+    Feature record: CXX_FEATURE:1cxx_decltype
+    Feature record: CXX_FEATURE:1cxx_decltype_auto
+    Feature record: CXX_FEATURE:1cxx_decltype_incomplete_return_types
+    Feature record: CXX_FEATURE:1cxx_default_function_template_args
+    Feature record: CXX_FEATURE:1cxx_defaulted_functions
+    Feature record: CXX_FEATURE:1cxx_defaulted_move_initializers
+    Feature record: CXX_FEATURE:1cxx_delegating_constructors
+    Feature record: CXX_FEATURE:1cxx_deleted_functions
+    Feature record: CXX_FEATURE:1cxx_digit_separators
+    Feature record: CXX_FEATURE:1cxx_enum_forward_declarations
+    Feature record: CXX_FEATURE:1cxx_explicit_conversions
+    Feature record: CXX_FEATURE:1cxx_extended_friend_declarations
+    Feature record: CXX_FEATURE:1cxx_extern_templates
+    Feature record: CXX_FEATURE:1cxx_final
+    Feature record: CXX_FEATURE:1cxx_func_identifier
+    Feature record: CXX_FEATURE:1cxx_generalized_initializers
+    Feature record: CXX_FEATURE:1cxx_generic_lambdas
+    Feature record: CXX_FEATURE:1cxx_inheriting_constructors
+    Feature record: CXX_FEATURE:1cxx_inline_namespaces
+    Feature record: CXX_FEATURE:1cxx_lambdas
+    Feature record: CXX_FEATURE:1cxx_lambda_init_captures
+    Feature record: CXX_FEATURE:1cxx_local_type_template_args
+    Feature record: CXX_FEATURE:1cxx_long_long_type
+    Feature record: CXX_FEATURE:1cxx_noexcept
+    Feature record: CXX_FEATURE:1cxx_nonstatic_member_init
+    Feature record: CXX_FEATURE:1cxx_nullptr
+    Feature record: CXX_FEATURE:1cxx_override
+    Feature record: CXX_FEATURE:1cxx_range_for
+    Feature record: CXX_FEATURE:1cxx_raw_string_literals
+    Feature record: CXX_FEATURE:1cxx_reference_qualified_functions
+    Feature record: CXX_FEATURE:1cxx_relaxed_constexpr
+    Feature record: CXX_FEATURE:1cxx_return_type_deduction
+    Feature record: CXX_FEATURE:1cxx_right_angle_brackets
+    Feature record: CXX_FEATURE:1cxx_rvalue_references
+    Feature record: CXX_FEATURE:1cxx_sizeof_member
+    Feature record: CXX_FEATURE:1cxx_static_assert
+    Feature record: CXX_FEATURE:1cxx_strong_enums
+    Feature record: CXX_FEATURE:1cxx_template_template_parameters
+    Feature record: CXX_FEATURE:1cxx_thread_local
+    Feature record: CXX_FEATURE:1cxx_trailing_return_types
+    Feature record: CXX_FEATURE:1cxx_unicode_literals
+    Feature record: CXX_FEATURE:1cxx_uniform_initialization
+    Feature record: CXX_FEATURE:1cxx_unrestricted_unions
+    Feature record: CXX_FEATURE:1cxx_user_literals
+    Feature record: CXX_FEATURE:1cxx_variable_templates
+    Feature record: CXX_FEATURE:1cxx_variadic_macros
+    Feature record: CXX_FEATURE:1cxx_variadic_templates
+
+
+Detecting CXX [-std=c++14] compiler features compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_40c07/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_40c07.dir/build.make CMakeFiles/cmTC_40c07.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_40c07.dir/feature_tests.cxx.o
+/usr/bin/c++    -std=c++14 -o CMakeFiles/cmTC_40c07.dir/feature_tests.cxx.o -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_40c07
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_40c07.dir/link.txt --verbose=1
+/usr/bin/c++       -rdynamic CMakeFiles/cmTC_40c07.dir/feature_tests.cxx.o  -o cmTC_40c07 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+    Feature record: CXX_FEATURE:1cxx_aggregate_default_initializers
+    Feature record: CXX_FEATURE:1cxx_alias_templates
+    Feature record: CXX_FEATURE:1cxx_alignas
+    Feature record: CXX_FEATURE:1cxx_alignof
+    Feature record: CXX_FEATURE:1cxx_attributes
+    Feature record: CXX_FEATURE:1cxx_attribute_deprecated
+    Feature record: CXX_FEATURE:1cxx_auto_type
+    Feature record: CXX_FEATURE:1cxx_binary_literals
+    Feature record: CXX_FEATURE:1cxx_constexpr
+    Feature record: CXX_FEATURE:1cxx_contextual_conversions
+    Feature record: CXX_FEATURE:1cxx_decltype
+    Feature record: CXX_FEATURE:1cxx_decltype_auto
+    Feature record: CXX_FEATURE:1cxx_decltype_incomplete_return_types
+    Feature record: CXX_FEATURE:1cxx_default_function_template_args
+    Feature record: CXX_FEATURE:1cxx_defaulted_functions
+    Feature record: CXX_FEATURE:1cxx_defaulted_move_initializers
+    Feature record: CXX_FEATURE:1cxx_delegating_constructors
+    Feature record: CXX_FEATURE:1cxx_deleted_functions
+    Feature record: CXX_FEATURE:1cxx_digit_separators
+    Feature record: CXX_FEATURE:1cxx_enum_forward_declarations
+    Feature record: CXX_FEATURE:1cxx_explicit_conversions
+    Feature record: CXX_FEATURE:1cxx_extended_friend_declarations
+    Feature record: CXX_FEATURE:1cxx_extern_templates
+    Feature record: CXX_FEATURE:1cxx_final
+    Feature record: CXX_FEATURE:1cxx_func_identifier
+    Feature record: CXX_FEATURE:1cxx_generalized_initializers
+    Feature record: CXX_FEATURE:1cxx_generic_lambdas
+    Feature record: CXX_FEATURE:1cxx_inheriting_constructors
+    Feature record: CXX_FEATURE:1cxx_inline_namespaces
+    Feature record: CXX_FEATURE:1cxx_lambdas
+    Feature record: CXX_FEATURE:1cxx_lambda_init_captures
+    Feature record: CXX_FEATURE:1cxx_local_type_template_args
+    Feature record: CXX_FEATURE:1cxx_long_long_type
+    Feature record: CXX_FEATURE:1cxx_noexcept
+    Feature record: CXX_FEATURE:1cxx_nonstatic_member_init
+    Feature record: CXX_FEATURE:1cxx_nullptr
+    Feature record: CXX_FEATURE:1cxx_override
+    Feature record: CXX_FEATURE:1cxx_range_for
+    Feature record: CXX_FEATURE:1cxx_raw_string_literals
+    Feature record: CXX_FEATURE:1cxx_reference_qualified_functions
+    Feature record: CXX_FEATURE:1cxx_relaxed_constexpr
+    Feature record: CXX_FEATURE:1cxx_return_type_deduction
+    Feature record: CXX_FEATURE:1cxx_right_angle_brackets
+    Feature record: CXX_FEATURE:1cxx_rvalue_references
+    Feature record: CXX_FEATURE:1cxx_sizeof_member
+    Feature record: CXX_FEATURE:1cxx_static_assert
+    Feature record: CXX_FEATURE:1cxx_strong_enums
+    Feature record: CXX_FEATURE:1cxx_template_template_parameters
+    Feature record: CXX_FEATURE:1cxx_thread_local
+    Feature record: CXX_FEATURE:1cxx_trailing_return_types
+    Feature record: CXX_FEATURE:1cxx_unicode_literals
+    Feature record: CXX_FEATURE:1cxx_uniform_initialization
+    Feature record: CXX_FEATURE:1cxx_unrestricted_unions
+    Feature record: CXX_FEATURE:1cxx_user_literals
+    Feature record: CXX_FEATURE:1cxx_variable_templates
+    Feature record: CXX_FEATURE:1cxx_variadic_macros
+    Feature record: CXX_FEATURE:1cxx_variadic_templates
+The system is: Linux - 4.15.0-64-generic - i686
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /usr/bin/cc 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/home/hamish/Documents/Code/simplex0_0/CMakeFiles/3.10.2/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /usr/bin/c++ 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/home/hamish/Documents/Code/simplex0_0/CMakeFiles/3.10.2/CompilerIdCXX/a.out"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_79f33/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_79f33.dir/build.make CMakeFiles/cmTC_79f33.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_79f33.dir/testCCompiler.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_79f33.dir/testCCompiler.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_79f33
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_79f33.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_79f33.dir/testCCompiler.c.o  -o cmTC_79f33 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_ce672/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_ce672.dir/build.make CMakeFiles/cmTC_ce672.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ce672.dir/CMakeCCompilerABI.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_ce672.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.10/Modules/CMakeCCompilerABI.c
+Linking C executable cmTC_ce672
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ce672.dir/link.txt --verbose=1
+/usr/bin/cc     -v -rdynamic CMakeFiles/cmTC_ce672.dir/CMakeCCompilerABI.c.o  -o cmTC_ce672 
+Using built-in specs.
+COLLECT_GCC=/usr/bin/cc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper
+Target: i686-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.4.0-1ubuntu1~18.04.1' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=i686-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-targets=all --enable-multiarch --disable-werror --with-arch-32=i686 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=i686-linux-gnu
+Thread model: posix
+gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1) 
+COMPILER_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/../../../../lib/:/lib/i386-linux-gnu/:/lib/../lib/:/usr/lib/i386-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/i686-linux-gnu/7/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_ce672' '-mtune=generic' '-march=i686'
+ /usr/lib/gcc/i686-linux-gnu/7/collect2 -plugin /usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/cc1kqWz8.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_i386 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib/ld-linux.so.2 -pie -z now -z relro -o cmTC_ce672 /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o /usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/i686-linux-gnu/7 -L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu -L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib -L/lib/i386-linux-gnu -L/lib/../lib -L/usr/lib/i386-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/i686-linux-gnu/7/../../.. CMakeFiles/cmTC_ce672.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib/gcc/i686-linux-gnu/7/crtendS.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_ce672' '-mtune=generic' '-march=i686'
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_ce672/fast"]
+  ignore line: [make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp']
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_ce672.dir/build.make CMakeFiles/cmTC_ce672.dir/build]
+  ignore line: [make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_ce672.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/cc    -o CMakeFiles/cmTC_ce672.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.10/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTC_ce672]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ce672.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/cc     -v -rdynamic CMakeFiles/cmTC_ce672.dir/CMakeCCompilerABI.c.o  -o cmTC_ce672 ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/bin/cc]
+  ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper]
+  ignore line: [Target: i686-linux-gnu]
+  ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.4.0-1ubuntu1~18.04.1' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=i686-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-targets=all --enable-multiarch --disable-werror --with-arch-32=i686 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=i686-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1) ]
+  ignore line: [COMPILER_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/]
+  ignore line: [LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/../../../../lib/:/lib/i386-linux-gnu/:/lib/../lib/:/usr/lib/i386-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/i686-linux-gnu/7/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_ce672' '-mtune=generic' '-march=i686']
+  link line: [ /usr/lib/gcc/i686-linux-gnu/7/collect2 -plugin /usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/cc1kqWz8.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_i386 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib/ld-linux.so.2 -pie -z now -z relro -o cmTC_ce672 /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o /usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/i686-linux-gnu/7 -L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu -L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib -L/lib/i386-linux-gnu -L/lib/../lib -L/usr/lib/i386-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/i686-linux-gnu/7/../../.. CMakeFiles/cmTC_ce672.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib/gcc/i686-linux-gnu/7/crtendS.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o]
+    arg [/usr/lib/gcc/i686-linux-gnu/7/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/cc1kqWz8.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [--sysroot=/] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_i386] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib/ld-linux.so.2] ==> ignore
+    arg [-pie] ==> ignore
+    arg [-znow] ==> ignore
+    arg [-zrelro] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_ce672] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o] ==> ignore
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7] ==> dir [/usr/lib/gcc/i686-linux-gnu/7]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../../../lib]
+    arg [-L/lib/i386-linux-gnu] ==> dir [/lib/i386-linux-gnu]
+    arg [-L/lib/../lib] ==> dir [/lib/../lib]
+    arg [-L/usr/lib/i386-linux-gnu] ==> dir [/usr/lib/i386-linux-gnu]
+    arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../..] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../..]
+    arg [CMakeFiles/cmTC_ce672.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [--push-state] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--pop-state] ==> ignore
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [--push-state] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--pop-state] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/crtendS.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o] ==> ignore
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7] ==> [/usr/lib/gcc/i686-linux-gnu/7]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu] ==> [/usr/lib/i386-linux-gnu]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../../../lib] ==> [/usr/lib]
+  collapse library dir [/lib/i386-linux-gnu] ==> [/lib/i386-linux-gnu]
+  collapse library dir [/lib/../lib] ==> [/lib]
+  collapse library dir [/usr/lib/i386-linux-gnu] ==> [/usr/lib/i386-linux-gnu]
+  collapse library dir [/usr/lib/../lib] ==> [/usr/lib]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../..] ==> [/usr/lib]
+  implicit libs: [gcc;gcc_s;c;gcc;gcc_s]
+  implicit dirs: [/usr/lib/gcc/i686-linux-gnu/7;/usr/lib/i386-linux-gnu;/usr/lib;/lib/i386-linux-gnu;/lib]
+  implicit fwks: []
+
+
+
+
+Detecting C [-std=c11] compiler features compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_f8751/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_f8751.dir/build.make CMakeFiles/cmTC_f8751.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f8751.dir/feature_tests.c.o
+/usr/bin/cc   -std=c11 -o CMakeFiles/cmTC_f8751.dir/feature_tests.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/feature_tests.c
+Linking C executable cmTC_f8751
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f8751.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_f8751.dir/feature_tests.c.o  -o cmTC_f8751 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:1c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c99] compiler features compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_407c5/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_407c5.dir/build.make CMakeFiles/cmTC_407c5.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_407c5.dir/feature_tests.c.o
+/usr/bin/cc   -std=c99 -o CMakeFiles/cmTC_407c5.dir/feature_tests.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/feature_tests.c
+Linking C executable cmTC_407c5
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_407c5.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_407c5.dir/feature_tests.c.o  -o cmTC_407c5 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c90] compiler features compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_3cf8e/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_3cf8e.dir/build.make CMakeFiles/cmTC_3cf8e.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_3cf8e.dir/feature_tests.c.o
+/usr/bin/cc   -std=c90 -o CMakeFiles/cmTC_3cf8e.dir/feature_tests.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/feature_tests.c
+Linking C executable cmTC_3cf8e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3cf8e.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_3cf8e.dir/feature_tests.c.o  -o cmTC_3cf8e 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:0c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:0c_variadic_macros
+Determining if the CXX compiler works passed with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_01db2/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_01db2.dir/build.make CMakeFiles/cmTC_01db2.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_01db2.dir/testCXXCompiler.cxx.o
+/usr/bin/c++     -o CMakeFiles/cmTC_01db2.dir/testCXXCompiler.cxx.o -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTC_01db2
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_01db2.dir/link.txt --verbose=1
+/usr/bin/c++       -rdynamic CMakeFiles/cmTC_01db2.dir/testCXXCompiler.cxx.o  -o cmTC_01db2 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_77228/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_77228.dir/build.make CMakeFiles/cmTC_77228.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_77228.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/c++     -o CMakeFiles/cmTC_77228.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.10/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTC_77228
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_77228.dir/link.txt --verbose=1
+/usr/bin/c++      -v -rdynamic CMakeFiles/cmTC_77228.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_77228 
+Using built-in specs.
+COLLECT_GCC=/usr/bin/c++
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper
+Target: i686-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.4.0-1ubuntu1~18.04.1' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=i686-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-targets=all --enable-multiarch --disable-werror --with-arch-32=i686 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=i686-linux-gnu
+Thread model: posix
+gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1) 
+COMPILER_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/../../../../lib/:/lib/i386-linux-gnu/:/lib/../lib/:/usr/lib/i386-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/i686-linux-gnu/7/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_77228' '-shared-libgcc' '-mtune=generic' '-march=i686'
+ /usr/lib/gcc/i686-linux-gnu/7/collect2 -plugin /usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/ccGDWweH.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_i386 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib/ld-linux.so.2 -pie -z now -z relro -o cmTC_77228 /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o /usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/i686-linux-gnu/7 -L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu -L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib -L/lib/i386-linux-gnu -L/lib/../lib -L/usr/lib/i386-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/i686-linux-gnu/7/../../.. CMakeFiles/cmTC_77228.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/i686-linux-gnu/7/crtendS.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_77228' '-shared-libgcc' '-mtune=generic' '-march=i686'
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_77228/fast"]
+  ignore line: [make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp']
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_77228.dir/build.make CMakeFiles/cmTC_77228.dir/build]
+  ignore line: [make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp']
+  ignore line: [Building CXX object CMakeFiles/cmTC_77228.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/usr/bin/c++     -o CMakeFiles/cmTC_77228.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.10/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTC_77228]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_77228.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/c++      -v -rdynamic CMakeFiles/cmTC_77228.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_77228 ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/bin/c++]
+  ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper]
+  ignore line: [Target: i686-linux-gnu]
+  ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.4.0-1ubuntu1~18.04.1' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=i686-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-targets=all --enable-multiarch --disable-werror --with-arch-32=i686 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=i686-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1) ]
+  ignore line: [COMPILER_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/]
+  ignore line: [LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/../../../../lib/:/lib/i386-linux-gnu/:/lib/../lib/:/usr/lib/i386-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/i686-linux-gnu/7/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_77228' '-shared-libgcc' '-mtune=generic' '-march=i686']
+  link line: [ /usr/lib/gcc/i686-linux-gnu/7/collect2 -plugin /usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/ccGDWweH.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_i386 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib/ld-linux.so.2 -pie -z now -z relro -o cmTC_77228 /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o /usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/i686-linux-gnu/7 -L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu -L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib -L/lib/i386-linux-gnu -L/lib/../lib -L/usr/lib/i386-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/i686-linux-gnu/7/../../.. CMakeFiles/cmTC_77228.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/i686-linux-gnu/7/crtendS.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o]
+    arg [/usr/lib/gcc/i686-linux-gnu/7/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccGDWweH.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [--sysroot=/] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_i386] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib/ld-linux.so.2] ==> ignore
+    arg [-pie] ==> ignore
+    arg [-znow] ==> ignore
+    arg [-zrelro] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_77228] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o] ==> ignore
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7] ==> dir [/usr/lib/gcc/i686-linux-gnu/7]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../../../lib]
+    arg [-L/lib/i386-linux-gnu] ==> dir [/lib/i386-linux-gnu]
+    arg [-L/lib/../lib] ==> dir [/lib/../lib]
+    arg [-L/usr/lib/i386-linux-gnu] ==> dir [/usr/lib/i386-linux-gnu]
+    arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../..] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../..]
+    arg [CMakeFiles/cmTC_77228.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [-lm] ==> lib [m]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lc] ==> lib [c]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [/usr/lib/gcc/i686-linux-gnu/7/crtendS.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o] ==> ignore
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7] ==> [/usr/lib/gcc/i686-linux-gnu/7]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu] ==> [/usr/lib/i386-linux-gnu]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../../../lib] ==> [/usr/lib]
+  collapse library dir [/lib/i386-linux-gnu] ==> [/lib/i386-linux-gnu]
+  collapse library dir [/lib/../lib] ==> [/lib]
+  collapse library dir [/usr/lib/i386-linux-gnu] ==> [/usr/lib/i386-linux-gnu]
+  collapse library dir [/usr/lib/../lib] ==> [/usr/lib]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../..] ==> [/usr/lib]
+  implicit libs: [stdc++;m;gcc_s;gcc;c;gcc_s;gcc]
+  implicit dirs: [/usr/lib/gcc/i686-linux-gnu/7;/usr/lib/i386-linux-gnu;/usr/lib;/lib/i386-linux-gnu;/lib]
+  implicit fwks: []
+
+
+
+
+Detecting CXX [-std=c++1z] compiler features compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_31ce8/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_31ce8.dir/build.make CMakeFiles/cmTC_31ce8.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_31ce8.dir/feature_tests.cxx.o
+/usr/bin/c++    -std=c++1z -o CMakeFiles/cmTC_31ce8.dir/feature_tests.cxx.o -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_31ce8
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_31ce8.dir/link.txt --verbose=1
+/usr/bin/c++       -rdynamic CMakeFiles/cmTC_31ce8.dir/feature_tests.cxx.o  -o cmTC_31ce8 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+    Feature record: CXX_FEATURE:1cxx_aggregate_default_initializers
+    Feature record: CXX_FEATURE:1cxx_alias_templates
+    Feature record: CXX_FEATURE:1cxx_alignas
+    Feature record: CXX_FEATURE:1cxx_alignof
+    Feature record: CXX_FEATURE:1cxx_attributes
+    Feature record: CXX_FEATURE:1cxx_attribute_deprecated
+    Feature record: CXX_FEATURE:1cxx_auto_type
+    Feature record: CXX_FEATURE:1cxx_binary_literals
+    Feature record: CXX_FEATURE:1cxx_constexpr
+    Feature record: CXX_FEATURE:1cxx_contextual_conversions
+    Feature record: CXX_FEATURE:1cxx_decltype
+    Feature record: CXX_FEATURE:1cxx_decltype_auto
+    Feature record: CXX_FEATURE:1cxx_decltype_incomplete_return_types
+    Feature record: CXX_FEATURE:1cxx_default_function_template_args
+    Feature record: CXX_FEATURE:1cxx_defaulted_functions
+    Feature record: CXX_FEATURE:1cxx_defaulted_move_initializers
+    Feature record: CXX_FEATURE:1cxx_delegating_constructors
+    Feature record: CXX_FEATURE:1cxx_deleted_functions
+    Feature record: CXX_FEATURE:1cxx_digit_separators
+    Feature record: CXX_FEATURE:1cxx_enum_forward_declarations
+    Feature record: CXX_FEATURE:1cxx_explicit_conversions
+    Feature record: CXX_FEATURE:1cxx_extended_friend_declarations
+    Feature record: CXX_FEATURE:1cxx_extern_templates
+    Feature record: CXX_FEATURE:1cxx_final
+    Feature record: CXX_FEATURE:1cxx_func_identifier
+    Feature record: CXX_FEATURE:1cxx_generalized_initializers
+    Feature record: CXX_FEATURE:1cxx_generic_lambdas
+    Feature record: CXX_FEATURE:1cxx_inheriting_constructors
+    Feature record: CXX_FEATURE:1cxx_inline_namespaces
+    Feature record: CXX_FEATURE:1cxx_lambdas
+    Feature record: CXX_FEATURE:1cxx_lambda_init_captures
+    Feature record: CXX_FEATURE:1cxx_local_type_template_args
+    Feature record: CXX_FEATURE:1cxx_long_long_type
+    Feature record: CXX_FEATURE:1cxx_noexcept
+    Feature record: CXX_FEATURE:1cxx_nonstatic_member_init
+    Feature record: CXX_FEATURE:1cxx_nullptr
+    Feature record: CXX_FEATURE:1cxx_override
+    Feature record: CXX_FEATURE:1cxx_range_for
+    Feature record: CXX_FEATURE:1cxx_raw_string_literals
+    Feature record: CXX_FEATURE:1cxx_reference_qualified_functions
+    Feature record: CXX_FEATURE:1cxx_relaxed_constexpr
+    Feature record: CXX_FEATURE:1cxx_return_type_deduction
+    Feature record: CXX_FEATURE:1cxx_right_angle_brackets
+    Feature record: CXX_FEATURE:1cxx_rvalue_references
+    Feature record: CXX_FEATURE:1cxx_sizeof_member
+    Feature record: CXX_FEATURE:1cxx_static_assert
+    Feature record: CXX_FEATURE:1cxx_strong_enums
+    Feature record: CXX_FEATURE:1cxx_template_template_parameters
+    Feature record: CXX_FEATURE:1cxx_thread_local
+    Feature record: CXX_FEATURE:1cxx_trailing_return_types
+    Feature record: CXX_FEATURE:1cxx_unicode_literals
+    Feature record: CXX_FEATURE:1cxx_uniform_initialization
+    Feature record: CXX_FEATURE:1cxx_unrestricted_unions
+    Feature record: CXX_FEATURE:1cxx_user_literals
+    Feature record: CXX_FEATURE:1cxx_variable_templates
+    Feature record: CXX_FEATURE:1cxx_variadic_macros
+    Feature record: CXX_FEATURE:1cxx_variadic_templates
+
+
+Detecting CXX [-std=c++14] compiler features compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_5c32e/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_5c32e.dir/build.make CMakeFiles/cmTC_5c32e.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_5c32e.dir/feature_tests.cxx.o
+/usr/bin/c++    -std=c++14 -o CMakeFiles/cmTC_5c32e.dir/feature_tests.cxx.o -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_5c32e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5c32e.dir/link.txt --verbose=1
+/usr/bin/c++       -rdynamic CMakeFiles/cmTC_5c32e.dir/feature_tests.cxx.o  -o cmTC_5c32e 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+    Feature record: CXX_FEATURE:1cxx_aggregate_default_initializers
+    Feature record: CXX_FEATURE:1cxx_alias_templates
+    Feature record: CXX_FEATURE:1cxx_alignas
+    Feature record: CXX_FEATURE:1cxx_alignof
+    Feature record: CXX_FEATURE:1cxx_attributes
+    Feature record: CXX_FEATURE:1cxx_attribute_deprecated
+    Feature record: CXX_FEATURE:1cxx_auto_type
+    Feature record: CXX_FEATURE:1cxx_binary_literals
+    Feature record: CXX_FEATURE:1cxx_constexpr
+    Feature record: CXX_FEATURE:1cxx_contextual_conversions
+    Feature record: CXX_FEATURE:1cxx_decltype
+    Feature record: CXX_FEATURE:1cxx_decltype_auto
+    Feature record: CXX_FEATURE:1cxx_decltype_incomplete_return_types
+    Feature record: CXX_FEATURE:1cxx_default_function_template_args
+    Feature record: CXX_FEATURE:1cxx_defaulted_functions
+    Feature record: CXX_FEATURE:1cxx_defaulted_move_initializers
+    Feature record: CXX_FEATURE:1cxx_delegating_constructors
+    Feature record: CXX_FEATURE:1cxx_deleted_functions
+    Feature record: CXX_FEATURE:1cxx_digit_separators
+    Feature record: CXX_FEATURE:1cxx_enum_forward_declarations
+    Feature record: CXX_FEATURE:1cxx_explicit_conversions
+    Feature record: CXX_FEATURE:1cxx_extended_friend_declarations
+    Feature record: CXX_FEATURE:1cxx_extern_templates
+    Feature record: CXX_FEATURE:1cxx_final
+    Feature record: CXX_FEATURE:1cxx_func_identifier
+    Feature record: CXX_FEATURE:1cxx_generalized_initializers
+    Feature record: CXX_FEATURE:1cxx_generic_lambdas
+    Feature record: CXX_FEATURE:1cxx_inheriting_constructors
+    Feature record: CXX_FEATURE:1cxx_inline_namespaces
+    Feature record: CXX_FEATURE:1cxx_lambdas
+    Feature record: CXX_FEATURE:1cxx_lambda_init_captures
+    Feature record: CXX_FEATURE:1cxx_local_type_template_args
+    Feature record: CXX_FEATURE:1cxx_long_long_type
+    Feature record: CXX_FEATURE:1cxx_noexcept
+    Feature record: CXX_FEATURE:1cxx_nonstatic_member_init
+    Feature record: CXX_FEATURE:1cxx_nullptr
+    Feature record: CXX_FEATURE:1cxx_override
+    Feature record: CXX_FEATURE:1cxx_range_for
+    Feature record: CXX_FEATURE:1cxx_raw_string_literals
+    Feature record: CXX_FEATURE:1cxx_reference_qualified_functions
+    Feature record: CXX_FEATURE:1cxx_relaxed_constexpr
+    Feature record: CXX_FEATURE:1cxx_return_type_deduction
+    Feature record: CXX_FEATURE:1cxx_right_angle_brackets
+    Feature record: CXX_FEATURE:1cxx_rvalue_references
+    Feature record: CXX_FEATURE:1cxx_sizeof_member
+    Feature record: CXX_FEATURE:1cxx_static_assert
+    Feature record: CXX_FEATURE:1cxx_strong_enums
+    Feature record: CXX_FEATURE:1cxx_template_template_parameters
+    Feature record: CXX_FEATURE:1cxx_thread_local
+    Feature record: CXX_FEATURE:1cxx_trailing_return_types
+    Feature record: CXX_FEATURE:1cxx_unicode_literals
+    Feature record: CXX_FEATURE:1cxx_uniform_initialization
+    Feature record: CXX_FEATURE:1cxx_unrestricted_unions
+    Feature record: CXX_FEATURE:1cxx_user_literals
+    Feature record: CXX_FEATURE:1cxx_variable_templates
+    Feature record: CXX_FEATURE:1cxx_variadic_macros
+    Feature record: CXX_FEATURE:1cxx_variadic_templates
+The system is: Linux - 4.15.0-64-generic - i686
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /usr/bin/cc 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/home/hamish/Documents/Code/simplex0_0/CMakeFiles/3.10.2/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /usr/bin/c++ 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/home/hamish/Documents/Code/simplex0_0/CMakeFiles/3.10.2/CompilerIdCXX/a.out"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_a1e31/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_a1e31.dir/build.make CMakeFiles/cmTC_a1e31.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a1e31.dir/testCCompiler.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_a1e31.dir/testCCompiler.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_a1e31
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a1e31.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_a1e31.dir/testCCompiler.c.o  -o cmTC_a1e31 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_64854/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_64854.dir/build.make CMakeFiles/cmTC_64854.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_64854.dir/CMakeCCompilerABI.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_64854.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.10/Modules/CMakeCCompilerABI.c
+Linking C executable cmTC_64854
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_64854.dir/link.txt --verbose=1
+/usr/bin/cc     -v -rdynamic CMakeFiles/cmTC_64854.dir/CMakeCCompilerABI.c.o  -o cmTC_64854 
+Using built-in specs.
+COLLECT_GCC=/usr/bin/cc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper
+Target: i686-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.4.0-1ubuntu1~18.04.1' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=i686-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-targets=all --enable-multiarch --disable-werror --with-arch-32=i686 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=i686-linux-gnu
+Thread model: posix
+gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1) 
+COMPILER_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/../../../../lib/:/lib/i386-linux-gnu/:/lib/../lib/:/usr/lib/i386-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/i686-linux-gnu/7/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_64854' '-mtune=generic' '-march=i686'
+ /usr/lib/gcc/i686-linux-gnu/7/collect2 -plugin /usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/ccabDkJ6.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_i386 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib/ld-linux.so.2 -pie -z now -z relro -o cmTC_64854 /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o /usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/i686-linux-gnu/7 -L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu -L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib -L/lib/i386-linux-gnu -L/lib/../lib -L/usr/lib/i386-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/i686-linux-gnu/7/../../.. CMakeFiles/cmTC_64854.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib/gcc/i686-linux-gnu/7/crtendS.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_64854' '-mtune=generic' '-march=i686'
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_64854/fast"]
+  ignore line: [make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp']
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_64854.dir/build.make CMakeFiles/cmTC_64854.dir/build]
+  ignore line: [make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_64854.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/cc    -o CMakeFiles/cmTC_64854.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.10/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTC_64854]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_64854.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/cc     -v -rdynamic CMakeFiles/cmTC_64854.dir/CMakeCCompilerABI.c.o  -o cmTC_64854 ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/bin/cc]
+  ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper]
+  ignore line: [Target: i686-linux-gnu]
+  ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.4.0-1ubuntu1~18.04.1' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=i686-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-targets=all --enable-multiarch --disable-werror --with-arch-32=i686 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=i686-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1) ]
+  ignore line: [COMPILER_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/]
+  ignore line: [LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/../../../../lib/:/lib/i386-linux-gnu/:/lib/../lib/:/usr/lib/i386-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/i686-linux-gnu/7/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_64854' '-mtune=generic' '-march=i686']
+  link line: [ /usr/lib/gcc/i686-linux-gnu/7/collect2 -plugin /usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/ccabDkJ6.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_i386 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib/ld-linux.so.2 -pie -z now -z relro -o cmTC_64854 /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o /usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/i686-linux-gnu/7 -L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu -L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib -L/lib/i386-linux-gnu -L/lib/../lib -L/usr/lib/i386-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/i686-linux-gnu/7/../../.. CMakeFiles/cmTC_64854.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib/gcc/i686-linux-gnu/7/crtendS.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o]
+    arg [/usr/lib/gcc/i686-linux-gnu/7/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccabDkJ6.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [--sysroot=/] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_i386] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib/ld-linux.so.2] ==> ignore
+    arg [-pie] ==> ignore
+    arg [-znow] ==> ignore
+    arg [-zrelro] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_64854] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o] ==> ignore
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7] ==> dir [/usr/lib/gcc/i686-linux-gnu/7]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../../../lib]
+    arg [-L/lib/i386-linux-gnu] ==> dir [/lib/i386-linux-gnu]
+    arg [-L/lib/../lib] ==> dir [/lib/../lib]
+    arg [-L/usr/lib/i386-linux-gnu] ==> dir [/usr/lib/i386-linux-gnu]
+    arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../..] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../..]
+    arg [CMakeFiles/cmTC_64854.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [--push-state] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--pop-state] ==> ignore
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [--push-state] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--pop-state] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/crtendS.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o] ==> ignore
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7] ==> [/usr/lib/gcc/i686-linux-gnu/7]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu] ==> [/usr/lib/i386-linux-gnu]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../../../lib] ==> [/usr/lib]
+  collapse library dir [/lib/i386-linux-gnu] ==> [/lib/i386-linux-gnu]
+  collapse library dir [/lib/../lib] ==> [/lib]
+  collapse library dir [/usr/lib/i386-linux-gnu] ==> [/usr/lib/i386-linux-gnu]
+  collapse library dir [/usr/lib/../lib] ==> [/usr/lib]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../..] ==> [/usr/lib]
+  implicit libs: [gcc;gcc_s;c;gcc;gcc_s]
+  implicit dirs: [/usr/lib/gcc/i686-linux-gnu/7;/usr/lib/i386-linux-gnu;/usr/lib;/lib/i386-linux-gnu;/lib]
+  implicit fwks: []
+
+
+
+
+Detecting C [-std=c11] compiler features compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_8f584/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_8f584.dir/build.make CMakeFiles/cmTC_8f584.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_8f584.dir/feature_tests.c.o
+/usr/bin/cc   -std=c11 -o CMakeFiles/cmTC_8f584.dir/feature_tests.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/feature_tests.c
+Linking C executable cmTC_8f584
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8f584.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_8f584.dir/feature_tests.c.o  -o cmTC_8f584 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:1c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c99] compiler features compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_bdf05/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_bdf05.dir/build.make CMakeFiles/cmTC_bdf05.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_bdf05.dir/feature_tests.c.o
+/usr/bin/cc   -std=c99 -o CMakeFiles/cmTC_bdf05.dir/feature_tests.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/feature_tests.c
+Linking C executable cmTC_bdf05
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_bdf05.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_bdf05.dir/feature_tests.c.o  -o cmTC_bdf05 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c90] compiler features compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_7eee4/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_7eee4.dir/build.make CMakeFiles/cmTC_7eee4.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_7eee4.dir/feature_tests.c.o
+/usr/bin/cc   -std=c90 -o CMakeFiles/cmTC_7eee4.dir/feature_tests.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/feature_tests.c
+Linking C executable cmTC_7eee4
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7eee4.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_7eee4.dir/feature_tests.c.o  -o cmTC_7eee4 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:0c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:0c_variadic_macros
+Determining if the CXX compiler works passed with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_51e53/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_51e53.dir/build.make CMakeFiles/cmTC_51e53.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_51e53.dir/testCXXCompiler.cxx.o
+/usr/bin/c++     -o CMakeFiles/cmTC_51e53.dir/testCXXCompiler.cxx.o -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTC_51e53
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_51e53.dir/link.txt --verbose=1
+/usr/bin/c++       -rdynamic CMakeFiles/cmTC_51e53.dir/testCXXCompiler.cxx.o  -o cmTC_51e53 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_e68be/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_e68be.dir/build.make CMakeFiles/cmTC_e68be.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_e68be.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/c++     -o CMakeFiles/cmTC_e68be.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.10/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTC_e68be
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e68be.dir/link.txt --verbose=1
+/usr/bin/c++      -v -rdynamic CMakeFiles/cmTC_e68be.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_e68be 
+Using built-in specs.
+COLLECT_GCC=/usr/bin/c++
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper
+Target: i686-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.4.0-1ubuntu1~18.04.1' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=i686-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-targets=all --enable-multiarch --disable-werror --with-arch-32=i686 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=i686-linux-gnu
+Thread model: posix
+gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1) 
+COMPILER_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/../../../../lib/:/lib/i386-linux-gnu/:/lib/../lib/:/usr/lib/i386-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/i686-linux-gnu/7/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_e68be' '-shared-libgcc' '-mtune=generic' '-march=i686'
+ /usr/lib/gcc/i686-linux-gnu/7/collect2 -plugin /usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/ccZAcVgJ.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_i386 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib/ld-linux.so.2 -pie -z now -z relro -o cmTC_e68be /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o /usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/i686-linux-gnu/7 -L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu -L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib -L/lib/i386-linux-gnu -L/lib/../lib -L/usr/lib/i386-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/i686-linux-gnu/7/../../.. CMakeFiles/cmTC_e68be.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/i686-linux-gnu/7/crtendS.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_e68be' '-shared-libgcc' '-mtune=generic' '-march=i686'
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_e68be/fast"]
+  ignore line: [make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp']
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_e68be.dir/build.make CMakeFiles/cmTC_e68be.dir/build]
+  ignore line: [make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp']
+  ignore line: [Building CXX object CMakeFiles/cmTC_e68be.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/usr/bin/c++     -o CMakeFiles/cmTC_e68be.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.10/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTC_e68be]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e68be.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/c++      -v -rdynamic CMakeFiles/cmTC_e68be.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_e68be ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/bin/c++]
+  ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper]
+  ignore line: [Target: i686-linux-gnu]
+  ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.4.0-1ubuntu1~18.04.1' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=i686-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-targets=all --enable-multiarch --disable-werror --with-arch-32=i686 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=i686-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1) ]
+  ignore line: [COMPILER_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/]
+  ignore line: [LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/../../../../lib/:/lib/i386-linux-gnu/:/lib/../lib/:/usr/lib/i386-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/i686-linux-gnu/7/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_e68be' '-shared-libgcc' '-mtune=generic' '-march=i686']
+  link line: [ /usr/lib/gcc/i686-linux-gnu/7/collect2 -plugin /usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/ccZAcVgJ.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_i386 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib/ld-linux.so.2 -pie -z now -z relro -o cmTC_e68be /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o /usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/i686-linux-gnu/7 -L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu -L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib -L/lib/i386-linux-gnu -L/lib/../lib -L/usr/lib/i386-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/i686-linux-gnu/7/../../.. CMakeFiles/cmTC_e68be.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/i686-linux-gnu/7/crtendS.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o]
+    arg [/usr/lib/gcc/i686-linux-gnu/7/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccZAcVgJ.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [--sysroot=/] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_i386] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib/ld-linux.so.2] ==> ignore
+    arg [-pie] ==> ignore
+    arg [-znow] ==> ignore
+    arg [-zrelro] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_e68be] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o] ==> ignore
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7] ==> dir [/usr/lib/gcc/i686-linux-gnu/7]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../../../lib]
+    arg [-L/lib/i386-linux-gnu] ==> dir [/lib/i386-linux-gnu]
+    arg [-L/lib/../lib] ==> dir [/lib/../lib]
+    arg [-L/usr/lib/i386-linux-gnu] ==> dir [/usr/lib/i386-linux-gnu]
+    arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../..] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../..]
+    arg [CMakeFiles/cmTC_e68be.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [-lm] ==> lib [m]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lc] ==> lib [c]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [/usr/lib/gcc/i686-linux-gnu/7/crtendS.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o] ==> ignore
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7] ==> [/usr/lib/gcc/i686-linux-gnu/7]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu] ==> [/usr/lib/i386-linux-gnu]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../../../lib] ==> [/usr/lib]
+  collapse library dir [/lib/i386-linux-gnu] ==> [/lib/i386-linux-gnu]
+  collapse library dir [/lib/../lib] ==> [/lib]
+  collapse library dir [/usr/lib/i386-linux-gnu] ==> [/usr/lib/i386-linux-gnu]
+  collapse library dir [/usr/lib/../lib] ==> [/usr/lib]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../..] ==> [/usr/lib]
+  implicit libs: [stdc++;m;gcc_s;gcc;c;gcc_s;gcc]
+  implicit dirs: [/usr/lib/gcc/i686-linux-gnu/7;/usr/lib/i386-linux-gnu;/usr/lib;/lib/i386-linux-gnu;/lib]
+  implicit fwks: []
+
+
+The system is: Linux - 4.15.0-64-generic - i686
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /usr/bin/cc 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/home/hamish/Documents/Code/simplex0_0/CMakeFiles/3.10.2/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /usr/bin/c++ 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/home/hamish/Documents/Code/simplex0_0/CMakeFiles/3.10.2/CompilerIdCXX/a.out"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_2f6f6/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_2f6f6.dir/build.make CMakeFiles/cmTC_2f6f6.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_2f6f6.dir/testCCompiler.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_2f6f6.dir/testCCompiler.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_2f6f6
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2f6f6.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_2f6f6.dir/testCCompiler.c.o  -o cmTC_2f6f6 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_4d3fd/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_4d3fd.dir/build.make CMakeFiles/cmTC_4d3fd.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4d3fd.dir/CMakeCCompilerABI.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_4d3fd.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.10/Modules/CMakeCCompilerABI.c
+Linking C executable cmTC_4d3fd
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4d3fd.dir/link.txt --verbose=1
+/usr/bin/cc     -v -rdynamic CMakeFiles/cmTC_4d3fd.dir/CMakeCCompilerABI.c.o  -o cmTC_4d3fd 
+Using built-in specs.
+COLLECT_GCC=/usr/bin/cc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper
+Target: i686-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.4.0-1ubuntu1~18.04.1' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=i686-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-targets=all --enable-multiarch --disable-werror --with-arch-32=i686 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=i686-linux-gnu
+Thread model: posix
+gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1) 
+COMPILER_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/../../../../lib/:/lib/i386-linux-gnu/:/lib/../lib/:/usr/lib/i386-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/i686-linux-gnu/7/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_4d3fd' '-mtune=generic' '-march=i686'
+ /usr/lib/gcc/i686-linux-gnu/7/collect2 -plugin /usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/ccpKGQap.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_i386 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib/ld-linux.so.2 -pie -z now -z relro -o cmTC_4d3fd /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o /usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/i686-linux-gnu/7 -L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu -L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib -L/lib/i386-linux-gnu -L/lib/../lib -L/usr/lib/i386-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/i686-linux-gnu/7/../../.. CMakeFiles/cmTC_4d3fd.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib/gcc/i686-linux-gnu/7/crtendS.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_4d3fd' '-mtune=generic' '-march=i686'
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_4d3fd/fast"]
+  ignore line: [make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp']
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_4d3fd.dir/build.make CMakeFiles/cmTC_4d3fd.dir/build]
+  ignore line: [make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_4d3fd.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/cc    -o CMakeFiles/cmTC_4d3fd.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.10/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTC_4d3fd]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4d3fd.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/cc     -v -rdynamic CMakeFiles/cmTC_4d3fd.dir/CMakeCCompilerABI.c.o  -o cmTC_4d3fd ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/bin/cc]
+  ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper]
+  ignore line: [Target: i686-linux-gnu]
+  ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.4.0-1ubuntu1~18.04.1' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=i686-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-targets=all --enable-multiarch --disable-werror --with-arch-32=i686 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=i686-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1) ]
+  ignore line: [COMPILER_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/]
+  ignore line: [LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/../../../../lib/:/lib/i386-linux-gnu/:/lib/../lib/:/usr/lib/i386-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/i686-linux-gnu/7/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_4d3fd' '-mtune=generic' '-march=i686']
+  link line: [ /usr/lib/gcc/i686-linux-gnu/7/collect2 -plugin /usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/ccpKGQap.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_i386 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib/ld-linux.so.2 -pie -z now -z relro -o cmTC_4d3fd /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o /usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/i686-linux-gnu/7 -L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu -L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib -L/lib/i386-linux-gnu -L/lib/../lib -L/usr/lib/i386-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/i686-linux-gnu/7/../../.. CMakeFiles/cmTC_4d3fd.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib/gcc/i686-linux-gnu/7/crtendS.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o]
+    arg [/usr/lib/gcc/i686-linux-gnu/7/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccpKGQap.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [--sysroot=/] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_i386] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib/ld-linux.so.2] ==> ignore
+    arg [-pie] ==> ignore
+    arg [-znow] ==> ignore
+    arg [-zrelro] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_4d3fd] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o] ==> ignore
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7] ==> dir [/usr/lib/gcc/i686-linux-gnu/7]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../../../lib]
+    arg [-L/lib/i386-linux-gnu] ==> dir [/lib/i386-linux-gnu]
+    arg [-L/lib/../lib] ==> dir [/lib/../lib]
+    arg [-L/usr/lib/i386-linux-gnu] ==> dir [/usr/lib/i386-linux-gnu]
+    arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../..] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../..]
+    arg [CMakeFiles/cmTC_4d3fd.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [--push-state] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--pop-state] ==> ignore
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [--push-state] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--pop-state] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/crtendS.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o] ==> ignore
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7] ==> [/usr/lib/gcc/i686-linux-gnu/7]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu] ==> [/usr/lib/i386-linux-gnu]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../../../lib] ==> [/usr/lib]
+  collapse library dir [/lib/i386-linux-gnu] ==> [/lib/i386-linux-gnu]
+  collapse library dir [/lib/../lib] ==> [/lib]
+  collapse library dir [/usr/lib/i386-linux-gnu] ==> [/usr/lib/i386-linux-gnu]
+  collapse library dir [/usr/lib/../lib] ==> [/usr/lib]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../..] ==> [/usr/lib]
+  implicit libs: [gcc;gcc_s;c;gcc;gcc_s]
+  implicit dirs: [/usr/lib/gcc/i686-linux-gnu/7;/usr/lib/i386-linux-gnu;/usr/lib;/lib/i386-linux-gnu;/lib]
+  implicit fwks: []
+
+
+
+
+Detecting C [-std=c11] compiler features compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_212a0/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_212a0.dir/build.make CMakeFiles/cmTC_212a0.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_212a0.dir/feature_tests.c.o
+/usr/bin/cc   -std=c11 -o CMakeFiles/cmTC_212a0.dir/feature_tests.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/feature_tests.c
+Linking C executable cmTC_212a0
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_212a0.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_212a0.dir/feature_tests.c.o  -o cmTC_212a0 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:1c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c99] compiler features compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_1465e/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_1465e.dir/build.make CMakeFiles/cmTC_1465e.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_1465e.dir/feature_tests.c.o
+/usr/bin/cc   -std=c99 -o CMakeFiles/cmTC_1465e.dir/feature_tests.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/feature_tests.c
+Linking C executable cmTC_1465e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1465e.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_1465e.dir/feature_tests.c.o  -o cmTC_1465e 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+The system is: Linux - 4.15.0-64-generic - i686
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /usr/bin/cc 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/home/hamish/Documents/Code/simplex0_0/CMakeFiles/3.10.2/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /usr/bin/c++ 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/home/hamish/Documents/Code/simplex0_0/CMakeFiles/3.10.2/CompilerIdCXX/a.out"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_f7ac1/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_f7ac1.dir/build.make CMakeFiles/cmTC_f7ac1.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f7ac1.dir/testCCompiler.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_f7ac1.dir/testCCompiler.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_f7ac1
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f7ac1.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_f7ac1.dir/testCCompiler.c.o  -o cmTC_f7ac1 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c2cf7/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_c2cf7.dir/build.make CMakeFiles/cmTC_c2cf7.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c2cf7.dir/CMakeCCompilerABI.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_c2cf7.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.10/Modules/CMakeCCompilerABI.c
+Linking C executable cmTC_c2cf7
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c2cf7.dir/link.txt --verbose=1
+/usr/bin/cc     -v -rdynamic CMakeFiles/cmTC_c2cf7.dir/CMakeCCompilerABI.c.o  -o cmTC_c2cf7 
+Using built-in specs.
+COLLECT_GCC=/usr/bin/cc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper
+Target: i686-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.4.0-1ubuntu1~18.04.1' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=i686-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-targets=all --enable-multiarch --disable-werror --with-arch-32=i686 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=i686-linux-gnu
+Thread model: posix
+gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1) 
+COMPILER_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/../../../../lib/:/lib/i386-linux-gnu/:/lib/../lib/:/usr/lib/i386-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/i686-linux-gnu/7/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_c2cf7' '-mtune=generic' '-march=i686'
+ /usr/lib/gcc/i686-linux-gnu/7/collect2 -plugin /usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/ccqKYKqt.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_i386 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib/ld-linux.so.2 -pie -z now -z relro -o cmTC_c2cf7 /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o /usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/i686-linux-gnu/7 -L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu -L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib -L/lib/i386-linux-gnu -L/lib/../lib -L/usr/lib/i386-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/i686-linux-gnu/7/../../.. CMakeFiles/cmTC_c2cf7.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib/gcc/i686-linux-gnu/7/crtendS.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_c2cf7' '-mtune=generic' '-march=i686'
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_c2cf7/fast"]
+  ignore line: [make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp']
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_c2cf7.dir/build.make CMakeFiles/cmTC_c2cf7.dir/build]
+  ignore line: [make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_c2cf7.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/cc    -o CMakeFiles/cmTC_c2cf7.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.10/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTC_c2cf7]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c2cf7.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/cc     -v -rdynamic CMakeFiles/cmTC_c2cf7.dir/CMakeCCompilerABI.c.o  -o cmTC_c2cf7 ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/bin/cc]
+  ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper]
+  ignore line: [Target: i686-linux-gnu]
+  ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.4.0-1ubuntu1~18.04.1' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=i686-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-targets=all --enable-multiarch --disable-werror --with-arch-32=i686 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=i686-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1) ]
+  ignore line: [COMPILER_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/]
+  ignore line: [LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/7/:/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/7/../../../../lib/:/lib/i386-linux-gnu/:/lib/../lib/:/usr/lib/i386-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/i686-linux-gnu/7/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_c2cf7' '-mtune=generic' '-march=i686']
+  link line: [ /usr/lib/gcc/i686-linux-gnu/7/collect2 -plugin /usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/ccqKYKqt.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_i386 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib/ld-linux.so.2 -pie -z now -z relro -o cmTC_c2cf7 /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o /usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/i686-linux-gnu/7 -L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu -L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib -L/lib/i386-linux-gnu -L/lib/../lib -L/usr/lib/i386-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/i686-linux-gnu/7/../../.. CMakeFiles/cmTC_c2cf7.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib/gcc/i686-linux-gnu/7/crtendS.o /usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o]
+    arg [/usr/lib/gcc/i686-linux-gnu/7/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/usr/lib/gcc/i686-linux-gnu/7/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccqKYKqt.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [--sysroot=/] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_i386] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib/ld-linux.so.2] ==> ignore
+    arg [-pie] ==> ignore
+    arg [-znow] ==> ignore
+    arg [-zrelro] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_c2cf7] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/Scrt1.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crti.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/crtbeginS.o] ==> ignore
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7] ==> dir [/usr/lib/gcc/i686-linux-gnu/7]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../../../lib] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../../../lib]
+    arg [-L/lib/i386-linux-gnu] ==> dir [/lib/i386-linux-gnu]
+    arg [-L/lib/../lib] ==> dir [/lib/../lib]
+    arg [-L/usr/lib/i386-linux-gnu] ==> dir [/usr/lib/i386-linux-gnu]
+    arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
+    arg [-L/usr/lib/gcc/i686-linux-gnu/7/../../..] ==> dir [/usr/lib/gcc/i686-linux-gnu/7/../../..]
+    arg [CMakeFiles/cmTC_c2cf7.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [--push-state] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--pop-state] ==> ignore
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [--push-state] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--pop-state] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/crtendS.o] ==> ignore
+    arg [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu/crtn.o] ==> ignore
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7] ==> [/usr/lib/gcc/i686-linux-gnu/7]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../../i386-linux-gnu] ==> [/usr/lib/i386-linux-gnu]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../../../lib] ==> [/usr/lib]
+  collapse library dir [/lib/i386-linux-gnu] ==> [/lib/i386-linux-gnu]
+  collapse library dir [/lib/../lib] ==> [/lib]
+  collapse library dir [/usr/lib/i386-linux-gnu] ==> [/usr/lib/i386-linux-gnu]
+  collapse library dir [/usr/lib/../lib] ==> [/usr/lib]
+  collapse library dir [/usr/lib/gcc/i686-linux-gnu/7/../../..] ==> [/usr/lib]
+  implicit libs: [gcc;gcc_s;c;gcc;gcc_s]
+  implicit dirs: [/usr/lib/gcc/i686-linux-gnu/7;/usr/lib/i386-linux-gnu;/usr/lib;/lib/i386-linux-gnu;/lib]
+  implicit fwks: []
+
+
+
+
+Detecting C [-std=c11] compiler features compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_fd561/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_fd561.dir/build.make CMakeFiles/cmTC_fd561.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_fd561.dir/feature_tests.c.o
+/usr/bin/cc   -std=c11 -o CMakeFiles/cmTC_fd561.dir/feature_tests.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/feature_tests.c
+Linking C executable cmTC_fd561
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_fd561.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_fd561.dir/feature_tests.c.o  -o cmTC_fd561 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:1c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c99] compiler features compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_133d3/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_133d3.dir/build.make CMakeFiles/cmTC_133d3.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_133d3.dir/feature_tests.c.o
+/usr/bin/cc   -std=c99 -o CMakeFiles/cmTC_133d3.dir/feature_tests.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/feature_tests.c
+Linking C executable cmTC_133d3
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_133d3.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_133d3.dir/feature_tests.c.o  -o cmTC_133d3 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c90] compiler features compiled with the following output:
+Change Dir: /home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_fb2d1/fast"
+make[1]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_fb2d1.dir/build.make CMakeFiles/cmTC_fb2d1.dir/build
+make[2]: Entering directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_fb2d1.dir/feature_tests.c.o
+/usr/bin/cc   -std=c90 -o CMakeFiles/cmTC_fb2d1.dir/feature_tests.c.o   -c /home/hamish/Documents/Code/simplex0_0/CMakeFiles/feature_tests.c
+Linking C executable cmTC_fb2d1
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_fb2d1.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_fb2d1.dir/feature_tests.c.o  -o cmTC_fb2d1 
+make[2]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:0c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:0c_variadic_macros

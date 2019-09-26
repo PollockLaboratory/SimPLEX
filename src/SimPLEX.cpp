@@ -15,24 +15,20 @@
 #include "Model.h"
 #include "Data.h"
 #include "MCMC.h"
-#include "utils.h"
 
 #include "IO/SubstitutionModelParser.h"
-#include "SubstitutionModels/SubstitutionModel.h"
+#include "ModelParts/SubstitutionModels/SubstitutionModel.h"
 
 #include "sol2/sol.hpp"
 
-#ifdef _WIN32
-#include <sys/time.h>
-#else
 #include <sys/times.h>
-#endif
 
 //Globals
 Environment env;
 IO::Files files;
 
 double Random() {
+  // Returns random number between 0.0 and 1.0;
   return (std::rand() % 10000) / 10000.0;
 }
 
@@ -41,7 +37,11 @@ int main(int argc, char* argv[]) {
   time_t start_time = time(NULL);
   std::cout.precision(17);
 
-  utils::printHeader();
+  std::cout << std::endl << "SimPLEX" << std::endl
+	    << "by Hamish N.C. Pike" << std::endl
+	    << "hamish.pike@cuanschutz.edu" << std::endl
+	    << "For internal use only." << std::endl
+	    << std::endl;
 
   //Establish environment and files.
   env.ReadOptions(argc, argv);
@@ -70,9 +70,23 @@ int main(int argc, char* argv[]) {
   mcmc.Run();
 
   model.Terminate();
-  utils::Terminate(start_time);
 
   files.close();
+
+  time_t time_taken = time(NULL) - start_time;
+  int h = time_taken / 3600;
+  int m = (time_taken % 3600) / 60;
+  int s = time_taken - (time_taken / 60) * 60;
+
+  char result[100];
+  if (h != 0) {
+    sprintf(result, "HH:MM:SS %d:%02d:%02d", h, m, s);
+  } else {
+    sprintf(result, "MM:SS %02d:%02d", m, s);
+  }
+
+  std::cout << "Time taken: " << result << std::endl;
+  std::string time_taken_file = "Time_taken";
 
   std::cout << "Successful end." << std::endl;
 

@@ -1,7 +1,7 @@
 #ifndef SubstitutionCounts_h_
 #define SubstitutionCounts_h_
 
-#include "SubstitutionModels/Components/RateVector.h"
+#include "ModelParts/SubstitutionModels/Components/RateVector.h"
 
 struct raw_counts {
   int num0subs = 0;

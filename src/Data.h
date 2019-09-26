@@ -11,9 +11,9 @@
 #include <list>
 #include <algorithm>
 
-#include "Sequence.h"
+#include "ModelParts/Sequence.h"
 #include "IO/TreeParser.h"
-#include "SubstitutionModels/SubstitutionModel.h"
+#include "ModelParts/SubstitutionModels/SubstitutionModel.h"
 #include "IO/SubstitutionModelParser.h"
 #include "IO/SequencesParser.h"
 

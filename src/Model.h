@@ -16,14 +16,15 @@
 #include <fstream>
 
 #include "SubstitutionCounts.h"
-#include "Trees/Tree.h"
-#include "SubstitutionModels/Components/RateVector.h"
+#include "ModelParts/ComponentSet.h"
+#include "ModelParts/Trees/Tree.h"
+#include "ModelParts/SubstitutionModels/SubstitutionModel.h"
+#include "ModelParts/SubstitutionModels/Components/RateVector.h" // This should be removed.
 #include "Data.h"
 
-#include "SubstitutionModels/SubstitutionModel.h"
 
 class Model {
- public:
+public:
   Model();
   void Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &MSA, IO::raw_substitution_model* &sm);
   bool SampleTree();
@@ -40,7 +41,8 @@ class Model {
   void print();
   void printParameters();
   void Terminate();
- private:
+private:
+  ComponentSet components;
   Tree* tree;
   bool ready; // Checks whether model is ready to be resampled. If not then the changes made from the previous sampling have not been accepted or rejected.
   int num_parameters;

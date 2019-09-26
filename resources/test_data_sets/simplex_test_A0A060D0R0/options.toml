@@ -17,6 +17,7 @@ seed = 0
   substitution_model_file = "model.lua"
 
   sequences_file = "A0A060D0R0.fasta"
+  #tree_file = "long.newick"
   tree_file = "A0A060D0R0.newick"
 [OUTPUT]
   output_directory = "/output"
@@ -29,9 +30,9 @@ seed = 0
   log_out_file = "run.log"
 
 [MCMC]
-  generations = 10001
-  tree_sample_frequency = 200
-  output_frequency = 200
+  generations = 100001
+  tree_sample_frequency = 2000
+  output_frequency = 500
   print_frequency = 500
 
 [MODEL]

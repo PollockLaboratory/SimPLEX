@@ -1,8 +1,4 @@
-add_subdirectory( SubstitutionModels )
-include_directories( SubstitutionModels )
-
 set(SRCS
-  utils.cpp
   Data.cpp
   MCMC.cpp
   Environment.cpp
@@ -10,19 +6,19 @@ set(SRCS
   IO/TreeParser.cpp
   IO/SubstitutionModelParser.cpp
   IO/SequencesParser.cpp
-  Sequence.cpp
   SubstitutionCounts.cpp
   Model.cpp
-  SubstitutionModels/SubstitutionModel.cpp
-  SubstitutionModels/Components/AbstractComponent.cpp
-  SubstitutionModels/Components/ComponentSet.cpp
-  SubstitutionModels/Components/ComponentTypes.cpp
-  SubstitutionModels/Components/RateVector.cpp
-  SubstitutionModels/Components/AbstractValueTypes.cpp
-  SubstitutionModels/Components/SampleableValueTypes.cpp
-  Trees/Tree.cpp
-  Trees/BranchSplitting.cpp
-  Trees/TreeParts.cpp )
+  ModelParts/Sequence.cpp
+  ModelParts/ComponentSet.cpp
+  ModelParts/AbstractComponent.cpp
+  ModelParts/SubstitutionModels/SubstitutionModel.cpp
+  ModelParts/SubstitutionModels/Components/ComponentTypes.cpp
+  ModelParts/SubstitutionModels/Components/RateVector.cpp
+  ModelParts/SubstitutionModels/Components/AbstractValueTypes.cpp
+  ModelParts/SubstitutionModels/Components/SampleableValueTypes.cpp
+  ModelParts/Trees/Tree.cpp
+  ModelParts/Trees/BranchSplitting.cpp
+  ModelParts/Trees/TreeParts.cpp )
 
 add_executable( simPLEX SimPLEX.cpp)
 target_sources( simPLEX PUBLIC ${SRCS} )
