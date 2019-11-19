@@ -1,5 +1,5 @@
 #include "ComponentSet.h"
-#include "SubstitutionModels/Components/RateVector.h"
+#include "SubstitutionModels/RateVector.h"
 #include "../Environment.h"
 #include "../IO/Files.h"
 
@@ -13,12 +13,13 @@ ComponentSet::ComponentSet() {
   /*
    * The default parameter set constructor.
    */
+  steps = 0;
 }
 
 // Setup.
 
 void ComponentSet::Initialize() {
-  current_parameter = samplable_parameters_list.begin();
+  current_parameter = sampleable_parameter_list.begin();
 
   // Refreshes all dependancies.
   for(auto p = all_parameters_list.begin(); p != all_parameters_list.end(); ++p) {
@@ -39,17 +40,26 @@ void ComponentSet::Initialize() {
 
 // Setting up.
 void ComponentSet::add_parameter(AbstractComponent* param) {
+  add_parameter(param, 0);
+}
+
+void ComponentSet::add_parameter(AbstractComponent* param, int i) {
   /* 
    * Adds the pointer to an actual parameter onto the parameter_list, and to the
    * name_to_adress map.
    */
   if(value_to_dependents.find(param) == value_to_dependents.end()) {
     // Check if Parameter has already been seen.
-    SampleableValue* p = dynamic_cast<SampleableValue*> (param);
+    SampleableComponent* p = dynamic_cast<SampleableComponent*> (param);
     if(p != NULL) {
+      sampleable_parameter_list.push_back({p, i, 0});
+    }
+
+    // Check if parameter has a value.
+    Valuable* v = dynamic_cast<Valuable*>(param);
+    if(v != NULL) {
       std::string name = param->get_name();
-      samplable_parameters_list.push_back(p);
-      name_to_address.insert(std::make_pair(name, p));
+      name_to_address.insert(std::make_pair(name, v));
     }
 
     value_to_dependents[param] = {};
@@ -66,8 +76,8 @@ void ComponentSet::add_parameter(AbstractComponent* param) {
 
 // Utils.
 
-AbstractComponent* ComponentSet::get_current_parameter() {
-  return(*current_parameter);
+SampleableComponent* ComponentSet::get_current_parameter() {
+  return((*current_parameter).ptr);
 }
 
 void ComponentSet::refreshDependancies(AbstractComponent* v) {
@@ -79,28 +89,34 @@ void ComponentSet::refreshDependancies(AbstractComponent* v) {
 }
 
 // Sampling.
-bool ComponentSet::sample() {
+sample_status ComponentSet::sample() {
   /*
    * Sample the current parameters.
    */
 
-  bool sampleType = (*current_parameter)->sample();
+  steps++;
+
+  SampleableComponent* param = get_current_parameter();
+
+  sample_status s = param->sample();
 
   try {
-    refreshDependancies(*current_parameter);
+    refreshDependancies(param);
   }
 
   catch(OutOfBoundsException &exception) {
     // A dependent parameter is out of bounds, undo the change
     // and try again.
-    (*current_parameter)->undo();
-    refreshDependancies(*current_parameter);
+    param->undo();
+    refreshDependancies(param);
 
     stepToNextParameter();
-    sampleType = sample();
+    s = sample();
   }
 
-  return (sampleType);
+  (*current_parameter).last_sample = steps;
+
+  return (s);
 }
 
 inline void ComponentSet::stepToNextParameter() {
@@ -108,56 +124,40 @@ inline void ComponentSet::stepToNextParameter() {
    * Sets the current_parameter iterator to the next sample.
    */
   ++current_parameter;
-  if(current_parameter == samplable_parameters_list.end()) {
-    current_parameter = samplable_parameters_list.begin();
+  if(current_parameter == sampleable_parameter_list.end()) {
+    current_parameter = sampleable_parameter_list.begin();
+  }
+
+  if((steps - (*current_parameter).last_sample) + 1 < (*current_parameter).freq) {
+    stepToNextParameter();
   }
 }
 
 void ComponentSet::accept() {
-  (*current_parameter)->fix();
+  get_current_parameter()->fix();
   stepToNextParameter();
 }
 
 void ComponentSet::reject() {
-  (*current_parameter)->undo();
-  refreshDependancies(*current_parameter);
+  get_current_parameter()->undo();
+  refreshDependancies(get_current_parameter());
   // (*current_parameter)->refresh_host_vectors();
   stepToNextParameter();
-}
-
-std::list<AbstractComponent*> ComponentSet::get_dependent_parameters(AbstractComponent* v) {
-  std::list<AbstractComponent*> l = {};
-  if(value_to_dependents[v].empty()) {
-    return(std::move(l));
-  } else {
-    for(auto d = value_to_dependents[v].begin(); d != value_to_dependents[v].end(); ++d) {
-      l.push_back(*d);
-      l.splice(l.end(), get_dependent_parameters(*d));
-    }
-    return(l);
-  }
-}
-
-std::list<AbstractComponent*> ComponentSet::get_current_parameters() {
-  /*
-   * Given the position of the current_parameter iterator, will return all the dependent parameters.
-   * This reflects all the parameters that have changed with current sampling.
-   */
-
-  std::list<AbstractComponent*> l = {*current_parameter};
-  std::list<AbstractComponent*> deps = get_dependent_parameters(*current_parameter);
-  for(auto it = deps.begin(); it != deps.end(); ++it) {
-    l.push_back(*it);
-  }
-  return(l);
 }
 
 void ComponentSet::print() {
   /*
    * Prints a short description of the state of the parameter_list.
    */
-  std::cout << "Parameter Set - size: " << all_parameters_list.size() << std::endl;
+  std::cout << "Component Set - size: " << all_parameters_list.size() << std::endl;
   for(auto iter = all_parameters_list.begin(); iter != all_parameters_list.end(); ++iter) {
+    std::string sampleable;
+    if(dynamic_cast<SampleableComponent*>(*iter) != nullptr) {
+      sampleable = "Sampled";
+    } else {
+      sampleable = "Non-sampled";
+    }
+    std::cout << "[" << (*iter)->get_ID() << "] " << sampleable << "\t";
     (*iter)->print();
   }
 }
@@ -173,8 +173,8 @@ void ComponentSet::print_dependencies() {
   }
 
   std::cout << "SampleableParameters: " << std::endl;
-  for(auto it = samplable_parameters_list.begin(); it != samplable_parameters_list.end(); ++it) {
-    std::cout << (*it)->get_name() << " ";
+  for(auto it = sampleable_parameter_list.begin(); it != sampleable_parameter_list.end(); ++it) {
+    std::cout << (*it).ptr->get_name() << " ";
   }
   std::cout << std::endl;
 }
@@ -194,7 +194,7 @@ double ComponentSet::get(const std::string &name) {
 }
 
 int ComponentSet::size() {
-  return(samplable_parameters_list.size());
+  return(sampleable_parameter_list.size());
 }
 
 void ComponentSet::saveToFile(int gen, double l) {
@@ -206,15 +206,13 @@ void ComponentSet::saveToFile(int gen, double l) {
   // This is not super efficient.
   static int i = -1;
   ++i;
-  out_file << i << "," << gen << "," << l;
 
-  for(auto it = all_parameters_list.begin(); it != all_parameters_list.end(); ++it) {
-    AbstractValue* val = dynamic_cast<AbstractValue*>(*it);
-    if(val != nullptr) {
-      out_file << "," << val->getValue();
-    } else {
-      out_file << ",NA";
-    }
+  std::string line = std::to_string(i) + "," + std::to_string(gen) + ",";
+
+
+  for(auto param = all_parameters_list.begin(); param != all_parameters_list.end(); ++param) {
+    line += "," + std::to_string((*param)->record_state(gen, l));
   }
-  out_file << std::endl;
+
+  out_file << line << std::endl;
 }

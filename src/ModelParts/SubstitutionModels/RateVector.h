@@ -9,10 +9,9 @@
 #include <list>
 #include <map>
 
-#include "../../AbstractComponent.h"
-#include "AbstractValueTypes.h"
-#include "SampleableValueTypes.h"
-#include "../../../IO/SubstitutionModelParser.h"
+#include "../AbstractComponent.h"
+#include "Parameters.h"
+#include "../../IO/SubstitutionModelParser.h"
 
 struct rv_request {
   // Struct representing a request for a rate vector.
@@ -26,10 +25,10 @@ class BranchSegment; // Defined in Trees/Types/TreeParts.h
 // Fundamental collection type of parameters in substitution model.
 class RateVector {
  public:
-  RateVector(std::string, int state, std::vector<AbstractValue*>);
+  RateVector(std::string, int state, std::vector<Valuable*>);
 
   std::string name;
-  std::vector<AbstractValue*> rates;
+  std::vector<Valuable*> rates;
   int state; // Determines the (ancestral) state that this rate vector applies to.
   float operator[](int);
   float get_rate_ratio(int i);
@@ -37,7 +36,7 @@ class RateVector {
 
   void print();
 
-  std::map<int, int> valueID_to_state; // Maps a values ID to the state it applies to in the rates vector.
+  //std::map<int, int> valueID_to_state; // Maps a values ID to the state it applies to in the rates vector.
  private:
   int id;
   void update_counts();

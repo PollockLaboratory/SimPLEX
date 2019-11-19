@@ -40,8 +40,7 @@ int main(int argc, char* argv[]) {
   std::cout << std::endl << "SimPLEX" << std::endl
 	    << "by Hamish N.C. Pike" << std::endl
 	    << "hamish.pike@cuanschutz.edu" << std::endl
-	    << "For internal use only." << std::endl
-	    << std::endl;
+	    << "For internal use only." << std::endl << std::endl;
 
   //Establish environment and files.
   env.ReadOptions(argc, argv);
@@ -51,25 +50,21 @@ int main(int argc, char* argv[]) {
   files.add_file("log", env.get<std::string>("OUTPUT.log_out_file"), IOtype::OUTPUT);
   // env.log_stream = files.get_ofstream("log");
 
-  std::cout << "Init complete." << std::endl;
+  std::cout << std::endl;
 
   // Initiating program.
   Data data;
   data.Initialize();
 
-  std::cout << "Data complete." << std::endl;
-
+  std::cout << std::endl;
+  
   Model model;
   model.Initialize(data.raw_tree, data.raw_msa, data.raw_sm);
 
-  std::cout << "Model complete." << std::endl;
-
   MCMC mcmc;
-  mcmc.initialize(&model);
+  mcmc.Initialize(&model);
 
   mcmc.Run();
-
-  model.Terminate();
 
   files.close();
 

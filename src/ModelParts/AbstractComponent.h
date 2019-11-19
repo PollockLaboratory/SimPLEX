@@ -11,15 +11,35 @@
 // Defined in RateVector.h
 class RateVector;
 
+typedef struct sample_status {
+  bool testp; // true if metropolis hasting sampling is required.
+  bool updatedp; // true if the component has actually changed.
+  bool full_recalculation; // True if full likelihood calculation is required.
+} sample_status;
+
 struct rv_loc {
   // Rate Vector Locations
   RateVector* rv;
   int pos;
 };
 
+class Valuable {
+public:
+  Valuable();
+  virtual const double& getValue() = 0;
+  virtual const double& getOldValue() = 0;
+  void print();
+
+  std::list<rv_loc> get_host_vectors();
+  void add_host_vector(RateVector*, int);
+  std::list<rv_loc> host_vectors; // Abstract components do not use this but it is here to avoid dynamic_casting. Pointers to the host RateVectors that a parameter sits within.
+};
+
 class AbstractComponent {
 public:
-  AbstractComponent(std::string name, int id);
+  int ID;
+  std::string name;
+  AbstractComponent(std::string name);
 
   void add_dependancy(AbstractComponent*);
   const std::list<AbstractComponent*>& get_dependancies();
@@ -29,41 +49,38 @@ public:
 
   virtual void refresh() = 0;
   virtual void print() = 0;
-  std::list<rv_loc> host_vectors; // Abstract components do not use this but it is here to avoid dynamic_casting. Pointers to the host RateVectors that a parameter sits within.
-  int ID;
-  std::string name;
+  virtual double record_state(int gen, double l) = 0;
 protected:
   std::list<AbstractComponent*> dependent_values;
 };
 
-class AbstractValue : public AbstractComponent {
+class SampleableComponent : public AbstractComponent {
 public:
-  AbstractValue(std::string name, int id);
-  virtual const double& getValue() = 0;
-  virtual const double& getOldValue() = 0;
-
-  void add_host_vector(RateVector*, int);
-  std::list<rv_loc> get_host_vectors();
-};
-
-class SampleableValue : public AbstractValue {
-public:
-  SampleableValue(std::string parameter_name, int id) : AbstractValue(parameter_name, id) { fixedQ = true; }
-
-  virtual bool sample() = 0; // If return true Metropolis Hasting Sample, else Gibbs.
+  SampleableComponent(std::string name);
+  virtual sample_status sample() = 0;
   virtual void undo() = 0;
   virtual void fix() = 0;
-  virtual void refresh() = 0;
 protected:
-  bool fixedQ; //Indicates whether the state of this parameter is fixed or still being trialed.
+  bool fixedQ;
 };
 
-class UniformizationConstant : public SampleableValue {
+class SampleableValue : public SampleableComponent , public Valuable {
 public:
-  UniformizationConstant();
+  SampleableValue(std::string name);
+};
+
+class StaticValue : public AbstractComponent, public Valuable {
+public:
+  StaticValue(std::string name);
+  virtual double record_state(int gen, double l);
+};
+
+class UniformizationConstant : public Valuable, public SampleableComponent {
+public:
+  UniformizationConstant(double);
 
   virtual void print();
-  virtual bool sample();
+  virtual sample_status sample();
 
   virtual const double& getValue();
   virtual const double& getOldValue();
@@ -71,8 +88,9 @@ public:
   virtual void undo();
   virtual void fix();
   virtual void refresh();
+  virtual double record_state(int gen, double l);
 
-  void add_VirtualSubstitutionRate(AbstractValue*);
+  void add_VirtualSubstitutionRate(Valuable*);
   void set_initial();
 
   friend std::ostream& operator<<(std::ostream&, const UniformizationConstant&);
@@ -81,7 +99,7 @@ private:
   double previous_value;
   double threshold;
   double max_step;
-  std::list<AbstractValue*> vsrs;
+  std::list<Valuable*> vsrs;
 };
 
 #endif

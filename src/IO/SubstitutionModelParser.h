@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <list>
+#include <map>
 
 #include "sol2/sol.hpp"
 
@@ -23,14 +24,15 @@ namespace IO {
   class raw_ContinuousFloat : public raw_param {
   public:
     double init;
+    double step_size;
     raw_ContinuousFloat(std::string, param_type, sol::table);
     void read_options_table(sol::table tbl);
   };
 
-  class raw_CategoryFloat : public raw_param {
+  class raw_DiscreteFloat : public raw_param {
   public:
     std::vector<float> categories;
-    raw_CategoryFloat(std::string, param_type, sol::table);
+    raw_DiscreteFloat(std::string, param_type, sol::table);
     void read_options_table(sol::table tbl);
   };
 
@@ -67,7 +69,9 @@ namespace IO {
     std::list<std::string> states;
     std::list<raw_rate_vector> rv_list;
     std::list<raw_param*> get_parameters();
+    const std::map<int, raw_param*>& get_map_parameters();
   private:
+    std::map<int, raw_param*> params;
     IO::raw_param* new_parameter(std::string, std::string, sol::table tbl);
     IO::raw_rate_vector new_rate_vector(std::string, sol::table, sol::table);
     void set_states(sol::table tbl);
@@ -76,4 +80,5 @@ namespace IO {
 
   raw_substitution_model* read_substitution_model(std::ifstream&);
 }
+
 #endif

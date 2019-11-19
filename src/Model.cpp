@@ -21,63 +21,72 @@ Model::Model() {
   /*
    * The default contructor.
    */
-  tree = NULL;
   ready = true;
+}
+
+Valuable* Model::create_uniformization_constant() {
+  Valuable* val =  nullptr;
+  if(env.get<bool>("UNIFORMIZATION.dynamic")) {
+    UniformizationConstant* u = new UniformizationConstant(env.get<double>("UNIFORMIZATION.initial_value"));
+    //u->set_initial();
+    components.add_parameter(u, env.get<int>("UNIFORMIZATION.sample_frequency"));
+    val = u; 
+  } else {
+    FixedFloat* f = new FixedFloat("U", env.get<double>("UNIFORMIZATION.initial_value"));
+    components.add_parameter(f);
+    val = f;
+  }
+  return(val);
 }
 
 void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw_substitution_model* &raw_sm) {
 
-  UniformizationConstant* u = new UniformizationConstant();
-  components.add_parameter(u);
-  
+  std::cout << "Initializing model:" << std::endl;
+
+  Valuable* u = create_uniformization_constant();
+
   // Substitution model.
   substitution_model = new SubstitutionModel(u);
   substitution_model->from_raw_model(raw_sm);
 
+  // Add all substitution parameters to component set.
   std::list<AbstractComponent*> sm_parameters = substitution_model->get_all_parameters();
   for(auto it = sm_parameters.begin(); it != sm_parameters.end(); ++it) {
     components.add_parameter(*it);
   }
 
-  components.refresh_dependencies();
-  u->set_initial();
+  // Tree.
+  TreeParameter* tp = new TreeParameter();
+  tp->Initialize(raw_tree, raw_msa, substitution_model);
+
+  UniformizationConstant* u_param = dynamic_cast<UniformizationConstant*>(u);
+  if(u_param and env.get<bool>("UNIFORMIZATION.refresh_tree_on_update")) {
+      tp->add_dependancy(u_param);
+  }
+
+  components.add_parameter(tp, env.get<int>("MCMC.tree_sample_frequency"));
+
+  CountsParameter* cp = new CountsParameter(&counts);
+  cp->link_to_tree(tp);
+  components.add_parameter(cp);
+
   components.Initialize();
 
-  // Sequences.
-  const States* states = substitution_model->get_states();
+  // Set initial tree state.
+  tp->sample();
+  components.refresh_dependencies();
 
-  SequenceAlignment* MSA = new SequenceAlignment(states);
-  MSA->Initialize(raw_msa);
-
-  // Tree.
-  tree = new Tree();
-  tree->Initialize(raw_tree, MSA, substitution_model);
-
-  counts = SubstitutionCounts(substitution_model->get_RateVectors(), tree->get_branch_lengths());
-  tree->update_counts(counts);
   counts.print();
+  std::cout << "Model succesfully constructed." << std::endl;
 }
 
 // Sampling
-bool Model::SampleTree() {
-  if(ready) {
-    bool t = tree->sample();
-    counts = SubstitutionCounts(substitution_model->get_RateVectors(), tree->get_branch_lengths()); // Empty list of counts
-    tree->update_counts(counts);
-
-    return(t);
-  } else {
-    std::cerr << "Error: Attempt to sample tree before accepting previous changes." << std::endl;
-    exit(EXIT_FAILURE);
-  }
-}
-
-bool Model::SampleSubstitutionModel() {
+sample_status Model::sample() {
   if(ready) {
     return(components.sample());
     ready = false;
   } else {
-    std::cerr << "Error: Attempt to sample parameter before accepting previous changes." << std::endl;
+    std::cerr << "Error: Attempt to sample next parameter before accepting previous changes." << std::endl;
     exit(EXIT_FAILURE);
   }
 }
@@ -132,6 +141,7 @@ double Model::updateLikelihood(){
   /*
    * Rather recalculating the full likelihood, will modify logLikelihood only by what has changed. 
    */
+
   delta_logL = 0.0;
  
   RateVector* rv;
@@ -152,7 +162,6 @@ void Model::RecordState(int gen, double l) {
 	/*
 	 * Records the state of both the tree and the substitution model.
 	 */
-	tree->record_state(gen, l);
 	components.saveToFile(gen, l);
 	substitution_model->saveToFile(gen, l);
 }
@@ -163,15 +172,4 @@ void Model::print() {
 void Model::printParameters() {
   components.print();
   //substitution_model->printParameters();
-  //tree->printCounts();
 }
-
-// Tidying up
-void Model::Terminate() {
-  /*
-   * Just terminates substitution_model.
-   */
-  // Save the tree data.
-  tree->record_tree();
-}
-

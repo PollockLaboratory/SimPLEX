@@ -3,9 +3,9 @@ model.set_name("Mixture Model")
 states.set(config.get_string_array("MODEL.states"))
 parameter_type = config.get_str("MODEL.parameter_type")
 
-if parameter_type == "float" then
-   param_template = {initial_value = 0.01}
-elseif parameter_type == "category" then
+if parameter_type == "continuous" then
+   param_template = {initial_value = 0.05, step_size = 0.01}
+elseif parameter_type == "discrete" then
    cats = {}
    val = 0.00
    for i=1,config.get_int("MODEL.num_categories") do

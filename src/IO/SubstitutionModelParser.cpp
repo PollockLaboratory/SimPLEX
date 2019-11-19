@@ -11,6 +11,17 @@ extern Environment env;
 
 sol::state lua;
 
+template <class T>
+static T value_from_table(sol::table tbl, std::string name) {
+  sol::optional<T> opt_val = tbl[name];
+  if(not opt_val) {
+    std::cerr << "Error: " << name << "has not been correctly specified." << std::endl;
+    exit(EXIT_FAILURE);
+  } else {
+    return(opt_val.value());
+  }
+}
+
 namespace IO {
 
   // RAW PARAMETERS.
@@ -28,40 +39,32 @@ namespace IO {
   raw_param_wrapper::raw_param_wrapper(raw_param* ptr) : ptr(ptr) {
   }
 
-  void raw_ContinuousFloat::read_options_table(sol::table tbl) {
-    sol::optional<double> initial_value = tbl["initial_value"];
-    if(initial_value) {
-      init = initial_value.value();
-    } else{
-      std::cerr << "Error: initial_value is not set or is not a double for float parameter \"" << name << "\"" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-  }
-  
+  // Continuous Parameter
   raw_ContinuousFloat::raw_ContinuousFloat(std::string name, param_type t, sol::table tbl) : raw_param(name, t) {
     read_options_table(tbl);
   }
 
-  void raw_CategoryFloat::read_options_table(sol::table tbl) {
-    sol::optional<sol::table> cats = tbl["categories"];
-    if(cats) {
-      for(auto kvp : cats.value()) {
-	const sol::object& val = kvp.second;
-	sol::optional<float> maybe_float = val.as<sol::optional<float>>();
-	if(maybe_float) {
-	  categories.push_back(maybe_float.value());
-	} else {
-	  std::cerr << "Error: expecting elements of type float in categories list in parameter \"" << name << "\"" << std::endl;
-	}	
-      }
-    } else {
-      std::cerr << "Error: categories is not set or is not a table for Categories parameter \"" << name << "\"" << std::endl;
-      exit(EXIT_FAILURE);
-    }
+  void raw_ContinuousFloat::read_options_table(sol::table tbl) {
+    init = value_from_table<double>(tbl, "initial_value");
+    step_size = value_from_table<double>(tbl, "step_size");
   }
-  
-  raw_CategoryFloat::raw_CategoryFloat(std::string name, param_type t, sol::table tbl) : raw_param(name, t) {
+
+  // Discrete Parameter.
+  raw_DiscreteFloat::raw_DiscreteFloat(std::string name, param_type t, sol::table tbl) : raw_param(name, t) {
     read_options_table(tbl);
+  }
+
+  void raw_DiscreteFloat::read_options_table(sol::table tbl) {
+    sol::table cats_tbl = value_from_table<sol::table>(tbl, "categories");
+    for(auto kvp : cats_tbl) {
+      const sol::object& val = kvp.second;
+      sol::optional<float> maybe_float = val.as<sol::optional<float>>();
+      if(maybe_float) {
+	categories.push_back(maybe_float.value());
+      } else {
+	std::cerr << "Error: expecting elements of type float in categories list in parameter \"" << name << "\"" << std::endl;
+      }
+    }
   }
 
   // RAW RATE VECTORS.
@@ -84,6 +87,7 @@ namespace IO {
   // RAW SUBSTITUTION MODEL.
   raw_substitution_model::raw_substitution_model() {
     states = {};
+    params = {};
   }
 
   std::list<raw_param*> raw_substitution_model::get_parameters() {
@@ -96,9 +100,12 @@ namespace IO {
 	return(ret);
   }
 
+  const std::map<int, raw_param*>& raw_substitution_model::get_map_parameters() {
+    return(params);
+  }
+
   // Lua bindings
   void raw_substitution_model::set_states(sol::table tbl) {
-    //  std::list<std::string> states = {};
     for(auto kvp : tbl) {
       const sol::object& val = kvp.second;
 
@@ -128,10 +135,10 @@ namespace IO {
 
   raw_param* raw_substitution_model::new_parameter(std::string name, std::string parameter_type, sol::table tbl) {
     raw_param* p;
-    if(parameter_type == "float") {
+    if(parameter_type == "continuous") {
       p = new raw_ContinuousFloat(name, FLOAT, tbl);
-    } else if(parameter_type == "category") {
-      p = new raw_CategoryFloat(name, CATEGORY, tbl);
+    } else if(parameter_type == "discrete") {
+      p = new raw_DiscreteFloat(name, CATEGORY, tbl);
     } else {
       std::cerr << "Error: " << parameter_type << " is not recognizes as a type of parameter." << std::endl;
       exit(EXIT_FAILURE);
@@ -223,6 +230,13 @@ namespace IO {
     buffer << lua_sm_in.rdbuf();
 
     lua.script(buffer.str());
+
+    // Tidy the output.
+    for(auto it = rv_list.begin(); it != rv_list.end(); it++) {
+      for(auto jt = (*it).rates.begin(); jt != (*it).rates.end(); ++jt) {
+	params[(*jt)->ID] = *jt; 
+      }
+    } 
   }
 
   raw_substitution_model* read_substitution_model(std::ifstream& lua_sm_in) {

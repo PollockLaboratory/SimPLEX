@@ -67,7 +67,8 @@ node_data IO::deconstructNodeString(std::string node_string) {
   } else {
     int len = last_colon_position - last_parens_position - 1;
     name = node_string.substr(last_parens_position + 1, len);
-    if(name == "") {
+    if(name == "" or std::atof(name.c_str()) != 0.0) {
+      // If missing name or is a bootstrap value.
       name = "BNode" + std::to_string(ID);
       ID++;
     }
@@ -89,7 +90,7 @@ IO::RawTreeNode* IO::parseRawTreeNode(std::string node_string, RawTreeNode* up) 
   right = (n.right != "") ? parseRawTreeNode(n.right, t) : 0;
 
   // std::cout << "Name: " << n.name << " Distance: " << n.distance << std::endl;
-  *t = {n.name, n.distance, up, left, right};
+  *t = {n.name, n.distance * env.get<double>("TREE.scale_factor"), up, left, right};
   return(t);
 }
 
@@ -103,9 +104,12 @@ IO::RawTreeNode* IO::parseTree(std::string tree_string) {
 	  std::cout << "Warning: truncating the root branch node." << std::endl;
 	  t->distance = 0.0;
 	};
-	
+
+	IO::printRawTree(t);
 	return(t);
 }
+
+// Utils
 
 std::list<std::string> IO::getRawTreeNodeNames(const IO::RawTreeNode* node) {
   std::list<std::string> node_names;
@@ -118,8 +122,6 @@ std::list<std::string> IO::getRawTreeNodeNames(const IO::RawTreeNode* node) {
   }
   return(node_names);
 }
-
-// Utils
 
 void IO::printRawTree(const RawTreeNode* node) {
   std::cout << "Node: " << node->name << " " << node->distance << std::endl;

@@ -9,7 +9,7 @@
 
 #include "../../IO/TreeParser.h"
 #include "../Sequence.h"
-#include "../SubstitutionModels/Components/RateVector.h"
+#include "../SubstitutionModels/RateVector.h"
 #include "../SubstitutionModels/SubstitutionModel.h"
 #include "../../SubstitutionCounts.h"
 

@@ -1,16 +1,17 @@
 #include <iostream>
 
 #include "AbstractComponent.h"
-#include "SubstitutionModels/Components/RateVector.h"
+#include "SubstitutionModels/RateVector.h"
 #include "../Environment.h"
 
 extern Environment env;
 
 // ABSTRACT COMPONENT
 
-AbstractComponent::AbstractComponent(std::string name, int id) : name(name) {
-  ID = id;
-  host_vectors = {};
+AbstractComponent::AbstractComponent(std::string name) : name(name) {
+  static int idc = -1;
+  idc++;
+  ID = idc;
 }
 
 int AbstractComponent::get_ID() {
@@ -30,30 +31,53 @@ const std::list<AbstractComponent*>& AbstractComponent::get_dependancies() {
 }
 
 // ABSTRACT VALUES
-
-AbstractValue::AbstractValue(std::string name, int id) : AbstractComponent(name, id) {
+Valuable::Valuable() {
   host_vectors = {};
-  dependent_values = {};
 }
 
-void AbstractValue::add_host_vector(RateVector* rv, int pos) {
+void Valuable::add_host_vector(RateVector* rv, int pos) {
   host_vectors.push_back(rv_loc {rv, pos});
 }
 
-std::list<rv_loc> AbstractValue::get_host_vectors() {
+std::list<rv_loc> Valuable::get_host_vectors() {
   return(host_vectors);
+}
+
+void Valuable::print() {
+  std::cout << this->getValue();
+}
+
+// SampleableComponent.
+
+SampleableComponent::SampleableComponent(std::string name) : AbstractComponent(name) {
+  fixedQ = true;
+  dependent_values = {};
+}
+
+// SampleableValue.
+
+SampleableValue::SampleableValue(std::string name) : SampleableComponent(name), Valuable() {
+}
+
+// StaticValue.
+
+StaticValue::StaticValue(std::string name) : AbstractComponent(name), Valuable() {
+}
+
+double StaticValue::record_state(int gen, double l) {
+  return(getValue());
 }
 
 // UniformizationConstant.
 // This is here because it is a special parameter.
 
-UniformizationConstant::UniformizationConstant() : SampleableValue("U", 0), value(1.0), previous_value(1.0) {
+UniformizationConstant::UniformizationConstant(double initial_value) : SampleableComponent("U"), value(initial_value), previous_value(initial_value) {
   threshold = env.get<double>("UNIFORMIZATION.threshold");
   max_step = env.get<double>("UNIFORMIZATION.max_step");
 }
 
 void UniformizationConstant::print() {
-  std::cout << "UniformizationConstant: " << value << std::endl;
+  std::cout << "DynamicUniformizationConstant: " << value << std::endl;
 }
 
 void UniformizationConstant::set_initial() {
@@ -64,17 +88,10 @@ void UniformizationConstant::set_initial() {
       min = v;
     }
   }
-  std::cout << std::endl;
   value = 1.05 - min;
-
-  // Hard coding value:
-  value = 0.99;
 }
 
-bool UniformizationConstant::sample() {
-  // Sampling of uniformization constant blocked.
-  return(false);
-
+sample_status UniformizationConstant::sample() {
   previous_value = value;
   double min = 1.0;
   for(auto it = vsrs.begin(); it != vsrs.end(); ++it) {
@@ -96,7 +113,7 @@ bool UniformizationConstant::sample() {
     value = value - spare;
   }
  
-  return(false);
+  return(sample_status({false, true, true}));
 }
 
 const double& UniformizationConstant::getValue() {
@@ -117,7 +134,11 @@ void UniformizationConstant::fix() {
 void UniformizationConstant::refresh() {
 }
 
-void UniformizationConstant::add_VirtualSubstitutionRate(AbstractValue* v) {
+double UniformizationConstant::record_state(int gen, double l) {
+  return(getValue());
+}
+
+void UniformizationConstant::add_VirtualSubstitutionRate(Valuable* v) {
   // These are the rates that if they get close to 0 or if they are all far from 0,
   // will change the uniformization rate.
   vsrs.push_back(v);
@@ -127,7 +148,3 @@ std::ostream& operator<<(std::ostream& os, const UniformizationConstant& u) {
   os << "[UniformizationConstant-" << u.value << "]";
   return(os);
 }
-
-
-
-

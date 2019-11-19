@@ -5,19 +5,27 @@ seed = 0
 [TREE]
   max_segment_length = 0.08
   branch_split_algorithm = 1
+  scale_factor = 1.0
 
 # Uniformization Constant
 [UNIFORMIZATION]
+  dynamic = false
+  initial_value = 0.1
   threshold = 0.005
   max_step = 0.001
+  sample_frequency = 250
+  refresh_tree_on_update = false
 
 [DATA]
   # This should be TRUE or FALSE
   ancestral_sequences = false
   substitution_model_file = "model.lua"
 
-  sequences_file = "test_data/5taxon_tf.fasta"
-  tree_file = "test_data/5taxon.tree"
+  sequences_file = "test_data/5taxon_same.fasta"
+  #tree_file = "test_data/5taxon_tips_only.newick"
+  #tree_file = "test_data/5taxon_all_names.newick"
+  tree_file = "test_data/5taxon_with_bootstrap.newick"
+  #tree_file = "test_data/5taxon_with_branchsplit.newick"
 
   #sequences_file = "../resources/test_data/Species_alignment_BLVRB.fasta"
   #tree_file = "../resources/test_data/BLVRB_subtree_MLbranches.nh"
@@ -40,14 +48,14 @@ seed = 0
   log_out_file = "run.log"
 
 [MCMC]
-  generations = 100001
+  generations = 10001
   tree_sample_frequency = 500
-  output_frequency = 500
-  print_frequency = 10000
-
+  output_frequency = 100
+  print_frequency = 250
+  
 [MODEL]
   #states = ["A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"]
   states = ["N", "F"]
-  parameter_type = "float"
+  parameter_type = "discrete"
   num_categories = 4
 

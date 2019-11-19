@@ -1,8 +1,8 @@
 #include "RateVector.h"
-#include "../../Sequence.h"
-#include "../../Trees/TreeParts.h"
-#include "../../../Environment.h"
-#include "../../../IO/Files.h"
+#include "../Sequence.h"
+#include "../Trees/TreeParts.h"
+#include "../../Environment.h"
+#include "../../IO/Files.h"
 
 extern Environment env;
 extern IO::Files files;
@@ -10,7 +10,7 @@ extern IO::Files files;
 int RateVector::IDc = 0;
 
 // Figure out locations Data Structure.
-RateVector::RateVector(std::string name, int state, std::vector<AbstractValue*> params) : name(name), state(state) {
+RateVector::RateVector(std::string name, int state, std::vector<Valuable*> params) : name(name), state(state) {
   id = IDc;
   IDc++;
   size = params.size();
@@ -19,9 +19,9 @@ RateVector::RateVector(std::string name, int state, std::vector<AbstractValue*> 
   counts = std::vector<int>(env.num_states, 0);
   logLikelihoods = std::vector<double>(env.num_states, 0);
 
-  for(unsigned int i = 0; i < rates.size(); i++) {
-    valueID_to_state[rates[i]->get_ID()] = i;
-  }
+  //for(unsigned int i = 0; i < rates.size(); i++) {
+  // valueID_to_state[rates[i]->get_ID()] = i;
+  //}
 }
 
 float RateVector::operator[](int i) {
@@ -53,8 +53,6 @@ RateVectorSet::RateVectorSet() {
 }
 
 void RateVectorSet::Initialize() {
-  std::cout << "Initializing rate vector" << std::endl;
-
   // Output file.
   files.add_file("rate_vectors", env.get<std::string>("OUTPUT.rate_vectors_out_file"), IOtype::OUTPUT);
   out_file = files.get_ofstream("rate_vectors");	
@@ -63,9 +61,6 @@ void RateVectorSet::Initialize() {
     out_file << "," << it->first;
   }
   out_file << std::endl;
-
-  // Collection of Rate Vectors.
-
 }
 
 void RateVectorSet::add(RateVector* rv, IO::rv_use_class uc) {
@@ -101,10 +96,8 @@ void RateVectorSet::organize(int seqLen, int numStates) {
 
   // Establish structure.
   rv_tree = std::vector<std::vector<std::list<RateVector*>>>(seqLen, std::vector<std::list<RateVector*>>(numStates));
-  std::cout << seqLen << " " << numStates << std::endl;
   for(int l = 0; l < seqLen; l++) {
     for(int s = 0; s < numStates; s++) {
-      //std::cout << l << " " << s << std::endl;
       rv_tree[l][s] = {};
     }
   }
@@ -113,7 +106,6 @@ void RateVectorSet::organize(int seqLen, int numStates) {
   for(auto it = col.begin(); it != col.end(); ++it) {
     // Add rate vector.
     IO::rv_use_class uc = id_to_uc[(*it)->getID()];
-    std::cout << "RateVector: " << (*it)->getID() << " " << uc.pos.size() << std::endl;
     // If no positions given then will apply to all positions.
     if(uc.pos.size() == 0) {
       for(int i = 0; i < seqLen; i++) {

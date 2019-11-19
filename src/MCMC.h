@@ -8,7 +8,7 @@
 class MCMC {
 public:
   MCMC();
-  void initialize(Model* model);
+  void Initialize(Model* model);
   void Run();
 private:
   Model* model;
@@ -23,7 +23,6 @@ private:
   int out_freq; // Frequency of saving state.
   int print_freq; // Frequency of printing likelihood to term.
   int gens; // Number of generations.
-  int tree_sample_freq; // Frequncy of tree ancestral state sampling.
 
   static std::ofstream lnlout;
   void sample();

@@ -25,6 +25,7 @@ void Environment::ReadOptions(int argc, char* argv[]) {
     exit(EXIT_FAILURE);
   }
 
+  std::cout << "Reading options file from: " << argv[1] << std::endl;
   ReadTOMLfile(argv[1]);
 
   debug = get<bool>("debug");
@@ -55,7 +56,7 @@ void Environment::InitializeRandomNumberGeneratorSeed() {
 
 // Print options.
 void Environment::PrintOptions() {
-  std::cout << std::endl << "Options:" << std::endl << *config << std::endl;
+  std::cout << "Received options:" << std::endl << *config << std::endl;
 }
 
 // Logger

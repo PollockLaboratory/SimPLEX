@@ -12,10 +12,8 @@ set(SRCS
   ModelParts/ComponentSet.cpp
   ModelParts/AbstractComponent.cpp
   ModelParts/SubstitutionModels/SubstitutionModel.cpp
-  ModelParts/SubstitutionModels/Components/ComponentTypes.cpp
-  ModelParts/SubstitutionModels/Components/RateVector.cpp
-  ModelParts/SubstitutionModels/Components/AbstractValueTypes.cpp
-  ModelParts/SubstitutionModels/Components/SampleableValueTypes.cpp
+  ModelParts/SubstitutionModels/RateVector.cpp
+  ModelParts/SubstitutionModels/Parameters.cpp
   ModelParts/Trees/Tree.cpp
   ModelParts/Trees/BranchSplitting.cpp
   ModelParts/Trees/TreeParts.cpp )

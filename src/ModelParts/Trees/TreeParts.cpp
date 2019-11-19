@@ -68,8 +68,9 @@ void BranchSegment::set_new_substitutions() {
       } else {
 	// Possibility of virtual substitution.
 	// Not sure this is exactly right.
-	double rate = rates[pos]->rates[dec[pos]]->getValue();
-	double p = rate / (1 - u + rate);
+	float length = distance;
+	double vir_rate = rates[pos]->rates[dec[pos]]->getValue();
+	double p = 1 - (1 / (1 + (vir_rate * distance)));
 	if(Random() < p) {
 	  substitutions[pos] = true;
 	} else {
@@ -322,7 +323,6 @@ void TreeNode::calculate_state_probabilities_pos(int pos, TreeNode* left_node, T
 }
 
 TreeNode* TreeNode::calculate_state_probabilities() {
-  //std::cout << "Cal: " << name << std::endl;
   if(isTip()) {
     sampledp = true;
     for(int pos = 0; pos < sequence->size(); pos++) {
@@ -351,8 +351,7 @@ TreeNode* TreeNode::calculate_state_probabilities() {
   } else {
     right_node = nullptr;
   }
-
-
+  
   // This doesn't deal with branch nodes.
   //std::cout << "Calculate State Probabilites: " << name << std::endl;
   for(int pos = 0; pos < env.n; pos++) {

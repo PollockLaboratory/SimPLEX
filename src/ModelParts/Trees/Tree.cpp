@@ -24,8 +24,6 @@ Tree::Tree() {
 
 // Tree Initialize using seqs and states
 void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, SubstitutionModel* &SM) {
-  std::cout << "Creating MCMC tree structure." << std::endl;
-
   // Configuration
   max_seg_len = env.get<double>("TREE.max_segment_length");
 
@@ -50,7 +48,6 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
   delete proxyBranch;
   delete proxyNode;
 
-  std::cout << "Attaching sequences to tree." << std::endl;
   configureSequences(root);
 
   for(auto t = nodeList.begin(); t != nodeList.end(); ++t) {
@@ -61,7 +58,6 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
 
   // Mark gaps.
   identify_gaps();
-  std::cout << "Identified gaps." << std::endl;
   
   // Initial sample to get counts.
   for(auto b = branchList.begin(); b != branchList.end(); ++b) {
@@ -72,8 +68,6 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
   sample_ancestral_states();
   
   initialize_output_streams();	
-
-  std::cout << std::endl;
 }
 
 // Creation of tree nodes.
@@ -177,7 +171,7 @@ void Tree::configureSequences(TreeNode* n) {
 }
 
 // Sampling and likelihood.
-void Tree::update_counts(SubstitutionCounts& counts) {
+void Tree::update_counts(SubstitutionCounts& counts) const {
   for(auto it = branchList.begin(); it != branchList.end(); ++it) {
     BranchSegment* b = *it;
     b->update_counts(counts.subs_by_rateVector, counts.subs_by_branch[b->distance]);
@@ -231,8 +225,8 @@ void Tree::identify_gaps() {
 // SAMPLING TREE PARAMETERS.
 //
 
-bool Tree::sample() {
-  bool s = (this->*treeSamplingMethod)();
+sample_status Tree::sample() {
+  sample_status s = (this->*treeSamplingMethod)();
 
   // Update branch list - new substitutions.
   for(auto b = branchList.begin(); b != branchList.end(); ++b) {
@@ -277,21 +271,21 @@ void Tree::find_ancestral_sequences() {
 }
 
 // Option 1.
-bool Tree::sample_ancestral_states() {
+sample_status Tree::sample_ancestral_states() {
   /*
    * Both recalculates substitution events and recalculates the ancestral sequences.
    */
 
   find_ancestral_sequences();
 
-  return(false);
+  return(sample_status({false, true, true}));
 }
 
 // Option 2.
-bool Tree::step_through_MSAs() {
+sample_status Tree::step_through_MSAs() {
   // This is not going to work anymore as the tree resampling algorithm has changed.
   MSA->step_to_next_MSA();
-  return(false);
+  return(sample_status({false, true, true}));
 }
 
 // Record State data.
@@ -356,4 +350,47 @@ void Tree::print_nodeList() {
   for(auto it = nodeList.begin(); it != nodeList.end(); ++it) {
     std::cout << "Node: " << (*it)->name << std::endl;
   }
+}
+
+// TreeParameter
+
+TreeParameter::TreeParameter() : SampleableComponent("Tree") {
+  tree = new Tree();
+}
+
+void TreeParameter::print() {
+  std::cout << "TreeParameter" << std::endl;
+}
+
+sample_status TreeParameter::sample() {
+  return(tree->sample());
+}
+
+void TreeParameter::undo() {
+  std::cout << "Error: TreeParameter update cannot be undone." << std::endl;
+  exit(EXIT_FAILURE);
+}
+
+void TreeParameter::fix() {
+}
+
+void TreeParameter::refresh() {
+}
+
+void TreeParameter::Initialize(IO::RawTreeNode* raw_tree, IO::RawMSA* &raw_msa, SubstitutionModel* &SM) {
+  const States* states = SM->get_states();
+  SequenceAlignment* MSA = new SequenceAlignment(states);
+  MSA->Initialize(raw_msa);
+
+  tree->Initialize(raw_tree, MSA, SM);
+  tree->record_tree();
+}
+
+Tree* TreeParameter::get_tree_ptr() {
+  return(tree);
+}
+
+double TreeParameter::record_state(int gen, double l) {
+  tree->record_state(gen, l);
+  return(0.0);
 }

@@ -7,7 +7,7 @@
 extern Environment env;
 extern IO::Files files;
 
-SubstitutionModel::SubstitutionModel(UniformizationConstant* u) : u(u) {
+SubstitutionModel::SubstitutionModel(Valuable* u) : u(u) {
   states.n = 0;
 }
 
@@ -19,48 +19,52 @@ void SubstitutionModel::add_state(std::string s) {
   states.n++;
 }
 
-AbstractValue* SubstitutionModel::realize_component(IO::raw_param* param) {
-  AbstractValue* p;
-  if(id_to_address.find(param->ID) == id_to_address.end()) {
+SampleableValue* SubstitutionModel::realize_component(IO::raw_param* param) {
+  SampleableValue* p;
+  if(realized_params.find(param->ID) == realized_params.end()) {
     if(param->t == IO::FLOAT) {
       IO::raw_ContinuousFloat* float_param = dynamic_cast<IO::raw_ContinuousFloat*>(param);
-      p = new ContinuousFloat(float_param->name, float_param->ID, float_param->init, 0.001, 0.0);
+      p = new ContinuousFloat(float_param->name, float_param->init, float_param->step_size, 0.0);
     } else if(param->t == IO::CATEGORY) {
-      IO::raw_CategoryFloat* cat_param = dynamic_cast<IO::raw_CategoryFloat*>(param);
+      IO::raw_DiscreteFloat* cat_param = dynamic_cast<IO::raw_DiscreteFloat*>(param);
       // Need to sort duplicate rate categories out here.
-      RateCategories* cats = new RateCategories("cats", 0, cat_param->categories);
-      p = new DiscreteFloat(cat_param->name, cat_param->ID, cats);
+      RateCategories* cats = new RateCategories("cats", cat_param->categories);
+      p = new DiscreteFloat(cat_param->name, cats);
     } else {
       std::cerr << "Error: unknown parameter type for parameter \"" << param->name << "\"." << std::endl;
       exit(EXIT_FAILURE);
     }
   } else {
-    p = id_to_address[param->ID];
+    p = realized_params[param->ID];
   }
   return(p);
 }
 
-void SubstitutionModel::create_parameters(std::list<IO::raw_param*> params) {
-  for(auto it = params.begin(); it != params.end(); ++it) {
-	AbstractValue* p = realize_component(*it);
-	id_to_address[p->get_ID()] = p;
+SampleableValue* SubstitutionModel::retreive_component(int id) {
+  if(realized_params.find(id) == realized_params.end()) {
+    realized_params[id] = realize_component(raw_params[id]);
   }
+
+  return(realized_params[id]);
 }
 
-RateVector* SubstitutionModel::create_rate_vector(States states, IO::raw_rate_vector rv, UniformizationConstant* u) {
-  std::vector<AbstractValue*> rates(states.n, nullptr);
+RateVector* SubstitutionModel::create_rate_vector(States states, IO::raw_rate_vector rv, Valuable* u) {
+  std::vector<Valuable*> rates(states.n, nullptr);
   int s = states.state_to_int[rv.uc.state];
-  VirtualSubstitutionRate* vir_rate = new VirtualSubstitutionRate("tmp_name", -1, u); 
+  VirtualSubstitutionRate* vir_rate = new VirtualSubstitutionRate("tmp_name_virtual_substitution.", u); 
   for(int i = 0; i < states.n; i++) {
     IO::raw_param* param = rv.rates.front();
+    if(param == nullptr) {
+      std::cerr << "Error: nullptr for parameter in rate vector " << rv.name << " at position " << i << "." << std::endl;
+      exit(EXIT_FAILURE);
+    }
     if(i != s) {
-      rates[i] = id_to_address[param->ID];
+      rates[i] = retreive_component(param->ID);
       // Add dependancies.
-      vir_rate->add_rate(id_to_address[param->ID]);
+      vir_rate->add_rate(rates[i]);
     } else {
       // Virtual Substitution rate.
       vir_rate->name = param->name;
-      vir_rate->ID = param->ID;
       rates[i] = vir_rate;
     }
     rv.rates.pop_front();
@@ -76,20 +80,19 @@ RateVector* SubstitutionModel::create_rate_vector(States states, IO::raw_rate_ve
 }
 
 void SubstitutionModel::from_raw_model(IO::raw_substitution_model* raw_sm) {
+  raw_params = raw_sm->get_map_parameters();
+
   // Read in states.
   for(auto it = raw_sm->states.begin(); it != raw_sm->states.end(); ++it) {
 	add_state(*it);
   }
 
-  // Get the list of naive list of parameters.
-  std::list<IO::raw_param*> params = raw_sm->get_parameters();
-  create_parameters(params);
-
-  // Put them into rate vectors.
-  for(auto it = raw_sm->rv_list.begin(); it != raw_sm->rv_list.end(); ++it) {
-    RateVector* rv = create_rate_vector(states, *it, u);
-    rateVectors.add(rv, (*it).uc);
+  // Read in rate vectors.
+  for(auto raw_rv = raw_sm->rv_list.begin(); raw_rv != raw_sm->rv_list.end(); ++raw_rv) {
+    RateVector* rv = create_rate_vector(states, *raw_rv, u);
+    rateVectors.add(rv, (*raw_rv).uc);
   }
+
   finalize();
 }
 
@@ -127,7 +130,12 @@ std::list<AbstractComponent*> SubstitutionModel::get_all_parameters() {
   std::list<AbstractComponent*> ret = {};
   for(auto it = rateVectors.col.begin(); it != rateVectors.col.end(); ++it) {
     for(auto jt = (*it)->rates.begin(); jt != (*it)->rates.end(); ++jt) {
-      ret.push_back(*jt);
+      AbstractComponent* c = dynamic_cast<AbstractComponent*>(*jt);
+      if(c == nullptr) {
+	std::cerr << "Error: parameter not of AbstractComponent type." << std::endl;
+	exit(EXIT_FAILURE);
+      }
+      ret.push_back(c);
     }
   }
   return(ret);
@@ -170,8 +178,11 @@ inline bool SubstitutionModel::iterator::step_to_next_component() {
     for(auto it = cq.front()->get_dependancies().begin(); it != cq.front()->get_dependancies().end(); ++it) {
       cq.push(*it);
     }
-    location = cq.front()->host_vectors.begin();
-    location_iter_end = cq.front()->host_vectors.end();
+    Valuable* v = dynamic_cast<Valuable*>(cq.front());
+    if(v != nullptr) {
+      location = v->host_vectors.begin();
+      location_iter_end = v->host_vectors.end();
+    }
     return(false);
   }
 }
@@ -190,8 +201,11 @@ SubstitutionModel::iterator::iterator(SubstitutionModel& s, bool e, AbstractComp
       cq.push(*it);
     }
 
-    location = cq.front()->host_vectors.begin();
-    location_iter_end = cq.front()->host_vectors.end();
+    Valuable* v = dynamic_cast<Valuable*>(cq.front());
+    if(v != nullptr) {
+      location = v->host_vectors.begin();
+      location_iter_end = v->host_vectors.end();
+    }
 
     while(location == location_iter_end) {
       endQ = step_to_next_component();

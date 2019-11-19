@@ -45,16 +45,16 @@ class Tree {
   void identify_gaps();
   
   // Sampling.
-  bool sample();
+  sample_status sample();
   void find_ancestral_sequences();
 
   // Possible sampling methods.
-  bool(Tree::*treeSamplingMethod)(); 
-  bool sample_ancestral_states(); // When the tree is actually being sampled.
-  bool step_through_MSAs(); // When the ancestral sequences have already been determined. 
+  sample_status(Tree::*treeSamplingMethod)(); 
+  sample_status sample_ancestral_states(); // When the tree is actually being sampled.
+  sample_status step_through_MSAs(); // When the ancestral sequences have already been determined. 
 
   // Counts
-  void update_counts(SubstitutionCounts&); // New.
+  void update_counts(SubstitutionCounts&) const; // New.
   std::list<float> get_branch_lengths();
 
   // Recording state data.
@@ -77,6 +77,24 @@ private:
 
   // Recording State.
   void record_substitutions(int gen, double l);
+};
+
+class TreeParameter : public SampleableComponent {
+private:
+  Tree* tree;
+public:
+  TreeParameter();
+
+  virtual void print();
+  
+  virtual sample_status sample();
+  virtual void undo();
+  virtual void fix();
+  virtual void refresh();
+  virtual double record_state(int gen, double l);
+
+  void Initialize(IO::RawTreeNode* raw_tree, IO::RawMSA* &raw_msa, SubstitutionModel* &SM);
+  Tree* get_tree_ptr();
 };
 
 #endif

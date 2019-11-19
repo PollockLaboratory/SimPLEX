@@ -29,7 +29,7 @@ MCMC::MCMC() {
 	lnL = 0;
 } 
 
-void MCMC::initialize(Model* model) {
+void MCMC::Initialize(Model* model) {
   /*
    * Init MCMC with model, gens calculate lnL.
    */
@@ -41,48 +41,45 @@ void MCMC::initialize(Model* model) {
   out_freq = env.get<int>("MCMC.output_frequency");
   print_freq = env.get<int>("MCMC.print_frequency");
   gens = env.get<int>("MCMC.generations");
-  tree_sample_freq = env.get<int>("MCMC.tree_sample_frequency");
 
   //Calculate initial likelihood.
   lnL = model->CalculateLikelihood();
-
-  RecordState();
 
   //Initialize output file.
   files.add_file("likelihoods", env.get<std::string>("OUTPUT.likelihood_out_file"), IOtype::OUTPUT);
   lnlout = files.get_ofstream("likelihoods");
   lnlout << "I,GEN,LogL" << std::endl;
 
+  RecordState();
+
   model->printParameters();
+  std::cout << "Model and data successfully loaded - MCMC ready." << std::endl << std::endl;
 }
 
 void MCMC::sample() {
-  static int i = 1;
-  bool sampleType;
+  sample_status s = model->sample();
 
-  if(i % tree_sample_freq == 0) {
-    sampleType = model->SampleTree(); // All tree sampling right now is Gibbs.
-    lnL = model->CalculateLikelihood();
-    i = 0;
+  if(s.full_recalculation) {
+    newLnL = model->CalculateLikelihood();
   } else {
+    // TODO check partial update.
+    //newLnL = model->updateLikelihood();
+    newLnL = model->CalculateLikelihood();
+  }
 
-    sampleType = model->SampleSubstitutionModel();
-    newLnL = model->updateLikelihood();
-    if(sampleType) {
-      //Metropolis-Hasting method.
-      if (log(Random()) <= (newLnL - lnL)) {
-	lnL = newLnL;
-	model->accept();
-      } else {
-	model->reject();
-      }
-    } else {
-      // No Metropolis Hastings needed - Gibbs sampling.
+  if(s.testp) {
+    //Metropolis-Hasting method.
+    if (log(Random()) <= (newLnL - lnL)) {
       lnL = newLnL;
       model->accept();
+    } else {
+      model->reject();
     }
+  } else {
+    // No Metropolis Hastings needed - Gibbs sampling.
+    lnL = newLnL;
+    model->accept();
   }
-  i++;
 }
 
 void MCMC::Run() {
@@ -108,12 +105,12 @@ void MCMC::Run() {
       RecordState();
     }
   }
+  std::cout << "MCMC complete." << std::endl << std::endl;
 }
 
-///  Private Functions  ///
-void MCMC::RecordState() {  // ought to use a function to return tab separated items with endl
+void MCMC::RecordState() {
   static int i = -1;
   i++;
   lnlout << i << "," << gen << "," << lnL << std::endl;
-  model->RecordState(gen, lnL); // is this always getting lnlout?
+  model->RecordState(gen, lnL);
 }

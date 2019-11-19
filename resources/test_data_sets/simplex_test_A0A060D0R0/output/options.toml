@@ -5,11 +5,16 @@ seed = 0
 [TREE]
   max_segment_length = 0.08
   branch_split_algorithm = 1
+  scale_factor = 1.0
 
 # Uniformization Constant
 [UNIFORMIZATION]
-  threshold = 0.002
-  max_step = 0.001
+  dynamic = false
+  sample_frequency = 2000
+  refresh_tree_on_update = true
+  initial_value = 0.5
+  threshold = 0.01
+  max_step = 0.005
 
 [DATA]
   # This should be TRUE or FALSE
@@ -17,8 +22,8 @@ seed = 0
   substitution_model_file = "model.lua"
 
   sequences_file = "A0A060D0R0.fasta"
-  #tree_file = "long.newick"
-  tree_file = "A0A060D0R0.newick"
+  tree_file = "long.newick"
+  #tree_file = "A0A060D0R0.newick"
 [OUTPUT]
   output_directory = "/output"
   tree_out_file = "tree_out.newick"
@@ -30,11 +35,11 @@ seed = 0
   log_out_file = "run.log"
 
 [MCMC]
-  generations = 100001
-  tree_sample_frequency = 2000
-  output_frequency = 500
-  print_frequency = 500
+  generations = 11
+  tree_sample_frequency = 3
+  output_frequency = 1
+  print_frequency = 1
 
 [MODEL]
   states = ["A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"]
-
+  parameter_type = "continuous"

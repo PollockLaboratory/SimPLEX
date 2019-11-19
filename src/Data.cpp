@@ -21,11 +21,13 @@ Data::~Data() {
 }
 
 void Data::Initialize() {
+  std::cout << "Loading data:" << std::endl;
   raw_msa = ReadMSA();
   raw_tree = ReadTree();
   raw_sm = ReadSubstitutionModel(raw_msa, raw_tree);
 
-  validateInputData(raw_msa, raw_tree);  
+  validateInputData(raw_msa, raw_tree);
+  std::cout << "Data successfully read." << std::endl;
 }
 
 IO::RawTreeNode* Data::ReadTree() {

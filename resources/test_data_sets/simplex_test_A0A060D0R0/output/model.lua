@@ -1,15 +1,30 @@
 model.set_name("Joseph's Model")
 
 state_names = config.get_string_array("MODEL.states")
+parameter_type = config.get_str("MODEL.parameter_type")
+
 states.set(state_names)
 
 for k, v in pairs(state_names) do
    print(k, v)
 end
 
-param_template = {initial_value = 0.02}
+if parameter_type == "continuous" then
+   print("Continuous")
+   rate = Parameter.new("rate", "continuous", {initial_value = 0.01, step_size = 0.0001})
+elseif parameter_type == "discrete" then
+   print("Discrete")
+   cats = {}
+   for i = 0.0015, 0.003, 0.00015 do
+      cats[#cats+1] = i
+   end
+   
+   rate = Parameter.new("rate", "discrete", {categories = cats})
+else
+   print("Error: no matching parameter type.")
+end
 
-rate = Parameter.new("rate", "float", {initial_value = 0.005})
+param_template = {initial_value = 0.001, step_size = 0.0001}
 
 Q = {}
 for i=1,20 do
@@ -17,7 +32,7 @@ for i=1,20 do
 	for j=1,20 do
 		-- Q[i][j] = Parameter.new(tostring(i)..tostring(j), param_template)
 		if i == j then
-		   Q[i][j] = Parameter.new(tostring(state_names[i])..tostring(state_names[j]), "float", param_template)
+		   Q[i][j] = Parameter.new(tostring(state_names[i])..tostring(state_names[j]), "continuous", param_template)
 		else
 		   --Q[i][j] = Parameter.new(tostring(state_names[i])..tostring(state_names[j]), "float", {initial_value = 0.005})
 		   Q[i][j] = rate
