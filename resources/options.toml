@@ -6,7 +6,7 @@ seed = 0
   max_segment_length = 0.08
   branch_split_algorithm = 1
   scale_factor = 1.0
-  resolve_root = true
+  resolve_multifurcation = true
 
 # Uniformization Constant
 [UNIFORMIZATION]
@@ -25,7 +25,7 @@ seed = 0
   sequences_file = "test_data/5taxon_same.fasta"
   #tree_file = "test_data/5taxon_tips_only.newick"
   #tree_file = "test_data/5taxon_all_names.newick"
-  #tree_file = "test_data/5taxon_unrooted.newick"
+  tree_file = "test_data/5taxon_unrooted.newick"
   #tree_file = "test_data/5taxon_with_bootstrap.newick"
   #tree_file = "test_data/5taxon_with_branchsplit.newick"
 
@@ -55,6 +55,6 @@ seed = 0
 [MODEL]
   #states = ["A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"]
   states = ["N", "F"]
-  parameter_type = "discrete"
+  parameter_type = "continuous"
   num_categories = 4
 

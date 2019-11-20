@@ -27,10 +27,8 @@ std::pair<std::string, std::string> IO::separate_node_info(std::string node_stri
    */
   int last_parens_position = node_string.find_last_of(')');
   if (last_parens_position == (signed int)string::npos) {
-    std::cout << "Child nodes: " << "" << " Info: " << node_string << std::endl;
     return(std::pair<std::string, std::string>("", node_string));
   } else {
-    std::cout << "Child nodes: " << node_string.substr(0, last_parens_position + 1) << " Info: " << node_string.substr(last_parens_position + 1) << std::endl;
     return(std::pair<std::string, std::string>(node_string.substr(0, last_parens_position + 1),
 					     node_string.substr(last_parens_position + 1)));
   }
@@ -58,9 +56,9 @@ node_info IO::parse_node_info(std::string info_string) {
   return(node_info({name, distance, bootstrap}));
 }
 
-std::vector<std::string> IO::separate_node_string(std::string node_string) {
+std::queue<std::string> IO::separate_node_string(std::string node_string) {
   int depth = 0;
-  std::vector<std::string>sub_nodes = {};
+  std::queue<std::string>sub_nodes = {};
 
   if(node_string == "") {
     return(sub_nodes);
@@ -78,27 +76,41 @@ std::vector<std::string> IO::separate_node_string(std::string node_string) {
       break;
     case ',':
       if(depth == 1) {
-	sub_nodes.push_back(node_string.substr(previous_comma + 1, i - previous_comma - 1));
+	sub_nodes.push(node_string.substr(previous_comma + 1, i - previous_comma - 1));
 	previous_comma = i;
       }
     }
   }
 
-  sub_nodes.push_back(node_string.substr(previous_comma + 1, node_string.size() - previous_comma - 2));
+  sub_nodes.push(node_string.substr(previous_comma + 1, node_string.size() - previous_comma - 2));
 
-  //std::cout << node_string << std::endl;
-  //for(auto it = sub_nodes.begin(); it != sub_nodes.end(); ++it) {
-  //  std::cout << "-> " << *it << std::endl;
-  // }
-  //std::cout << std::endl;
   return(sub_nodes);
+}
+
+std::pair<IO::RawTreeNode*, IO::RawTreeNode*> IO::resolve_child_nodes(std::queue<std::string> nodes, IO::RawTreeNode* up) {
+  static int ID = 0;
+  IO::RawTreeNode* left = parseRawTreeNode(nodes.front(), up);
+  nodes.pop();
+  if(nodes.size() == 1) {
+    return(std::pair<IO::RawTreeNode*, IO::RawTreeNode*>(left, parseRawTreeNode(nodes.front(), up)));
+  } else {
+    if(env.get<bool>("TREE.resolve_multifurcation")) {
+      RawTreeNode* intermediate = new RawTreeNode;
+      std::pair<IO::RawTreeNode*, IO::RawTreeNode*> child_nodes = resolve_child_nodes(nodes, intermediate);
+      *intermediate = {"MNode" + std::to_string(ID), 0.00000000001, up, child_nodes.first, child_nodes.second};
+      ID++;
+      return(std::pair<IO::RawTreeNode*, IO::RawTreeNode*>(left, intermediate));
+    } else {
+      std::cerr << "Error: detected nodes with multiple decendents. Set TREE.resolve_multifurcation to force resolution." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+  }
 }
 
 IO::RawTreeNode* IO::parseRawTreeNode(std::string node_string, RawTreeNode* up) {
   std::pair<std::string, std::string> node_pair = separate_node_info(node_string);
   node_info info = parse_node_info(node_pair.second);
-  std::vector<std::string> child_nodes = separate_node_string(node_pair.first);
-  std::cout << "Name: " << info.name << " Dist: " << info.distance << " Bootstrap: " << info.bootstrap << std::endl;
+  std::queue<std::string> child_nodes = separate_node_string(node_pair.first);
 
   IO::RawTreeNode* t = new RawTreeNode;
   IO::RawTreeNode* left;
@@ -112,26 +124,13 @@ IO::RawTreeNode* IO::parseRawTreeNode(std::string node_string, RawTreeNode* up) 
   case 1:
     std::cerr << "Error: I have not implimented a tree parser to deal with internal nodes yet." << std::endl;
     exit(EXIT_FAILURE);
-    left = parseRawTreeNode(child_nodes[0], t);
+    left = parseRawTreeNode(child_nodes.front(), t);
     right = nullptr;
     break;
-  case 2:
-    left = parseRawTreeNode(child_nodes[0], t);
-    right = parseRawTreeNode(child_nodes[1], t);
-    break;
-  case 3:
-    if(env.get<bool>("TREE.resolve_root")) {
-      left = new RawTreeNode;
-      *left = {"RRNode", 0.0000000001, t, parseRawTreeNode(child_nodes[0], left), parseRawTreeNode(child_nodes[1], left)};
-      right = parseRawTreeNode(child_nodes[2], t);
-    } else {
-      std::cerr << "Error: detected an unrooted tree during tree parsing. Set TREE.resolve_root to arbitrarily root." << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    break;
   default:
-    std::cerr << "Error: invalid number of downstream nodes during tree parsing." << std::endl;
-    exit(EXIT_FAILURE);
+    std::pair<IO::RawTreeNode*, IO::RawTreeNode*> children = resolve_child_nodes(child_nodes, up);
+    left = children.first;
+    right = children.second;
     break;
   }
 
@@ -141,7 +140,6 @@ IO::RawTreeNode* IO::parseRawTreeNode(std::string node_string, RawTreeNode* up) 
 
 IO::RawTreeNode* IO::parseTree(std::string tree_string) {
   tree_string = cleanTreeString(tree_string);
-  std::cout << "Start: " << tree_string << std::endl;
   IO::RawTreeNode* root = new RawTreeNode;
   *root = {"Root", 0, NULL, NULL, NULL};
   IO::RawTreeNode* t = parseRawTreeNode(tree_string, root);
@@ -152,7 +150,6 @@ IO::RawTreeNode* IO::parseTree(std::string tree_string) {
   };
 
   IO::printRawTree(t);
-  //exit(EXIT_FAILURE);
   return(t);
 }
 

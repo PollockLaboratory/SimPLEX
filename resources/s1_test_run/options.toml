@@ -6,7 +6,7 @@ seed = 0
   max_segment_length = 0.08
   branch_split_algorithm = 1
   scale_factor = 1.0
-  resolve_root = true
+  resolve_multifurcation = true
 
 # Uniformization Constant
 [UNIFORMIZATION]
@@ -55,6 +55,6 @@ seed = 0
 [MODEL]
   #states = ["A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"]
   states = ["N", "F"]
-  parameter_type = "discrete"
+  parameter_type = "continuous"
   num_categories = 4
 
