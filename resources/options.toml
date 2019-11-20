@@ -6,6 +6,7 @@ seed = 0
   max_segment_length = 0.08
   branch_split_algorithm = 1
   scale_factor = 1.0
+  resolve_root = true
 
 # Uniformization Constant
 [UNIFORMIZATION]
@@ -24,11 +25,9 @@ seed = 0
   sequences_file = "test_data/5taxon_same.fasta"
   #tree_file = "test_data/5taxon_tips_only.newick"
   #tree_file = "test_data/5taxon_all_names.newick"
-  tree_file = "test_data/5taxon_with_bootstrap.newick"
+  #tree_file = "test_data/5taxon_unrooted.newick"
+  #tree_file = "test_data/5taxon_with_bootstrap.newick"
   #tree_file = "test_data/5taxon_with_branchsplit.newick"
-
-  #sequences_file = "../resources/test_data/Species_alignment_BLVRB.fasta"
-  #tree_file = "../resources/test_data/BLVRB_subtree_MLbranches.nh"
 
 [OUTPUT]
   # If an output file is given as "", then no data will be saved to that file.

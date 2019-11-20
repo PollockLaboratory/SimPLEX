@@ -19,94 +19,141 @@ inline std::string& IO::cleanTreeString(std::string &tree_string) {
 	return(tree_string);
 }
 
-std::pair<std::string, std::string> IO::splitBranchString(std::string branch_string) {
-  std::pair<std::string, std::string> b;
-  int tree_depth = 0;
-  int comma_position = -1;
-  for (unsigned int position = 0; position < branch_string.size(); position++) {
-    char character = branch_string.at(position);
-    //std::cout << "Char: " << character << " Depth: " << tree_depth << std::endl;
-    if (character == '(')
-      tree_depth++;
-    else if (character == ')')
-      tree_depth--;
-    else if (character == ',' and tree_depth == 0) {
-      if(comma_position == -1) {
-	comma_position = position;
-      } else {
-	std::cerr << "Error: in tree parsing. Suspected unrooted tree." << std::endl;
-	exit(EXIT_FAILURE);
+std::pair<std::string, std::string> IO::separate_node_info(std::string node_string) {
+  /*
+   * Takes a node string of form (...)name:distance or name:distance and returns a pair of strings.
+   * The first element represents the potential child nodes (...), and the second element represents
+   * the info name:distance.
+   */
+  int last_parens_position = node_string.find_last_of(')');
+  if (last_parens_position == (signed int)string::npos) {
+    std::cout << "Child nodes: " << "" << " Info: " << node_string << std::endl;
+    return(std::pair<std::string, std::string>("", node_string));
+  } else {
+    std::cout << "Child nodes: " << node_string.substr(0, last_parens_position + 1) << " Info: " << node_string.substr(last_parens_position + 1) << std::endl;
+    return(std::pair<std::string, std::string>(node_string.substr(0, last_parens_position + 1),
+					     node_string.substr(last_parens_position + 1)));
+  }
+}
+
+node_info IO::parse_node_info(std::string info_string) {
+  static int ID = 0;
+  int last_colon_position = info_string.find_last_of(':');
+  std::string name;
+  float distance = atof(info_string.substr(last_colon_position + 1).c_str());
+  float bootstrap =  0.0;
+  if(last_colon_position == 0) {
+    name = "BNode" + std::to_string(ID);
+    ID++;
+  } else {
+    std::string name_or_bootstrap = info_string.substr(0, last_colon_position);
+    if(std::atof(name_or_bootstrap.c_str()) != 0.0) {
+      bootstrap = std::atof(name_or_bootstrap.c_str());
+      name = "BNode" + std::to_string(ID);
+      ID++;
+    } else {
+      name = name_or_bootstrap;
+    }
+  }
+  return(node_info({name, distance, bootstrap}));
+}
+
+std::vector<std::string> IO::separate_node_string(std::string node_string) {
+  int depth = 0;
+  std::vector<std::string>sub_nodes = {};
+
+  if(node_string == "") {
+    return(sub_nodes);
+  }
+
+  unsigned int previous_comma = 0;
+  for(unsigned int i = 0; i < node_string.size(); i++) {
+    char c = node_string[i];
+    switch(c) {
+    case '(':
+      depth++;
+      break;
+    case ')':
+      depth--;
+      break;
+    case ',':
+      if(depth == 1) {
+	sub_nodes.push_back(node_string.substr(previous_comma + 1, i - previous_comma - 1));
+	previous_comma = i;
       }
     }
   }
 
-  if(comma_position == -1) {
-    // Node with a single decendent.
-    b.first = branch_string;
-    b.second = "";
-  } else {
-    b.first = branch_string.substr(0, comma_position);
-    b.second = branch_string.substr(comma_position + 1, branch_string.size() - comma_position + 1);
-  }
-  return(b);
-}
+  sub_nodes.push_back(node_string.substr(previous_comma + 1, node_string.size() - previous_comma - 2));
 
-node_data IO::deconstructNodeString(std::string node_string) {
-  static int ID = 0;
-  int last_colon_position = node_string.find_last_of(':');
-  int last_parens_position = node_string.find_last_of(')');
-
-  float distance = atof(node_string.substr(last_colon_position + 1).c_str());	
-
-  std::string name;
-  std::pair<std::string, std::string> branch_strings;
-  if (last_parens_position == (signed int)string::npos) {
-    // Tip node.
-    name = node_string.substr(0, last_colon_position);
-    branch_strings = std::make_pair("", "");
-  } else {
-    int len = last_colon_position - last_parens_position - 1;
-    name = node_string.substr(last_parens_position + 1, len);
-    if(name == "" or std::atof(name.c_str()) != 0.0) {
-      // If missing name or is a bootstrap value.
-      name = "BNode" + std::to_string(ID);
-      ID++;
-    }
-    branch_strings = splitBranchString(node_string.substr(1, last_parens_position - 1));
-  }
-  node_data n = {name, distance, branch_strings.first, branch_strings.second};
-  return(n);
+  //std::cout << node_string << std::endl;
+  //for(auto it = sub_nodes.begin(); it != sub_nodes.end(); ++it) {
+  //  std::cout << "-> " << *it << std::endl;
+  // }
+  //std::cout << std::endl;
+  return(sub_nodes);
 }
 
 IO::RawTreeNode* IO::parseRawTreeNode(std::string node_string, RawTreeNode* up) {
-  node_data n = deconstructNodeString(node_string);
+  std::pair<std::string, std::string> node_pair = separate_node_info(node_string);
+  node_info info = parse_node_info(node_pair.second);
+  std::vector<std::string> child_nodes = separate_node_string(node_pair.first);
+  std::cout << "Name: " << info.name << " Dist: " << info.distance << " Bootstrap: " << info.bootstrap << std::endl;
 
-  // std::cout << node_string << std::endl;
   IO::RawTreeNode* t = new RawTreeNode;
   IO::RawTreeNode* left;
   IO::RawTreeNode* right;
 
-  left = (n.left != "") ? parseRawTreeNode(n.left, t) : 0;
-  right = (n.right != "") ? parseRawTreeNode(n.right, t) : 0;
+  switch(child_nodes.size()) {
+  case 0:
+    left = 0;
+    right = 0;
+    break;
+  case 1:
+    std::cerr << "Error: I have not implimented a tree parser to deal with internal nodes yet." << std::endl;
+    exit(EXIT_FAILURE);
+    left = parseRawTreeNode(child_nodes[0], t);
+    right = nullptr;
+    break;
+  case 2:
+    left = parseRawTreeNode(child_nodes[0], t);
+    right = parseRawTreeNode(child_nodes[1], t);
+    break;
+  case 3:
+    if(env.get<bool>("TREE.resolve_root")) {
+      left = new RawTreeNode;
+      *left = {"RRNode", 0.0000000001, t, parseRawTreeNode(child_nodes[0], left), parseRawTreeNode(child_nodes[1], left)};
+      right = parseRawTreeNode(child_nodes[2], t);
+    } else {
+      std::cerr << "Error: detected an unrooted tree during tree parsing. Set TREE.resolve_root to arbitrarily root." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    break;
+  default:
+    std::cerr << "Error: invalid number of downstream nodes during tree parsing." << std::endl;
+    exit(EXIT_FAILURE);
+    break;
+  }
 
-  // std::cout << "Name: " << n.name << " Distance: " << n.distance << std::endl;
-  *t = {n.name, n.distance * env.get<double>("TREE.scale_factor"), up, left, right};
+  *t = {info.name, info.distance * env.get<double>("TREE.scale_factor"), up, left, right};
   return(t);
 }
 
 IO::RawTreeNode* IO::parseTree(std::string tree_string) {
-	tree_string = cleanTreeString(tree_string);
-	IO::RawTreeNode* root = new RawTreeNode;
-	*root = {"Root", 0, NULL, NULL, NULL};
-	IO::RawTreeNode* t = parseRawTreeNode(tree_string, root);
+  tree_string = cleanTreeString(tree_string);
+  std::cout << "Start: " << tree_string << std::endl;
+  IO::RawTreeNode* root = new RawTreeNode;
+  *root = {"Root", 0, NULL, NULL, NULL};
+  IO::RawTreeNode* t = parseRawTreeNode(tree_string, root);
 
-	if(t->distance > 0.0) {
-	  std::cout << "Warning: truncating the root branch node." << std::endl;
-	  t->distance = 0.0;
-	};
+  if(t->distance > 0.0) {
+    std::cout << "Warning: truncating the root branch node." << std::endl;
+    t->distance = 0.0;
+  };
 
-	IO::printRawTree(t);
-	return(t);
+  IO::printRawTree(t);
+  //exit(EXIT_FAILURE);
+  return(t);
 }
 
 // Utils

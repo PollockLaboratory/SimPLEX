@@ -35,10 +35,10 @@ seed = 0
   log_out_file = "run.log"
 
 [MCMC]
-  generations = 11
-  tree_sample_frequency = 3
-  output_frequency = 1
-  print_frequency = 1
+  generations = 1000001
+  tree_sample_frequency = 5000
+  output_frequency = 2500
+  print_frequency = 5000
 
 [MODEL]
   states = ["A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"]

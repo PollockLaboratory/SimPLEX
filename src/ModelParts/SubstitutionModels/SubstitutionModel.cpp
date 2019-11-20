@@ -9,6 +9,7 @@ extern IO::Files files;
 
 SubstitutionModel::SubstitutionModel(Valuable* u) : u(u) {
   states.n = 0;
+  realized_params = {};
 }
 
 void SubstitutionModel::add_state(std::string s) {
@@ -42,7 +43,9 @@ SampleableValue* SubstitutionModel::realize_component(IO::raw_param* param) {
 
 SampleableValue* SubstitutionModel::retreive_component(int id) {
   if(realized_params.find(id) == realized_params.end()) {
-    realized_params[id] = realize_component(raw_params[id]);
+    // Note: doing this on one line adds element to map before function call.
+    SampleableValue* s = realize_component(raw_params[id]);
+    realized_params[id] = s;
   }
 
   return(realized_params[id]);
