@@ -23,11 +23,20 @@ std::string AbstractComponent::get_name() {
 }
 
 void AbstractComponent::add_dependancy(AbstractComponent* v) {
-  dependent_values.push_back(v);
+  dependencies.push_back(v);
 }
 
 const std::list<AbstractComponent*>& AbstractComponent::get_dependancies() {
-  return(dependent_values);
+  return(dependencies);
+}
+
+void AbstractComponent::add_dependent(AbstractComponent* v) {
+  // Check if it already exists in the list.
+  dependents.push_back(v);
+}
+
+const std::list<AbstractComponent*>& AbstractComponent::get_dependents() {
+  return(dependents);
 }
 
 // ABSTRACT VALUES
@@ -51,7 +60,7 @@ void Valuable::print() {
 
 SampleableComponent::SampleableComponent(std::string name) : AbstractComponent(name) {
   fixedQ = true;
-  dependent_values = {};
+  dependencies = {};
 }
 
 // SampleableValue.

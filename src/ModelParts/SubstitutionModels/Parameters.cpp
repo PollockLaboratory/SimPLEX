@@ -257,10 +257,13 @@ void VirtualSubstitutionRate::refresh() {
   double total = 0.0;
 
   int i = 0;
+  //std::cout << "rates [ " << std::endl;
   for(auto it = dependent_rates.begin(); it != dependent_rates.end(); ++it) {
+    // std::cout << (*it)->getValue() << " ";
     total += (*it)->getValue();
   }
-
+  //std::cout << "]" << std::endl;
+  
   value = u->getValue() - total;
 
   if(value <= 0.0 || value > 1.0) {

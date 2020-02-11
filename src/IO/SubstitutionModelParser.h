@@ -67,6 +67,7 @@ namespace IO {
     void read_from_file(std::ifstream&);
     friend std::ostream& operator<<(std::ostream&, const IO::raw_substitution_model&);
     std::list<std::string> states;
+    std::list<std::string> ignore_states;
     std::list<raw_rate_vector> rv_list;
     std::list<raw_param*> get_parameters();
     const std::map<int, raw_param*>& get_map_parameters();
@@ -75,6 +76,7 @@ namespace IO {
     IO::raw_param* new_parameter(std::string, std::string, sol::table tbl);
     IO::raw_rate_vector new_rate_vector(std::string, sol::table, sol::table);
     void set_states(sol::table tbl);
+    void set_ignore_states(sol::table tbl);
     void add_rate_vector(raw_rate_vector rv);
   };
 

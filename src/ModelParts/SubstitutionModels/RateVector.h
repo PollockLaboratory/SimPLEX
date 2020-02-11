@@ -9,6 +9,7 @@
 #include <list>
 #include <map>
 
+#include "States.h"
 #include "../AbstractComponent.h"
 #include "Parameters.h"
 #include "../../IO/SubstitutionModelParser.h"
@@ -24,26 +25,26 @@ class BranchSegment; // Defined in Trees/Types/TreeParts.h
 
 // Fundamental collection type of parameters in substitution model.
 class RateVector {
- public:
-  RateVector(std::string, int state, std::vector<Valuable*>);
-
+private:
+  const States* states;
+  int id;
+  static int IDc;
   std::string name;
+public:
+  RateVector(std::string, std::string, const States*, std::vector<Valuable*>);
+
   std::vector<Valuable*> rates;
   int state; // Determines the (ancestral) state that this rate vector applies to.
   float operator[](int);
   float get_rate_ratio(int i);
   const int& getID();
 
-  void print();
+  int size();
+  const std::string& get_name();
+  std::string get_state();
+  std::string get_state_by_pos(int);
 
-  //std::map<int, int> valueID_to_state; // Maps a values ID to the state it applies to in the rates vector.
- private:
-  int id;
-  void update_counts();
-  std::vector<int> counts; // The counts of substitutions that apply to each rate.
-  std::vector<double> logLikelihoods; // The logLikelihoods associated with each rate. count * log(rate).
-  int size;
-  static int IDc;
+  void print();
 };
 
 // Collections of rate vectors.

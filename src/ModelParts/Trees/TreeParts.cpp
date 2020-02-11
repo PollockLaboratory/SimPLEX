@@ -20,7 +20,7 @@ extern Environment env;
 BranchSegment::BranchSegment(float distance) {
   this->distance = distance;
   rates = std::vector<RateVector*>(env.n, NULL);
-  substitutions = std::vector<bool>(env.n, false);
+  substitutions = std::vector<Substitution>(env.n, Substitution({false, 0, 0, nullptr}));
 }
 
 BranchSegment::~BranchSegment() {
@@ -30,6 +30,10 @@ BranchSegment::~BranchSegment() {
 std::ostream& operator<< (std::ostream &out, const BranchSegment &b) {
   out << b.distance;
   return out;
+}
+
+const std::vector<Substitution>& BranchSegment::get_substitutions() {
+  return(substitutions);
 }
 
 double BranchSegment::get_rate(int pos, int dec_state) {
@@ -61,10 +65,12 @@ void BranchSegment::set_new_substitutions() {
   std::vector<int> dec = *(decendant->sequence);
 
   for(unsigned int pos = 0; pos < anc.size(); pos++) {
-    if(anc[pos] != -1) {
+    if(anc[pos] == -1 or dec[pos] == -1) {
+      substitutions[pos] = {false, anc[pos], dec[pos], rates[pos]};
+    } else {
       if(anc[pos] != dec[pos]) {
 	// Normal substitutions.
-	substitutions[pos] = true;
+	substitutions[pos] = {true, anc[pos], dec[pos], rates[pos]};
       } else {
 	// Possibility of virtual substitution.
 	// Not sure this is exactly right.
@@ -72,41 +78,18 @@ void BranchSegment::set_new_substitutions() {
 	double vir_rate = rates[pos]->rates[dec[pos]]->getValue();
 	double p = 1 - (1 / (1 + (vir_rate * distance)));
 	if(Random() < p) {
-	  substitutions[pos] = true;
+	  substitutions[pos] = {true, anc[pos], dec[pos], rates[pos]};
 	} else {
-	  substitutions[pos] = false;
+	  substitutions[pos] = {false, anc[pos], dec[pos], rates[pos]};
 	}
       }
-    } else {
-	substitutions[pos] = false;
     }
   } 
 }
 
 void BranchSegment::update() {
   update_rate_vectors();
-}
-
-void BranchSegment::update_counts(std::map<RateVector*, std::vector<int>>& subs_by_rateVector,
-				  raw_counts& subs_by_branch) {
-  std::vector<int> anc = *(ancestral->sequence);
-  std::vector<int> dec = *(decendant->sequence);
-
-  // Substitutions tracked.
-  for(unsigned int pos = 0; pos < anc.size(); pos++) {
-    if(anc.at(pos) == -1 and dec.at(pos) != -1) {
-      std::cerr << "Error: gap upstream of non-gap state." << std::endl;
-      exit(EXIT_FAILURE);
-    }
-
-    if(substitutions[pos] == true and dec.at(pos) != -1) {
-      // Adds both virtual substitutions and normal substitutions.
-      subs_by_branch.num1subs += 1;
-      subs_by_rateVector[rates[pos]][dec.at(pos)] += 1;
-    } else {
-      subs_by_branch.num0subs += 1;
-    }
-  }
+  set_new_substitutions();
 }
 
 // TREE NODES
@@ -322,12 +305,12 @@ void TreeNode::calculate_state_probabilities_pos(int pos, TreeNode* left_node, T
   }
 }
 
-TreeNode* TreeNode::calculate_state_probabilities() {
+TreeNode* TreeNode::calculate_state_probabilities(const std::list<int>& positions) {
   if(isTip()) {
     sampledp = true;
-    for(int pos = 0; pos < sequence->size(); pos++) {
-      if(not gaps[pos]) {
-	state_probabilities[pos][sequence->at(pos)] = 1.0;
+    for(auto pos = positions.begin(); pos != positions.end(); ++pos){
+      if(not gaps[*pos]) {
+	state_probabilities[*pos][sequence->at(*pos)] = 1.0;
       }
     }
     
@@ -354,9 +337,9 @@ TreeNode* TreeNode::calculate_state_probabilities() {
   
   // This doesn't deal with branch nodes.
   //std::cout << "Calculate State Probabilites: " << name << std::endl;
-  for(int pos = 0; pos < env.n; pos++) {
-    if(not gaps[pos]) {
-      calculate_state_probabilities_pos(pos, left->decendant, right_node, nullptr);
+  for(auto pos = positions.begin(); pos != positions.end(); ++pos){
+    if(not gaps[*pos]) {
+      calculate_state_probabilities_pos(*pos, left->decendant, right_node, nullptr);
     }
   }
 
@@ -370,6 +353,8 @@ TreeNode* TreeNode::calculate_state_probabilities() {
     return(this);
   }
 }
+
+// Picking the state from the pre-calculated probabilites.
 
 int TreeNode::pick_state_from_probabilities(int pos) {
   float* probs = state_probabilities[pos];
@@ -399,9 +384,8 @@ int TreeNode::pick_state_from_probabilities(int pos) {
   return(val);
 }
 
-void TreeNode::pick_sequences() {
+void TreeNode::pick_sequences(const std::list<int>& positions) {
   if(isTip()) {
-    up->set_new_substitutions();
     return;
   }
 
@@ -415,33 +399,28 @@ void TreeNode::pick_sequences() {
   // Recalculate state probability vector.
   // No need if at the root.
   if(up != nullptr) {
-    for(int pos = 0; pos < env.n; pos++) {
-      if(not gaps[pos]) {
-	  calculate_state_probabilities_pos(pos, left->decendant, right_node, up->ancestral);
+    for(auto pos = positions.begin(); pos != positions.end(); ++pos){
+      if(not gaps[*pos]) {
+	  calculate_state_probabilities_pos(*pos, left->decendant, right_node, up->ancestral);
       }
     }
   }
 
-  for(unsigned int pos = 0; pos < sequence->size(); pos++) {
-    if(gaps[pos]) {
-      (*sequence)[pos] = -1;
+  for(auto pos = positions.begin(); pos != positions.end(); ++pos){
+    if(gaps[*pos]) {
+      (*sequence)[*pos] = -1;
     } else {
-      (*sequence)[pos] = pick_state_from_probabilities(pos);
+      (*sequence)[*pos] = pick_state_from_probabilities(*pos);
     }
-  }
-
-  if(up != nullptr) {
-    // No up branch on root.
-    up->set_new_substitutions();
   }
 
   // Recursively call the remainder of the tree.
   if(right) {
-    right->decendant->pick_sequences();
+    right->decendant->pick_sequences(positions);
   }
 
   if(left) {
-    left->decendant->pick_sequences();
+    left->decendant->pick_sequences(positions);
   }
 }
 

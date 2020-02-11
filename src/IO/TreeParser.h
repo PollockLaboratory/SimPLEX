@@ -13,6 +13,8 @@ struct node_info {
   float bootstrap; // The bootstrap value.
 };
 
+void print_node_info(const node_info&);
+
 namespace IO {
   struct RawTreeNode {
     std::string name;
@@ -31,6 +33,7 @@ namespace IO {
   RawTreeNode* parseRawTreeNode(std::string node_string, RawTreeNode* up);
   RawTreeNode* parseTree(std::string tree_string);
   std::list<std::string> getRawTreeNodeNames(const RawTreeNode* node);
+  std::list<std::string> getRawTreeNodeTipNames(const RawTreeNode* node);
 
   void printRawTree(const RawTreeNode* node);
 }

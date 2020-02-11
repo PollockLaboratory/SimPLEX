@@ -36,6 +36,10 @@ public:
 };
 
 class AbstractComponent {
+protected:
+  // Dependencies -> this component -> dependents.
+  std::list<AbstractComponent*> dependencies; // Components that this component depends on.
+  std::list<AbstractComponent*> dependents; // Components that depend on this parameter.
 public:
   int ID;
   std::string name;
@@ -44,14 +48,15 @@ public:
   void add_dependancy(AbstractComponent*);
   const std::list<AbstractComponent*>& get_dependancies();
 
+  void add_dependent(AbstractComponent*);
+  const std::list<AbstractComponent*>& get_dependents();
+
   int get_ID();
   std::string get_name();
 
   virtual void refresh() = 0;
   virtual void print() = 0;
   virtual double record_state(int gen, double l) = 0;
-protected:
-  std::list<AbstractComponent*> dependent_values;
 };
 
 class SampleableComponent : public AbstractComponent {

@@ -37,7 +37,7 @@ class Data {
   vector<int> columns_without_gaps;
 
   void validateInputData(const IO::RawMSA* raw_msa, const IO::RawTreeNode* raw_tree);
-  bool matchNodeNames(list<string> names1, list<string> names2);
+  void matchNodeNames(list<string> names1, list<string> names2);
   
   IO::RawTreeNode* ReadTree();
   IO::RawMSA* ReadMSA();

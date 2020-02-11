@@ -46,6 +46,7 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw
   Valuable* u = create_uniformization_constant();
 
   // Substitution model.
+  std::cout << "\tConstructing Substitution model." << std::endl;
   substitution_model = new SubstitutionModel(u);
   substitution_model->from_raw_model(raw_sm);
 
@@ -56,9 +57,11 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw
   }
 
   // Tree.
+  std::cout << "\tConstructing tree." << std::endl;
   TreeParameter* tp = new TreeParameter();
   tp->Initialize(raw_tree, raw_msa, substitution_model);
 
+  std::cout << "\tAdding Uniformization constant." << std::endl;
   UniformizationConstant* u_param = dynamic_cast<UniformizationConstant*>(u);
   if(u_param and env.get<bool>("UNIFORMIZATION.refresh_tree_on_update")) {
       tp->add_dependancy(u_param);
@@ -66,15 +69,17 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw
 
   components.add_parameter(tp, env.get<int>("MCMC.tree_sample_frequency"));
 
-  CountsParameter* cp = new CountsParameter(&counts);
-  cp->link_to_tree(tp);
+  
+  std::cout << "\tPreparing substitution counts." << std::endl;
+  CountsParameter* cp = new CountsParameter(&counts, tp);
   components.add_parameter(cp);
 
   components.Initialize();
 
+  std::cout << "\tSetting initial parameter states." << std::endl;
   // Set initial tree state.
   tp->sample();
-  components.refresh_dependencies();
+  components.refresh_all_dependencies();
 
   counts.print();
   std::cout << "Model succesfully constructed." << std::endl;
@@ -98,7 +103,7 @@ void Model::accept() {
 
 void Model::reject() {
   components.reject();
-  logL -= delta_logL;
+  //logL = previous_logL;
   ready = true;
 }
 
@@ -107,10 +112,10 @@ double Model::CalculateLikelihood() {
   /*
    * Calculates the likelihood of the current tree and substitution model.
    */
+  
+  double logL_waiting = 0.0;
+  double logL_subs = 0.0;
 
-  logL_waiting = 0.0;
-  logL_subs = 0.0;
-  logL = 0.0;
   float t;
   int num0subs;
   int num1subs;
@@ -131,30 +136,31 @@ double Model::CalculateLikelihood() {
       logL_subs += C_xy[i] * log((*rv)[i]);
     }
   }
-
-  logL = logL_waiting + logL_subs;
-
-  return(logL);
+  
+  return(logL_waiting + logL_subs);
 }
 
-double Model::updateLikelihood(){
+double Model::CalculateChangeInLikelihood(){
   /*
    * Rather recalculating the full likelihood, will modify logLikelihood only by what has changed. 
    */
 
-  delta_logL = 0.0;
+  double delta_logL = 0.0;
  
   RateVector* rv;
   int C_xy;
 
-  for(auto it = substitution_model->modified_begin(components.get_current_parameter()); it.at_end() == false; ++it) {
+  for(auto it = substitution_model->modified_begin(components.get_current_parameter());
+      it.at_end() == false; ++it) {
     rv = (*it).rv;
     C_xy = counts.subs_by_rateVector[rv][(*it).pos];
-    delta_logL += C_xy * log(rv->get_rate_ratio((*it).pos)); // Should be ratio;
+    delta_logL += C_xy * log(rv->get_rate_ratio((*it).pos));
+    //std::cout << "RV: " << rv->get_name() << " " << (*it).pos << " " << C_xy << " " << log(rv->get_rate_ratio((*it).pos)) << " " << delta_logL << std::endl;
   }
 
-  logL += delta_logL;
-  return(logL);
+  //logL += delta_logL;
+  //std::cout << "Delta: " << delta_logL << std::endl;
+  return(delta_logL);
 }
 
 // Printing/Recording

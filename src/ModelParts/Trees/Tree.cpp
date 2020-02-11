@@ -63,10 +63,7 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
   for(auto b = branchList.begin(); b != branchList.end(); ++b) {
   	(*b)->update();
   }
-
-  // This should depend on the method for ancestral state sampling.
-  sample_ancestral_states();
-  
+ 
   initialize_output_streams();	
 }
 
@@ -170,12 +167,13 @@ void Tree::configureSequences(TreeNode* n) {
   }
 }
 
+SubstitutionModel* Tree::get_SM() {
+  return(SM);
+}
+
 // Sampling and likelihood.
-void Tree::update_counts(SubstitutionCounts& counts) const {
-  for(auto it = branchList.begin(); it != branchList.end(); ++it) {
-    BranchSegment* b = *it;
-    b->update_counts(counts.subs_by_rateVector, counts.subs_by_branch[b->distance]);
-  }
+const std::list<BranchSegment*> Tree::get_branches() {
+  return(branchList);
 }
 
 std::list<float> Tree::get_branch_lengths() {
@@ -201,7 +199,7 @@ void Tree::identify_gaps() {
 
   std::queue<TreeNode*> nodes = {};
 
-  // Add tip nodes to nodes.
+  // Add tip nodes to starting nodes.
   for(auto t = tipList.begin(); t != tipList.end(); ++t) {
     (*t)->sampledp = false;
     nodes.push(*t);
@@ -225,8 +223,8 @@ void Tree::identify_gaps() {
 // SAMPLING TREE PARAMETERS.
 //
 
-sample_status Tree::sample() {
-  sample_status s = (this->*treeSamplingMethod)();
+sample_status Tree::sample(const std::list<int>& positions) {
+  sample_status s = (this->*treeSamplingMethod)(positions);
 
   // Update branch list - new substitutions.
   for(auto b = branchList.begin(); b != branchList.end(); ++b) {
@@ -240,7 +238,12 @@ sample_status Tree::sample() {
 // Two options for changing ancestral states.
 //
 
-void Tree::find_ancestral_sequences() {
+// Option 1.
+sample_status Tree::sample_ancestral_states(const std::list<int>& positions) {
+  /*
+   * Both recalculates substitution events and recalculates the ancestral sequences.
+   */
+ 
   // Reset all nodes such that the sampled flag is false.
   for(auto n = nodeList.begin(); n != nodeList.end(); ++n) {
     (*n)->sampledp = false;
@@ -256,33 +259,24 @@ void Tree::find_ancestral_sequences() {
 
   while(not nodes.empty()) {
     if(not nodes.front()->sampledp) {
-      nodes.push(nodes.front()->calculate_state_probabilities());
+      nodes.push(nodes.front()->calculate_state_probabilities(positions));
     }
 
     nodes.pop();
   }
 
-  root->pick_sequences();
+  root->pick_sequences(positions);
 
   // Reset all nodes such that the sampled flag is false.
   for(auto n = nodeList.begin(); n != nodeList.end(); ++n) {
     (*n)->sampledp = false;
   }
-}
-
-// Option 1.
-sample_status Tree::sample_ancestral_states() {
-  /*
-   * Both recalculates substitution events and recalculates the ancestral sequences.
-   */
-
-  find_ancestral_sequences();
 
   return(sample_status({false, true, true}));
 }
 
 // Option 2.
-sample_status Tree::step_through_MSAs() {
+sample_status Tree::step_through_MSAs(const std::list<int>& positions) {
   // This is not going to work anymore as the tree resampling algorithm has changed.
   MSA->step_to_next_MSA();
   return(sample_status({false, true, true}));
@@ -295,7 +289,6 @@ void Tree::initialize_output_streams() {
 
   files.add_file("substitutions", env.get<std::string>("OUTPUT.substitutions_out_file"), IOtype::OUTPUT);
   substitutions_out = files.get_ofstream("substitutions");
-
   substitutions_out << "I,GEN,LogL,Ancestral,Decendant,Substitutions" << endl;
 }
 
@@ -312,16 +305,11 @@ void Tree::record_substitutions(int gen, double l) {
   for(auto it = branchList.begin(); it != branchList.end(); ++it) {
     substitutions_out << index << "," << gen << "," << l << ",";
     substitutions_out << (*it)->ancestral->name << "," << (*it)->decendant->name << ",[ ";
-    for(unsigned int i = 0; i < (*it)->substitutions.size(); i++) {
+    std::vector<Substitution> subs = (*it)->get_substitutions();
+    for(unsigned int i = 0; i < subs.size(); i++) {
 	TreeNode* anc = (*it)->ancestral;
 	TreeNode* dec = (*it)->decendant;
-
-	if((*anc->sequence)[i] != (*dec->sequence)[i] and (*it)->substitutions[i] == false) {
-	  std::cerr << "Error: counting substitutions has gone wrong." << std::endl;
-	  exit(EXIT_FAILURE);
-	}
-
-	if((*it)->substitutions[i] == true) {
+	if(subs[i].occuredp == true) {
 	  substitutions_out << (*it)->ancestral->state_at_pos(i) << i << (*it)->decendant->state_at_pos(i) << " ";
 	}
     }
@@ -356,14 +344,35 @@ void Tree::print_nodeList() {
 
 TreeParameter::TreeParameter() : SampleableComponent("Tree") {
   tree = new Tree();
+  n_samples =  env.get<int>("MCMC.tree_sample_n_positions");
 }
 
 void TreeParameter::print() {
   std::cout << "TreeParameter" << std::endl;
 }
 
+std::list<int> random_positions(int s_length, int n) {
+  std::list<int> positions = {};
+  if(n > s_length) {
+    for(int i = 0; i < s_length; i++) {
+      positions.push_back(i);
+    }
+  } else {
+    // Very inefficient.
+    int i;
+    while(positions.size() < n) {
+      i = rand() % s_length;
+      positions.push_back(i);
+      positions.unique();
+    }
+  }
+  return(positions);
+}
+
 sample_status TreeParameter::sample() {
-  return(tree->sample());
+  // Pick positions.
+  std::list<int> positions = random_positions(env.n, n_samples);
+  return(tree->sample(positions));
 }
 
 void TreeParameter::undo() {

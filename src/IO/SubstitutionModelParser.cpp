@@ -5,22 +5,12 @@
 
 #include "../Environment.h"
 #include "Files.h"
+#include "LuaUtils.h"
 
 extern IO::Files files;
 extern Environment env;
 
 sol::state lua;
-
-template <class T>
-static T value_from_table(sol::table tbl, std::string name) {
-  sol::optional<T> opt_val = tbl[name];
-  if(not opt_val) {
-    std::cerr << "Error: " << name << "has not been correctly specified." << std::endl;
-    exit(EXIT_FAILURE);
-  } else {
-    return(opt_val.value());
-  }
-}
 
 namespace IO {
 
@@ -87,6 +77,7 @@ namespace IO {
   // RAW SUBSTITUTION MODEL.
   raw_substitution_model::raw_substitution_model() {
     states = {};
+    ignore_states = {};
     params = {};
   }
 
@@ -106,23 +97,7 @@ namespace IO {
 
   // Lua bindings
   void raw_substitution_model::set_states(sol::table tbl) {
-    for(auto kvp : tbl) {
-      const sol::object& val = kvp.second;
-
-      sol::optional<std::string> maybe_str = val.as<sol::optional<std::string>>();
-
-      if(maybe_str) {
-	std::string s = maybe_str.value();
-	if(s == "-") {
-	  std::cerr << "Error: the character \"-\" is reserved for gaps. Cannot be manually reassigned." << std::endl;
-	  exit(EXIT_FAILURE);
-	}
-	states.push_back(s);
-      } else {
-	std::cerr << "Error: state is not String."  << std::endl;
-	exit(EXIT_FAILURE);
-      }
-    }
+    into_list(tbl, states);
 
     lua["states"]["count"] = states.size();
 
@@ -131,6 +106,10 @@ namespace IO {
       lua["states"][i] = *it;
       i++;
     }
+  }
+
+  void raw_substitution_model::set_ignore_states(sol::table tbl) {
+    into_list(tbl, ignore_states);
   }
 
   raw_param* raw_substitution_model::new_parameter(std::string name, std::string parameter_type, sol::table tbl) {

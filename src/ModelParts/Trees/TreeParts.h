@@ -13,10 +13,23 @@
 #include "../SubstitutionModels/SubstitutionModel.h"
 #include "../../SubstitutionCounts.h"
 
+typedef struct Substitution {
+  bool occuredp;
+  int anc_state;
+  int dec_state;
+  RateVector* rate_vector; // The rate vector this substitution occured under.
+} Substitution;
+
 class TreeNode;
 
 class BranchSegment {
- public:
+private:
+  std::vector<Substitution> substitutions;
+  std::vector<RateVector*> rates; //By site.
+
+  inline void update_rate_vectors();
+  void set_new_substitutions(); 
+public:
   BranchSegment(float distance);
   ~BranchSegment();
 
@@ -24,21 +37,13 @@ class BranchSegment {
   TreeNode* ancestral;
   TreeNode* decendant;
 
+  const std::vector<Substitution>& get_substitutions();
   double get_rate(int pos, int dec_state);
 
-  // Key statistics.
-  inline void update_rate_vectors();
-  void set_new_substitutions();
-
-  void update_counts(std::map<RateVector*, std::vector<int>>& subs_by_rateVector,
-		       raw_counts& subs_by_branch);
-
+  // Updating.
   void update();
  
   friend std::ostream& operator<< (std::ostream &out, const BranchSegment &b);
-
-  std::vector<bool> substitutions;
-  std::vector<RateVector*> rates; //By site.
 };
 
 class TreeNode {
@@ -70,8 +75,9 @@ class TreeNode {
   bool ready_to_sample();
   int pick_state_from_probabilities(int pos);
   void calculate_state_probabilities_pos(int pos, TreeNode* left, TreeNode* right, TreeNode* up);
-  TreeNode* calculate_state_probabilities();
-  void pick_sequences();
+
+  TreeNode* calculate_state_probabilities(const std::list<int>&);
+  void pick_sequences(const std::list<int>&);
 
   // Printing/Display
   std::string toString();

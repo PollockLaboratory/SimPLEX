@@ -15,13 +15,7 @@
 #include "../ComponentSet.h"
 #include "RateVector.h"
 #include "../../IO/SubstitutionModelParser.h"
-
-struct States {
-  int n; // Careful about indels.
-  std::set<std::string> possible;
-  std::map<std::string, int> state_to_int;
-  std::map<int, std::string> int_to_state;
-};
+#include "States.h"
 
 class SubstitutionModel {
   class iterator;
@@ -31,7 +25,7 @@ public:
   // Reading IO.
   SampleableValue* realize_component(IO::raw_param*);
   SampleableValue* retreive_component(int id);
-  RateVector* create_rate_vector(States states, IO::raw_rate_vector rv, Valuable* u);
+  RateVector* create_rate_vector(IO::raw_rate_vector rv, Valuable* u);
   void from_raw_model(IO::raw_substitution_model*);
 
   std::map<int, SampleableValue*> realized_params;
@@ -76,7 +70,8 @@ private:
     SubstitutionModel& sub_model;
     bool endQ;
     std::list<SampleableValue*> changed_comps; // List of the components that have changes with recent sampling.
-    std::queue<AbstractComponent*> cq;
+    std::queue<AbstractComponent*> cq; // Current queue.
+    std::set<AbstractComponent*> previous;
     std::list<rv_loc>::iterator location; // The location within a rate vector that has changed.
     std::list<rv_loc>::iterator location_iter_end;
   };

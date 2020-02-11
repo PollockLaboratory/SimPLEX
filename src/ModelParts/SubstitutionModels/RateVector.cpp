@@ -10,18 +10,11 @@ extern IO::Files files;
 int RateVector::IDc = 0;
 
 // Figure out locations Data Structure.
-RateVector::RateVector(std::string name, int state, std::vector<Valuable*> params) : name(name), state(state) {
-  id = IDc;
-  IDc++;
-  size = params.size();
+RateVector::RateVector(std::string name, std::string s, const States* states, std::vector<Valuable*> params) : name(name), states(states) {
+  state = states->state_to_int.at(s);
+  id = IDc++;
+  //std::cout << id << " " << name << std::endl;
   rates = params;	
-  //locations = {};
-  counts = std::vector<int>(env.num_states, 0);
-  logLikelihoods = std::vector<double>(env.num_states, 0);
-
-  //for(unsigned int i = 0; i < rates.size(); i++) {
-  // valueID_to_state[rates[i]->get_ID()] = i;
-  //}
 }
 
 float RateVector::operator[](int i) {
@@ -35,6 +28,22 @@ float RateVector::get_rate_ratio(int i) {
 
 const int& RateVector::getID() {
   return(id);
+}
+
+int RateVector::size() {
+  return(rates.size());
+}
+
+const std::string& RateVector::get_name() {
+  return(name);
+}
+
+std::string RateVector::get_state() {
+  return(states->int_to_state.at(state));
+}
+
+std::string RateVector::get_state_by_pos(int pos) {
+  return(states->int_to_state.at(pos));
 }
 
 // Util.
@@ -129,7 +138,7 @@ void RateVectorSet::saveToFile(int gen, double l) {
   static int i = -1;
   ++i;
   for(auto it = col.begin(); it != col.end(); ++it) {
-    out_file << i << "," << gen << "," << l << "," << (*it)->name << "," << (*it)->state;
+    out_file << i << "," << gen << "," << l << "," << (*it)->get_name() << "," << (*it)->state;
     for(auto jt = (*it)->rates.begin(); jt != (*it)->rates.end(); ++jt) {
       out_file << "," << (*jt)->getValue();
     }

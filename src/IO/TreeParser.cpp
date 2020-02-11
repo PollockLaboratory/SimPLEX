@@ -8,6 +8,11 @@
 extern Environment env;
 extern IO::Files files;
 
+void print_node_info(const node_info& info) {
+  std::cout << "[ " << info.name << " " << info.distance << " "
+	    << info.bootstrap << " ]" << std::endl;
+}
+
 inline std::string& IO::cleanTreeString(std::string &tree_string) {
 	/*
 	 * Removes whitespace and trailing ';'.
@@ -34,18 +39,27 @@ std::pair<std::string, std::string> IO::separate_node_info(std::string node_stri
   }
 }
 
+bool is_number(const std::string& s) {
+  auto it = s.begin();
+  while(it != s.end() && std::isdigit(*it)) {
+    ++it;
+  }
+  return(!s.empty() && it == s.end());
+}
+
 node_info IO::parse_node_info(std::string info_string) {
   static int ID = 0;
   int last_colon_position = info_string.find_last_of(':');
   std::string name;
   float distance = atof(info_string.substr(last_colon_position + 1).c_str());
   float bootstrap =  0.0;
+
   if(last_colon_position == 0) {
     name = "BNode" + std::to_string(ID);
     ID++;
   } else {
     std::string name_or_bootstrap = info_string.substr(0, last_colon_position);
-    if(std::atof(name_or_bootstrap.c_str()) != 0.0) {
+    if(is_number(name_or_bootstrap)) {
       bootstrap = std::atof(name_or_bootstrap.c_str());
       name = "BNode" + std::to_string(ID);
       ID++;
@@ -111,7 +125,7 @@ IO::RawTreeNode* IO::parseRawTreeNode(std::string node_string, RawTreeNode* up) 
   std::pair<std::string, std::string> node_pair = separate_node_info(node_string);
   node_info info = parse_node_info(node_pair.second);
   std::queue<std::string> child_nodes = separate_node_string(node_pair.first);
-
+ 
   IO::RawTreeNode* t = new RawTreeNode;
   IO::RawTreeNode* left;
   IO::RawTreeNode* right;
@@ -133,7 +147,6 @@ IO::RawTreeNode* IO::parseRawTreeNode(std::string node_string, RawTreeNode* up) 
     right = children.second;
     break;
   }
-
   *t = {info.name, info.distance * env.get<double>("TREE.scale_factor"), up, left, right};
   return(t);
 }
@@ -149,7 +162,9 @@ IO::RawTreeNode* IO::parseTree(std::string tree_string) {
     t->distance = 0.0;
   };
 
-  IO::printRawTree(t);
+  // Connect Root Down node.
+
+  //IO::printRawTree(t);
   return(t);
 }
 
@@ -166,6 +181,22 @@ std::list<std::string> IO::getRawTreeNodeNames(const IO::RawTreeNode* node) {
   }
   return(node_names);
 }
+
+std::list<std::string> IO::getRawTreeNodeTipNames(const IO::RawTreeNode* node) {
+  std::list<std::string> node_names;
+  if(node->left == nullptr and node->right == nullptr) {
+    node_names.push_back(node->name);
+  }
+  if(node->left != 0) {
+    node_names.splice(node_names.begin(), getRawTreeNodeTipNames(node->left));
+  }
+  if(node->right != 0) {
+    node_names.splice(node_names.begin(), getRawTreeNodeTipNames(node->right));
+  }
+  return(node_names);
+}
+
+
 
 void IO::printRawTree(const RawTreeNode* node) {
   std::cout << "Node: " << node->name << " " << node->distance << std::endl;

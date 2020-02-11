@@ -51,7 +51,7 @@ SampleableValue* SubstitutionModel::retreive_component(int id) {
   return(realized_params[id]);
 }
 
-RateVector* SubstitutionModel::create_rate_vector(States states, IO::raw_rate_vector rv, Valuable* u) {
+RateVector* SubstitutionModel::create_rate_vector(IO::raw_rate_vector rv, Valuable* u) {
   std::vector<Valuable*> rates(states.n, nullptr);
   int s = states.state_to_int[rv.uc.state];
   VirtualSubstitutionRate* vir_rate = new VirtualSubstitutionRate("tmp_name_virtual_substitution.", u); 
@@ -78,7 +78,7 @@ RateVector* SubstitutionModel::create_rate_vector(States states, IO::raw_rate_ve
     exit(EXIT_FAILURE);
   }
 
-  RateVector* new_rv = new RateVector(rv.name, states.state_to_int[rv.uc.state], rates);
+  RateVector* new_rv = new RateVector(rv.name, rv.uc.state, &states, rates);
   return(new_rv);
 }
 
@@ -92,7 +92,7 @@ void SubstitutionModel::from_raw_model(IO::raw_substitution_model* raw_sm) {
 
   // Read in rate vectors.
   for(auto raw_rv = raw_sm->rv_list.begin(); raw_rv != raw_sm->rv_list.end(); ++raw_rv) {
-    RateVector* rv = create_rate_vector(states, *raw_rv, u);
+    RateVector* rv = create_rate_vector(*raw_rv, u);
     rateVectors.add(rv, (*raw_rv).uc);
   }
 
@@ -178,9 +178,14 @@ inline bool SubstitutionModel::iterator::step_to_next_component() {
     return(true);
   } else {
     // Add dependancies for new Abstract component at head of the queue.
-    for(auto it = cq.front()->get_dependancies().begin(); it != cq.front()->get_dependancies().end(); ++it) {
-      cq.push(*it);
+    for(auto it = cq.front()->get_dependents().begin(); it != cq.front()->get_dependents().end(); ++it) {
+      if(previous.find(*it) != previous.end()) {
+	//std::cout << "Adding dep: " << (*it)->get_name() << std::endl;
+	previous.insert(*it);
+	cq.push(*it);
+      }
     }
+
     Valuable* v = dynamic_cast<Valuable*>(cq.front());
     if(v != nullptr) {
       location = v->host_vectors.begin();
@@ -194,14 +199,21 @@ SubstitutionModel::iterator::iterator(SubstitutionModel& s, bool e, AbstractComp
   cq = {};
   cq.push(modified_component);
 
+  previous = {};
+  previous.insert(modified_component);
+
   // This if statement is for cases when there are no parameters to be fitted.
   // Essentially a redundant if statement in vast majority of cases.
   if(cq.front() == nullptr) {
     endQ = true;
   } else {
     // Add dependancies to queue.
-    for(auto it = cq.front()->get_dependancies().begin(); it != cq.front()->get_dependancies().end(); ++it) {
-      cq.push(*it);
+    for(auto it = cq.front()->get_dependents().begin(); it != cq.front()->get_dependents().end(); ++it) {
+      if(previous.find(*it) == previous.end()) {
+	//std::cout << "Adding dep: " << (*it)->get_name() << std::endl;
+	previous.insert(*it);
+	cq.push(*it);
+      }
     }
 
     Valuable* v = dynamic_cast<Valuable*>(cq.front());
@@ -213,7 +225,7 @@ SubstitutionModel::iterator::iterator(SubstitutionModel& s, bool e, AbstractComp
     while(location == location_iter_end) {
       endQ = step_to_next_component();
       if(endQ) {
-      return;
+	return;
       }
     }
   }

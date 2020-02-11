@@ -15,18 +15,14 @@ extern double Random();
 extern Environment env;
 extern IO::Files files;
 
-ofstream MCMC::time_out;
-
 /// Public Functions ///
 
 MCMC::MCMC() {
-	/*
-	 * Default constructor.
-	 */
-	model = 0;
-	gen = 0;
-	gens = 0;
-	lnL = 0;
+  model = 0;
+  gen = 0;
+  gens = 0;
+  lnL = 0;
+  complete_likelihood_update = 0;
 } 
 
 void MCMC::Initialize(Model* model) {
@@ -38,9 +34,10 @@ void MCMC::Initialize(Model* model) {
   this->model = model; // associate the pointer with the MCMC
 
   // Env settings.
+  gens = env.get<int>("MCMC.generations");
   out_freq = env.get<int>("MCMC.output_frequency");
   print_freq = env.get<int>("MCMC.print_frequency");
-  gens = env.get<int>("MCMC.generations");
+  complete_likelihood_update = env.get<int>("MCMC.full_update_freq");
 
   //Calculate initial likelihood.
   lnL = model->CalculateLikelihood();
@@ -59,12 +56,21 @@ void MCMC::Initialize(Model* model) {
 void MCMC::sample() {
   sample_status s = model->sample();
 
-  if(s.full_recalculation) {
+  static int gens_since_complete = complete_likelihood_update;
+
+  if(s.full_recalculation or gens_since_complete % complete_likelihood_update == 0) {
     newLnL = model->CalculateLikelihood();
+    gens_since_complete = 1;
+    //std::cout << "Inter Likelihood: " << newLnL << " ";
   } else {
     // TODO check partial update.
-    //newLnL = model->updateLikelihood();
-    newLnL = model->CalculateLikelihood();
+
+    double delta_LogL = model->CalculateChangeInLikelihood();
+    newLnL = lnL + delta_LogL;
+    //double test_LogL = model->CalculateLikelihood();
+    gens_since_complete++;
+
+    //std::cout << "Inter Likelihood: " << newLnL << " - " << test_LogL << " ";
   }
 
   if(s.testp) {
@@ -72,8 +78,10 @@ void MCMC::sample() {
     if (log(Random()) <= (newLnL - lnL)) {
       lnL = newLnL;
       model->accept();
+      //std::cout << "Accept" << std::endl;
     } else {
       model->reject();
+      //std::cout << "Reject" << std::endl;
     }
   } else {
     // No Metropolis Hastings needed - Gibbs sampling.

@@ -30,7 +30,7 @@ void SubstitutionCounts::print() {
     for(auto jt = it->second.begin(); jt != it->second.end(); ++jt) {
       std::cout << *jt << "\t";
     }
-    std::cout << "] - " << it->first->name << std::endl;
+    std::cout << "] - " << it->first->get_name() << std::endl;
   }
 
   // By Branch length.
@@ -40,17 +40,43 @@ void SubstitutionCounts::print() {
   }
 }
 
-CountsParameter::CountsParameter(SubstitutionCounts* counts) : AbstractComponent("SubstitutionCounts."), counts(counts) {
-}
+// CountsParameter
 
-void CountsParameter::link_to_tree(TreeParameter* tp) {
+std::ofstream CountsParameter::out_file;
+
+CountsParameter::CountsParameter(SubstitutionCounts* counts, TreeParameter* tp) : AbstractComponent("SubstitutionCounts."), counts(counts) {
+
   this->tree = tp->get_tree_ptr();
   this->add_dependancy(tp);
+
+  files.add_file("substitution_counts", env.get<std::string>("OUTPUT.counts_out_file"), IOtype::OUTPUT);
+  out_file = files.get_ofstream("substitution_counts");
+
+  // Print csv header to outfile.
+  out_file << "RateVector,State";
+  RateVector* rv = tree->get_SM()->get_RateVectors().front();
+  for(int i = 0; i < rv->size(); i++) {
+    out_file << "," << rv->get_state_by_pos(i);
+  }
+  out_file << std::endl;
 }
 
 void CountsParameter::refresh() {
-  *counts = SubstitutionCounts(tree->SM->get_RateVectors(), tree->get_branch_lengths());
-  tree->update_counts(*counts);
+  *counts = SubstitutionCounts(tree->get_SM()->get_RateVectors(), tree->get_branch_lengths());
+
+  const std::list<BranchSegment*> branchList = tree->get_branches();
+  for(auto it = branchList.begin(); it != branchList.end(); ++it) {
+    BranchSegment* b = *it;
+    for(auto sub = b->get_substitutions().begin(); sub != b->get_substitutions().end(); ++sub) {
+      if(sub->occuredp == true) {
+	// Adds both virtual substitutions and normal substitutions.
+	counts->subs_by_branch[b->distance].num1subs += 1;
+	counts->subs_by_rateVector[sub->rate_vector][sub->dec_state] += 1;
+      } else {
+	counts->subs_by_branch[b->distance].num0subs += 1;
+      }
+    }
+  }
 }
 
 void CountsParameter::print() {
@@ -58,5 +84,12 @@ void CountsParameter::print() {
 }
 
 double CountsParameter::record_state(int gen, double l) {
+  for(auto it = counts->subs_by_rateVector.begin(); it != counts->subs_by_rateVector.end(); ++it) {
+    out_file << it->first->get_name() << "," << it->first->get_state();
+    for(auto jt = it->second.begin(); jt != it->second.end(); ++jt) {
+      out_file << "," << *jt;
+    }
+    out_file << std::endl;
+  }
   return(0.0);
 }

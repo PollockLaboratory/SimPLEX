@@ -24,11 +24,11 @@ class TreeParameter;
 
 class CountsParameter : public AbstractComponent {
 private:
+  static std::ofstream out_file;
   SubstitutionCounts* counts;
   Tree* tree;
 public:
-  CountsParameter(SubstitutionCounts*);
-  void link_to_tree(TreeParameter*);
+  CountsParameter(SubstitutionCounts*, TreeParameter*);
   virtual void refresh();
   virtual void print();
   virtual double record_state(int gen, double l);
