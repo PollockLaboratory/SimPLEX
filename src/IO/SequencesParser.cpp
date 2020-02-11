@@ -1,5 +1,6 @@
 #include "SequencesParser.h"
 #include <iostream>
+#include <algorithm>
 
 extern IO::Files files;
 
@@ -84,4 +85,18 @@ namespace IO {
     }
     return(names);
   }
+
+  void convertToGaps(RawMSA& msa, std::list<std::string> remove_list) {
+    for(auto it = msa.seqs.begin(); it != msa.seqs.end(); ++it) {
+      std::string *seq = &it->second;
+      for(auto jt = seq->begin(); jt != seq->end(); ++jt) {
+	if(std::find(remove_list.begin(), remove_list.end(), std::string(1, *jt)) != remove_list.end()) {
+	  *jt = '-';
+	}
+      }
+    }
+  }
 }
+
+// Utils
+

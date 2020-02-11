@@ -2,25 +2,25 @@
 
 # A basic install script for simPLEX.
 
-echo "$(tput setaf 4)Installing simPLEX.$(tput setaf 0)"
+echo "Installing simPLEX."
 
 if test -f /usr/bin/simPLEX; then
-    echo "$(tput setaf 4)Removing old version of simPLEX from /usr/bin$(tput setaf 0)"
+    echo "Removing old version of simPLEX from /usr/bin"
     rm -v /usr/bin/simPLEX
 fi
 
-echo "$(tput setaf 4)Creating build directory.$(tput setaf 0)"
+echo "Creating build directory."
 mkdir -vp build/
 cd build/
 
-echo "$(tput setaf 4)Making build scripts.$(tput setaf 0)"
+echo "Making build scripts."
 cmake .. -DCMAKE_BUILD_TYPE=RELEASE
 
-echo -e "$(tput setaf 4)Compiling simPLEX.$(tput setaf 0)"
+echo -e "Compiling simPLEX."
 make 
 
 if test -f ./bin/simPLEX; then
-    echo -e "$(tput setaf 4)Successful compile, copying binary to /usr/bin.$(tput setaf 0)"
+    echo -e "Successful compile, copying binary to /usr/bin."
     cp -v ./bin/simPLEX /usr/bin/simPLEX
 fi
 

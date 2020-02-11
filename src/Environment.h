@@ -25,12 +25,17 @@ public:
   int num_states;		    // number of states, not including gap.
   std::map<std::string, int> state_to_integer;
 
+  // Logger.
+  std::ofstream log_stream;
+  void log(std::string message);
+
   template<typename T>
   T get(std::string);
 
   template<typename T>
   std::vector<T> get_array(std::string);
-private:
+
+  private:
   void InitializeRandomNumberGeneratorSeed();
   void ReadTOMLfile(std::string);
   std::shared_ptr<cpptoml::table> config;

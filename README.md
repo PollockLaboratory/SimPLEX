@@ -92,10 +92,15 @@ This is where most of the configuration is done. The model is constructed as a s
   * to_str
   
 ## Parameters
-* **Continuous Float**
-* **Category Float**
+A new parameter is created through the call *Parmeter.new(String name, String type, lua_table options)*. For example:
+
+	$ Paramters.new("example_name", "float", {init = 0.01})
+	
+* **Continuous Float** Specified by type = "float". Current options are *init* (initial value) a float.
+* **Category Float** Specified by type = "Category". Current options are *values* (lua_table of floats).
 * **Fixed Float**
-* **Rate Vector**
+* **Virtual Substitution Rate** Any parameter in the virtual substitution rate postion in the rate vector will be implicitally converted to a VirtualSubstitutionRate parameter.
+* **Rate Vector** 
 
 # Implimentation details of simPLEX
 

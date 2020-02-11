@@ -16,6 +16,9 @@ namespace IO {
   RawMSA* readRawMSA(std::ifstream &sequences_stream);
   void printRawMSA(const RawMSA& msa);
   std::list<std::string> getRawMSANames(const RawMSA& msa);
+
+  // Utils
+  void convertToGaps(RawMSA& msa, std::list<std::string> remove_list);
 }
 
 #endif

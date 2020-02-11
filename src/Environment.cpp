@@ -1,8 +1,10 @@
 #include "Environment.h"
 
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <stdlib.h>
+#include <time.h>
 
 #include <sys/stat.h> // For making directories in Linux and OS X
 #include <sys/times.h> // For time()
@@ -23,6 +25,7 @@ void Environment::ReadOptions(int argc, char* argv[]) {
     exit(EXIT_FAILURE);
   }
 
+  std::cout << "Reading options file from: " << argv[1] << std::endl;
   ReadTOMLfile(argv[1]);
 
   debug = get<bool>("debug");
@@ -53,5 +56,17 @@ void Environment::InitializeRandomNumberGeneratorSeed() {
 
 // Print options.
 void Environment::PrintOptions() {
-  std::cout << std::endl << "Options:" << std::endl << *config << std::endl;
+  std::cout << "Received options:" << std::endl << *config << std::endl;
+}
+
+// Logger
+void Environment::log(std::string message) {
+  time_t raw_time;
+  time(&raw_time);
+  struct tm * timeinfo;
+  timeinfo = localtime(&raw_time);
+  char buffer[80];
+  strftime(buffer, 80, "%D %T", timeinfo);
+
+  log_stream << "[ " << buffer << " ] " << message << std::endl;
 }

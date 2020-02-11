@@ -1,7 +1,8 @@
 #ifndef SubstitutionCounts_h_
 #define SubstitutionCounts_h_
 
-#include "SubstitutionModels/Components/RateVector.h"
+#include "ModelParts/SubstitutionModels/RateVector.h"
+#include "ModelParts/AbstractComponent.h"
 
 struct raw_counts {
   int num0subs = 0;
@@ -16,6 +17,21 @@ class SubstitutionCounts {
   std::map<RateVector*, std::vector<int>> subs_by_rateVector;
   std::map<float, raw_counts> subs_by_branch;
   void print();
+};
+
+class Tree;
+class TreeParameter;
+
+class CountsParameter : public AbstractComponent {
+private:
+  static std::ofstream out_file;
+  SubstitutionCounts* counts;
+  Tree* tree;
+public:
+  CountsParameter(SubstitutionCounts*, TreeParameter*);
+  virtual void refresh();
+  virtual void print();
+  virtual double record_state(int gen, double l);
 };
 
 #endif

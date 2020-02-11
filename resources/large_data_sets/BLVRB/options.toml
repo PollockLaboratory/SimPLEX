@@ -1,0 +1,46 @@
+debug = true
+seed = 0
+
+# Tree Settings
+[TREE]
+  max_segment_length = 0.08
+  branch_split_algorithm = 1
+  scale_factor = 4.0
+  resolve_multifurcation = true
+
+# Uniformization Constant
+[UNIFORMIZATION]
+  dynamic = false
+  sample_frequency = 2000
+  refresh_tree_on_update = true
+  initial_value = 0.5
+  threshold = 0.01
+  max_step = 0.005
+
+[DATA]
+  # This should be TRUE or FALSE
+  ancestral_sequences = false
+  substitution_model_file = "model.lua"
+
+  sequences_file = "Species_alignment_BLVRB.fasta"
+  tree_file = "BLVRB_subtree_MLbranches.nh"
+  #tree_file = "A0A060D0R0.newick"
+[OUTPUT]
+  output_directory = "/output"
+  tree_out_file = "tree_out.newick"
+  sequences_out_file = "sequences_out.fasta"
+  parameters_out_file = "parameters_out.csv"
+  rate_vectors_out_file = "rate_vectors_out.csv"
+  likelihood_out_file = "likelihoods_out.csv"
+  substitutions_out_file = "substitutions.out"
+  log_out_file = "run.log"
+
+[MCMC]
+  generations = 1000001
+  tree_sample_frequency = 5000
+  output_frequency = 2500
+  print_frequency = 5000
+
+[MODEL]
+  states = ["A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"]
+  parameter_type = "continuous"

@@ -15,77 +15,79 @@ extern double Random();
 extern Environment env;
 extern IO::Files files;
 
-ofstream MCMC::time_out;
-
 /// Public Functions ///
 
 MCMC::MCMC() {
-	/*
-	 * Default constructor.
-	 */
-	model = 0;
-	gen = 0;
-	gens = 0;
-	lnL = 0;
+  model = 0;
+  gen = 0;
+  gens = 0;
+  lnL = 0;
+  complete_likelihood_update = 0;
 } 
 
-void MCMC::initialize(Model* model) {
+void MCMC::Initialize(Model* model) {
   /*
    * Init MCMC with model, gens calculate lnL.
    */
 
-  std::cout << "Initializing MCMC." << std::endl;
+  std::cout << "\nInitializing MCMC." << std::endl;
   this->model = model; // associate the pointer with the MCMC
 
   // Env settings.
+  gens = env.get<int>("MCMC.generations");
   out_freq = env.get<int>("MCMC.output_frequency");
   print_freq = env.get<int>("MCMC.print_frequency");
-  gens = env.get<int>("MCMC.generations");
-  tree_sample_freq = env.get<int>("MCMC.tree_sample_frequency");
+  complete_likelihood_update = env.get<int>("MCMC.full_update_freq");
 
   //Calculate initial likelihood.
   lnL = model->CalculateLikelihood();
-
-  RecordState();
 
   //Initialize output file.
   files.add_file("likelihoods", env.get<std::string>("OUTPUT.likelihood_out_file"), IOtype::OUTPUT);
   lnlout = files.get_ofstream("likelihoods");
   lnlout << "I,GEN,LogL" << std::endl;
 
-  files.add_file("time", env.get<std::string>("OUTPUT.time_out_file"), IOtype::OUTPUT);
-  time_out = files.get_ofstream("time");
+  RecordState();
 
   model->printParameters();
+  std::cout << "Model and data successfully loaded - MCMC ready." << std::endl << std::endl;
 }
 
 void MCMC::sample() {
-  static int i = 1;
-  bool sampleType;
+  sample_status s = model->sample();
 
-  if(i % tree_sample_freq == 0) {
-    sampleType = model->SampleTree(); // All tree sampling right now is Gibbs.
-    lnL = model->CalculateLikelihood();
-    i = 0;
+  static int gens_since_complete = complete_likelihood_update;
+
+  if(s.full_recalculation or gens_since_complete % complete_likelihood_update == 0) {
+    newLnL = model->CalculateLikelihood();
+    gens_since_complete = 1;
+    //std::cout << "Inter Likelihood: " << newLnL << " ";
   } else {
+    // TODO check partial update.
 
-    sampleType = model->SampleSubstitutionModel();
-    newLnL = model->updateLikelihood();
-    if(sampleType) {
-      //Metropolis-Hasting method.
-      if (log(Random()) <= (newLnL - lnL)) {
-	lnL = newLnL;
-	model->accept();
-      } else {
-	model->reject();
-      }
-    } else {
-      // No Metropolis Hastings needed - Gibbs sampling.
+    double delta_LogL = model->CalculateChangeInLikelihood();
+    newLnL = lnL + delta_LogL;
+    //double test_LogL = model->CalculateLikelihood();
+    gens_since_complete++;
+
+    //std::cout << "Inter Likelihood: " << newLnL << " - " << test_LogL << " ";
+  }
+
+  if(s.testp) {
+    //Metropolis-Hasting method.
+    if (log(Random()) <= (newLnL - lnL)) {
       lnL = newLnL;
       model->accept();
+      //std::cout << "Accept" << std::endl;
+    } else {
+      model->reject();
+      //std::cout << "Reject" << std::endl;
     }
+  } else {
+    // No Metropolis Hastings needed - Gibbs sampling.
+    lnL = newLnL;
+    model->accept();
   }
-  i++;
 }
 
 void MCMC::Run() {
@@ -111,17 +113,12 @@ void MCMC::Run() {
       RecordState();
     }
   }
-
-  time_out << "SAMPLING TIME DATA" << std::endl;
-  // time_out << "Tree Sampling: Total time: " << total_time_tree_samples << " us. Average time per sample: " << total_time_tree_samples/n_tree_samples << " us." << std::endl;
-  // time_out << "Parameter Sampling: Total time: " << total_time_parameter_samples << " us. Average time per sample: " << total_time_parameter_samples/n_parameter_samples << " us." << std::endl;
-  // float r = ((float)total_time_tree_samples)/(total_time_tree_samples + total_time_parameter_samples);time_out << r*100.0 << "\% of time spent sampling tree parameters." << std::endl;
+  std::cout << "MCMC complete." << std::endl << std::endl;
 }
 
-///  Private Functions  ///
-void MCMC::RecordState() {  // ought to use a function to return tab separated items with endl
+void MCMC::RecordState() {
   static int i = -1;
   i++;
   lnlout << i << "," << gen << "," << lnL << std::endl;
-  model->RecordState(gen, lnL); // is this always getting lnlout?
+  model->RecordState(gen, lnL);
 }

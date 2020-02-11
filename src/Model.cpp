@@ -4,7 +4,7 @@
 #include <chrono>
 
 #include "Model.h"
-#include "SubstitutionModels/SubstitutionModel.h"
+#include "ModelParts/SubstitutionModels/SubstitutionModel.h"
 
 #include "Environment.h"
 #include "IO/Files.h"
@@ -21,59 +21,89 @@ Model::Model() {
   /*
    * The default contructor.
    */
-  tree = NULL;
   ready = true;
 }
 
+Valuable* Model::create_uniformization_constant() {
+  Valuable* val =  nullptr;
+  if(env.get<bool>("UNIFORMIZATION.dynamic")) {
+    UniformizationConstant* u = new UniformizationConstant(env.get<double>("UNIFORMIZATION.initial_value"));
+    //u->set_initial();
+    components.add_parameter(u, env.get<int>("UNIFORMIZATION.sample_frequency"));
+    val = u; 
+  } else {
+    FixedFloat* f = new FixedFloat("U", env.get<double>("UNIFORMIZATION.initial_value"));
+    components.add_parameter(f);
+    val = f;
+  }
+  return(val);
+}
+
 void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw_substitution_model* &raw_sm) {
-  substitution_model = new SubstitutionModel();
+
+  std::cout << "Initializing model:" << std::endl;
+
+  Valuable* u = create_uniformization_constant();
+
+  // Substitution model.
+  std::cout << "\tConstructing Substitution model." << std::endl;
+  substitution_model = new SubstitutionModel(u);
   substitution_model->from_raw_model(raw_sm);
 
-  const States* states = substitution_model->get_states();
+  // Add all substitution parameters to component set.
+  std::list<AbstractComponent*> sm_parameters = substitution_model->get_all_parameters();
+  for(auto it = sm_parameters.begin(); it != sm_parameters.end(); ++it) {
+    components.add_parameter(*it);
+  }
 
-  SequenceAlignment* MSA = new SequenceAlignment(states);
-  MSA->Initialize(raw_msa);
+  // Tree.
+  std::cout << "\tConstructing tree." << std::endl;
+  TreeParameter* tp = new TreeParameter();
+  tp->Initialize(raw_tree, raw_msa, substitution_model);
 
-  tree = new Tree();
-  tree->Initialize(raw_tree, MSA, substitution_model);
+  std::cout << "\tAdding Uniformization constant." << std::endl;
+  UniformizationConstant* u_param = dynamic_cast<UniformizationConstant*>(u);
+  if(u_param and env.get<bool>("UNIFORMIZATION.refresh_tree_on_update")) {
+      tp->add_dependancy(u_param);
+  }
 
-  counts = SubstitutionCounts(substitution_model->get_RateVectors(), tree->get_branch_lengths());
-  tree->update_counts(counts);
+  components.add_parameter(tp, env.get<int>("MCMC.tree_sample_frequency"));
+
+  
+  std::cout << "\tPreparing substitution counts." << std::endl;
+  CountsParameter* cp = new CountsParameter(&counts, tp);
+  components.add_parameter(cp);
+
+  components.Initialize();
+
+  std::cout << "\tSetting initial parameter states." << std::endl;
+  // Set initial tree state.
+  tp->sample();
+  components.refresh_all_dependencies();
+
   counts.print();
+  std::cout << "Model succesfully constructed." << std::endl;
 }
 
 // Sampling
-bool Model::SampleTree() {
+sample_status Model::sample() {
   if(ready) {
-    bool t = tree->sample();
-    counts = SubstitutionCounts(substitution_model->get_RateVectors(), tree->get_branch_lengths()); // Empty list of counts
-    tree->update_counts(counts);
-
-    return(t);
-  } else {
-    std::cout << "Error: Attempt to sample tree before accepting previous changes." << std::endl;
-    exit(EXIT_FAILURE);
-  }
-}
-
-bool Model::SampleSubstitutionModel() {
-  if(ready) {
-    return(substitution_model->SampleParameters());
+    return(components.sample());
     ready = false;
   } else {
-    std::cout << "Error: Attempt to sample parameter before accepting previous changes." << std::endl;
+    std::cerr << "Error: Attempt to sample next parameter before accepting previous changes." << std::endl;
     exit(EXIT_FAILURE);
   }
 }
 
 void Model::accept() {
-  substitution_model->accept();
+  components.accept();
   ready = true;
 }
 
 void Model::reject() {
-  substitution_model->reject();
-  logL -= delta_logL;
+  components.reject();
+  //logL = previous_logL;
   ready = true;
 }
 
@@ -82,10 +112,10 @@ double Model::CalculateLikelihood() {
   /*
    * Calculates the likelihood of the current tree and substitution model.
    */
+  
+  double logL_waiting = 0.0;
+  double logL_subs = 0.0;
 
-  logL_waiting = 0.0;
-  logL_subs = 0.0;
-  logL = 0.0;
   float t;
   int num0subs;
   int num1subs;
@@ -106,29 +136,31 @@ double Model::CalculateLikelihood() {
       logL_subs += C_xy[i] * log((*rv)[i]);
     }
   }
-
-  logL = logL_waiting + logL_subs;
-
-  return(logL);
+  
+  return(logL_waiting + logL_subs);
 }
 
-double Model::updateLikelihood(){
+double Model::CalculateChangeInLikelihood(){
   /*
    * Rather recalculating the full likelihood, will modify logLikelihood only by what has changed. 
    */
-  delta_logL = 0.0;
+
+  double delta_logL = 0.0;
  
   RateVector* rv;
   int C_xy;
 
-  for(auto it = substitution_model->changed_vectors_begin(); it.at_end() == false; ++it) {
+  for(auto it = substitution_model->modified_begin(components.get_current_parameter());
+      it.at_end() == false; ++it) {
     rv = (*it).rv;
     C_xy = counts.subs_by_rateVector[rv][(*it).pos];
-    delta_logL += C_xy * log(rv->get_rate_ratio((*it).pos)); // Should be ratio;
+    delta_logL += C_xy * log(rv->get_rate_ratio((*it).pos));
+    //std::cout << "RV: " << rv->get_name() << " " << (*it).pos << " " << C_xy << " " << log(rv->get_rate_ratio((*it).pos)) << " " << delta_logL << std::endl;
   }
 
-  logL += delta_logL;
-  return(logL);
+  //logL += delta_logL;
+  //std::cout << "Delta: " << delta_logL << std::endl;
+  return(delta_logL);
 }
 
 // Printing/Recording
@@ -136,26 +168,14 @@ void Model::RecordState(int gen, double l) {
 	/*
 	 * Records the state of both the tree and the substitution model.
 	 */
-	tree->record_state(gen, l);
+	components.saveToFile(gen, l);
 	substitution_model->saveToFile(gen, l);
 }
 
 void Model::print() {
-
 }
 
 void Model::printParameters() {
-  substitution_model->printParameters();
-  //tree->printCounts();
+  components.print();
+  //substitution_model->printParameters();
 }
-
-// Tidying up
-void Model::Terminate() {
-	/*
-	 * Just terminates substitution_model.
-	 */
-  // Save the tree data.
-  tree->record_tree();
-  substitution_model->Terminate();
-}
-
