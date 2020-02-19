@@ -4,6 +4,9 @@
 #include "IO/Files.h"
 #include "ModelParts/Trees/Tree.h"
 
+#include <sstream>
+#include <string>
+
 extern Environment env;
 extern IO::Files files;
 
@@ -42,23 +45,25 @@ void SubstitutionCounts::print() {
 
 // CountsParameter
 
-std::ofstream CountsParameter::out_file;
+//std::ofstream CountsParameter::out_file;
 
 CountsParameter::CountsParameter(SubstitutionCounts* counts, TreeParameter* tp) : AbstractComponent("SubstitutionCounts."), counts(counts) {
 
   this->tree = tp->get_tree_ptr();
   this->add_dependancy(tp);
 
-  files.add_file("substitution_counts", env.get<std::string>("OUTPUT.counts_out_file"), IOtype::OUTPUT);
-  out_file = files.get_ofstream("substitution_counts");
+  files.add_file("substitution_counts_out", env.get<std::string>("OUTPUT.counts_out_file"), IOtype::OUTPUT);
 
   // Print csv header to outfile.
-  out_file << "RateVector,State";
+  std::ostringstream buffer;
+  buffer << "RateVector,State";
   RateVector* rv = tree->get_SM()->get_RateVectors().front();
   for(int i = 0; i < rv->size(); i++) {
-    out_file << "," << rv->get_state_by_pos(i);
+    buffer << "," << rv->get_state_by_pos(i);
   }
-  out_file << std::endl;
+  buffer << std::endl;
+
+  files.write_to_file("substitution_counts_out", buffer.str());
 }
 
 void CountsParameter::refresh() {
@@ -84,12 +89,16 @@ void CountsParameter::print() {
 }
 
 double CountsParameter::record_state(int gen, double l) {
+  std::ostringstream buffer;
+
   for(auto it = counts->subs_by_rateVector.begin(); it != counts->subs_by_rateVector.end(); ++it) {
-    out_file << it->first->get_name() << "," << it->first->get_state();
+    buffer << it->first->get_name() << "," << it->first->get_state();
     for(auto jt = it->second.begin(); jt != it->second.end(); ++jt) {
-      out_file << "," << *jt;
+      buffer << "," << *jt;
     }
-    out_file << std::endl;
+    buffer << std::endl;
   }
+
+  files.write_to_file("substitution_counts_out", buffer.str());
   return(0.0);
 }

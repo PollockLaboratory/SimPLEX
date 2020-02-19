@@ -67,7 +67,6 @@ public:
   // Tree structure of Rate Vectors.
   // Organized via positions -> states -> possible RateVectors.
   std::vector<std::vector<std::list<RateVector*>>> rv_tree; 
-  static std::ofstream out_file;
 };
 
 #endif

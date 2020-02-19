@@ -15,8 +15,6 @@ extern IO::Files files;
 
 /*  The tree needs the names_to_sequence map. The substitution model might need the empirical frequencies. */
 
-// using namespace std;
-
 Model::Model() {
   /*
    * The default contructor.

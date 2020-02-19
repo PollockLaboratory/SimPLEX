@@ -183,7 +183,7 @@ namespace IO {
     rv_list.push_back(rv);
   }
 
-  void raw_substitution_model::read_from_file(std::ifstream& lua_sm_in) {
+  void raw_substitution_model::read_from_file(std::string file_name) {
     lua.open_libraries(sol::lib::base, sol::lib::table);
 
     //Main tables.
@@ -205,10 +205,7 @@ namespace IO {
     			      "new", [this](std::string name, sol::table info_tbl, sol::table param_tbl) -> raw_rate_vector { return(this->new_rate_vector(name, info_tbl, param_tbl)); });
 
     // Read the file.
-    std::stringstream buffer;
-    buffer << lua_sm_in.rdbuf();
-
-    lua.script(buffer.str());
+    lua.script(files.read_all(file_name));
 
     // Tidy the output.
     for(auto it = rv_list.begin(); it != rv_list.end(); it++) {
@@ -218,9 +215,9 @@ namespace IO {
     } 
   }
 
-  raw_substitution_model* read_substitution_model(std::ifstream& lua_sm_in) {
+  raw_substitution_model* read_substitution_model(std::string file_name) {
     raw_substitution_model* raw_model = new raw_substitution_model();
-    raw_model->read_from_file(lua_sm_in);
+    raw_model->read_from_file(file_name);
     return(raw_model);
   }
 

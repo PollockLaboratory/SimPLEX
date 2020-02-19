@@ -1,11 +1,11 @@
 #ifndef Sequence_h_
 #define Sequence_h_
 
-#include<string>
-#include<map>
-#include<vector>
-#include<list>
-#include<set>
+#include <string>
+#include <map>
+#include <vector>
+#include <list>
+#include <set>
 
 #include "SubstitutionModels/SubstitutionModel.h"
 #include "../IO/SequencesParser.h"
@@ -55,8 +55,5 @@ class SequenceAlignment {
   void DetermineColumnsWithoutGaps();
   void RemoveColumnsWithGapsFromSequences();
   std::vector<int> RemoveGapsFromEncodedSequence(std::vector<int> encoded_sequence);
-
-  // Output.
-  static std::ofstream sequences_out;
 };
 #endif

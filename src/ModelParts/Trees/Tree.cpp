@@ -13,11 +13,6 @@ extern double Random();
 extern Environment env;
 extern IO::Files files;
 
-using namespace std;
-
-ofstream Tree::substitutions_out;
-ofstream Tree::tree_out;
-
 // Tree constructor.
 Tree::Tree() {   
 }
@@ -63,8 +58,12 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
   for(auto b = branchList.begin(); b != branchList.end(); ++b) {
   	(*b)->update();
   }
- 
-  initialize_output_streams();	
+
+  //Setup output.
+  files.add_file("tree_out", env.get<std::string>("OUTPUT.tree_out_file"), IOtype::OUTPUT);
+
+  files.add_file("substitutions_out", env.get<std::string>("OUTPUT.substitutions_out_file"), IOtype::OUTPUT);
+  files.write_to_file("substitutions_out", "I,GEN,LogL,Ancestral,Decendant,Substitutions\n");
 }
 
 // Creation of tree nodes.
@@ -283,45 +282,37 @@ sample_status Tree::step_through_MSAs(const std::list<int>& positions) {
 }
 
 // Record State data.
-void Tree::initialize_output_streams() {
-  files.add_file("tree", env.get<std::string>("OUTPUT.tree_out_file"), IOtype::OUTPUT);
-  tree_out = files.get_ofstream("tree");
-
-  files.add_file("substitutions", env.get<std::string>("OUTPUT.substitutions_out_file"), IOtype::OUTPUT);
-  substitutions_out = files.get_ofstream("substitutions");
-  substitutions_out << "I,GEN,LogL,Ancestral,Decendant,Substitutions" << endl;
-}
-
 void Tree::record_tree() {
   /*
    * Records the tree topology with all node names and branch segments.
    */
-  tree_out << root->toString();
+  files.write_to_file("tree_out", root->toString());
 }
 
 void Tree::record_substitutions(int gen, double l) {
   static int index = -1;
   index++;
+
+  std::ostringstream buffer;
   for(auto it = branchList.begin(); it != branchList.end(); ++it) {
-    substitutions_out << index << "," << gen << "," << l << ",";
-    substitutions_out << (*it)->ancestral->name << "," << (*it)->decendant->name << ",[ ";
+    buffer << index << "," << gen << "," << l << ",";
+    buffer << (*it)->ancestral->name << "," << (*it)->decendant->name << ",[ ";
     std::vector<Substitution> subs = (*it)->get_substitutions();
     for(unsigned int i = 0; i < subs.size(); i++) {
 	TreeNode* anc = (*it)->ancestral;
 	TreeNode* dec = (*it)->decendant;
 	if(subs[i].occuredp == true) {
-	  substitutions_out << (*it)->ancestral->state_at_pos(i) << i << (*it)->decendant->state_at_pos(i) << " ";
+	  buffer << (*it)->ancestral->state_at_pos(i) << i << (*it)->decendant->state_at_pos(i) << " ";
 	}
     }
-    substitutions_out << "]\n";
+    buffer << "]\n";
   }
+  files.write_to_file("substitutions_out", buffer.str());
 }
 
 void Tree::record_state(int gen, double l) {
   MSA->saveToFile(gen, l);
-  if(files.check_file("substitutions")) {
-      record_substitutions(gen, l);
-  }
+  record_substitutions(gen, l);
 }
 
 // Debug tools.

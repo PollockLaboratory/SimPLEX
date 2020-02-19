@@ -13,7 +13,7 @@ namespace IO {
     unsigned int cols = 0;
   };
 
-  RawMSA* readRawMSA(std::ifstream &sequences_stream);
+  RawMSA* readRawMSA(std::string file_name);
   void printRawMSA(const RawMSA& msa);
   std::list<std::string> getRawMSANames(const RawMSA& msa);
 

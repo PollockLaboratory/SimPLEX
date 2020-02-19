@@ -5,7 +5,6 @@
 #include <vector>
 #include <map>
 #include <string>
-#include <fstream>
 #include <set>
 
 #include "AbstractComponent.h"
@@ -39,9 +38,6 @@ private:
   // Dependancies.
   void refresh_dependancies(AbstractComponent*);
   void refresh_dependancies(AbstractComponent*, std::set<AbstractComponent*>);
-
-  // Output
-  static std::ofstream out_file;
 public:
   ComponentSet();
   void Initialize();

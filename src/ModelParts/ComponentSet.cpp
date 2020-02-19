@@ -3,10 +3,10 @@
 #include "../Environment.h"
 #include "../IO/Files.h"
 
+#include <sstream>
+
 extern Environment env;
 extern IO::Files files;
-
-std::ofstream ComponentSet::out_file;
 
 // Constructors.
 ComponentSet::ComponentSet() {
@@ -32,15 +32,16 @@ void ComponentSet::Initialize() {
   // Refreshes all dependancies.
   refresh_all_dependencies();
 
-  files.add_file("parameters", env.get<std::string>("OUTPUT.parameters_out_file"), IOtype::OUTPUT);
-  out_file = files.get_ofstream("parameters");
+  files.add_file("parameters_out", env.get<std::string>("OUTPUT.parameters_out_file"), IOtype::OUTPUT);
 
-  out_file << "I,GEN,LogL";
+  std::ostringstream buffer;
+  buffer << "I,GEN,LogL";
   for(auto it = all_parameters.begin(); it != all_parameters.end(); ++it) {
-    out_file << "," << (*it)->get_name();
+    buffer << "," << (*it)->get_name();
   }
+  buffer << std::endl;
 
-  out_file << std::endl;
+  files.write_to_file("parameters_out", buffer.str());
 }
 
 // Setting up.
@@ -190,17 +191,14 @@ void ComponentSet::saveToFile(int gen, double l) {
    * Saves the current parameter values to the output csv file, contained
    * in the out_file.
    */
-
-  // This is not super efficient.
   static int i = -1;
   ++i;
 
-  std::string line = std::to_string(i) + "," + std::to_string(gen) + ",";
-
+  std::string line = std::to_string(i) + "," + std::to_string(gen);
 
   for(auto param = all_parameters.begin(); param != all_parameters.end(); ++param) {
     line += "," + std::to_string((*param)->record_state(gen, l));
   }
 
-  out_file << line << std::endl;
+  files.write_to_file("parameters_out", line + "\n");
 }

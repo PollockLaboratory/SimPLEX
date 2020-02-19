@@ -64,7 +64,7 @@ namespace IO {
   public:
     std::string name;
     raw_substitution_model();
-    void read_from_file(std::ifstream&);
+    void read_from_file(std::string file_name);
     friend std::ostream& operator<<(std::ostream&, const IO::raw_substitution_model&);
     std::list<std::string> states;
     std::list<std::string> ignore_states;
@@ -80,7 +80,7 @@ namespace IO {
     void add_rate_vector(raw_rate_vector rv);
   };
 
-  raw_substitution_model* read_substitution_model(std::ifstream&);
+  raw_substitution_model* read_substitution_model(std::string file_name);
 }
 
 #endif

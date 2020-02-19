@@ -41,13 +41,6 @@ private:
 
   SubstitutionCounts counts;
   SubstitutionModel* substitution_model;
-
-  //double logL_waiting; // The likelihood of the waiting times.
-  //double logL_subs; // The likelihood of the waiting times.
-  //double logL;
-
-  //double previous_logL;
-  //double delta_logL;
 };
 
 #endif

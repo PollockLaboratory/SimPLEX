@@ -40,15 +40,16 @@ void addSequence(IO::RawMSA& msa, std::string name, std::string seq) {
 }
 
 namespace IO {
-  RawMSA* readRawMSA(std::ifstream &sequences_file) {
+  RawMSA* readRawMSA(std::string file_name) {
     RawMSA* raw_msa = new RawMSA();
     raw_msa->n = 0;
 
-    std::string line;
     std::string name = "";
     std::string seq = "";
-    while(sequences_file.good()) {
-      getline(sequences_file, line);
+    std::string line; // = files.get_next_line("sequences_in");
+
+    while(not files.end("sequences_in")) {
+      line = files.get_next_line("sequences_in");
       std::string clean_line = cleanLine(line);
 
       //Ignore empty lines or comments.

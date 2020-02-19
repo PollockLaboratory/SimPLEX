@@ -1,4 +1,4 @@
-#include <iostream>
+#include <sstream>
 #include <algorithm>
 
 #include "Sequence.h"
@@ -11,8 +11,6 @@ extern IO::Files files;
 
 std::vector<std::string> aa({"A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"});
 std::vector<std::string> nucleotides({"A", "T", "C", "G"});
-
-std::ofstream SequenceAlignment::sequences_out;
 
 // Sequence Alignment class.
 
@@ -65,8 +63,7 @@ void SequenceAlignment::Initialize(std::list<SequenceAlignment*>* msa_List) {
   MSA_list = msa_List;
 
   // Setup output.
-  files.add_file("sequences", env.get<std::string>("OUTPUT.sequences_out_file"), IOtype::OUTPUT);
-  sequences_out = files.get_ofstream("sequences");
+  files.add_file("sequences_out", env.get<std::string>("OUTPUT.sequences_out_file"), IOtype::OUTPUT);
 
   // Setup Environment.
   env.n = (*taxa_names_to_sequences.begin()).second.size();
@@ -81,8 +78,7 @@ void SequenceAlignment::Initialize(IO::RawMSA* &raw_msa) {
   RemoveColumnsWithGapsFromSequences();
 
   // Setup output.
-  files.add_file("sequences", env.get<std::string>("OUTPUT.sequences_out_file"), IOtype::OUTPUT);
-  sequences_out = files.get_ofstream("sequences");
+  files.add_file("sequences_out", env.get<std::string>("OUTPUT.sequences_out_file"), IOtype::OUTPUT);
 
   // Setup Environment.
   env.n = (*taxa_names_to_sequences.begin()).second.size();
@@ -91,10 +87,14 @@ void SequenceAlignment::Initialize(IO::RawMSA* &raw_msa) {
 void SequenceAlignment::saveToFile(int gen, double l) {
   static int i = -1;
   ++i;
-  sequences_out << "#" << i << ":" << gen << ":" << l << std::endl;
+
+  std::ostringstream buffer;
+  buffer << "#" << i << ":" << gen << ":" << l << std::endl;
   for(auto it = taxa_names_to_sequences.begin(); it != taxa_names_to_sequences.end(); ++it) {
-    sequences_out << ">" << it->first << "\n" << decodeSequence(it->second) << std::endl;
+    buffer << ">" << it->first << "\n" << decodeSequence(it->second) << std::endl;
   }
+
+  files.write_to_file("sequences_out", buffer.str());
 }
 
 // Reading Fasta files.

@@ -1,7 +1,6 @@
 #ifndef MCMC_h_
 #define MCMC_h_
 
-#include <fstream>
 #include "Environment.h"
 #include "Model.h"
 
@@ -19,7 +18,6 @@ private:
   int print_freq; // Frequency of printing likelihood to term.
   int complete_likelihood_update; // Number of generations before force full likelihood calculation.
 
-  static std::ofstream lnlout;
   void sample();
 
   void RecordState(); 

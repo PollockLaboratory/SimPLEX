@@ -1,8 +1,5 @@
 /*
- * Molecular Evolution Model Testing
- * This is for internal use only.
- *
- * Renamed from SimPLEX on 2014-2-13
+ * SimPLEX
  *
  * Author: Hamish Pike
  * hamish.pike@ucdenver.edu

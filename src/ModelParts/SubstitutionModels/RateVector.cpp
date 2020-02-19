@@ -4,6 +4,8 @@
 #include "../../Environment.h"
 #include "../../IO/Files.h"
 
+#include <sstream>
+
 extern Environment env;
 extern IO::Files files;
 
@@ -56,20 +58,21 @@ void RateVector::print() {
 }
 
 // COLLECTIONS of rate vectors.
-std::ofstream RateVectorSet::out_file;
-
 RateVectorSet::RateVectorSet() {
 }
 
 void RateVectorSet::Initialize() {
   // Output file.
-  files.add_file("rate_vectors", env.get<std::string>("OUTPUT.rate_vectors_out_file"), IOtype::OUTPUT);
-  out_file = files.get_ofstream("rate_vectors");	
-  out_file << "I,GEN,LogL,NAME,ANC";
+  files.add_file("rate_vectors_out", env.get<std::string>("OUTPUT.rate_vectors_out_file"), IOtype::OUTPUT);
+
+  std::ostringstream buffer;
+  buffer << "I,GEN,LogL,NAME,ANC";
   for(auto it = env.state_to_integer.begin(); it != env.state_to_integer.end(); ++it) {
-    out_file << "," << it->first;
+    buffer << "," << it->first;
   }
-  out_file << std::endl;
+  buffer << std::endl;
+
+  files.write_to_file("rate_vectors_out", buffer.str());
 }
 
 void RateVectorSet::add(RateVector* rv, IO::rv_use_class uc) {
@@ -137,11 +140,14 @@ void RateVectorSet::print() {
 void RateVectorSet::saveToFile(int gen, double l) {
   static int i = -1;
   ++i;
+
+  std::ostringstream buffer;
   for(auto it = col.begin(); it != col.end(); ++it) {
-    out_file << i << "," << gen << "," << l << "," << (*it)->get_name() << "," << (*it)->state;
+    buffer << i << "," << gen << "," << l << "," << (*it)->get_name() << "," << (*it)->state;
     for(auto jt = (*it)->rates.begin(); jt != (*it)->rates.end(); ++jt) {
-      out_file << "," << (*jt)->getValue();
+      buffer << "," << (*jt)->getValue();
     }
-    out_file << std::endl;
+    buffer << std::endl;
   }
+  files.write_to_file("rate_vectors_out", buffer.str());
 }

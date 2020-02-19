@@ -1,9 +1,6 @@
 #ifndef Data_h_
 #define Data_h_
 
-#include <iostream>
-#include <fstream>
-
 #include <string>
 #include <vector>
 #include <set> // for columns_with_gaps
@@ -17,13 +14,11 @@
 #include "IO/SubstitutionModelParser.h"
 #include "IO/SequencesParser.h"
 
-using namespace std;
-
 class Data {
  public:
   SubstitutionModel* sm;
   SequenceAlignment* MSA;
-  list<SequenceAlignment*> MSA_list;
+  std::list<SequenceAlignment*> MSA_list;
   IO::RawMSA* raw_msa;
   IO::RawTreeNode* raw_tree;
   IO::raw_substitution_model* raw_sm;
@@ -33,11 +28,11 @@ class Data {
 
   void Initialize();
  private:
-  set<int> columns_with_gaps;
-  vector<int> columns_without_gaps;
+  std::set<int> columns_with_gaps;
+  std::vector<int> columns_without_gaps;
 
   void validateInputData(const IO::RawMSA* raw_msa, const IO::RawTreeNode* raw_tree);
-  void matchNodeNames(list<string> names1, list<string> names2);
+  void matchNodeNames(std::list<std::string> names1, std::list<std::string> names2);
   
   IO::RawTreeNode* ReadTree();
   IO::RawMSA* ReadMSA();

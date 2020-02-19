@@ -8,7 +8,10 @@
 #include <iostream>
 #include <string.h>
 
+#include <sys/types.h>
 #include <sys/stat.h> // For making directories in Linux and OS X
+#include <unistd.h>
+#include <fcntl.h>
 #include <sys/times.h> // For time()
 #include <unistd.h> // For getcwd.
 
@@ -60,7 +63,7 @@ Path::Path(std::vector<std::string> r) {
   }
 }
 
-bool Path::null() {
+bool Path::null() const {
   return(nullp);
 }
 
@@ -122,6 +125,15 @@ IO::Files::Files() {
   total_files = 0;
 }
 
+fileInfo& IO::Files::get_info(std::string name) {
+  if(file_to_index.find(name) == file_to_index.end()) {
+    std::cerr << "Error: \'" << name << "\' is being requested, but has not been added to Files." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  int id = file_to_index[name];
+  return(file_values[id]);
+}
+
 std::string get_current_directory() {
   char cwd[512];
   std::string dir;
@@ -141,7 +153,7 @@ void configure_directory(Path dir_path) {
   }
   
   struct stat st;
-  if (stat(dir_path.as_str().c_str(), &st) == 0 && S_ISDIR(st.st_mode)) {
+  if(stat(dir_path.as_str().c_str(), &st) == 0 && S_ISDIR(st.st_mode)) {
     if (not env.debug) {
       std::cout << "output dir " << dir_path << " exists. Overwrite? (Y/n)" << std::endl;
       if (getchar() != 'Y') exit(1);
@@ -176,14 +188,6 @@ void IO::Files::initialize(char* argv[]) {
   configure_directory(absolute_outdir);
 }
 
-inline std::string IO::Files::path_to_file(int i) {
-  if(file_values[i].path.null() == true) {
-    std::cerr << "Error: trying to get path to NullPath." << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  return((reference_dir + file_values[i].path).as_str());
-}
-
 void IO::Files::add_file(std::string name, std::string path, IOtype t) {
   file_to_index[name] = total_files;
   Path fp(path);
@@ -195,23 +199,30 @@ void IO::Files::add_file(std::string name, std::string path, IOtype t) {
       exit(EXIT_FAILURE);
     }
 
-    //std::cout << "Input: " << name << " " << fp << std::endl;
-    file_values[total_files] = {fp, fp.get_name(), t};
-    // Check file exists.
-    std::string path = path_to_file(total_files);
-    std::ifstream file_stream(path);
-    check_stream(name, path, file_stream);
-    file_stream.close();
+    std::string full_path = (reference_dir + fp).as_str();
+
+    int fd = open(full_path.c_str(), O_RDONLY);
+    if(fd == -1) {
+      std::cerr << "Error: unable to open \'" << path << "\'." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    struct stat finfo;
+    fstat(fd, &finfo);
+    int size = finfo.st_size;
+
+    file_values[total_files] = {fp, fp.get_name(), t, fd, size};
     break;
   }
   case IOtype::OUTPUT : {
     //std::cout << "Output: " << name << " " << path << " " << relative_outdir << std::endl;
     if(path != "") {
-      file_values[total_files] = {relative_outdir + fp, fp.get_name(), t};
-      ofstream_map[total_files] = get_ofstream(name);
+      std::string full_path = (absolute_outdir + fp).as_str();
+      mode_t file_permissions = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH;
+      int fd = open(full_path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, file_permissions);
+      file_values[total_files] = {absolute_outdir + fp, fp.get_name(), t, fd, 0};
     } else {
       // If no path is given then do not save data.
-      file_values[total_files] = {Path(""), "", t};
+      file_values[total_files] = {Path(""), "", t, 0, 0};
     }
     break;
   }
@@ -219,39 +230,90 @@ void IO::Files::add_file(std::string name, std::string path, IOtype t) {
   total_files++;
 }
 
-std::ifstream IO::Files::get_ifstream(std::string name) {
-  int i = file_to_index[name];
+bool IO::Files::end(std::string name) {
+  fileInfo info = get_info(name);
 
-  if(file_values[i].t != IOtype::INPUT) {
-    std::cout << "Error: Attempting to read " << file_values[i].file_name << " that is not flagged as IOtype::INPUT." << std::endl;
+  if(lseek(info.fd, 0, SEEK_CUR) >= info.size) {
+    return(true);
+  } else {
+    return(false);
+  }
+}
+
+std::string IO::Files::get_next_line(std::string name) {
+  fileInfo info = get_info(name);
+
+  if(info.t != IOtype::INPUT) {
+    std::cerr << "Error: Attempting to read " << info.file_name << " that is not flagged as IOtype::INPUT." << std::endl;
     exit(EXIT_FAILURE);
   }
 
-  std::string path = path_to_file(i);
-  std::ifstream file_stream(path);
-  check_stream(name, path, file_stream);
+  std::string data = "";
+  ssize_t num_read;
 
-  return(file_stream);
+  int fd = info.fd;
+  int buf_size = 256;
+  char buf[buf_size];
+
+  while(true) {
+    int loc = lseek(fd, 0, SEEK_CUR);
+    num_read = read(fd, &buf, buf_size);
+
+    if(num_read == -1) {
+      std::cerr << "Error: cannot read \'" << info.file_name << "\'." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    for(int i = 0; i < buf_size; i++) {
+      if(loc + i >= info.size) {
+	return(data);
+      }
+
+      if(buf[i] == '\n') {
+	lseek(fd, i-num_read+1, SEEK_CUR);
+	return(data);
+      } else {
+	data.push_back(buf[i]);
+      }
+    }
+  }  
 }
 
-std::ofstream IO::Files::get_ofstream(std::string name) {
-  int i = file_to_index[name];
+std::string IO::Files::read_all(std::string name) {
+  fileInfo info = get_info(name);
+  lseek(info.fd, 0, SEEK_SET);
 
-  if(file_values[i].t != IOtype::OUTPUT) {
-    std::cout << "Error: Attempting to read " << file_values[i].file_name << " that is not flagged as IOtype::OUTPUT." << std::endl;
+  char* buf = new char [info.size];
+  ssize_t num_read = read(info.fd, buf, info.size);
+
+  if(num_read == -1) {
+    std::cerr << "Error: cannot read \'" << info.file_name << "\'." << std::endl;
     exit(EXIT_FAILURE);
   }
-  
-  std::ofstream file_stream(path_to_file(i));
-  return(file_stream);
+
+  std::string ret(buf, info.size);
+
+  delete[] buf;
+
+  return(ret);
 }
 
-// Not quite sure what these are really doing.
-bool IO::Files::check_file(std::string name) {
-  // Check if an output file is configured not null.
-  int i = file_to_index[name];
-  Path p = file_values[i].path;
-  return(not p.null());
+void IO::Files::write_to_file(std::string name, std::string data) {
+  fileInfo info = get_info(name);
+
+  if(info.file_name == "") {
+    return;
+  }
+
+  const char* cstr = data.c_str();
+  ssize_t num_write = write(info.fd, cstr, data.size());
+
+  if(num_write == -1) {
+    std::cerr << "Error: failed to write to \'" << info.file_name << "\'." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  // Increase size of file in fileInfo.
 }
 
 void IO::Files::print() {
@@ -295,16 +357,4 @@ void IO::Files::close() {
     }
   }
   print();
-}
-
-inline void IO::Files::check_stream(const std::string &name, const std::string &file_path, std::ifstream &s) {
-  if (not s.good()) {
-    std::cerr << "Error: Cannot read " << name << " file: \"" << file_path << "\"" << std::endl;
-    exit(EXIT_FAILURE);
-  }
-}
-
-std::string IO::Files::get_file_info(std::string name) {
-  int i = file_to_index[name];
-  return(file_values[i].file_name);
 }

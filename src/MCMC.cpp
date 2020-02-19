@@ -1,15 +1,8 @@
 #include "MCMC.h"
-#include <iostream>
-#include <fstream>
-#include <cmath>
-#include <limits>
-#include <chrono>
+#include <sstream>
 
 #include "Model.h"
 #include "IO/Files.h"
-
-
-std::ofstream MCMC::lnlout;
 
 extern double Random();
 extern Environment env;
@@ -44,8 +37,7 @@ void MCMC::Initialize(Model* model) {
 
   //Initialize output file.
   files.add_file("likelihoods", env.get<std::string>("OUTPUT.likelihood_out_file"), IOtype::OUTPUT);
-  lnlout = files.get_ofstream("likelihoods");
-  lnlout << "I,GEN,LogL" << std::endl;
+  files.write_to_file("likelihoods", "I,GEN,LogL\n");
 
   RecordState();
 
@@ -119,6 +111,10 @@ void MCMC::Run() {
 void MCMC::RecordState() {
   static int i = -1;
   i++;
-  lnlout << i << "," << gen << "," << lnL << std::endl;
+
+  std::ostringstream buffer;
+  buffer << i << "," << gen << "," << lnL << std::endl;
+  files.write_to_file("likelihoods", buffer.str());
+
   model->RecordState(gen, lnL);
 }

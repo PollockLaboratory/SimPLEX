@@ -46,10 +46,6 @@ private:
   void configureSequences(TreeNode* n);
 
   // Output.
-  static std::ofstream tree_out;
-  static std::ofstream substitutions_out;
-
-  void initialize_output_streams();
   void record_substitutions(int gen, double l);
 
   // Possible sampling methods.
