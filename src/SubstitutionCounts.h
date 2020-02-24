@@ -29,9 +29,10 @@ private:
   Tree* tree;
 public:
   CountsParameter(SubstitutionCounts*, TreeParameter*);
-  virtual void refresh();
-  virtual void print();
-  virtual double record_state(int gen, double l);
+  void refresh() override;
+  void print() override;
+  double record_state(int gen, double l) override;
+  std::string get_type() override;
 };
 
 #endif

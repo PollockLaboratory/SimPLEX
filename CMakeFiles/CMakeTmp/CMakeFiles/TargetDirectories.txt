@@ -1,3 +1,0 @@
-/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp/CMakeFiles/rebuild_cache.dir
-/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp/CMakeFiles/cmTC_9386e.dir
-/home/hamish/Documents/Code/simplex0_0/CMakeFiles/CMakeTmp/CMakeFiles/edit_cache.dir

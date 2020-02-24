@@ -3,6 +3,7 @@
 #include "../Environment.h"
 #include "../IO/Files.h"
 
+#include <iostream>
 #include <sstream>
 
 extern Environment env;
@@ -27,6 +28,11 @@ void ComponentSet::Initialize() {
     for(auto d = deps.begin(); d != deps.end(); ++d) {
       (*d)->add_dependent(*p);
     }
+  }
+
+  // Setup refresh list.
+  for(auto p = all_parameters.begin(); p != all_parameters.end(); ++p) {
+    (*p)->setup_refresh_list();
   }
 
   // Refreshes all dependancies.
@@ -73,19 +79,8 @@ SampleableComponent* ComponentSet::get_current_parameter() {
 }
 
 void ComponentSet::refresh_dependancies(AbstractComponent* v) {
-  v->refresh();
-  refresh_dependancies(v, {v});
-}
-
-void ComponentSet::refresh_dependancies(AbstractComponent* v, std::set<AbstractComponent*> previously_refreshed) {
-  //Assumes each component only has one depent. Assumes order of refreshing doesn't matter.
-  std::list<AbstractComponent*> deps = v->get_dependents();
-  for(auto d = deps.begin(); d != deps.end(); ++d) {
-    if(previously_refreshed.find(*d) == previously_refreshed.end()) {
-      (*d)->refresh();
-      previously_refreshed.insert(*d);
-      refresh_dependancies(*d, previously_refreshed);
-    }
+  for(auto c = v->get_refresh_list().begin(); c != v->get_refresh_list().end(); ++c) {
+    (*c)->refresh();
   }
 }
 
@@ -105,6 +100,7 @@ sample_status ComponentSet::sample() {
 
   SampleableComponent* param = get_current_parameter();
 
+  //std::cout << std::endl << "Start: " << param->get_name() << std::endl;
   sample_status s = param->sample();
 
   try {
@@ -115,6 +111,7 @@ sample_status ComponentSet::sample() {
     // A dependent parameter is out of bounds, undo the change
     // and try again.
     param->undo();
+
     refresh_dependancies(param);
 
     stepToNextParameter();
@@ -148,7 +145,6 @@ void ComponentSet::accept() {
 void ComponentSet::reject() {
   get_current_parameter()->undo();
   refresh_dependancies(get_current_parameter());
-  // (*current_parameter)->refresh_host_vectors();
   stepToNextParameter();
 }
 
@@ -194,7 +190,7 @@ void ComponentSet::saveToFile(int gen, double l) {
   static int i = -1;
   ++i;
 
-  std::string line = std::to_string(i) + "," + std::to_string(gen);
+  std::string line = std::to_string(i) + "," + std::to_string(gen) + "," + std::to_string(l);
 
   for(auto param = all_parameters.begin(); param != all_parameters.end(); ++param) {
     line += "," + std::to_string((*param)->record_state(gen, l));

@@ -20,7 +20,7 @@ seed = 0
 [DATA]
   # This should be TRUE or FALSE
   ancestral_sequences = false
-  substitution_model_file = "model.lua"
+  substitution_model_file = "model_GNR_discrete.lua"
 
   sequences_file = "test_data/5taxon_same.fasta"
   #tree_file = "test_data/5taxon_tips_only.newick"
@@ -58,6 +58,6 @@ seed = 0
 [MODEL]
   #states = ["A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"]
   states = ["N", "F"]
-  parameter_type = "continuous"
-  num_categories = 4
+  #parameter_type = "discrete"
+  #um_categories = 4
 

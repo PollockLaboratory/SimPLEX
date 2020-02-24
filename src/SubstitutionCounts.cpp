@@ -102,3 +102,7 @@ double CountsParameter::record_state(int gen, double l) {
   files.write_to_file("substitution_counts_out", buffer.str());
   return(0.0);
 }
+
+std::string CountsParameter::get_type() {
+  return("COUNTS_PARAMETER");
+}

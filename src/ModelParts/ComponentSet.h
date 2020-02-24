@@ -37,7 +37,6 @@ private:
 
   // Dependancies.
   void refresh_dependancies(AbstractComponent*);
-  void refresh_dependancies(AbstractComponent*, std::set<AbstractComponent*>);
 public:
   ComponentSet();
   void Initialize();

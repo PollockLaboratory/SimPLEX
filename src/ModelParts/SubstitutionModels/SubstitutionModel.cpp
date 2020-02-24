@@ -9,7 +9,6 @@ extern IO::Files files;
 
 SubstitutionModel::SubstitutionModel(Valuable* u) : u(u) {
   states.n = 0;
-  realized_params = {};
 }
 
 void SubstitutionModel::add_state(std::string s) {
@@ -20,53 +19,29 @@ void SubstitutionModel::add_state(std::string s) {
   states.n++;
 }
 
-SampleableValue* SubstitutionModel::realize_component(IO::raw_param* param) {
-  SampleableValue* p;
-  if(realized_params.find(param->ID) == realized_params.end()) {
-    if(param->t == IO::FLOAT) {
-      IO::raw_ContinuousFloat* float_param = dynamic_cast<IO::raw_ContinuousFloat*>(param);
-      p = new ContinuousFloat(float_param->name, float_param->init, float_param->step_size, 0.0);
-    } else if(param->t == IO::CATEGORY) {
-      IO::raw_DiscreteFloat* cat_param = dynamic_cast<IO::raw_DiscreteFloat*>(param);
-      // Need to sort duplicate rate categories out here.
-      RateCategories* cats = new RateCategories("cats", cat_param->categories);
-      p = new DiscreteFloat(cat_param->name, cats);
-    } else {
-      std::cerr << "Error: unknown parameter type for parameter \"" << param->name << "\"." << std::endl;
-      exit(EXIT_FAILURE);
-    }
-  } else {
-    p = realized_params[param->ID];
-  }
-  return(p);
-}
-
-SampleableValue* SubstitutionModel::retreive_component(int id) {
-  if(realized_params.find(id) == realized_params.end()) {
-    // Note: doing this on one line adds element to map before function call.
-    SampleableValue* s = realize_component(raw_params[id]);
-    realized_params[id] = s;
-  }
-
-  return(realized_params[id]);
-}
-
 RateVector* SubstitutionModel::create_rate_vector(IO::raw_rate_vector rv, Valuable* u) {
   std::vector<Valuable*> rates(states.n, nullptr);
   int s = states.state_to_int[rv.uc.state];
   VirtualSubstitutionRate* vir_rate = new VirtualSubstitutionRate("tmp_name_virtual_substitution.", u); 
   for(int i = 0; i < states.n; i++) {
-    IO::raw_param* param = rv.rates.front();
+    AbstractComponent* param = rv.rates.front();
     if(param == nullptr) {
       std::cerr << "Error: nullptr for parameter in rate vector " << rv.name << " at position " << i << "." << std::endl;
       exit(EXIT_FAILURE);
     }
+
     if(i != s) {
-      rates[i] = retreive_component(param->ID);
+      SampleableValue* v = dynamic_cast<SampleableValue*>(param);
+      if(v == nullptr) {
+	std::cerr << "Error: parameter in raw_rate_vector is not Valuable." << std::endl;
+	exit(EXIT_FAILURE);
+      }
+      rates[i] = v;
       // Add dependancies.
       vir_rate->add_rate(rates[i]);
     } else {
       // Virtual Substitution rate.
+      // Need to delete virtual parameter.
       vir_rate->name = param->name;
       rates[i] = vir_rate;
     }
@@ -83,8 +58,6 @@ RateVector* SubstitutionModel::create_rate_vector(IO::raw_rate_vector rv, Valuab
 }
 
 void SubstitutionModel::from_raw_model(IO::raw_substitution_model* raw_sm) {
-  raw_params = raw_sm->get_map_parameters();
-
   // Read in states.
   for(auto it = raw_sm->states.begin(); it != raw_sm->states.end(); ++it) {
 	add_state(*it);
@@ -129,19 +102,26 @@ const double& SubstitutionModel::get_u() {
   return(u->getValue());
 }
 
+void add_all_dependancies(std::list<AbstractComponent*>& all, AbstractComponent* parameter) {
+  all.push_back(parameter);
+  for(auto it = parameter->get_dependancies().begin(); it != parameter->get_dependancies().end(); ++it) {
+    add_all_dependancies(all, *it);
+  }
+}
+
 std::list<AbstractComponent*> SubstitutionModel::get_all_parameters() {
-  std::list<AbstractComponent*> ret = {};
+  std::list<AbstractComponent*> all_deps = {};
   for(auto it = rateVectors.col.begin(); it != rateVectors.col.end(); ++it) {
     for(auto jt = (*it)->rates.begin(); jt != (*it)->rates.end(); ++jt) {
-      AbstractComponent* c = dynamic_cast<AbstractComponent*>(*jt);
-      if(c == nullptr) {
+      AbstractComponent* parameter = dynamic_cast<AbstractComponent*>(*jt);
+      if(parameter == nullptr) {
 	std::cerr << "Error: parameter not of AbstractComponent type." << std::endl;
 	exit(EXIT_FAILURE);
       }
-      ret.push_back(c);
+      add_all_dependancies(all_deps, parameter);
     }
   }
-  return(ret);
+  return(all_deps);
 }
 
 std::vector<RateVector*> SubstitutionModel::get_RateVectors() {

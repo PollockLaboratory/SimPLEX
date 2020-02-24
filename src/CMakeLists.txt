@@ -6,6 +6,8 @@ set(SRCS
   IO/TreeParser.cpp
   IO/SubstitutionModelParser.cpp
   IO/SequencesParser.cpp
+  IO/RawParameterTypes.cpp
+  IO/LuaUtils.cpp
   SubstitutionCounts.cpp
   Model.cpp
   ModelParts/Sequence.cpp

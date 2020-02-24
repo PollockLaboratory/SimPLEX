@@ -68,5 +68,5 @@ void Environment::log(std::string message) {
   char buffer[80];
   strftime(buffer, 80, "%D %T", timeinfo);
 
-  log_stream << "[ " << buffer << " ] " << message << std::endl;
+  //log_stream << "[ " << buffer << " ] " << message << std::endl;
 }

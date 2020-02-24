@@ -179,32 +179,167 @@ Environment.cpp.s:
 	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/Environment.cpp.s
 .PHONY : Environment.cpp.s
 
-IO.o: IO.cpp.o
+IO/Files.o: IO/Files.cpp.o
 
-.PHONY : IO.o
+.PHONY : IO/Files.o
 
 # target to build an object file
-IO.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO.cpp.o
-.PHONY : IO.cpp.o
+IO/Files.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/Files.cpp.o
+.PHONY : IO/Files.cpp.o
 
-IO.i: IO.cpp.i
+IO/Files.i: IO/Files.cpp.i
 
-.PHONY : IO.i
+.PHONY : IO/Files.i
 
 # target to preprocess a source file
-IO.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO.cpp.i
-.PHONY : IO.cpp.i
+IO/Files.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/Files.cpp.i
+.PHONY : IO/Files.cpp.i
 
-IO.s: IO.cpp.s
+IO/Files.s: IO/Files.cpp.s
 
-.PHONY : IO.s
+.PHONY : IO/Files.s
 
 # target to generate assembly for a file
-IO.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO.cpp.s
-.PHONY : IO.cpp.s
+IO/Files.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/Files.cpp.s
+.PHONY : IO/Files.cpp.s
+
+IO/LuaUtils.o: IO/LuaUtils.cpp.o
+
+.PHONY : IO/LuaUtils.o
+
+# target to build an object file
+IO/LuaUtils.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/LuaUtils.cpp.o
+.PHONY : IO/LuaUtils.cpp.o
+
+IO/LuaUtils.i: IO/LuaUtils.cpp.i
+
+.PHONY : IO/LuaUtils.i
+
+# target to preprocess a source file
+IO/LuaUtils.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/LuaUtils.cpp.i
+.PHONY : IO/LuaUtils.cpp.i
+
+IO/LuaUtils.s: IO/LuaUtils.cpp.s
+
+.PHONY : IO/LuaUtils.s
+
+# target to generate assembly for a file
+IO/LuaUtils.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/LuaUtils.cpp.s
+.PHONY : IO/LuaUtils.cpp.s
+
+IO/RawParameterTypes.o: IO/RawParameterTypes.cpp.o
+
+.PHONY : IO/RawParameterTypes.o
+
+# target to build an object file
+IO/RawParameterTypes.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/RawParameterTypes.cpp.o
+.PHONY : IO/RawParameterTypes.cpp.o
+
+IO/RawParameterTypes.i: IO/RawParameterTypes.cpp.i
+
+.PHONY : IO/RawParameterTypes.i
+
+# target to preprocess a source file
+IO/RawParameterTypes.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/RawParameterTypes.cpp.i
+.PHONY : IO/RawParameterTypes.cpp.i
+
+IO/RawParameterTypes.s: IO/RawParameterTypes.cpp.s
+
+.PHONY : IO/RawParameterTypes.s
+
+# target to generate assembly for a file
+IO/RawParameterTypes.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/RawParameterTypes.cpp.s
+.PHONY : IO/RawParameterTypes.cpp.s
+
+IO/SequencesParser.o: IO/SequencesParser.cpp.o
+
+.PHONY : IO/SequencesParser.o
+
+# target to build an object file
+IO/SequencesParser.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/SequencesParser.cpp.o
+.PHONY : IO/SequencesParser.cpp.o
+
+IO/SequencesParser.i: IO/SequencesParser.cpp.i
+
+.PHONY : IO/SequencesParser.i
+
+# target to preprocess a source file
+IO/SequencesParser.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/SequencesParser.cpp.i
+.PHONY : IO/SequencesParser.cpp.i
+
+IO/SequencesParser.s: IO/SequencesParser.cpp.s
+
+.PHONY : IO/SequencesParser.s
+
+# target to generate assembly for a file
+IO/SequencesParser.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/SequencesParser.cpp.s
+.PHONY : IO/SequencesParser.cpp.s
+
+IO/SubstitutionModelParser.o: IO/SubstitutionModelParser.cpp.o
+
+.PHONY : IO/SubstitutionModelParser.o
+
+# target to build an object file
+IO/SubstitutionModelParser.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/SubstitutionModelParser.cpp.o
+.PHONY : IO/SubstitutionModelParser.cpp.o
+
+IO/SubstitutionModelParser.i: IO/SubstitutionModelParser.cpp.i
+
+.PHONY : IO/SubstitutionModelParser.i
+
+# target to preprocess a source file
+IO/SubstitutionModelParser.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/SubstitutionModelParser.cpp.i
+.PHONY : IO/SubstitutionModelParser.cpp.i
+
+IO/SubstitutionModelParser.s: IO/SubstitutionModelParser.cpp.s
+
+.PHONY : IO/SubstitutionModelParser.s
+
+# target to generate assembly for a file
+IO/SubstitutionModelParser.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/SubstitutionModelParser.cpp.s
+.PHONY : IO/SubstitutionModelParser.cpp.s
+
+IO/TreeParser.o: IO/TreeParser.cpp.o
+
+.PHONY : IO/TreeParser.o
+
+# target to build an object file
+IO/TreeParser.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/TreeParser.cpp.o
+.PHONY : IO/TreeParser.cpp.o
+
+IO/TreeParser.i: IO/TreeParser.cpp.i
+
+.PHONY : IO/TreeParser.i
+
+# target to preprocess a source file
+IO/TreeParser.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/TreeParser.cpp.i
+.PHONY : IO/TreeParser.cpp.i
+
+IO/TreeParser.s: IO/TreeParser.cpp.s
+
+.PHONY : IO/TreeParser.s
+
+# target to generate assembly for a file
+IO/TreeParser.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/TreeParser.cpp.s
+.PHONY : IO/TreeParser.cpp.s
 
 MCMC.o: MCMC.cpp.o
 
@@ -260,32 +395,248 @@ Model.cpp.s:
 	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/Model.cpp.s
 .PHONY : Model.cpp.s
 
-Sequence.o: Sequence.cpp.o
+ModelParts/AbstractComponent.o: ModelParts/AbstractComponent.cpp.o
 
-.PHONY : Sequence.o
+.PHONY : ModelParts/AbstractComponent.o
 
 # target to build an object file
-Sequence.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/Sequence.cpp.o
-.PHONY : Sequence.cpp.o
+ModelParts/AbstractComponent.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/AbstractComponent.cpp.o
+.PHONY : ModelParts/AbstractComponent.cpp.o
 
-Sequence.i: Sequence.cpp.i
+ModelParts/AbstractComponent.i: ModelParts/AbstractComponent.cpp.i
 
-.PHONY : Sequence.i
+.PHONY : ModelParts/AbstractComponent.i
 
 # target to preprocess a source file
-Sequence.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/Sequence.cpp.i
-.PHONY : Sequence.cpp.i
+ModelParts/AbstractComponent.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/AbstractComponent.cpp.i
+.PHONY : ModelParts/AbstractComponent.cpp.i
 
-Sequence.s: Sequence.cpp.s
+ModelParts/AbstractComponent.s: ModelParts/AbstractComponent.cpp.s
 
-.PHONY : Sequence.s
+.PHONY : ModelParts/AbstractComponent.s
 
 # target to generate assembly for a file
-Sequence.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/Sequence.cpp.s
-.PHONY : Sequence.cpp.s
+ModelParts/AbstractComponent.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/AbstractComponent.cpp.s
+.PHONY : ModelParts/AbstractComponent.cpp.s
+
+ModelParts/ComponentSet.o: ModelParts/ComponentSet.cpp.o
+
+.PHONY : ModelParts/ComponentSet.o
+
+# target to build an object file
+ModelParts/ComponentSet.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/ComponentSet.cpp.o
+.PHONY : ModelParts/ComponentSet.cpp.o
+
+ModelParts/ComponentSet.i: ModelParts/ComponentSet.cpp.i
+
+.PHONY : ModelParts/ComponentSet.i
+
+# target to preprocess a source file
+ModelParts/ComponentSet.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/ComponentSet.cpp.i
+.PHONY : ModelParts/ComponentSet.cpp.i
+
+ModelParts/ComponentSet.s: ModelParts/ComponentSet.cpp.s
+
+.PHONY : ModelParts/ComponentSet.s
+
+# target to generate assembly for a file
+ModelParts/ComponentSet.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/ComponentSet.cpp.s
+.PHONY : ModelParts/ComponentSet.cpp.s
+
+ModelParts/Sequence.o: ModelParts/Sequence.cpp.o
+
+.PHONY : ModelParts/Sequence.o
+
+# target to build an object file
+ModelParts/Sequence.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/Sequence.cpp.o
+.PHONY : ModelParts/Sequence.cpp.o
+
+ModelParts/Sequence.i: ModelParts/Sequence.cpp.i
+
+.PHONY : ModelParts/Sequence.i
+
+# target to preprocess a source file
+ModelParts/Sequence.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/Sequence.cpp.i
+.PHONY : ModelParts/Sequence.cpp.i
+
+ModelParts/Sequence.s: ModelParts/Sequence.cpp.s
+
+.PHONY : ModelParts/Sequence.s
+
+# target to generate assembly for a file
+ModelParts/Sequence.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/Sequence.cpp.s
+.PHONY : ModelParts/Sequence.cpp.s
+
+ModelParts/SubstitutionModels/Parameters.o: ModelParts/SubstitutionModels/Parameters.cpp.o
+
+.PHONY : ModelParts/SubstitutionModels/Parameters.o
+
+# target to build an object file
+ModelParts/SubstitutionModels/Parameters.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/SubstitutionModels/Parameters.cpp.o
+.PHONY : ModelParts/SubstitutionModels/Parameters.cpp.o
+
+ModelParts/SubstitutionModels/Parameters.i: ModelParts/SubstitutionModels/Parameters.cpp.i
+
+.PHONY : ModelParts/SubstitutionModels/Parameters.i
+
+# target to preprocess a source file
+ModelParts/SubstitutionModels/Parameters.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/SubstitutionModels/Parameters.cpp.i
+.PHONY : ModelParts/SubstitutionModels/Parameters.cpp.i
+
+ModelParts/SubstitutionModels/Parameters.s: ModelParts/SubstitutionModels/Parameters.cpp.s
+
+.PHONY : ModelParts/SubstitutionModels/Parameters.s
+
+# target to generate assembly for a file
+ModelParts/SubstitutionModels/Parameters.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/SubstitutionModels/Parameters.cpp.s
+.PHONY : ModelParts/SubstitutionModels/Parameters.cpp.s
+
+ModelParts/SubstitutionModels/RateVector.o: ModelParts/SubstitutionModels/RateVector.cpp.o
+
+.PHONY : ModelParts/SubstitutionModels/RateVector.o
+
+# target to build an object file
+ModelParts/SubstitutionModels/RateVector.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/SubstitutionModels/RateVector.cpp.o
+.PHONY : ModelParts/SubstitutionModels/RateVector.cpp.o
+
+ModelParts/SubstitutionModels/RateVector.i: ModelParts/SubstitutionModels/RateVector.cpp.i
+
+.PHONY : ModelParts/SubstitutionModels/RateVector.i
+
+# target to preprocess a source file
+ModelParts/SubstitutionModels/RateVector.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/SubstitutionModels/RateVector.cpp.i
+.PHONY : ModelParts/SubstitutionModels/RateVector.cpp.i
+
+ModelParts/SubstitutionModels/RateVector.s: ModelParts/SubstitutionModels/RateVector.cpp.s
+
+.PHONY : ModelParts/SubstitutionModels/RateVector.s
+
+# target to generate assembly for a file
+ModelParts/SubstitutionModels/RateVector.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/SubstitutionModels/RateVector.cpp.s
+.PHONY : ModelParts/SubstitutionModels/RateVector.cpp.s
+
+ModelParts/SubstitutionModels/SubstitutionModel.o: ModelParts/SubstitutionModels/SubstitutionModel.cpp.o
+
+.PHONY : ModelParts/SubstitutionModels/SubstitutionModel.o
+
+# target to build an object file
+ModelParts/SubstitutionModels/SubstitutionModel.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/SubstitutionModels/SubstitutionModel.cpp.o
+.PHONY : ModelParts/SubstitutionModels/SubstitutionModel.cpp.o
+
+ModelParts/SubstitutionModels/SubstitutionModel.i: ModelParts/SubstitutionModels/SubstitutionModel.cpp.i
+
+.PHONY : ModelParts/SubstitutionModels/SubstitutionModel.i
+
+# target to preprocess a source file
+ModelParts/SubstitutionModels/SubstitutionModel.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/SubstitutionModels/SubstitutionModel.cpp.i
+.PHONY : ModelParts/SubstitutionModels/SubstitutionModel.cpp.i
+
+ModelParts/SubstitutionModels/SubstitutionModel.s: ModelParts/SubstitutionModels/SubstitutionModel.cpp.s
+
+.PHONY : ModelParts/SubstitutionModels/SubstitutionModel.s
+
+# target to generate assembly for a file
+ModelParts/SubstitutionModels/SubstitutionModel.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/SubstitutionModels/SubstitutionModel.cpp.s
+.PHONY : ModelParts/SubstitutionModels/SubstitutionModel.cpp.s
+
+ModelParts/Trees/BranchSplitting.o: ModelParts/Trees/BranchSplitting.cpp.o
+
+.PHONY : ModelParts/Trees/BranchSplitting.o
+
+# target to build an object file
+ModelParts/Trees/BranchSplitting.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/Trees/BranchSplitting.cpp.o
+.PHONY : ModelParts/Trees/BranchSplitting.cpp.o
+
+ModelParts/Trees/BranchSplitting.i: ModelParts/Trees/BranchSplitting.cpp.i
+
+.PHONY : ModelParts/Trees/BranchSplitting.i
+
+# target to preprocess a source file
+ModelParts/Trees/BranchSplitting.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/Trees/BranchSplitting.cpp.i
+.PHONY : ModelParts/Trees/BranchSplitting.cpp.i
+
+ModelParts/Trees/BranchSplitting.s: ModelParts/Trees/BranchSplitting.cpp.s
+
+.PHONY : ModelParts/Trees/BranchSplitting.s
+
+# target to generate assembly for a file
+ModelParts/Trees/BranchSplitting.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/Trees/BranchSplitting.cpp.s
+.PHONY : ModelParts/Trees/BranchSplitting.cpp.s
+
+ModelParts/Trees/Tree.o: ModelParts/Trees/Tree.cpp.o
+
+.PHONY : ModelParts/Trees/Tree.o
+
+# target to build an object file
+ModelParts/Trees/Tree.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/Trees/Tree.cpp.o
+.PHONY : ModelParts/Trees/Tree.cpp.o
+
+ModelParts/Trees/Tree.i: ModelParts/Trees/Tree.cpp.i
+
+.PHONY : ModelParts/Trees/Tree.i
+
+# target to preprocess a source file
+ModelParts/Trees/Tree.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/Trees/Tree.cpp.i
+.PHONY : ModelParts/Trees/Tree.cpp.i
+
+ModelParts/Trees/Tree.s: ModelParts/Trees/Tree.cpp.s
+
+.PHONY : ModelParts/Trees/Tree.s
+
+# target to generate assembly for a file
+ModelParts/Trees/Tree.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/Trees/Tree.cpp.s
+.PHONY : ModelParts/Trees/Tree.cpp.s
+
+ModelParts/Trees/TreeParts.o: ModelParts/Trees/TreeParts.cpp.o
+
+.PHONY : ModelParts/Trees/TreeParts.o
+
+# target to build an object file
+ModelParts/Trees/TreeParts.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/Trees/TreeParts.cpp.o
+.PHONY : ModelParts/Trees/TreeParts.cpp.o
+
+ModelParts/Trees/TreeParts.i: ModelParts/Trees/TreeParts.cpp.i
+
+.PHONY : ModelParts/Trees/TreeParts.i
+
+# target to preprocess a source file
+ModelParts/Trees/TreeParts.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/Trees/TreeParts.cpp.i
+.PHONY : ModelParts/Trees/TreeParts.cpp.i
+
+ModelParts/Trees/TreeParts.s: ModelParts/Trees/TreeParts.cpp.s
+
+.PHONY : ModelParts/Trees/TreeParts.s
+
+# target to generate assembly for a file
+ModelParts/Trees/TreeParts.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/ModelParts/Trees/TreeParts.cpp.s
+.PHONY : ModelParts/Trees/TreeParts.cpp.s
 
 SimPLEX.o: SimPLEX.cpp.o
 
@@ -341,357 +692,6 @@ SubstitutionCounts.cpp.s:
 	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionCounts.cpp.s
 .PHONY : SubstitutionCounts.cpp.s
 
-SubstitutionModels/Components/AbstractComponent.o: SubstitutionModels/Components/AbstractComponent.cpp.o
-
-.PHONY : SubstitutionModels/Components/AbstractComponent.o
-
-# target to build an object file
-SubstitutionModels/Components/AbstractComponent.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractComponent.cpp.o
-.PHONY : SubstitutionModels/Components/AbstractComponent.cpp.o
-
-SubstitutionModels/Components/AbstractComponent.i: SubstitutionModels/Components/AbstractComponent.cpp.i
-
-.PHONY : SubstitutionModels/Components/AbstractComponent.i
-
-# target to preprocess a source file
-SubstitutionModels/Components/AbstractComponent.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractComponent.cpp.i
-.PHONY : SubstitutionModels/Components/AbstractComponent.cpp.i
-
-SubstitutionModels/Components/AbstractComponent.s: SubstitutionModels/Components/AbstractComponent.cpp.s
-
-.PHONY : SubstitutionModels/Components/AbstractComponent.s
-
-# target to generate assembly for a file
-SubstitutionModels/Components/AbstractComponent.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractComponent.cpp.s
-.PHONY : SubstitutionModels/Components/AbstractComponent.cpp.s
-
-SubstitutionModels/Components/AbstractValueTypes.o: SubstitutionModels/Components/AbstractValueTypes.cpp.o
-
-.PHONY : SubstitutionModels/Components/AbstractValueTypes.o
-
-# target to build an object file
-SubstitutionModels/Components/AbstractValueTypes.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.o
-.PHONY : SubstitutionModels/Components/AbstractValueTypes.cpp.o
-
-SubstitutionModels/Components/AbstractValueTypes.i: SubstitutionModels/Components/AbstractValueTypes.cpp.i
-
-.PHONY : SubstitutionModels/Components/AbstractValueTypes.i
-
-# target to preprocess a source file
-SubstitutionModels/Components/AbstractValueTypes.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.i
-.PHONY : SubstitutionModels/Components/AbstractValueTypes.cpp.i
-
-SubstitutionModels/Components/AbstractValueTypes.s: SubstitutionModels/Components/AbstractValueTypes.cpp.s
-
-.PHONY : SubstitutionModels/Components/AbstractValueTypes.s
-
-# target to generate assembly for a file
-SubstitutionModels/Components/AbstractValueTypes.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/AbstractValueTypes.cpp.s
-.PHONY : SubstitutionModels/Components/AbstractValueTypes.cpp.s
-
-SubstitutionModels/Components/ComponentSet.o: SubstitutionModels/Components/ComponentSet.cpp.o
-
-.PHONY : SubstitutionModels/Components/ComponentSet.o
-
-# target to build an object file
-SubstitutionModels/Components/ComponentSet.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentSet.cpp.o
-.PHONY : SubstitutionModels/Components/ComponentSet.cpp.o
-
-SubstitutionModels/Components/ComponentSet.i: SubstitutionModels/Components/ComponentSet.cpp.i
-
-.PHONY : SubstitutionModels/Components/ComponentSet.i
-
-# target to preprocess a source file
-SubstitutionModels/Components/ComponentSet.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentSet.cpp.i
-.PHONY : SubstitutionModels/Components/ComponentSet.cpp.i
-
-SubstitutionModels/Components/ComponentSet.s: SubstitutionModels/Components/ComponentSet.cpp.s
-
-.PHONY : SubstitutionModels/Components/ComponentSet.s
-
-# target to generate assembly for a file
-SubstitutionModels/Components/ComponentSet.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentSet.cpp.s
-.PHONY : SubstitutionModels/Components/ComponentSet.cpp.s
-
-SubstitutionModels/Components/ComponentTypes.o: SubstitutionModels/Components/ComponentTypes.cpp.o
-
-.PHONY : SubstitutionModels/Components/ComponentTypes.o
-
-# target to build an object file
-SubstitutionModels/Components/ComponentTypes.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentTypes.cpp.o
-.PHONY : SubstitutionModels/Components/ComponentTypes.cpp.o
-
-SubstitutionModels/Components/ComponentTypes.i: SubstitutionModels/Components/ComponentTypes.cpp.i
-
-.PHONY : SubstitutionModels/Components/ComponentTypes.i
-
-# target to preprocess a source file
-SubstitutionModels/Components/ComponentTypes.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentTypes.cpp.i
-.PHONY : SubstitutionModels/Components/ComponentTypes.cpp.i
-
-SubstitutionModels/Components/ComponentTypes.s: SubstitutionModels/Components/ComponentTypes.cpp.s
-
-.PHONY : SubstitutionModels/Components/ComponentTypes.s
-
-# target to generate assembly for a file
-SubstitutionModels/Components/ComponentTypes.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/ComponentTypes.cpp.s
-.PHONY : SubstitutionModels/Components/ComponentTypes.cpp.s
-
-SubstitutionModels/Components/RateVector.o: SubstitutionModels/Components/RateVector.cpp.o
-
-.PHONY : SubstitutionModels/Components/RateVector.o
-
-# target to build an object file
-SubstitutionModels/Components/RateVector.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/RateVector.cpp.o
-.PHONY : SubstitutionModels/Components/RateVector.cpp.o
-
-SubstitutionModels/Components/RateVector.i: SubstitutionModels/Components/RateVector.cpp.i
-
-.PHONY : SubstitutionModels/Components/RateVector.i
-
-# target to preprocess a source file
-SubstitutionModels/Components/RateVector.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/RateVector.cpp.i
-.PHONY : SubstitutionModels/Components/RateVector.cpp.i
-
-SubstitutionModels/Components/RateVector.s: SubstitutionModels/Components/RateVector.cpp.s
-
-.PHONY : SubstitutionModels/Components/RateVector.s
-
-# target to generate assembly for a file
-SubstitutionModels/Components/RateVector.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/RateVector.cpp.s
-.PHONY : SubstitutionModels/Components/RateVector.cpp.s
-
-SubstitutionModels/Components/SampleableValueTypes.o: SubstitutionModels/Components/SampleableValueTypes.cpp.o
-
-.PHONY : SubstitutionModels/Components/SampleableValueTypes.o
-
-# target to build an object file
-SubstitutionModels/Components/SampleableValueTypes.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.o
-.PHONY : SubstitutionModels/Components/SampleableValueTypes.cpp.o
-
-SubstitutionModels/Components/SampleableValueTypes.i: SubstitutionModels/Components/SampleableValueTypes.cpp.i
-
-.PHONY : SubstitutionModels/Components/SampleableValueTypes.i
-
-# target to preprocess a source file
-SubstitutionModels/Components/SampleableValueTypes.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.i
-.PHONY : SubstitutionModels/Components/SampleableValueTypes.cpp.i
-
-SubstitutionModels/Components/SampleableValueTypes.s: SubstitutionModels/Components/SampleableValueTypes.cpp.s
-
-.PHONY : SubstitutionModels/Components/SampleableValueTypes.s
-
-# target to generate assembly for a file
-SubstitutionModels/Components/SampleableValueTypes.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/Components/SampleableValueTypes.cpp.s
-.PHONY : SubstitutionModels/Components/SampleableValueTypes.cpp.s
-
-SubstitutionModels/SubstitutionModel.o: SubstitutionModels/SubstitutionModel.cpp.o
-
-.PHONY : SubstitutionModels/SubstitutionModel.o
-
-# target to build an object file
-SubstitutionModels/SubstitutionModel.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModel.cpp.o
-.PHONY : SubstitutionModels/SubstitutionModel.cpp.o
-
-SubstitutionModels/SubstitutionModel.i: SubstitutionModels/SubstitutionModel.cpp.i
-
-.PHONY : SubstitutionModels/SubstitutionModel.i
-
-# target to preprocess a source file
-SubstitutionModels/SubstitutionModel.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModel.cpp.i
-.PHONY : SubstitutionModels/SubstitutionModel.cpp.i
-
-SubstitutionModels/SubstitutionModel.s: SubstitutionModels/SubstitutionModel.cpp.s
-
-.PHONY : SubstitutionModels/SubstitutionModel.s
-
-# target to generate assembly for a file
-SubstitutionModels/SubstitutionModel.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModel.cpp.s
-.PHONY : SubstitutionModels/SubstitutionModel.cpp.s
-
-SubstitutionModels/SubstitutionModelParser.o: SubstitutionModels/SubstitutionModelParser.cpp.o
-
-.PHONY : SubstitutionModels/SubstitutionModelParser.o
-
-# target to build an object file
-SubstitutionModels/SubstitutionModelParser.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.o
-.PHONY : SubstitutionModels/SubstitutionModelParser.cpp.o
-
-SubstitutionModels/SubstitutionModelParser.i: SubstitutionModels/SubstitutionModelParser.cpp.i
-
-.PHONY : SubstitutionModels/SubstitutionModelParser.i
-
-# target to preprocess a source file
-SubstitutionModels/SubstitutionModelParser.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.i
-.PHONY : SubstitutionModels/SubstitutionModelParser.cpp.i
-
-SubstitutionModels/SubstitutionModelParser.s: SubstitutionModels/SubstitutionModelParser.cpp.s
-
-.PHONY : SubstitutionModels/SubstitutionModelParser.s
-
-# target to generate assembly for a file
-SubstitutionModels/SubstitutionModelParser.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/SubstitutionModels/SubstitutionModelParser.cpp.s
-.PHONY : SubstitutionModels/SubstitutionModelParser.cpp.s
-
-Trees/BranchSplitting.o: Trees/BranchSplitting.cpp.o
-
-.PHONY : Trees/BranchSplitting.o
-
-# target to build an object file
-Trees/BranchSplitting.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/Trees/BranchSplitting.cpp.o
-.PHONY : Trees/BranchSplitting.cpp.o
-
-Trees/BranchSplitting.i: Trees/BranchSplitting.cpp.i
-
-.PHONY : Trees/BranchSplitting.i
-
-# target to preprocess a source file
-Trees/BranchSplitting.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/Trees/BranchSplitting.cpp.i
-.PHONY : Trees/BranchSplitting.cpp.i
-
-Trees/BranchSplitting.s: Trees/BranchSplitting.cpp.s
-
-.PHONY : Trees/BranchSplitting.s
-
-# target to generate assembly for a file
-Trees/BranchSplitting.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/Trees/BranchSplitting.cpp.s
-.PHONY : Trees/BranchSplitting.cpp.s
-
-Trees/Tree.o: Trees/Tree.cpp.o
-
-.PHONY : Trees/Tree.o
-
-# target to build an object file
-Trees/Tree.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/Trees/Tree.cpp.o
-.PHONY : Trees/Tree.cpp.o
-
-Trees/Tree.i: Trees/Tree.cpp.i
-
-.PHONY : Trees/Tree.i
-
-# target to preprocess a source file
-Trees/Tree.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/Trees/Tree.cpp.i
-.PHONY : Trees/Tree.cpp.i
-
-Trees/Tree.s: Trees/Tree.cpp.s
-
-.PHONY : Trees/Tree.s
-
-# target to generate assembly for a file
-Trees/Tree.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/Trees/Tree.cpp.s
-.PHONY : Trees/Tree.cpp.s
-
-Trees/TreeParser.o: Trees/TreeParser.cpp.o
-
-.PHONY : Trees/TreeParser.o
-
-# target to build an object file
-Trees/TreeParser.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/Trees/TreeParser.cpp.o
-.PHONY : Trees/TreeParser.cpp.o
-
-Trees/TreeParser.i: Trees/TreeParser.cpp.i
-
-.PHONY : Trees/TreeParser.i
-
-# target to preprocess a source file
-Trees/TreeParser.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/Trees/TreeParser.cpp.i
-.PHONY : Trees/TreeParser.cpp.i
-
-Trees/TreeParser.s: Trees/TreeParser.cpp.s
-
-.PHONY : Trees/TreeParser.s
-
-# target to generate assembly for a file
-Trees/TreeParser.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/Trees/TreeParser.cpp.s
-.PHONY : Trees/TreeParser.cpp.s
-
-Trees/TreeParts.o: Trees/TreeParts.cpp.o
-
-.PHONY : Trees/TreeParts.o
-
-# target to build an object file
-Trees/TreeParts.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/Trees/TreeParts.cpp.o
-.PHONY : Trees/TreeParts.cpp.o
-
-Trees/TreeParts.i: Trees/TreeParts.cpp.i
-
-.PHONY : Trees/TreeParts.i
-
-# target to preprocess a source file
-Trees/TreeParts.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/Trees/TreeParts.cpp.i
-.PHONY : Trees/TreeParts.cpp.i
-
-Trees/TreeParts.s: Trees/TreeParts.cpp.s
-
-.PHONY : Trees/TreeParts.s
-
-# target to generate assembly for a file
-Trees/TreeParts.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/Trees/TreeParts.cpp.s
-.PHONY : Trees/TreeParts.cpp.s
-
-utils.o: utils.cpp.o
-
-.PHONY : utils.o
-
-# target to build an object file
-utils.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/utils.cpp.o
-.PHONY : utils.cpp.o
-
-utils.i: utils.cpp.i
-
-.PHONY : utils.i
-
-# target to preprocess a source file
-utils.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/utils.cpp.i
-.PHONY : utils.cpp.i
-
-utils.s: utils.cpp.s
-
-.PHONY : utils.s
-
-# target to generate assembly for a file
-utils.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/utils.cpp.s
-.PHONY : utils.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -707,63 +707,63 @@ help:
 	@echo "... Environment.o"
 	@echo "... Environment.i"
 	@echo "... Environment.s"
-	@echo "... IO.o"
-	@echo "... IO.i"
-	@echo "... IO.s"
+	@echo "... IO/Files.o"
+	@echo "... IO/Files.i"
+	@echo "... IO/Files.s"
+	@echo "... IO/LuaUtils.o"
+	@echo "... IO/LuaUtils.i"
+	@echo "... IO/LuaUtils.s"
+	@echo "... IO/RawParameterTypes.o"
+	@echo "... IO/RawParameterTypes.i"
+	@echo "... IO/RawParameterTypes.s"
+	@echo "... IO/SequencesParser.o"
+	@echo "... IO/SequencesParser.i"
+	@echo "... IO/SequencesParser.s"
+	@echo "... IO/SubstitutionModelParser.o"
+	@echo "... IO/SubstitutionModelParser.i"
+	@echo "... IO/SubstitutionModelParser.s"
+	@echo "... IO/TreeParser.o"
+	@echo "... IO/TreeParser.i"
+	@echo "... IO/TreeParser.s"
 	@echo "... MCMC.o"
 	@echo "... MCMC.i"
 	@echo "... MCMC.s"
 	@echo "... Model.o"
 	@echo "... Model.i"
 	@echo "... Model.s"
-	@echo "... Sequence.o"
-	@echo "... Sequence.i"
-	@echo "... Sequence.s"
+	@echo "... ModelParts/AbstractComponent.o"
+	@echo "... ModelParts/AbstractComponent.i"
+	@echo "... ModelParts/AbstractComponent.s"
+	@echo "... ModelParts/ComponentSet.o"
+	@echo "... ModelParts/ComponentSet.i"
+	@echo "... ModelParts/ComponentSet.s"
+	@echo "... ModelParts/Sequence.o"
+	@echo "... ModelParts/Sequence.i"
+	@echo "... ModelParts/Sequence.s"
+	@echo "... ModelParts/SubstitutionModels/Parameters.o"
+	@echo "... ModelParts/SubstitutionModels/Parameters.i"
+	@echo "... ModelParts/SubstitutionModels/Parameters.s"
+	@echo "... ModelParts/SubstitutionModels/RateVector.o"
+	@echo "... ModelParts/SubstitutionModels/RateVector.i"
+	@echo "... ModelParts/SubstitutionModels/RateVector.s"
+	@echo "... ModelParts/SubstitutionModels/SubstitutionModel.o"
+	@echo "... ModelParts/SubstitutionModels/SubstitutionModel.i"
+	@echo "... ModelParts/SubstitutionModels/SubstitutionModel.s"
+	@echo "... ModelParts/Trees/BranchSplitting.o"
+	@echo "... ModelParts/Trees/BranchSplitting.i"
+	@echo "... ModelParts/Trees/BranchSplitting.s"
+	@echo "... ModelParts/Trees/Tree.o"
+	@echo "... ModelParts/Trees/Tree.i"
+	@echo "... ModelParts/Trees/Tree.s"
+	@echo "... ModelParts/Trees/TreeParts.o"
+	@echo "... ModelParts/Trees/TreeParts.i"
+	@echo "... ModelParts/Trees/TreeParts.s"
 	@echo "... SimPLEX.o"
 	@echo "... SimPLEX.i"
 	@echo "... SimPLEX.s"
 	@echo "... SubstitutionCounts.o"
 	@echo "... SubstitutionCounts.i"
 	@echo "... SubstitutionCounts.s"
-	@echo "... SubstitutionModels/Components/AbstractComponent.o"
-	@echo "... SubstitutionModels/Components/AbstractComponent.i"
-	@echo "... SubstitutionModels/Components/AbstractComponent.s"
-	@echo "... SubstitutionModels/Components/AbstractValueTypes.o"
-	@echo "... SubstitutionModels/Components/AbstractValueTypes.i"
-	@echo "... SubstitutionModels/Components/AbstractValueTypes.s"
-	@echo "... SubstitutionModels/Components/ComponentSet.o"
-	@echo "... SubstitutionModels/Components/ComponentSet.i"
-	@echo "... SubstitutionModels/Components/ComponentSet.s"
-	@echo "... SubstitutionModels/Components/ComponentTypes.o"
-	@echo "... SubstitutionModels/Components/ComponentTypes.i"
-	@echo "... SubstitutionModels/Components/ComponentTypes.s"
-	@echo "... SubstitutionModels/Components/RateVector.o"
-	@echo "... SubstitutionModels/Components/RateVector.i"
-	@echo "... SubstitutionModels/Components/RateVector.s"
-	@echo "... SubstitutionModels/Components/SampleableValueTypes.o"
-	@echo "... SubstitutionModels/Components/SampleableValueTypes.i"
-	@echo "... SubstitutionModels/Components/SampleableValueTypes.s"
-	@echo "... SubstitutionModels/SubstitutionModel.o"
-	@echo "... SubstitutionModels/SubstitutionModel.i"
-	@echo "... SubstitutionModels/SubstitutionModel.s"
-	@echo "... SubstitutionModels/SubstitutionModelParser.o"
-	@echo "... SubstitutionModels/SubstitutionModelParser.i"
-	@echo "... SubstitutionModels/SubstitutionModelParser.s"
-	@echo "... Trees/BranchSplitting.o"
-	@echo "... Trees/BranchSplitting.i"
-	@echo "... Trees/BranchSplitting.s"
-	@echo "... Trees/Tree.o"
-	@echo "... Trees/Tree.i"
-	@echo "... Trees/Tree.s"
-	@echo "... Trees/TreeParser.o"
-	@echo "... Trees/TreeParser.i"
-	@echo "... Trees/TreeParser.s"
-	@echo "... Trees/TreeParts.o"
-	@echo "... Trees/TreeParts.i"
-	@echo "... Trees/TreeParts.s"
-	@echo "... utils.o"
-	@echo "... utils.i"
-	@echo "... utils.s"
 .PHONY : help
 
 

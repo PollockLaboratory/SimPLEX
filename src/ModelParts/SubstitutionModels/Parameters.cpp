@@ -33,7 +33,7 @@ ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, d
 }
 
 void ContinuousFloat::print() {
-  std::cout << "Continuous float - " << name << ": " << value << std::endl;
+  std::cout << "Continuous float - " << name << ": " << value << " [" << lower_bound << "->" << upper_bound << "]" << std::endl;
 }
 
 sample_status ContinuousFloat::sample() {
@@ -43,13 +43,16 @@ sample_status ContinuousFloat::sample() {
   double r = ((rand() % 10000) / 10000.0) - 0.5;
   value = value + (r * std_dev);
 
-  if(value < lower_bound) {
-    value = 2*lower_bound - value;
+  while(value < lower_bound or value > upper_bound) {
+    if(value < lower_bound) {
+      value = (2*lower_bound) - value;
+    }
+
+    if(value > upper_bound) {
+      value = (2*upper_bound) - value;
+    }
   }
 
-  if(value > upper_bound) {
-    value = 2*upper_bound - value;
-  }
   return(sample_status({true, true, false}));
 }
 
@@ -83,23 +86,26 @@ double ContinuousFloat::record_state(int gen, double l) {
   return(getValue());
 }
 
+std::string ContinuousFloat::get_type() {
+  return("CONTINUOUS_FLOAT");
+}
+
 std::ostream& operator<<(std::ostream& os, const ContinuousFloat& cf) {
   os << "[ContinuousFloat-" << cf.name << "]";
   return(os);
 }
 
 // DISCRETE FLOAT
-
-RateCategories::RateCategories(std::string name, std::vector<float> categories) : AbstractComponent(name) {
+RateCategories::RateCategories(std::string name, std::vector<Valuable*> categories) : AbstractComponent(name) {
   values = categories;
   n = values.size();
-}
-
-RateCategories::RateCategories(std::string name, float lower_b, float upper_b, int steps) : AbstractComponent(name), n(steps) {
-  values = {};
-  float step_size = (upper_b - lower_b) / steps;
-  for(int i = 1; i <= steps; i++) {
-    values.push_back(i*step_size);
+  for(auto it = values.begin(); it != values.end(); ++it) {
+    AbstractComponent* component = dynamic_cast<AbstractComponent*>(*it);
+    if(component != nullptr) {
+      add_dependancy(component);
+    } else {
+      std::cerr << "Error: cannot add value dependancies to RateCategories." << std::endl;  
+    }
   }
 }
 
@@ -118,8 +124,12 @@ void RateCategories::print() {
   std::cout << "]" << std::endl;
 }
 
-float &RateCategories::operator[](int i) {
-  return(values[i]);
+double RateCategories::operator[](int i) {
+  return(values[i]->getValue());
+}
+
+std::string RateCategories::get_type() {
+  return("RATE_CATEGORIES");
 }
 
 DiscreteFloat::DiscreteFloat(std::string name, RateCategories* categories) : SampleableValue(name) {
@@ -130,7 +140,7 @@ DiscreteFloat::DiscreteFloat(std::string name, RateCategories* categories) : Sam
   add_dependancy(rc);
   n = rc->n;
   i = 0;
-  prev_i = 0;
+  prev_i = i;
   value = (*rc)[i]; 
   previous_value = value;
 
@@ -148,6 +158,7 @@ void DiscreteFloat::print() {
 
 sample_status DiscreteFloat::sample() {
   prev_i = i;
+  // Previous value isn't needed.
   previous_value = value;
   fixedQ = false;
 
@@ -184,12 +195,14 @@ const double& DiscreteFloat::getOldValue() {
     std::cout << "Error: in CategoryFloat::getOldValue - already fixed." << std::endl;
     exit(EXIT_FAILURE);
   }
+  previous_value = (*rc)[prev_i];
   return(previous_value);
 }
 
 void DiscreteFloat::undo() {
   i = prev_i;
-  value = previous_value;
+  value = (*rc)[i];
+  //value = previous_value;
   fixedQ = true;
 }
 
@@ -197,11 +210,16 @@ void DiscreteFloat::fix() {
   fixedQ = true;
 }
 
-void DiscreteFloat::refresh(){
+void DiscreteFloat::refresh() {
+  value = (*rc)[i];
 }
 
 double DiscreteFloat::record_state(int gen, double l) {
   return(getValue());
+}
+
+std::string DiscreteFloat::get_type() {
+  return("DISCRETE_FLOAT");
 }
 
 // FIXED FLOAT
@@ -223,6 +241,10 @@ void FixedFloat::print() {
 }
 
 void FixedFloat::refresh() {	
+}
+
+std::string FixedFloat::get_type() {
+  return("FIXED_FLOAT");
 }
 
 // VIRTUAL SUBSTITUTION RATE
@@ -252,6 +274,10 @@ void VirtualSubstitutionRate::print() {
   std::cout << "VirtualSubstitutionRate - " << name << ": " << value << std::endl;
 }
 
+std::string VirtualSubstitutionRate::get_type() {
+  return("VIRTUAL_SUBSTITUTION_RATE");
+}
+
 void VirtualSubstitutionRate::refresh() {
   previous_value = value;
   double total = 0.0;
@@ -266,6 +292,7 @@ void VirtualSubstitutionRate::refresh() {
   
   value = u->getValue() - total;
 
+  //std::cout << previous_value << "->" << value << std::endl;
   if(value <= 0.0 || value > 1.0) {
     throw OutOfBoundsException("VirtualSubstitutionRate out of bounds.");
   }

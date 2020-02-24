@@ -349,12 +349,14 @@ void copy_file(const Path &sourcefile, const Path &newfile) {
   destination << source.rdbuf();
 }
 
-void IO::Files::close() {
+void IO::Files::clean_and_close() {
   for(std::map<std::string, int>::iterator it = file_to_index.begin(); it != file_to_index.end(); ++it) {
     if(file_values[it->second].t == IOtype::INPUT) {
       Path new_path = absolute_outdir + Path(file_values[it->second].file_name);
       copy_file(reference_dir + file_values[it->second].path, new_path);
     }
+    fileInfo info = get_info(it->first);
+    close(info.fd);
   }
   print();
 }

@@ -45,7 +45,6 @@ int main(int argc, char* argv[]) {
   files.initialize(argv);
   
   files.add_file("log", env.get<std::string>("OUTPUT.log_out_file"), IOtype::OUTPUT);
-  // env.log_stream = files.get_ofstream("log");
 
   std::cout << std::endl;
 
@@ -63,7 +62,7 @@ int main(int argc, char* argv[]) {
 
   mcmc.Run();
 
-  files.close();
+  files.clean_and_close();
 
   time_t time_taken = time(NULL) - start_time;
   int h = time_taken / 3600;

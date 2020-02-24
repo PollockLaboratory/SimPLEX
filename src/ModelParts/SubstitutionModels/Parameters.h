@@ -2,6 +2,7 @@
 #define PARAMETERS_h
 
 #include "../AbstractComponent.h"
+//#include "../../IO/RawParameterTypes.h"
 
 #include <string>
 #include <list>
@@ -16,17 +17,18 @@ public:
   ContinuousFloat(std::string, double, double, double);
   ContinuousFloat(std::string, double, double, double, double);
 
-  virtual void print();
-  virtual sample_status sample();
+  void print() override;
+  sample_status sample() override;
 
-  virtual const double& getValue();
-  virtual const double& getOldValue();
+  const double& getValue() override;
+  const double& getOldValue() override;
 
-  virtual void undo();
-  virtual void fix();
-  virtual void refresh();
+  void undo() override;
+  void fix() override;
+  void refresh() override;
 
-  virtual double record_state(int gen, double l);
+  double record_state(int gen, double l) override;
+  std::string get_type() override;
 
   friend std::ostream& operator<<(std::ostream&, const ContinuousFloat&);
 private:
@@ -42,33 +44,34 @@ private:
 class RateCategories : public AbstractComponent {
   // The vector representing the possible rate a discretely sampled value can be.
 public:
-  RateCategories(std::string name, std::vector<float> categories);
-  RateCategories(std::string name, float lower_b, float upper_b, int steps);
-  virtual void refresh();
-  virtual void print();
+  RateCategories(std::string name, std::vector<Valuable*> categories);
+  void refresh() override;
+  void print() override;
 
-  virtual double record_state(int gen, double l);
+  double record_state(int gen, double l) override;
+  std::string get_type() override;
 
-  float &operator[](int);
+  double operator[](int);
   int n;
 private:
-  std::vector<float> values;
+  std::vector<Valuable*> values;
 };
 
 class DiscreteFloat : public SampleableValue {
 public:
   DiscreteFloat(std::string, RateCategories*);
-  virtual void print();
-  virtual sample_status sample();
+  void print() override;
+  sample_status sample() override;
 
-  virtual const double& getValue();
-  virtual const double& getOldValue();
+  const double& getValue() override;
+  const double& getOldValue() override;
 
-  virtual void undo();
-  virtual void fix();
-  virtual void refresh();
+  void undo() override;
+  void fix() override;
+  void refresh() override;
 
-  virtual double record_state(int gen, double l);
+  double record_state(int gen, double l) override;
+  std::string get_type() override;
 private:
   RateCategories* rc;
   int i;
@@ -83,10 +86,11 @@ private:
 class FixedFloat : public StaticValue {
  public:
   FixedFloat(std::string parameter_name, double);
-  virtual const double& getValue();
-  virtual const double& getOldValue();
-  virtual void print();
-  virtual void refresh();
+  const double& getValue() override;
+  const double& getOldValue() override;
+  void print() override;
+  void refresh() override;
+  std::string get_type() override;
  private:
   double value;
 };
@@ -102,9 +106,10 @@ class OutOfBoundsException: public std::exception {
 class VirtualSubstitutionRate : public StaticValue {
  public:
   VirtualSubstitutionRate(std::string parameter_name, Valuable* unif);
-  virtual const double& getValue();
-  virtual const double& getOldValue();
-  virtual void print();
+  const double& getValue() override;
+  const double& getOldValue() override;
+  void print() override;
+  std::string get_type() override;
   void refresh();
   void add_rate(Valuable* v);
  private:

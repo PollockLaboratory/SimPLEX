@@ -342,6 +342,10 @@ void TreeParameter::print() {
   std::cout << "TreeParameter" << std::endl;
 }
 
+std::string TreeParameter::get_type() {
+  return("TREE_PARAMETER");
+}
+
 std::list<int> random_positions(int s_length, int n) {
   std::list<int> positions = {};
   if(n > s_length) {

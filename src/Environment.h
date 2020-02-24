@@ -26,7 +26,6 @@ public:
   std::map<std::string, int> state_to_integer;
 
   // Logger.
-  std::ofstream log_stream;
   void log(std::string message);
 
   template<typename T>

@@ -56,14 +56,14 @@ namespace IO {
     void write_to_file(std::string name, std::string data);
     
     void print();
-    void close();
+    void clean_and_close();
   private:
     int total_files;
     std::map<std::string, int> file_to_index;
     std::map<int, fileInfo> file_values;
 
-    Path reference_dir; // Absolute path to location of toml file. Files will be searched for relative to this directory.
-    //std::string tomlfile; // Absolute path to options file.
+    Path reference_dir; // Absolute path to location of options toml file.
+                        // Files will be searched for relative to this directory.
     Path relative_outdir; // Relative path to out dir from reference directory.
     Path absolute_outdir; // Absolute path to the output directory.
   };

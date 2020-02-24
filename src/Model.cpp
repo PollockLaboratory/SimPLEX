@@ -86,6 +86,7 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw
 // Sampling
 sample_status Model::sample() {
   if(ready) {
+    //std::cout << std::endl << "New sample." << std::endl;
     return(components.sample());
     ready = false;
   } else {

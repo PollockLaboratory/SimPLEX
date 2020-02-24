@@ -77,13 +77,14 @@ private:
 public:
   TreeParameter();
 
-  virtual void print();
+  void print() override;
+  std::string get_type() override;
   
-  virtual sample_status sample();
-  virtual void undo();
-  virtual void fix();
-  virtual void refresh();
-  virtual double record_state(int gen, double l);
+  sample_status sample() override;
+  void undo() override;
+  void fix() override;
+  void refresh() override;
+  double record_state(int gen, double l) override;
 
   void Initialize(IO::RawTreeNode* raw_tree, IO::RawMSA* &raw_msa, SubstitutionModel* &SM);
   Tree* get_tree_ptr();

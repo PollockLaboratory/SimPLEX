@@ -23,14 +23,9 @@ public:
   SubstitutionModel(Valuable* u);
 
   // Reading IO.
-  SampleableValue* realize_component(IO::raw_param*);
-  SampleableValue* retreive_component(int id);
   RateVector* create_rate_vector(IO::raw_rate_vector rv, Valuable* u);
   void from_raw_model(IO::raw_substitution_model*);
 
-  std::map<int, SampleableValue*> realized_params;
-  std::map<int, IO::raw_param*> raw_params;
-    
   // States.
   States states;
   void add_state(std::string);

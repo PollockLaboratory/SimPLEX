@@ -40,6 +40,7 @@ protected:
   // Dependencies -> this component -> dependents.
   std::list<AbstractComponent*> dependencies; // Components that this component depends on.
   std::list<AbstractComponent*> dependents; // Components that depend on this parameter.
+  std::list<AbstractComponent*> refresh_list; // List of AbstractComponent that mush be refreshed when this AbstractComponent changes.
 public:
   int ID;
   std::string name;
@@ -51,12 +52,16 @@ public:
   void add_dependent(AbstractComponent*);
   const std::list<AbstractComponent*>& get_dependents();
 
+  void setup_refresh_list();
+  const std::list<AbstractComponent*>& get_refresh_list();
+
   int get_ID();
   std::string get_name();
 
   virtual void refresh() = 0;
   virtual void print() = 0;
   virtual double record_state(int gen, double l) = 0;
+  virtual std::string get_type() = 0;
 };
 
 class SampleableComponent : public AbstractComponent {
@@ -84,16 +89,17 @@ class UniformizationConstant : public Valuable, public SampleableComponent {
 public:
   UniformizationConstant(double);
 
-  virtual void print();
-  virtual sample_status sample();
+  void print() override;
+  sample_status sample() override;
 
-  virtual const double& getValue();
-  virtual const double& getOldValue();
+  const double& getValue() override;
+  const double& getOldValue() override;
 
-  virtual void undo();
-  virtual void fix();
-  virtual void refresh();
-  virtual double record_state(int gen, double l);
+  void undo() override;
+  void fix() override;
+  void refresh() override;
+  double record_state(int gen, double l) override;
+  std::string get_type() override;
 
   void add_VirtualSubstitutionRate(Valuable*);
   void set_initial();
