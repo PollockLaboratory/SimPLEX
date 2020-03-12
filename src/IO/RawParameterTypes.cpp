@@ -17,8 +17,54 @@ namespace IO {
   }
 
   std::string ParameterWrapper::get_type() {
-    // This isn't correct.
+    // This isn't correct?
     return(parameter->get_type());
+  }
+
+  void ParameterWrapper::set_lower_bound(ParameterWrapper* param) {
+    if(this->get_type() != "CONTINUOUS_FLOAT") {
+      std::cerr << "Error: setting the lower bound for parameter not of type CONTINUOUS_FLOAT." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    ContinuousFloat* cf = dynamic_cast<ContinuousFloat*>(param->parameter);
+    if(cf == nullptr) {
+      std::cerr << "Error: constraint parameter must be of type CONTINUOUS_FLOAT." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    DynamicConstraint* constraint = new DynamicConstraint(cf);
+
+    SampleableValue* sv = dynamic_cast<SampleableValue*>(this->parameter);
+    if(sv == nullptr) {
+      std::cerr << "Error: unable to cast parameter to SampleableValue when setting lower bound." << std::endl;
+      exit(EXIT_FAILURE); 
+    }
+
+    sv->set_lower_boundary(constraint);
+  }
+
+  void ParameterWrapper::set_upper_bound(ParameterWrapper* param) {
+    if(this->get_type() != "CONTINUOUS_FLOAT") {
+      std::cerr << "Error: setting the upper bound for parameter not of type CONTINUOUS_FLOAT." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    ContinuousFloat* cf = dynamic_cast<ContinuousFloat*>(param->parameter);
+    if(cf == nullptr) {
+      std::cerr << "Error: constraint parameter must be of type CONTINUOUS_FLOAT." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    DynamicConstraint* constraint = new DynamicConstraint(cf);
+
+    SampleableValue* sv = dynamic_cast<SampleableValue*>(this->parameter);
+    if(sv == nullptr) {
+      std::cerr << "Error: unable to cast parameter to SampleableValue when setting lower bound." << std::endl;
+      exit(EXIT_FAILURE); 
+    }
+
+    sv->set_upper_boundary(constraint);
   }
 
   ContinuousFloat* new_ContinuousFloat(std::string name, sol::table tbl) {
@@ -26,11 +72,23 @@ namespace IO {
     double step_size = value_from_table<double>(tbl, "step_size");
     double lower_bound = tbl.get_or<double>("lower_bound", neg_inf);
     double upper_bound = tbl.get_or<double>("upper_bound", inf);
-    return(new ContinuousFloat(name, init, step_size, lower_bound, upper_bound));
+
+    ContinuousFloat* parameter = new ContinuousFloat(name, init, step_size);
+
+    if(lower_bound != neg_inf) {
+      parameter->set_lower_boundary(new FixedConstraint(lower_bound));
+    }
+
+    if(upper_bound != inf) {
+      parameter->set_upper_boundary(new FixedConstraint(upper_bound));
+    }
+
+    return(parameter);
   }
 
   DiscreteFloat* new_DiscreteFloat(std::string name, sol::table tbl) {
     RateCategories* new_categories = dynamic_cast<RateCategories*>(value_from_table<ParameterWrapper>(tbl, "categories").parameter);
+    //int initial_cat = tbl.get_or<int>("initial_category", 0);
     return(new DiscreteFloat(name, new_categories));
   }
 

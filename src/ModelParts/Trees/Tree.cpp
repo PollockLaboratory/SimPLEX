@@ -331,18 +331,18 @@ void Tree::print_nodeList() {
   }
 }
 
-// TreeParameter
+// Ancestral States Parameter
 
-TreeParameter::TreeParameter() : SampleableComponent("Tree") {
+AncestralStatesParameter::AncestralStatesParameter() : SampleableComponent("AncestralStates") {
   tree = new Tree();
   n_samples =  env.get<int>("MCMC.tree_sample_n_positions");
 }
 
-void TreeParameter::print() {
-  std::cout << "TreeParameter" << std::endl;
+void AncestralStatesParameter::print() {
+  std::cout << "AncestralStates" << std::endl;
 }
 
-std::string TreeParameter::get_type() {
+std::string AncestralStatesParameter::get_type() {
   return("TREE_PARAMETER");
 }
 
@@ -364,24 +364,24 @@ std::list<int> random_positions(int s_length, int n) {
   return(positions);
 }
 
-sample_status TreeParameter::sample() {
+sample_status AncestralStatesParameter::sample() {
   // Pick positions.
   std::list<int> positions = random_positions(env.n, n_samples);
   return(tree->sample(positions));
 }
 
-void TreeParameter::undo() {
+void AncestralStatesParameter::undo() {
   std::cout << "Error: TreeParameter update cannot be undone." << std::endl;
   exit(EXIT_FAILURE);
 }
 
-void TreeParameter::fix() {
+void AncestralStatesParameter::fix() {
 }
 
-void TreeParameter::refresh() {
+void AncestralStatesParameter::refresh() {
 }
 
-void TreeParameter::Initialize(IO::RawTreeNode* raw_tree, IO::RawMSA* &raw_msa, SubstitutionModel* &SM) {
+void AncestralStatesParameter::Initialize(IO::RawTreeNode* raw_tree, IO::RawMSA* &raw_msa, SubstitutionModel* &SM) {
   const States* states = SM->get_states();
   SequenceAlignment* MSA = new SequenceAlignment(states);
   MSA->Initialize(raw_msa);
@@ -390,11 +390,11 @@ void TreeParameter::Initialize(IO::RawTreeNode* raw_tree, IO::RawMSA* &raw_msa, 
   tree->record_tree();
 }
 
-Tree* TreeParameter::get_tree_ptr() {
+Tree* AncestralStatesParameter::get_tree_ptr() {
   return(tree);
 }
 
-double TreeParameter::record_state(int gen, double l) {
+double AncestralStatesParameter::record_state(int gen, double l) {
   tree->record_state(gen, l);
   return(0.0);
 }

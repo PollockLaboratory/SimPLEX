@@ -17,7 +17,17 @@ for i = 0, (upper_bound - lower_bound)/step_size do
    w = lower_bound + ((i + 1) * step_size)
    init = (l + w)/2.0
 
-   cats[i+1] = Parameter.new("Category-" .. i, "continuous", {initial_value = init, step_size = 0.01, lower_bound = l, upper_bound = w})
+   cats[i+1] = Parameter.new("Category-" .. i, "continuous", {initial_value = init, step_size = 0.01, lower_bound = 0})
+end
+
+for i = 1, #cats do
+   if i ~= 1 then
+      cats[i]:set_lower_bound(cats[i-1])
+   end
+
+   if i ~= #cats then
+      cats[i]:set_upper_bound(cats[i+1])
+   end
 end
 
 Category_Object = Categories.new("RateCategories", cats)

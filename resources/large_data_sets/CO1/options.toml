@@ -20,10 +20,12 @@ seed = 0
 [DATA]
   # This should be TRUE or FALSE
   ancestral_sequences = false
-  substitution_model_file = "model_GNR_discrete.lua"
+  substitution_model_file = "model_GNR.lua"
 
-  sequences_file = "co1.fasta"
-  tree_file = "co1.newick"
+  #sequences_file = "co1.fasta"
+  sequences_file = "co1_reduced.fasta"
+  #tree_file = "co1.newick"
+  tree_file = "mito.newick"
 [OUTPUT]
   output_directory = "/output"
   tree_out_file = "tree_out.newick"
@@ -37,14 +39,15 @@ seed = 0
   log_out_file = "run.log"
 
 [MCMC]
-  generations = 4000001
+  generations = 10000001
+  #generations = 800
   full_update_freq = 200
-  #generations = 201
-  tree_sample_frequency = 50001
+  tree_sample_frequency = 70001
   tree_sample_n_positions = 10000
-  output_frequency = 5000
-  print_frequency = 5000
+  output_frequency = 10000
+  print_frequency = 10000
 
 [MODEL]
   states = ["A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"]
+  num_categories = 10
   #parameter_type = "continuous"

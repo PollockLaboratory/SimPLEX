@@ -27,8 +27,8 @@ struct SampleCounter {
 
 class ComponentSet {
 private:
-  std::set<AbstractComponent*> all_parameters;
   std::list<SampleCounter> sampleable_parameter_list;
+  std::map<int, AbstractComponent*> all_parameters;
 
   // Tracking the current parameter.
   std::list<SampleCounter>::iterator current_parameter; //Tracks the current parameter to be sampled, via an iterator across the parameter_list.
@@ -50,7 +50,7 @@ public:
 
   // Getters.
   SampleableComponent* get_current_parameter();
-  void refresh_all_dependencies();
+  void reset_dependencies();
 
   // Output
   void print();

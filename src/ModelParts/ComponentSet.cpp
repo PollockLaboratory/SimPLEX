@@ -24,26 +24,26 @@ void ComponentSet::Initialize() {
 
   // Reverse dependancies to set up dependents.
   for(auto p = all_parameters.begin(); p != all_parameters.end(); ++p) {
-    std::list<AbstractComponent*> deps = (*p)->get_dependancies();
+    std::list<AbstractComponent*> deps = p->second->get_dependancies();
     for(auto d = deps.begin(); d != deps.end(); ++d) {
-      (*d)->add_dependent(*p);
+      (*d)->add_dependent(p->second);
     }
   }
 
   // Setup refresh list.
   for(auto p = all_parameters.begin(); p != all_parameters.end(); ++p) {
-    (*p)->setup_refresh_list();
+    p->second->setup_refresh_list();
   }
 
   // Refreshes all dependancies.
-  refresh_all_dependencies();
+  reset_dependencies();
 
   files.add_file("parameters_out", env.get<std::string>("OUTPUT.parameters_out_file"), IOtype::OUTPUT);
 
   std::ostringstream buffer;
   buffer << "I,GEN,LogL";
-  for(auto it = all_parameters.begin(); it != all_parameters.end(); ++it) {
-    buffer << "," << (*it)->get_name();
+  for(int i = 0; i < all_parameters.size(); i++) {
+    buffer << "," << all_parameters[i]->get_name();
   }
   buffer << std::endl;
 
@@ -60,14 +60,14 @@ void ComponentSet::add_parameter(AbstractComponent* param, int max_sample_freq) 
    * Adds the pointer to an actual parameter onto the parameter_list, and to the
    * name_to_adress map.
    */
-  if(all_parameters.find(param) == all_parameters.end()) {
+  if(all_parameters.find(param->get_ID()) == all_parameters.end()) {
     // Check if Parameter has already been seen.
     SampleableComponent* p = dynamic_cast<SampleableComponent*> (param);
     if(p != NULL) {
       sampleable_parameter_list.push_back({p, max_sample_freq, 0});
     }
 
-    all_parameters.insert(param);
+    all_parameters[param->get_ID()] = param;
 
     }
 }
@@ -79,14 +79,18 @@ SampleableComponent* ComponentSet::get_current_parameter() {
 }
 
 void ComponentSet::refresh_dependancies(AbstractComponent* v) {
+  //std::cout << "Refresh: ";
   for(auto c = v->get_refresh_list().begin(); c != v->get_refresh_list().end(); ++c) {
     (*c)->refresh();
+    //std::cout << (*c)->get_name() << " ";
   }
+  //std::cout << std::endl;
 }
 
-void ComponentSet::refresh_all_dependencies() {
+void ComponentSet::reset_dependencies() {
   for(auto p = all_parameters.begin(); p != all_parameters.end(); ++p) {
-    refresh_dependancies(*p);
+    refresh_dependancies(p->second);
+    p->second->fix();
   }
 }
 
@@ -120,7 +124,7 @@ sample_status ComponentSet::sample() {
 
   (*current_parameter).last_sample = steps;
 
-  return (s);
+  return(s);
 }
 
 inline void ComponentSet::stepToNextParameter() {
@@ -138,12 +142,18 @@ inline void ComponentSet::stepToNextParameter() {
 }
 
 void ComponentSet::accept() {
-  get_current_parameter()->fix();
+  SampleableComponent* cp = get_current_parameter();
+
+  for(auto c = cp->get_refresh_list().begin(); c != cp->get_refresh_list().end(); ++c) {
+    (*c)->fix();
+  }
+
   stepToNextParameter();
 }
 
 void ComponentSet::reject() {
   get_current_parameter()->undo();
+
   refresh_dependancies(get_current_parameter());
   stepToNextParameter();
 }
@@ -153,15 +163,17 @@ void ComponentSet::print() {
    * Prints a short description of the state of the parameter_list.
    */
   std::cout << "Component Set - size: " << all_parameters.size() << std::endl;
-  for(auto iter = all_parameters.begin(); iter != all_parameters.end(); ++iter) {
+  //for(auto iter = all_parameters.begin(); iter != all_parameters.end(); ++iter) {
+  for(int i = 0; i < all_parameters.size(); i++) {
+    AbstractComponent* param = all_parameters[i];
     std::string sampleable;
-    if(dynamic_cast<SampleableComponent*>(*iter) != nullptr) {
+    if(dynamic_cast<SampleableComponent*>(param) != nullptr) {
       sampleable = "Sampled";
     } else {
       sampleable = "Non-sampled";
     }
-    std::cout << "[" << (*iter)->get_ID() << "] " << sampleable << "\t";
-    (*iter)->print();
+    std::cout << "[" << param->get_ID() << "] " << sampleable << "\t";
+    param->print();
   }
 }
 
@@ -192,8 +204,8 @@ void ComponentSet::saveToFile(int gen, double l) {
 
   std::string line = std::to_string(i) + "," + std::to_string(gen) + "," + std::to_string(l);
 
-  for(auto param = all_parameters.begin(); param != all_parameters.end(); ++param) {
-    line += "," + std::to_string((*param)->record_state(gen, l));
+  for(int j = 0; j < all_parameters.size(); j++) {
+    line += "," + std::to_string(all_parameters[j]->record_state(gen, l));
   }
 
   files.write_to_file("parameters_out", line + "\n");

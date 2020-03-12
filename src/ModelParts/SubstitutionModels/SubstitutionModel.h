@@ -64,11 +64,11 @@ private:
     inline bool step_to_next_component();
     SubstitutionModel& sub_model;
     bool endQ;
-    std::list<SampleableValue*> changed_comps; // List of the components that have changes with recent sampling.
-    std::queue<AbstractComponent*> cq; // Current queue.
-    std::set<AbstractComponent*> previous;
+    //std::list<SampleableValue*> changed_comps; // List of the components that have changes with recent sampling.
     std::list<rv_loc>::iterator location; // The location within a rate vector that has changed.
     std::list<rv_loc>::iterator location_iter_end;
+    std::list<Valuable*>::const_iterator current_parameter;
+    std::list<Valuable*>::const_iterator valuables_end;
   };
 };
 

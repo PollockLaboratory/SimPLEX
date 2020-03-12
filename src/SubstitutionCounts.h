@@ -20,7 +20,7 @@ class SubstitutionCounts {
 };
 
 class Tree;
-class TreeParameter;
+class AncestralStatesParameter;
 
 class CountsParameter : public AbstractComponent {
 private:
@@ -28,7 +28,8 @@ private:
   SubstitutionCounts* counts;
   Tree* tree;
 public:
-  CountsParameter(SubstitutionCounts*, TreeParameter*);
+  CountsParameter(SubstitutionCounts*, AncestralStatesParameter*);
+  void fix() override;
   void refresh() override;
   void print() override;
   double record_state(int gen, double l) override;

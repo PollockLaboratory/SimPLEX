@@ -22,7 +22,16 @@ void SubstitutionModel::add_state(std::string s) {
 RateVector* SubstitutionModel::create_rate_vector(IO::raw_rate_vector rv, Valuable* u) {
   std::vector<Valuable*> rates(states.n, nullptr);
   int s = states.state_to_int[rv.uc.state];
-  VirtualSubstitutionRate* vir_rate = new VirtualSubstitutionRate("tmp_name_virtual_substitution.", u); 
+
+  auto it = rv.rates.begin();
+  int i = 0;
+  while(i != s) {
+    ++it;
+    i++;
+  }
+
+  VirtualSubstitutionRate* vir_rate = new VirtualSubstitutionRate(*it, u);
+  
   for(int i = 0; i < states.n; i++) {
     AbstractComponent* param = rv.rates.front();
     if(param == nullptr) {
@@ -41,8 +50,6 @@ RateVector* SubstitutionModel::create_rate_vector(IO::raw_rate_vector rv, Valuab
       vir_rate->add_rate(rates[i]);
     } else {
       // Virtual Substitution rate.
-      // Need to delete virtual parameter.
-      vir_rate->name = param->name;
       rates[i] = vir_rate;
     }
     rv.rates.pop_front();
@@ -153,54 +160,41 @@ inline void SubstitutionModel::iterator::step_to_next_location() {
 }
 
 inline bool SubstitutionModel::iterator::step_to_next_component() {
-  cq.pop(); // Remove first element of queue.
-  if(cq.empty()) {
+  current_parameter++;
+  if(current_parameter == valuables_end) { 
+    //std::cout << std::endl;
     return(true);
   } else {
-    // Add dependancies for new Abstract component at head of the queue.
-    for(auto it = cq.front()->get_dependents().begin(); it != cq.front()->get_dependents().end(); ++it) {
-      if(previous.find(*it) != previous.end()) {
-	//std::cout << "Adding dep: " << (*it)->get_name() << std::endl;
-	previous.insert(*it);
-	cq.push(*it);
-      }
-    }
-
-    Valuable* v = dynamic_cast<Valuable*>(cq.front());
-    if(v != nullptr) {
-      location = v->host_vectors.begin();
-      location_iter_end = v->host_vectors.end();
-    }
+    location = (*current_parameter)->host_vectors.begin();
+    location_iter_end = (*current_parameter)->host_vectors.end();
+    AbstractComponent* comp = dynamic_cast<AbstractComponent*>(*current_parameter);
+    //std::cout << comp->get_name() << "-" << (*current_parameter)->host_vectors.size() << " ";
     return(false);
   }
 }
 
 SubstitutionModel::iterator::iterator(SubstitutionModel& s, bool e, AbstractComponent* modified_component) : sub_model(s), endQ(e) {
-  cq = {};
-  cq.push(modified_component);
+  current_parameter = modified_component->get_valuable_dependents().begin();
+  valuables_end = modified_component->get_valuable_dependents().end();
 
-  previous = {};
-  previous.insert(modified_component);
+  AbstractComponent* comp = dynamic_cast<AbstractComponent*>(*current_parameter);
+  //std::cout << "Begin: " << comp->get_name() << "-" << (*current_parameter)->host_vectors.size() << " ";
+
+  //std::cout << "VD " << modified_component->get_valuable_dependents().size() << " : ";
+  //for(auto it = modified_component->get_valuable_dependents().begin();
+  //    it != modified_component->get_valuable_dependents().end(); ++it) {
+  //  AbstractComponent* comp = dynamic_cast<AbstractComponent*>(*it);
+  //  std::cout << comp->name << " ";
+  //}
+  //std::cout << std::endl;
 
   // This if statement is for cases when there are no parameters to be fitted.
   // Essentially a redundant if statement in vast majority of cases.
-  if(cq.front() == nullptr) {
+  if(current_parameter == valuables_end) {
     endQ = true;
   } else {
-    // Add dependancies to queue.
-    for(auto it = cq.front()->get_dependents().begin(); it != cq.front()->get_dependents().end(); ++it) {
-      if(previous.find(*it) == previous.end()) {
-	//std::cout << "Adding dep: " << (*it)->get_name() << std::endl;
-	previous.insert(*it);
-	cq.push(*it);
-      }
-    }
-
-    Valuable* v = dynamic_cast<Valuable*>(cq.front());
-    if(v != nullptr) {
-      location = v->host_vectors.begin();
-      location_iter_end = v->host_vectors.end();
-    }
+    location = (*current_parameter)->host_vectors.begin();
+    location_iter_end = (*current_parameter)->host_vectors.end();
 
     while(location == location_iter_end) {
       endQ = step_to_next_component();
@@ -217,6 +211,8 @@ SubstitutionModel::iterator& SubstitutionModel::iterator::operator++() {
 }
 
 const rv_loc& SubstitutionModel::iterator::operator*() const {
+  //AbstractComponent* comp = dynamic_cast<AbstractComponent*>(*current_parameter);
+  //std::cout << comp->name << " ";
   return(*location);
 }
 

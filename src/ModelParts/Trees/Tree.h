@@ -70,12 +70,12 @@ public:
   void print_nodeList();
 };
 
-class TreeParameter : public SampleableComponent {
+class AncestralStatesParameter : public SampleableComponent {
 private:
   Tree* tree;
   int n_samples; // Number of positions/columns to resample each sample request.
 public:
-  TreeParameter();
+  AncestralStatesParameter();
 
   void print() override;
   std::string get_type() override;

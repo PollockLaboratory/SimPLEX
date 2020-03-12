@@ -14,8 +14,6 @@
 class ContinuousFloat : public SampleableValue {
 public:
   ContinuousFloat(std::string, double, double);
-  ContinuousFloat(std::string, double, double, double);
-  ContinuousFloat(std::string, double, double, double, double);
 
   void print() override;
   sample_status sample() override;
@@ -35,9 +33,6 @@ private:
   double value;
   double std_dev;
 
-  double lower_bound;
-  double upper_bound;
-
   double previous_value;	
 };
 
@@ -45,6 +40,7 @@ class RateCategories : public AbstractComponent {
   // The vector representing the possible rate a discretely sampled value can be.
 public:
   RateCategories(std::string name, std::vector<Valuable*> categories);
+  void fix() override;
   void refresh() override;
   void print() override;
 
@@ -89,6 +85,8 @@ class FixedFloat : public StaticValue {
   const double& getValue() override;
   const double& getOldValue() override;
   void print() override;
+
+  void fix() override;
   void refresh() override;
   std::string get_type() override;
  private:
@@ -105,12 +103,14 @@ class OutOfBoundsException: public std::exception {
 
 class VirtualSubstitutionRate : public StaticValue {
  public:
-  VirtualSubstitutionRate(std::string parameter_name, Valuable* unif);
+  VirtualSubstitutionRate(AbstractComponent* parameter, Valuable* unif);
   const double& getValue() override;
   const double& getOldValue() override;
   void print() override;
   std::string get_type() override;
-  void refresh();
+
+  void fix() override;
+  void refresh() override;
   void add_rate(Valuable* v);
  private:
   Valuable* u;

@@ -56,7 +56,7 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw
 
   // Tree.
   std::cout << "\tConstructing tree." << std::endl;
-  TreeParameter* tp = new TreeParameter();
+  AncestralStatesParameter* tp = new AncestralStatesParameter();
   tp->Initialize(raw_tree, raw_msa, substitution_model);
 
   std::cout << "\tAdding Uniformization constant." << std::endl;
@@ -77,7 +77,7 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw
   std::cout << "\tSetting initial parameter states." << std::endl;
   // Set initial tree state.
   tp->sample();
-  components.refresh_all_dependencies();
+  components.reset_dependencies();
 
   counts.print();
   std::cout << "Model succesfully constructed." << std::endl;
@@ -149,15 +149,16 @@ double Model::CalculateChangeInLikelihood(){
   RateVector* rv;
   int C_xy;
 
+  //std::cout << std::endl;
   for(auto it = substitution_model->modified_begin(components.get_current_parameter());
-      it.at_end() == false; ++it) {
+      it.at_end() == false; ++it) { 
     rv = (*it).rv;
     C_xy = counts.subs_by_rateVector[rv][(*it).pos];
     delta_logL += C_xy * log(rv->get_rate_ratio((*it).pos));
-    //std::cout << "RV: " << rv->get_name() << " " << (*it).pos << " " << C_xy << " " << log(rv->get_rate_ratio((*it).pos)) << " " << delta_logL << std::endl;
+    //std::cout << "[" << rv->get_rate_ratio((*it).pos) << " " << C_xy * log(rv->get_rate_ratio((*it).pos)) << "] ";
+    //std::cout << "RV: " << rv->get_name() << " count: " << C_xy << " ratio: " << rv->get_rate_ratio((*it).pos) << " log: " << log(rv->get_rate_ratio((*it).pos)) << " " << delta_logL << std::endl;
   }
 
-  //logL += delta_logL;
   //std::cout << "Delta: " << delta_logL << std::endl;
   return(delta_logL);
 }

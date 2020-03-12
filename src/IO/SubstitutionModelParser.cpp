@@ -139,11 +139,13 @@ namespace IO {
     config_table.set_function("get_string_array", &get_string_tbl);
 
     lua.new_usertype<ParameterWrapper>("Parameter",
-					"new", [](std::string name, std::string parameter_type, sol::table tbl) -> ParameterWrapper {
+				       "new", [](std::string name, std::string parameter_type, sol::table tbl) -> ParameterWrapper {
 						 return(new_parameter(name, parameter_type, tbl));
 					       },
-					"name", &ParameterWrapper::get_name,
-					"type", &ParameterWrapper::get_type);
+				       "name", &ParameterWrapper::get_name,
+				       "type", &ParameterWrapper::get_type,
+				       "set_lower_bound", &ParameterWrapper::set_lower_bound,
+				       "set_upper_bound", &ParameterWrapper::set_upper_bound);
 
     auto CatsTable = lua["Categories"].get_or_create<sol::table>();
     CatsTable.set_function("new", [](std::string name, sol::table tbl) -> ParameterWrapper {
@@ -156,7 +158,7 @@ namespace IO {
 					     });
 
     // Read the file.
-    lua.script(files.read_all(file_name)); 
+    lua.script(files.read_all(file_name));
   }
 
   raw_substitution_model* read_substitution_model(std::string file_name) {

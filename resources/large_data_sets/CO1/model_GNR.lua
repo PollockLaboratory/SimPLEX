@@ -8,7 +8,7 @@ for k, v in pairs(state_names) do
    print(k, v)
 end
 
-param_template = {initial_value = 0.001, step_size = 0.00005}
+param_template = {initial_value = 0.001, step_size = 0.0005, lower_bound = 0}
 
 print(#state_names)
 

@@ -15,6 +15,8 @@ namespace IO {
     ParameterWrapper(AbstractComponent*);
     std::string get_name();
     std::string get_type();
+    void set_upper_bound(ParameterWrapper*);
+    void set_lower_bound(ParameterWrapper*);
     AbstractComponent* parameter;
   };
 

@@ -48,7 +48,7 @@ seed = 0
   log_out_file = "run.log"
 
 [MCMC]
-  generations = 10001
+  generations = 21
   tree_sample_n_positions = 100000
   full_update_freq = 100
   tree_sample_frequency = 500

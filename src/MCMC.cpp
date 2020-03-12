@@ -56,15 +56,14 @@ void MCMC::sample() {
     //std::cout << "Inter Likelihood: " << newLnL << " ";
   } else {
     // TODO check partial update.
-
+    //double test_LogL = model->CalculateLikelihood();
     double delta_LogL = model->CalculateChangeInLikelihood();
     newLnL = lnL + delta_LogL;
-    //double test_LogL = model->CalculateLikelihood();
     gens_since_complete++;
 
-    //std::cout << "Inter Likelihood: " << newLnL << " - " << test_LogL << " ";
+    //std::cout << "Inter Likelihood: " << newLnL << " - " << test_LogL << " " << test_LogL - newLnL << " ";
   }
-
+  //std::cout << std::endl;
   if(s.testp) {
     //Metropolis-Hasting method.
     if (log(Random()) <= (newLnL - lnL)) {

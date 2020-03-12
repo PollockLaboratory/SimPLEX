@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <set>
 
 // Given these current class definitions there cannot be a samplable parameter that is also dependent on other
 // parameters - such as category parameters.
@@ -41,10 +42,14 @@ protected:
   std::list<AbstractComponent*> dependencies; // Components that this component depends on.
   std::list<AbstractComponent*> dependents; // Components that depend on this parameter.
   std::list<AbstractComponent*> refresh_list; // List of AbstractComponent that mush be refreshed when this AbstractComponent changes.
+  std::list<Valuable*> valuable_dependents; // List of dependents of valuable type.
+
+  std::list<AbstractComponent*> next_dependents(std::list<AbstractComponent*>, std::set<AbstractComponent*>&);
 public:
   int ID;
   std::string name;
   AbstractComponent(std::string name);
+  AbstractComponent(AbstractComponent* parameter);
 
   void add_dependancy(AbstractComponent*);
   const std::list<AbstractComponent*>& get_dependancies();
@@ -54,10 +59,12 @@ public:
 
   void setup_refresh_list();
   const std::list<AbstractComponent*>& get_refresh_list();
+  const std::list<Valuable*>& get_valuable_dependents();
 
   int get_ID();
   std::string get_name();
 
+  virtual void fix() = 0;
   virtual void refresh() = 0;
   virtual void print() = 0;
   virtual double record_state(int gen, double l) = 0;
@@ -69,20 +76,51 @@ public:
   SampleableComponent(std::string name);
   virtual sample_status sample() = 0;
   virtual void undo() = 0;
-  virtual void fix() = 0;
 protected:
   bool fixedQ;
 };
 
+// Constraints
+
+class BaseConstraint {
+public:
+  virtual double get_value() const = 0;
+  virtual std::string get_description() const = 0;
+};
+
+class FixedConstraint : public BaseConstraint {
+private:
+  double value;
+public:
+  FixedConstraint(double value);
+  double get_value() const override;
+  std::string get_description() const override;
+};
+
+class DynamicConstraint : public BaseConstraint {
+private:
+  Valuable* value;
+public:
+  DynamicConstraint(Valuable* value);
+  double get_value() const override;
+  std::string get_description() const override;
+};
+
 class SampleableValue : public SampleableComponent , public Valuable {
+protected:
+  BaseConstraint* lower_bound;
+  BaseConstraint* upper_bound;
 public:
   SampleableValue(std::string name);
+  void set_lower_boundary(BaseConstraint*);
+  void set_upper_boundary(BaseConstraint*);
 };
 
 class StaticValue : public AbstractComponent, public Valuable {
 public:
   StaticValue(std::string name);
-  virtual double record_state(int gen, double l);
+  StaticValue(AbstractComponent* parameter);
+  double record_state(int gen, double l) override;
 };
 
 class UniformizationConstant : public Valuable, public SampleableComponent {

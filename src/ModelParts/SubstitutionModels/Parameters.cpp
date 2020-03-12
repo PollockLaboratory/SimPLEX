@@ -4,36 +4,18 @@
 
 // CONTINUOUS FLOAT
 
-double inf = std::numeric_limits<double>::infinity();
-
 ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, double initial_std_dev = 1.0) : SampleableValue(name), value(initial_value), std_dev(initial_std_dev) {
   /*
    * The default constructor for the Continuous Float parameter class.
    */
-  lower_bound = -inf;
-  upper_bound = inf;
 
-  previous_value = initial_value;
-}
-
-ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, double initial_std_dev = 1.0, double lower_bound = -inf) : SampleableValue(name), value(initial_value), std_dev(initial_std_dev), lower_bound(lower_bound) {
-  /*
-   * The default constructor for the Continuous Float parameter class - with bounds
-   */
-  upper_bound = inf;
-
-  previous_value = initial_value;
-}
-
-ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, double initial_std_dev = 1.0, double lower_bound = -inf, double upper_bound = inf) : SampleableValue(name), value(initial_value), std_dev(initial_std_dev), lower_bound(lower_bound), upper_bound(upper_bound) {
-  /*
-   * The default constructor for the Continuous Float parameter class - with bounds
-   */
   previous_value = initial_value;
 }
 
 void ContinuousFloat::print() {
-  std::cout << "Continuous float - " << name << ": " << value << " [" << lower_bound << "->" << upper_bound << "]" << std::endl;
+  std::cout << "Continuous float - " << name << ": " << value
+	    << " [" << lower_bound->get_description()
+	    << "->" << upper_bound->get_description() << "]" << std::endl;
 }
 
 sample_status ContinuousFloat::sample() {
@@ -43,13 +25,16 @@ sample_status ContinuousFloat::sample() {
   double r = ((rand() % 10000) / 10000.0) - 0.5;
   value = value + (r * std_dev);
 
-  while(value < lower_bound or value > upper_bound) {
-    if(value < lower_bound) {
-      value = (2*lower_bound) - value;
+  double lb = lower_bound->get_value();
+  double ub = upper_bound->get_value();
+
+  while(value < lb or value > ub) {
+    if(value < lb) {
+      value = (2*lb) - value;
     }
 
-    if(value > upper_bound) {
-      value = (2*upper_bound) - value;
+    if(value > ub) {
+      value = (2*ub) - value;
     }
   }
 
@@ -60,22 +45,17 @@ const double& ContinuousFloat::getValue() {
   return(value);
 }
 
-const double& ContinuousFloat::getOldValue() {
-  if(fixedQ) {
-    std::cout << "Error: in ContinuousFloat::getOldValue - already fixed." << std::endl;
-    exit(EXIT_FAILURE);
-  }
+const double& ContinuousFloat::getOldValue() { 
   return(previous_value);
 }
 
 void ContinuousFloat::undo() {
   value = previous_value;
-  previous_value = 0;
   fixedQ = true;
 }
 
 void ContinuousFloat::fix() {
-  previous_value = 0;
+  previous_value = value;
   fixedQ = true;
 }
 
@@ -109,6 +89,9 @@ RateCategories::RateCategories(std::string name, std::vector<Valuable*> categori
   }
 }
 
+void RateCategories::fix() {
+}
+
 void RateCategories::refresh() {
 }
 
@@ -119,7 +102,8 @@ double RateCategories::record_state(int gen, double l) {
 void RateCategories::print() {
   std::cout << "Rate Categories - " << name << ": [ ";
   for(int i = 0; i < n; i++) {
-    std::cout << values[i] << " ";
+    AbstractComponent* component = dynamic_cast<AbstractComponent*>(values[i]);
+    std::cout << component->name << " ";
   }
   std::cout << "]" << std::endl;
 }
@@ -140,7 +124,7 @@ DiscreteFloat::DiscreteFloat(std::string name, RateCategories* categories) : Sam
   add_dependancy(rc);
   n = rc->n;
   i = 0;
-  prev_i = i;
+  prev_i = 0;
   value = (*rc)[i]; 
   previous_value = value;
 
@@ -157,10 +141,9 @@ void DiscreteFloat::print() {
 }
 
 sample_status DiscreteFloat::sample() {
-  prev_i = i;
-  // Previous value isn't needed.
-  previous_value = value;
   fixedQ = false;
+
+  prev_i = i;
 
   if(i == 0) {
     i = 1;
@@ -191,27 +174,24 @@ const double& DiscreteFloat::getValue() {
 }
 
 const double& DiscreteFloat::getOldValue() {
-  if(fixedQ) {
-    std::cout << "Error: in CategoryFloat::getOldValue - already fixed." << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  previous_value = (*rc)[prev_i];
   return(previous_value);
 }
 
 void DiscreteFloat::undo() {
   i = prev_i;
   value = (*rc)[i];
-  //value = previous_value;
   fixedQ = true;
 }
 
 void DiscreteFloat::fix() {
+  //value = (*rc)[i];
+  prev_i = i;
+  previous_value = value;
   fixedQ = true;
 }
 
 void DiscreteFloat::refresh() {
-  value = (*rc)[i];
+    value = (*rc)[i];
 }
 
 double DiscreteFloat::record_state(int gen, double l) {
@@ -240,6 +220,9 @@ void FixedFloat::print() {
   std::cout << "FixedFloat - " << name << ": " << value << std::endl;
 }
 
+void FixedFloat::fix() {
+}
+
 void FixedFloat::refresh() {	
 }
 
@@ -249,10 +232,9 @@ std::string FixedFloat::get_type() {
 
 // VIRTUAL SUBSTITUTION RATE
 
-VirtualSubstitutionRate::VirtualSubstitutionRate(std::string parameter_name, Valuable* unif) : StaticValue(parameter_name), u(unif) {
+VirtualSubstitutionRate::VirtualSubstitutionRate(AbstractComponent* parameter, Valuable* unif) : StaticValue(parameter) {
   u = unif;
 
-  // Check to see if the uniformization constant is dynamic.
   UniformizationConstant* uniform = dynamic_cast<UniformizationConstant*>(u);
   if(uniform != nullptr) {
     uniform->add_VirtualSubstitutionRate(this);
@@ -260,6 +242,7 @@ VirtualSubstitutionRate::VirtualSubstitutionRate(std::string parameter_name, Val
   }
   // This should be more throughtfully set.
   value = 0.232323;
+  previous_value = value;
 }
 
 const double& VirtualSubstitutionRate::getValue() {
@@ -278,8 +261,11 @@ std::string VirtualSubstitutionRate::get_type() {
   return("VIRTUAL_SUBSTITUTION_RATE");
 }
 
-void VirtualSubstitutionRate::refresh() {
+void VirtualSubstitutionRate::fix() {
   previous_value = value;
+}
+
+void VirtualSubstitutionRate::refresh() {
   double total = 0.0;
 
   int i = 0;
