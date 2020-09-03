@@ -23,15 +23,25 @@ RateVector* SubstitutionModel::create_rate_vector(IO::raw_rate_vector rv, Valuab
   std::vector<Valuable*> rates(states.n, nullptr);
   int s = states.state_to_int[rv.uc.state];
 
-  auto it = rv.rates.begin();
+  // Setup Virtual Substitution rate.
+  auto ptr_vir = rv.rates.begin();
   int i = 0;
   while(i != s) {
-    ++it;
+    ++ptr_vir;
     i++;
   }
 
-  VirtualSubstitutionRate* vir_rate = new VirtualSubstitutionRate(*it, u);
+  // Test code.
+  VirtualSubstitutionRate* vir_rate = dynamic_cast<VirtualSubstitutionRate*>(*ptr_vir);
+
+  if(vir_rate == nullptr) {
+    std::cerr << "Error: expecting substitution rate at position " << i << " in rate vector " << rv.name << "." << std::endl;
+    exit(EXIT_FAILURE);
+  }
   
+  vir_rate->set_u(u);
+
+  // Add each of the remaining parameters to the rate vector.
   for(int i = 0; i < states.n; i++) {
     AbstractComponent* param = rv.rates.front();
     if(param == nullptr) {
@@ -40,7 +50,7 @@ RateVector* SubstitutionModel::create_rate_vector(IO::raw_rate_vector rv, Valuab
     }
 
     if(i != s) {
-      SampleableValue* v = dynamic_cast<SampleableValue*>(param);
+      Valuable* v = dynamic_cast<Valuable*>(param);
       if(v == nullptr) {
 	std::cerr << "Error: parameter in raw_rate_vector is not Valuable." << std::endl;
 	exit(EXIT_FAILURE);
@@ -106,7 +116,7 @@ RateVector* SubstitutionModel::selectRateVector(rv_request rq) {
 // Getters
 
 const double& SubstitutionModel::get_u() {
-  return(u->getValue());
+  return(u->get_value());
 }
 
 void add_all_dependancies(std::list<AbstractComponent*>& all, AbstractComponent* parameter) {
@@ -167,8 +177,6 @@ inline bool SubstitutionModel::iterator::step_to_next_component() {
   } else {
     location = (*current_parameter)->host_vectors.begin();
     location_iter_end = (*current_parameter)->host_vectors.end();
-    AbstractComponent* comp = dynamic_cast<AbstractComponent*>(*current_parameter);
-    //std::cout << comp->get_name() << "-" << (*current_parameter)->host_vectors.size() << " ";
     return(false);
   }
 }
@@ -177,7 +185,7 @@ SubstitutionModel::iterator::iterator(SubstitutionModel& s, bool e, AbstractComp
   current_parameter = modified_component->get_valuable_dependents().begin();
   valuables_end = modified_component->get_valuable_dependents().end();
 
-  AbstractComponent* comp = dynamic_cast<AbstractComponent*>(*current_parameter);
+  //AbstractComponent* comp = dynamic_cast<AbstractComponent*>(*current_parameter);
   //std::cout << "Begin: " << comp->get_name() << "-" << (*current_parameter)->host_vectors.size() << " ";
 
   //std::cout << "VD " << modified_component->get_valuable_dependents().size() << " : ";

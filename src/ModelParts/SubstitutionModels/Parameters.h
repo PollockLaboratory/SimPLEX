@@ -18,14 +18,16 @@ public:
   void print() override;
   sample_status sample() override;
 
-  const double& getValue() override;
-  const double& getOldValue() override;
+  const double& get_value() override;
+  const double& get_old_value() override;
 
   void undo() override;
   void fix() override;
   void refresh() override;
 
-  double record_state(int gen, double l) override;
+  std::string get_state_header() override;
+  std::string get_state() override;
+
   std::string get_type() override;
 
   friend std::ostream& operator<<(std::ostream&, const ContinuousFloat&);
@@ -44,7 +46,9 @@ public:
   void refresh() override;
   void print() override;
 
-  double record_state(int gen, double l) override;
+  std::string get_state_header() override;
+  std::string get_state() override;
+
   std::string get_type() override;
 
   double operator[](int);
@@ -59,14 +63,16 @@ public:
   void print() override;
   sample_status sample() override;
 
-  const double& getValue() override;
-  const double& getOldValue() override;
+  const double& get_value() override;
+  const double& get_old_value() override;
 
   void undo() override;
   void fix() override;
   void refresh() override;
 
-  double record_state(int gen, double l) override;
+  std::string get_state_header() override;
+  std::string get_state() override;
+
   std::string get_type() override;
 private:
   RateCategories* rc;
@@ -79,40 +85,78 @@ private:
 
 // Dependent
 
-class FixedFloat : public StaticValue {
- public:
+class FixedFloat : public NonSampleableValue {
+public:
   FixedFloat(std::string parameter_name, double);
-  const double& getValue() override;
-  const double& getOldValue() override;
+  const double& get_value() override;
+  const double& get_old_value() override;
+  void print() override;
+  std::string get_type() override;
+
+  void fix() override;
+  void refresh() override;
+
+private:
+  double value;
+};
+
+// Arithmatic
+
+enum arith_op {
+	       ADDITION,
+	       SUBTRACTION,
+	       MULTIPLICATION,
+	       DIVISION
+};
+
+class Arithmatic : public NonSampleableValue{
+public:
+  static int idc;
+  Arithmatic(arith_op, Valuable*, Valuable*);
+  Arithmatic(std::string, arith_op, Valuable*, Valuable*);
+
+  const double& get_value() override;
+  const double& get_old_value() override;
   void print() override;
 
   void fix() override;
   void refresh() override;
+
   std::string get_type() override;
- private:
+private:
+  arith_op op;
+  double (*arith_func)(double, double);
   double value;
+  double previous_value;
+  Valuable* v1;
+  Valuable* v2;
+  void setup(Valuable*, Valuable*);
 };
 
+// Virtual Substitution rate.
+
 class OutOfBoundsException: public std::exception {
- private:
+private:
   std::string m_error;
- public:
+public:
   OutOfBoundsException(std::string error_message) : m_error(error_message) {
   }
 };
 
-class VirtualSubstitutionRate : public StaticValue {
- public:
-  VirtualSubstitutionRate(AbstractComponent* parameter, Valuable* unif);
-  const double& getValue() override;
-  const double& getOldValue() override;
+class VirtualSubstitutionRate : public NonSampleableValue {
+public:
+  VirtualSubstitutionRate(std::string name);
+  const double& get_value() override;
+  const double& get_old_value() override;
   void print() override;
   std::string get_type() override;
 
   void fix() override;
   void refresh() override;
+
+  void set_u(Valuable* unif);
   void add_rate(Valuable* v);
- private:
+private:
   Valuable* u;
   double value;
   double previous_value;

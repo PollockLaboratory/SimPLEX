@@ -37,7 +37,7 @@ const std::vector<Substitution>& BranchSegment::get_substitutions() {
 }
 
 double BranchSegment::get_rate(int pos, int dec_state) {
-  double r = rates[pos]->rates[dec_state]->getValue();
+  double r = rates[pos]->rates[dec_state]->get_value();
   // Might not need this anymore.
   if(isnan(log(r))) {
     rates[pos]->rates[dec_state]->print();
@@ -75,7 +75,7 @@ void BranchSegment::set_new_substitutions() {
 	// Possibility of virtual substitution.
 	// Not sure this is exactly right.
 	float length = distance;
-	double vir_rate = rates[pos]->rates[dec[pos]]->getValue();
+	double vir_rate = rates[pos]->rates[dec[pos]]->get_value();
 	double p = 1 - (1 / (1 + (vir_rate * distance)));
 	if(Random() < p) {
 	  substitutions[pos] = {true, anc[pos], dec[pos], rates[pos]};
@@ -229,7 +229,7 @@ void TreeNode::calculate_state_probabilities_pos(int pos, TreeNode* left_node, T
       rv = SM->selectRateVector({pos, i});
       for(int j = 0; j < env.num_states; j++) {
 	if(not left_node->gaps[pos]) {
-	  double rate = rv->rates[dec_seq->at(pos)]->getValue();
+	  double rate = rv->rates[dec_seq->at(pos)]->get_value();
 	  left_prob += (left_node->state_probabilities[pos][j] * rate * t_b)/(1.0 + (u * t_b));
 	} else {
 	  left_prob = 1.0;
@@ -247,7 +247,7 @@ void TreeNode::calculate_state_probabilities_pos(int pos, TreeNode* left_node, T
       rv = SM->selectRateVector({pos, i});
       for(int j = 0; j < env.num_states; j++) {
 	if(not right_node->gaps[pos]) {
-	  double rate = rv->rates[right_node->sequence->at(pos)]->getValue();
+	  double rate = rv->rates[right_node->sequence->at(pos)]->get_value();
 	  right_prob += (right_node->state_probabilities[pos][j] * rate * t_b)/(1.0 + (u * t_b));
 	} else {
 	  right_prob = 1.0;
@@ -276,7 +276,7 @@ void TreeNode::calculate_state_probabilities_pos(int pos, TreeNode* left_node, T
       for(int j = 0; j < env.num_states; j++) {
 	// Double check this.
 	rv = SM->selectRateVector({pos, j});
-	double rate = rv->rates[i]->getValue();
+	double rate = rv->rates[i]->get_value();
 	up_prob += (up_node->state_probabilities[pos][j] * rate * t_b)/(1.0 + (u * t_b));
       }
 

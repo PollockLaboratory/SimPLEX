@@ -41,11 +41,11 @@ sample_status ContinuousFloat::sample() {
   return(sample_status({true, true, false}));
 }
 
-const double& ContinuousFloat::getValue() {
+const double& ContinuousFloat::get_value() {
   return(value);
 }
 
-const double& ContinuousFloat::getOldValue() { 
+const double& ContinuousFloat::get_old_value() { 
   return(previous_value);
 }
 
@@ -62,8 +62,12 @@ void ContinuousFloat::fix() {
 void ContinuousFloat::refresh() {
 }
 
-double ContinuousFloat::record_state(int gen, double l) {
-  return(getValue());
+std::string ContinuousFloat::get_state_header() {
+  return(name);
+}
+
+std::string ContinuousFloat::get_state() {
+  return(std::to_string(get_value()));
 }
 
 std::string ContinuousFloat::get_type() {
@@ -95,8 +99,12 @@ void RateCategories::fix() {
 void RateCategories::refresh() {
 }
 
-double RateCategories::record_state(int gen, double l) {
-  return(0.0);
+std::string RateCategories::get_state_header() {
+  return(name);
+}
+
+std::string RateCategories::get_state() {
+  return("n/a");
 }
 
 void RateCategories::print() {
@@ -109,7 +117,7 @@ void RateCategories::print() {
 }
 
 double RateCategories::operator[](int i) {
-  return(values[i]->getValue());
+  return(values[i]->get_value());
 }
 
 std::string RateCategories::get_type() {
@@ -169,11 +177,11 @@ sample_status DiscreteFloat::sample() {
   return(sample_status({true, true, false}));
 }
 
-const double& DiscreteFloat::getValue() {
+const double& DiscreteFloat::get_value() {
   return(value);
 }
 
-const double& DiscreteFloat::getOldValue() {
+const double& DiscreteFloat::get_old_value() {
   return(previous_value);
 }
 
@@ -194,8 +202,12 @@ void DiscreteFloat::refresh() {
     value = (*rc)[i];
 }
 
-double DiscreteFloat::record_state(int gen, double l) {
-  return(getValue());
+std::string DiscreteFloat::get_state_header() {
+  return(name + "-value," + name + "-category");
+}
+
+std::string DiscreteFloat::get_state() {
+  return(std::to_string(get_value()) + "," + std::to_string(i));
 }
 
 std::string DiscreteFloat::get_type() {
@@ -204,15 +216,15 @@ std::string DiscreteFloat::get_type() {
 
 // FIXED FLOAT
 
-FixedFloat::FixedFloat(std::string parameter_name, double v) : StaticValue(parameter_name) {
+FixedFloat::FixedFloat(std::string parameter_name, double v) : NonSampleableValue(parameter_name) {
   value = v;
 }
 
-const double& FixedFloat::getValue() {
+const double& FixedFloat::get_value() {
   return(value);
 }
 
-const double&  FixedFloat::getOldValue() {
+const double&  FixedFloat::get_old_value() {
   return(value);
 }
 
@@ -230,26 +242,118 @@ std::string FixedFloat::get_type() {
   return("FIXED_FLOAT");
 }
 
+// Arithmatic
+
+double arith_add(double v1, double v2) {
+  return(v1 + v2);
+};
+
+double arith_subtract(double v1, double v2) {
+  return(v1 - v2);
+};
+
+double arith_multiply(double v1, double v2) {
+  return(v1 * v2);
+}
+
+double arith_divide(double v1, double v2) {
+  return(v1 / v2);
+}
+
+int Arithmatic::idc = 0;
+
+void Arithmatic::setup(Valuable* v1, Valuable* v2) {
+  switch(op) {
+  case ADDITION:
+    arith_func = &arith_add;
+    break;
+  case SUBTRACTION:
+    arith_func = &arith_subtract;
+    break;
+  case MULTIPLICATION:
+    arith_func = &arith_multiply;
+    break;
+  case DIVISION:
+    arith_func = &arith_divide;
+    break;
+  }
+  
+  AbstractComponent* c1 = dynamic_cast<AbstractComponent*>(v1);
+  AbstractComponent* c2 = dynamic_cast<AbstractComponent*>(v2);
+
+  this->add_dependancy(c1);
+  this->add_dependancy(c2);
+
+  value = arith_func(v1->get_value(), v2->get_value());
+  previous_value = value;
+}
+
+Arithmatic::Arithmatic(std::string name, arith_op op, Valuable* v1, Valuable* v2) : NonSampleableValue(name), op(op), v1(v1), v2(v2) {
+  setup(v1, v2);
+}
+
+Arithmatic::Arithmatic(arith_op op, Valuable* v1, Valuable* v2) : NonSampleableValue("Arithmatic-" + std::to_string(idc)), op(op), v1(v1), v2(v2) {
+  idc++;
+  setup(v1, v2);
+}
+
+const double& Arithmatic::get_value() {
+  return(value);
+}
+
+const double& Arithmatic::get_old_value() {
+  return(previous_value);
+}
+
+void Arithmatic::print() {
+  std::string op_char = "";
+  switch(op) {
+  case ADDITION:
+    op_char = "+";
+    break;
+  case SUBTRACTION:
+    op_char = "-";
+    break;
+  case MULTIPLICATION:
+    op_char = "*";
+    break;
+  case DIVISION:
+    op_char = "/";
+    break;
+  }
+
+  std::string name1 = dynamic_cast<AbstractComponent*>(v1)->name;
+  std::string name2 = dynamic_cast<AbstractComponent*>(v2)->name;
+
+  std::cout << "ARITH[" << name1 << op_char << name2 << "] " << name << ": " << value << std::endl;
+}
+
+void Arithmatic::fix() {
+  previous_value = value;
+}
+
+void Arithmatic::refresh() {
+  value = arith_func(v1->get_value(), v2->get_value());
+}
+
+std::string Arithmatic::get_type() {
+  return("Arithmatic");
+}
+
 // VIRTUAL SUBSTITUTION RATE
 
-VirtualSubstitutionRate::VirtualSubstitutionRate(AbstractComponent* parameter, Valuable* unif) : StaticValue(parameter) {
-  u = unif;
+VirtualSubstitutionRate::VirtualSubstitutionRate(std::string name) : NonSampleableValue(name) {
+  u = nullptr;
 
-  UniformizationConstant* uniform = dynamic_cast<UniformizationConstant*>(u);
-  if(uniform != nullptr) {
-    uniform->add_VirtualSubstitutionRate(this);
-    this->add_dependancy(uniform);
-  }
-  // This should be more throughtfully set.
   value = 0.232323;
   previous_value = value;
 }
 
-const double& VirtualSubstitutionRate::getValue() {
+const double& VirtualSubstitutionRate::get_value() {
   return(value);
 }
 
-const double& VirtualSubstitutionRate::getOldValue() {
+const double& VirtualSubstitutionRate::get_old_value() {
   return(previous_value);
 }
 
@@ -268,15 +372,14 @@ void VirtualSubstitutionRate::fix() {
 void VirtualSubstitutionRate::refresh() {
   double total = 0.0;
 
-  int i = 0;
-  //std::cout << "rates [ " << std::endl;
+  //std::cout << "rates [ ";
   for(auto it = dependent_rates.begin(); it != dependent_rates.end(); ++it) {
-    // std::cout << (*it)->getValue() << " ";
-    total += (*it)->getValue();
+    //std::cout << (*it)->get_value() << " ";
+    total += (*it)->get_value();
   }
   //std::cout << "]" << std::endl;
   
-  value = u->getValue() - total;
+  value = u->get_value() - total;
 
   //std::cout << previous_value << "->" << value << std::endl;
   if(value <= 0.0 || value > 1.0) {
@@ -294,4 +397,14 @@ void VirtualSubstitutionRate::add_rate(Valuable* v) {
   dependent_rates.push_back(v);
 }
 
+void VirtualSubstitutionRate::set_u(Valuable *unif) {
+  u = unif;
+
+  // If Uniformization constant is dynamic, rather that simply a fixed float.
+  UniformizationConstant* uniform = dynamic_cast<UniformizationConstant*>(u);
+  if(uniform != nullptr) {
+    uniform->add_VirtualSubstitutionRate(this);
+    this->add_dependancy(uniform);
+  }
+}
 

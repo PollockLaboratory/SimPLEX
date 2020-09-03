@@ -9,7 +9,7 @@ extern Environment env;
 
 // ABSTRACT COMPONENT
 
-AbstractComponent::AbstractComponent(std::string name) : name(name) {
+AbstractComponent::AbstractComponent(std::string name) : name(name), hidden(false) {
   static int idc = -1;
   idc++;
   ID = idc;
@@ -17,21 +17,16 @@ AbstractComponent::AbstractComponent(std::string name) : name(name) {
   valuable_dependents = {};
 }
 
-AbstractComponent::AbstractComponent(AbstractComponent* parameter) {
-  ID = parameter->get_ID();
-  name = parameter->get_name();
-
-  refresh_list = {};
-  valuable_dependents = {};
-  delete parameter;
-}
-
-int AbstractComponent::get_ID() {
+int AbstractComponent::get_ID() const {
   return(ID);
 }
 
-std::string AbstractComponent::get_name() {
+std::string AbstractComponent::get_name() const {
   return(name);
+}
+
+bool AbstractComponent::get_hidden() const {
+  return(hidden);
 }
 
 void AbstractComponent::add_dependancy(AbstractComponent* v) {
@@ -113,7 +108,7 @@ std::list<rv_loc> Valuable::get_host_vectors() {
 }
 
 void Valuable::print() {
-  std::cout << this->getValue();
+  std::cout << this->get_value();
 }
 
 // SampleableComponent.
@@ -148,7 +143,7 @@ DynamicConstraint::DynamicConstraint(Valuable* value) : value(value) {
 }
 
 double DynamicConstraint::get_value() const {
-  return(value->getValue());
+  return(value->get_value());
 }
 
 std::string DynamicConstraint::get_description() const {
@@ -175,14 +170,15 @@ void SampleableValue::set_upper_boundary(BaseConstraint* constraint) {
 
 // StaticValue.
 
-StaticValue::StaticValue(std::string name) : AbstractComponent(name), Valuable() {
+NonSampleableValue::NonSampleableValue(std::string name) : AbstractComponent(name), Valuable() {
 }
 
-StaticValue::StaticValue(AbstractComponent* parameter) : AbstractComponent(parameter), Valuable() {
+std::string NonSampleableValue::get_state_header() {
+  return(name);
 }
 
-double StaticValue::record_state(int gen, double l) {
-  return(getValue());
+std::string NonSampleableValue::get_state() {
+  return(std::to_string(get_value()));
 }
 
 // UniformizationConstant.
@@ -200,7 +196,7 @@ void UniformizationConstant::print() {
 void UniformizationConstant::set_initial() {
   double min = 1.0;
   for(auto it = vsrs.begin(); it != vsrs.end(); ++it) {
-    double v = (*it)->getValue();
+    double v = (*it)->get_value();
     if(v < min) {
       min = v;
     }
@@ -212,7 +208,7 @@ sample_status UniformizationConstant::sample() {
   previous_value = value;
   double min = 1.0;
   for(auto it = vsrs.begin(); it != vsrs.end(); ++it) {
-    double v = (*it)->getValue();
+    double v = (*it)->get_value();
     if(v < min) {
       min = v;
     }
@@ -233,11 +229,11 @@ sample_status UniformizationConstant::sample() {
   return(sample_status({false, true, true}));
 }
 
-const double& UniformizationConstant::getValue() {
+const double& UniformizationConstant::get_value() {
   return(value);
 }
 
-const double& UniformizationConstant::getOldValue() {
+const double& UniformizationConstant::get_old_value() {
   return(previous_value);
 }
 
@@ -251,12 +247,16 @@ void UniformizationConstant::fix() {
 void UniformizationConstant::refresh() {
 }
 
-double UniformizationConstant::record_state(int gen, double l) {
-  return(getValue());
-}
-
 std::string UniformizationConstant::get_type() {
   return("UNIFORMIZATION_CONSTANT");
+}
+
+std::string UniformizationConstant::get_state_header() {
+  return(name);
+}
+
+std::string UniformizationConstant::get_state() {
+  return(std::to_string(get_value()));
 }
 
 void UniformizationConstant::add_VirtualSubstitutionRate(Valuable* v) {

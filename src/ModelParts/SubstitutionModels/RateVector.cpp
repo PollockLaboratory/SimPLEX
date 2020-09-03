@@ -21,11 +21,11 @@ RateVector::RateVector(std::string name, std::string s, const States* states, st
 
 float RateVector::operator[](int i) {
   
-  return(rates[i]->getValue());
+  return(rates[i]->get_value());
 }
 
 float RateVector::get_rate_ratio(int i) {
-  return(rates[i]->getValue() / rates[i]->getOldValue());
+  return(rates[i]->get_value() / rates[i]->get_old_value());
 }
 
 const int& RateVector::getID() {
@@ -52,7 +52,7 @@ std::string RateVector::get_state_by_pos(int pos) {
 void RateVector::print() {
   std::cout << "RateVector:\t" << name << "\t";
   for(auto it = rates.begin(); it != rates.end(); ++it) {
-    std::cout << (*it)->getValue() << " ";
+    std::cout << (*it)->get_value() << " ";
   }
   std::cout << std::endl;
 }
@@ -145,7 +145,7 @@ void RateVectorSet::saveToFile(int gen, double l) {
   for(auto it = col.begin(); it != col.end(); ++it) {
     buffer << i << "," << gen << "," << l << "," << (*it)->get_name() << "," << (*it)->state;
     for(auto jt = (*it)->rates.begin(); jt != (*it)->rates.end(); ++jt) {
-      buffer << "," << (*jt)->getValue();
+      buffer << "," << (*jt)->get_value();
     }
     buffer << std::endl;
   }

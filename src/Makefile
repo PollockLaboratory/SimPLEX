@@ -56,6 +56,41 @@ CMAKE_BINARY_DIR = /home/hamish/Documents/Code/simplex0_0
 #=============================================================================
 # Targets provided globally by CMake.
 
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
+
+# Special rule for the target install/strip
+install/strip/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip/fast
+
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
+
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+
+.PHONY : test/fast
+
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -67,6 +102,16 @@ rebuild_cache/fast: rebuild_cache
 
 .PHONY : rebuild_cache/fast
 
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+
+.PHONY : list_install_components/fast
+
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
@@ -77,6 +122,18 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -233,33 +290,6 @@ IO/LuaUtils.cpp.s:
 	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/LuaUtils.cpp.s
 .PHONY : IO/LuaUtils.cpp.s
 
-IO/RawParameterTypes.o: IO/RawParameterTypes.cpp.o
-
-.PHONY : IO/RawParameterTypes.o
-
-# target to build an object file
-IO/RawParameterTypes.cpp.o:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/RawParameterTypes.cpp.o
-.PHONY : IO/RawParameterTypes.cpp.o
-
-IO/RawParameterTypes.i: IO/RawParameterTypes.cpp.i
-
-.PHONY : IO/RawParameterTypes.i
-
-# target to preprocess a source file
-IO/RawParameterTypes.cpp.i:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/RawParameterTypes.cpp.i
-.PHONY : IO/RawParameterTypes.cpp.i
-
-IO/RawParameterTypes.s: IO/RawParameterTypes.cpp.s
-
-.PHONY : IO/RawParameterTypes.s
-
-# target to generate assembly for a file
-IO/RawParameterTypes.cpp.s:
-	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/RawParameterTypes.cpp.s
-.PHONY : IO/RawParameterTypes.cpp.s
-
 IO/SequencesParser.o: IO/SequencesParser.cpp.o
 
 .PHONY : IO/SequencesParser.o
@@ -286,6 +316,33 @@ IO/SequencesParser.s: IO/SequencesParser.cpp.s
 IO/SequencesParser.cpp.s:
 	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/SequencesParser.cpp.s
 .PHONY : IO/SequencesParser.cpp.s
+
+IO/SubstitutionModelParameterWrapper.o: IO/SubstitutionModelParameterWrapper.cpp.o
+
+.PHONY : IO/SubstitutionModelParameterWrapper.o
+
+# target to build an object file
+IO/SubstitutionModelParameterWrapper.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/SubstitutionModelParameterWrapper.cpp.o
+.PHONY : IO/SubstitutionModelParameterWrapper.cpp.o
+
+IO/SubstitutionModelParameterWrapper.i: IO/SubstitutionModelParameterWrapper.cpp.i
+
+.PHONY : IO/SubstitutionModelParameterWrapper.i
+
+# target to preprocess a source file
+IO/SubstitutionModelParameterWrapper.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/SubstitutionModelParameterWrapper.cpp.i
+.PHONY : IO/SubstitutionModelParameterWrapper.cpp.i
+
+IO/SubstitutionModelParameterWrapper.s: IO/SubstitutionModelParameterWrapper.cpp.s
+
+.PHONY : IO/SubstitutionModelParameterWrapper.s
+
+# target to generate assembly for a file
+IO/SubstitutionModelParameterWrapper.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/simPLEX.dir/build.make src/CMakeFiles/simPLEX.dir/IO/SubstitutionModelParameterWrapper.cpp.s
+.PHONY : IO/SubstitutionModelParameterWrapper.cpp.s
 
 IO/SubstitutionModelParser.o: IO/SubstitutionModelParser.cpp.o
 
@@ -698,9 +755,14 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... rebuild_cache"
+	@echo "... install/strip"
+	@echo "... install/local"
+	@echo "... test"
 	@echo "... simPLEX"
+	@echo "... rebuild_cache"
+	@echo "... list_install_components"
 	@echo "... edit_cache"
+	@echo "... install"
 	@echo "... Data.o"
 	@echo "... Data.i"
 	@echo "... Data.s"
@@ -713,12 +775,12 @@ help:
 	@echo "... IO/LuaUtils.o"
 	@echo "... IO/LuaUtils.i"
 	@echo "... IO/LuaUtils.s"
-	@echo "... IO/RawParameterTypes.o"
-	@echo "... IO/RawParameterTypes.i"
-	@echo "... IO/RawParameterTypes.s"
 	@echo "... IO/SequencesParser.o"
 	@echo "... IO/SequencesParser.i"
 	@echo "... IO/SequencesParser.s"
+	@echo "... IO/SubstitutionModelParameterWrapper.o"
+	@echo "... IO/SubstitutionModelParameterWrapper.i"
+	@echo "... IO/SubstitutionModelParameterWrapper.s"
 	@echo "... IO/SubstitutionModelParser.o"
 	@echo "... IO/SubstitutionModelParser.i"
 	@echo "... IO/SubstitutionModelParser.s"

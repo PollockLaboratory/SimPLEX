@@ -41,7 +41,7 @@ public:
   ComponentSet();
   void Initialize();
   void add_parameter(AbstractComponent* param);
-  void add_parameter(AbstractComponent* param, int max_sample_freq);
+  void add_parameter(AbstractComponent* param, unsigned int max_sample_freq);
 
   // Sampling.
   sample_status sample();
@@ -55,7 +55,7 @@ public:
   // Output
   void print();
   void print_dependencies();
-  void saveToFile(int gen, double l);
+  void save_to_file(int gen, double l);
 };
 
 #endif

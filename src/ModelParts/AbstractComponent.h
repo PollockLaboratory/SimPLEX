@@ -27,8 +27,8 @@ struct rv_loc {
 class Valuable {
 public:
   Valuable();
-  virtual const double& getValue() = 0;
-  virtual const double& getOldValue() = 0;
+  virtual const double& get_value() = 0;
+  virtual const double& get_old_value() = 0;
   void print();
 
   std::list<rv_loc> get_host_vectors();
@@ -39,6 +39,7 @@ public:
 class AbstractComponent {
 protected:
   // Dependencies -> this component -> dependents.
+  bool hidden; // If hidden is true will not be printed in the output files.
   std::list<AbstractComponent*> dependencies; // Components that this component depends on.
   std::list<AbstractComponent*> dependents; // Components that depend on this parameter.
   std::list<AbstractComponent*> refresh_list; // List of AbstractComponent that mush be refreshed when this AbstractComponent changes.
@@ -49,7 +50,6 @@ public:
   int ID;
   std::string name;
   AbstractComponent(std::string name);
-  AbstractComponent(AbstractComponent* parameter);
 
   void add_dependancy(AbstractComponent*);
   const std::list<AbstractComponent*>& get_dependancies();
@@ -61,13 +61,16 @@ public:
   const std::list<AbstractComponent*>& get_refresh_list();
   const std::list<Valuable*>& get_valuable_dependents();
 
-  int get_ID();
-  std::string get_name();
+  int get_ID() const;
+  std::string get_name() const;
+  bool get_hidden() const;
+
+  virtual std::string get_state_header()  = 0; // Returns the column(s) names for the component set output file.
+  virtual std::string get_state() = 0; // Returns the current state of the parameter, typically a double that fills the csv column.
 
   virtual void fix() = 0;
   virtual void refresh() = 0;
   virtual void print() = 0;
-  virtual double record_state(int gen, double l) = 0;
   virtual std::string get_type() = 0;
 };
 
@@ -116,11 +119,12 @@ public:
   void set_upper_boundary(BaseConstraint*);
 };
 
-class StaticValue : public AbstractComponent, public Valuable {
+class NonSampleableValue : public AbstractComponent, public Valuable {
 public:
-  StaticValue(std::string name);
-  StaticValue(AbstractComponent* parameter);
-  double record_state(int gen, double l) override;
+  NonSampleableValue(std::string name);
+
+  std::string get_state_header() override;
+  std::string get_state() override;  
 };
 
 class UniformizationConstant : public Valuable, public SampleableComponent {
@@ -130,15 +134,17 @@ public:
   void print() override;
   sample_status sample() override;
 
-  const double& getValue() override;
-  const double& getOldValue() override;
+  const double& get_value() override;
+  const double& get_old_value() override;
 
   void undo() override;
   void fix() override;
   void refresh() override;
-  double record_state(int gen, double l) override;
   std::string get_type() override;
 
+  std::string get_state_header() override;
+  std::string get_state() override;
+ 
   void add_VirtualSubstitutionRate(Valuable*);
   void set_initial();
 

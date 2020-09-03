@@ -41,6 +41,9 @@ private:
 
   SubstitutionCounts counts;
   SubstitutionModel* substitution_model;
+
+  AncestralStatesParameter* tp;
+  CountsParameter* cp;
 };
 
 #endif

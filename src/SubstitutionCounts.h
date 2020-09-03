@@ -32,8 +32,13 @@ public:
   void fix() override;
   void refresh() override;
   void print() override;
-  double record_state(int gen, double l) override;
+
+  std::string get_state_header() override;
+  std::string get_state() override;
+
   std::string get_type() override;
+
+  void save_to_file(int gen, double l);
 };
 
 #endif

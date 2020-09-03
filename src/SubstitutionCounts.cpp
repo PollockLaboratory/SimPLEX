@@ -48,6 +48,7 @@ void SubstitutionCounts::print() {
 //std::ofstream CountsParameter::out_file;
 
 CountsParameter::CountsParameter(SubstitutionCounts* counts, AncestralStatesParameter* tp) : AbstractComponent("SubstitutionCounts."), counts(counts) {
+  hidden = true;
 
   this->tree = tp->get_tree_ptr();
   this->add_dependancy(tp);
@@ -56,7 +57,7 @@ CountsParameter::CountsParameter(SubstitutionCounts* counts, AncestralStatesPara
 
   // Print csv header to outfile.
   std::ostringstream buffer;
-  buffer << "RateVector,State";
+  buffer << "I,GEN,LogL,RateVector,State";
   RateVector* rv = tree->get_SM()->get_RateVectors().front();
   for(int i = 0; i < rv->size(); i++) {
     buffer << "," << rv->get_state_by_pos(i);
@@ -91,11 +92,22 @@ void CountsParameter::print() {
   std::cout << "CountsParameter." << std::endl;
 }
 
-double CountsParameter::record_state(int gen, double l) {
+std::string CountsParameter::get_state_header() {
+  return(name);
+}
+
+std::string CountsParameter::get_state() {
+  return("n/a");
+}
+
+void CountsParameter::save_to_file(int gen, double l) {
+  static int index = -1;
+  index++;
+
   std::ostringstream buffer;
 
   for(auto it = counts->subs_by_rateVector.begin(); it != counts->subs_by_rateVector.end(); ++it) {
-    buffer << it->first->get_name() << "," << it->first->get_state();
+    buffer << index << "," << gen << "," << l << "," << it->first->get_name() << "," << it->first->get_state();
     for(auto jt = it->second.begin(); jt != it->second.end(); ++jt) {
       buffer << "," << *jt;
     }
@@ -103,7 +115,6 @@ double CountsParameter::record_state(int gen, double l) {
   }
 
   files.write_to_file("substitution_counts_out", buffer.str());
-  return(0.0);
 }
 
 std::string CountsParameter::get_type() {

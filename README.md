@@ -46,8 +46,21 @@ Test that everything is working:
 Copy the simPLEX binary to a location on your path so simPLEX can be used in any directory:
 
 	$ cp ./bin/simPLEX /usr/bin/simPLEX
+	
+## Building tests
+Ignore this section unless you are trying to edit or develop any additional feature in simPLEX. Tests are not built by default. In order to build the tests, the additional CMake flag (BUILD_TESTS) must be set to ON. For example, from the build directory (./build):
 
-## Usage
+	$ cmake .. -DCMAKE_BUILD_TYPE=DEBUG	-DBUILD_TESTS=ON
+	
+Then compile as normal:
+
+	$ make
+	
+Tests can be run with all_tests executable:
+
+	$ ./tests/all_tests
+	
+### Usage
 
 When configuring simPLEX there are 3 main core input files.
 

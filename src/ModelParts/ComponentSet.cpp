@@ -20,6 +20,14 @@ ComponentSet::ComponentSet() {
 // Setup.
 
 void ComponentSet::Initialize() {
+  // Check if any parameters are not used.
+  for(unsigned int i = 0; i < all_parameters.size(); i++) {
+    if(all_parameters[i] == nullptr) {
+      std::cerr << "Error: a parameter is created in the model script, but not used." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+  }
+  
   current_parameter = sampleable_parameter_list.begin();
 
   // Reverse dependancies to set up dependents.
@@ -40,10 +48,13 @@ void ComponentSet::Initialize() {
 
   files.add_file("parameters_out", env.get<std::string>("OUTPUT.parameters_out_file"), IOtype::OUTPUT);
 
+  // Set header of components csv output.
   std::ostringstream buffer;
   buffer << "I,GEN,LogL";
-  for(int i = 0; i < all_parameters.size(); i++) {
-    buffer << "," << all_parameters[i]->get_name();
+  for(unsigned int i = 0; i < all_parameters.size(); i++) {
+    if(all_parameters[i]->get_hidden() != true) {
+      buffer << "," << all_parameters[i]->get_state_header();
+    }
   }
   buffer << std::endl;
 
@@ -55,7 +66,7 @@ void ComponentSet::add_parameter(AbstractComponent* param) {
   add_parameter(param, 0);
 }
 
-void ComponentSet::add_parameter(AbstractComponent* param, int max_sample_freq) {
+void ComponentSet::add_parameter(AbstractComponent* param, unsigned int max_sample_freq) {
   /* 
    * Adds the pointer to an actual parameter onto the parameter_list, and to the
    * name_to_adress map.
@@ -164,16 +175,18 @@ void ComponentSet::print() {
    */
   std::cout << "Component Set - size: " << all_parameters.size() << std::endl;
   //for(auto iter = all_parameters.begin(); iter != all_parameters.end(); ++iter) {
-  for(int i = 0; i < all_parameters.size(); i++) {
+  for(unsigned int i = 0; i < all_parameters.size(); i++) {
     AbstractComponent* param = all_parameters[i];
-    std::string sampleable;
-    if(dynamic_cast<SampleableComponent*>(param) != nullptr) {
-      sampleable = "Sampled";
-    } else {
-      sampleable = "Non-sampled";
+    if(param->get_hidden() != true) {
+      std::string sampleable;
+      if(dynamic_cast<SampleableComponent*>(param) != nullptr) {
+	sampleable = "Sampled";
+      } else {
+	sampleable = "Non-sampled";
+      }
+      std::cout << "[" << param->get_ID() << "] " << sampleable << "\t";
+      param->print();
     }
-    std::cout << "[" << param->get_ID() << "] " << sampleable << "\t";
-    param->print();
   }
 }
 
@@ -194,7 +207,7 @@ void ComponentSet::print_dependencies() {
   std::cout << std::endl;
 }
 
-void ComponentSet::saveToFile(int gen, double l) {
+void ComponentSet::save_to_file(int gen, double l) {
   /*
    * Saves the current parameter values to the output csv file, contained
    * in the out_file.
@@ -204,8 +217,10 @@ void ComponentSet::saveToFile(int gen, double l) {
 
   std::string line = std::to_string(i) + "," + std::to_string(gen) + "," + std::to_string(l);
 
-  for(int j = 0; j < all_parameters.size(); j++) {
-    line += "," + std::to_string(all_parameters[j]->record_state(gen, l));
+  for(unsigned int j = 0; j < all_parameters.size(); j++) {
+    if(all_parameters[j]->get_hidden() != true) {
+      line += "," + all_parameters[j]->get_state();
+    }
   }
 
   files.write_to_file("parameters_out", line + "\n");

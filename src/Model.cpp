@@ -56,7 +56,7 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw
 
   // Tree.
   std::cout << "\tConstructing tree." << std::endl;
-  AncestralStatesParameter* tp = new AncestralStatesParameter();
+  tp = new AncestralStatesParameter();
   tp->Initialize(raw_tree, raw_msa, substitution_model);
 
   std::cout << "\tAdding Uniformization constant." << std::endl;
@@ -69,7 +69,7 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw
 
   
   std::cout << "\tPreparing substitution counts." << std::endl;
-  CountsParameter* cp = new CountsParameter(&counts, tp);
+  cp = new CountsParameter(&counts, tp);
   components.add_parameter(cp);
 
   components.Initialize();
@@ -168,8 +168,11 @@ void Model::RecordState(int gen, double l) {
 	/*
 	 * Records the state of both the tree and the substitution model.
 	 */
-	components.saveToFile(gen, l);
+	components.save_to_file(gen, l);
 	substitution_model->saveToFile(gen, l);
+	// Counts and tree save should be here.
+	tp->save_to_file(gen, l);
+	cp->save_to_file(gen, l); 
 }
 
 void Model::print() {

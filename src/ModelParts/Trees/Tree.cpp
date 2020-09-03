@@ -299,8 +299,6 @@ void Tree::record_substitutions(int gen, double l) {
     buffer << (*it)->ancestral->name << "," << (*it)->decendant->name << ",[ ";
     std::vector<Substitution> subs = (*it)->get_substitutions();
     for(unsigned int i = 0; i < subs.size(); i++) {
-	TreeNode* anc = (*it)->ancestral;
-	TreeNode* dec = (*it)->decendant;
 	if(subs[i].occuredp == true) {
 	  buffer << (*it)->ancestral->state_at_pos(i) << i << (*it)->decendant->state_at_pos(i) << " ";
 	}
@@ -382,6 +380,7 @@ void AncestralStatesParameter::refresh() {
 }
 
 void AncestralStatesParameter::Initialize(IO::RawTreeNode* raw_tree, IO::RawMSA* &raw_msa, SubstitutionModel* &SM) {
+  hidden = true;
   const States* states = SM->get_states();
   SequenceAlignment* MSA = new SequenceAlignment(states);
   MSA->Initialize(raw_msa);
@@ -394,7 +393,14 @@ Tree* AncestralStatesParameter::get_tree_ptr() {
   return(tree);
 }
 
-double AncestralStatesParameter::record_state(int gen, double l) {
+std::string AncestralStatesParameter::get_state_header() {
+  return(name);
+}
+
+void AncestralStatesParameter::save_to_file(int gen, double l) {
   tree->record_state(gen, l);
-  return(0.0);
+}
+
+std::string AncestralStatesParameter::get_state() {
+  return("n/a");
 }

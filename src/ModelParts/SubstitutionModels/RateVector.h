@@ -26,10 +26,10 @@ class BranchSegment; // Defined in Trees/Types/TreeParts.h
 // Fundamental collection type of parameters in substitution model.
 class RateVector {
 private:
-  const States* states;
   int id;
   static int IDc;
   std::string name;
+  const States* states;
 public:
   RateVector(std::string, std::string, const States*, std::vector<Valuable*>);
 

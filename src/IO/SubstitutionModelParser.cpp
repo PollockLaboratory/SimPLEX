@@ -49,6 +49,7 @@ namespace IO {
     }
   }
 
+  // Look into this - not sure the ignore states do anything.
   void raw_substitution_model::set_ignore_states(sol::table tbl) {
     into_list(tbl, ignore_states);
   }
@@ -95,7 +96,7 @@ namespace IO {
     return(rv);
   }
 
-  sol::table get_string_tbl(std::string option) {
+  sol::table get_string_tbl(std::string option) { // from the Environment.
     std::vector<std::string> vals = env.get_array<std::string>(option);
     sol::table tbl = lua.create_table();
     int i = 1;
@@ -111,7 +112,7 @@ namespace IO {
   }
 
   void raw_substitution_model::read_from_file(std::string file_name) {
-    lua.open_libraries(sol::lib::base, sol::lib::table);
+    lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::string);
 
     //Main tables.
     auto model_table = lua["model"].get_or_create<sol::table>();
@@ -145,7 +146,15 @@ namespace IO {
 				       "name", &ParameterWrapper::get_name,
 				       "type", &ParameterWrapper::get_type,
 				       "set_lower_bound", &ParameterWrapper::set_lower_bound,
-				       "set_upper_bound", &ParameterWrapper::set_upper_bound);
+				       "set_upper_bound", &ParameterWrapper::set_upper_bound,
+				       "add", add_parameters,
+				       "named_add", named_add_parameters,
+				       "subtract", subtract_parameters,
+				       "named_subtract", named_subtract_parameters,
+				       "multiply", multiply_parameters,
+				       "named_multiply", named_multiply_parameters,
+				       "divide", divide_parameters,
+				       "named_divide", named_divide_parameters);
 
     auto CatsTable = lua["Categories"].get_or_create<sol::table>();
     CatsTable.set_function("new", [](std::string name, sol::table tbl) -> ParameterWrapper {

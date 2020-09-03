@@ -7,7 +7,7 @@
 #include <map>
 
 #include "sol2/sol.hpp"
-#include "RawParameterTypes.h"
+#include "SubstitutionModelParameterWrapper.h"
 
 namespace IO {
   // RATE VECTOR
@@ -19,7 +19,6 @@ namespace IO {
 
   class raw_rate_vector {
   public:
-    //raw_rate_vector(std::string, rv_use_class, std::list<raw_Parameter*>);
     raw_rate_vector(std::string, rv_use_class, std::list<AbstractComponent*>);
     int ID;
     std::string name;
@@ -37,11 +36,7 @@ namespace IO {
     std::list<std::string> states;
     std::list<std::string> ignore_states;
     std::list<raw_rate_vector> rv_list;
-    //std::list<AbstractComponent*> get_parameters();
-    //const std::map<int, raw_Parameter*>& get_map_parameters();
   private:
-    //void fill_parameter_list(raw_Parameter*);
-    //std::map<int, raw_Parameter*> params;
     void set_states(sol::table tbl);
     void set_ignore_states(sol::table tbl);
     void add_rate_vector(raw_rate_vector rv);

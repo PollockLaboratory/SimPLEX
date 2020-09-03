@@ -35,8 +35,6 @@ NtoF = Parameter.new("NtoF", parameter_type, param_template)
 FtoN = Parameter.new("FtoN", parameter_type, param_template)
 FtoF = Parameter.new("FtoF", parameter_type, param_template)
 
-Parameter.multiply(NtoF, FtoN)
-
 print("Name:", NtoN:type())
 
 model.add_rate_vector(RateVector.new("Non-functional", {state = states[1], pos = {}}, {NtoN, NtoF}))

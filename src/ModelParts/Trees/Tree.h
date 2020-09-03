@@ -76,6 +76,7 @@ private:
   int n_samples; // Number of positions/columns to resample each sample request.
 public:
   AncestralStatesParameter();
+  void Initialize(IO::RawTreeNode* raw_tree, IO::RawMSA* &raw_msa, SubstitutionModel* &SM);
 
   void print() override;
   std::string get_type() override;
@@ -84,9 +85,12 @@ public:
   void undo() override;
   void fix() override;
   void refresh() override;
-  double record_state(int gen, double l) override;
 
-  void Initialize(IO::RawTreeNode* raw_tree, IO::RawMSA* &raw_msa, SubstitutionModel* &SM);
+  std::string get_state_header() override;
+  std::string get_state() override;
+
+  void save_to_file(int gen, double l);
+
   Tree* get_tree_ptr();
 };
 
