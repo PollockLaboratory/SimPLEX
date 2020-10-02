@@ -1,11 +1,11 @@
-set(BINARY run_tests)
+set(TEST_BINARY run_tests)
 
-set(TEST_SRCS
-  basic.cpp )
+set(TEST_FILES
+  all_tests.cpp )
 
-ADD_EXECUTABLE(${BINARY} ${TEST_SRCS})
+ADD_EXECUTABLE(${TEST_BINARY} ${TEST_FILES})
 
-target_link_libraries(${BINARY} gtest gtest_main)
+target_link_libraries(${TEST_BINARY} PUBLIC libSimPLEX gtest gtest_main)
 
-add_test(AllTests ${BINARY})
+add_test(AllTests ${TEST_BINARY})
 

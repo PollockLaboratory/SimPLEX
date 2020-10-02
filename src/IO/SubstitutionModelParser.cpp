@@ -133,6 +133,10 @@ namespace IO {
 					   return(env.get<int>(key));
 					 });
 
+    config_table.set_function("get_float", [](std::string key) -> double {
+					     return(env.get<double>(key));
+					   });
+
     config_table.set_function("get_str", [](std::string key) -> std::string {
 					   return(env.get<std::string>(key));
 					 });

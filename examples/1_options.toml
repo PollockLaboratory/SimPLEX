@@ -1,0 +1,49 @@
+debug = true
+seed = 0
+
+# Tree Settings
+[TREE]
+  max_segment_length = 0.08
+  branch_split_algorithm = 1
+  scale_factor = 1.0
+  resolve_multifurcation = true
+
+# Uniformization Constant
+[UNIFORMIZATION]
+  dynamic = false
+  sample_frequency = 2000
+  refresh_tree_on_update = true
+  initial_value = 0.5
+  threshold = 0.01
+  max_step = 0.005
+
+[DATA]
+  # This should be TRUE or FALSE
+  ancestral_sequences = false
+  substitution_model_file = "1_basic_model.lua"
+
+  sequences_file = "data_sets/nucleotide.fasta"
+  tree_file = "data_sets/tree.newick"
+[OUTPUT]
+  output_directory = "/output"
+  tree_out_file = "tree_out.newick"
+  #sequences_out_file = "sequences_out.fasta"
+  sequences_out_file = ""
+  parameters_out_file = "parameters_out.csv"
+  rate_vectors_out_file = "rate_vectors_out.csv"
+  likelihood_out_file = "likelihoods_out.csv"
+  substitutions_out_file = "substitutions.out"
+  counts_out_file = "counts.csv"
+  log_out_file = "run.log"
+
+[MCMC]
+  generations = 1001
+  #generations = 800
+  full_update_freq = 200
+  tree_sample_frequency = 200
+  tree_sample_n_positions = 10000
+  output_frequency = 100
+  print_frequency = 100
+
+[MODEL]
+    step_size = 0.0005

@@ -35,7 +35,7 @@ RateVector* SubstitutionModel::create_rate_vector(IO::raw_rate_vector rv, Valuab
   VirtualSubstitutionRate* vir_rate = dynamic_cast<VirtualSubstitutionRate*>(*ptr_vir);
 
   if(vir_rate == nullptr) {
-    std::cerr << "Error: expecting substitution rate at position " << i << " in rate vector " << rv.name << "." << std::endl;
+    std::cerr << "Error: expecting virtual substitution rate at position " << i << " in rate vector " << rv.name << "." << std::endl;
     exit(EXIT_FAILURE);
   }
   

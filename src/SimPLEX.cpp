@@ -31,13 +31,18 @@ double Random() {
 
 //Entry point for SimPLEX.
 int main(int argc, char* argv[]) {
+  std::cout << "<< SimPLEX >>" << std::endl
+	    << "developed by Hamish N.C. Pike" << std::endl
+	    << "hamish.pike@cuanschutz.edu" << std::endl;
+
+  if(argc <= 1) {
+    return(0);
+  } else {
+    std::cout << std::endl;
+  }
+  
   time_t start_time = time(NULL);
   std::cout.precision(17);
-
-  std::cout << std::endl << "SimPLEX" << std::endl
-	    << "by Hamish N.C. Pike" << std::endl
-	    << "hamish.pike@cuanschutz.edu" << std::endl
-	    << "For internal use only." << std::endl << std::endl;
 
   //Establish environment and files.
   env.ReadOptions(argc, argv);

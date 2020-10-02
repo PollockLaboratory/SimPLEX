@@ -1,3 +1,4 @@
+# Add sources.
 set(SRCS
   Data.cpp
   MCMC.cpp
@@ -20,22 +21,23 @@ set(SRCS
   ModelParts/Trees/BranchSplitting.cpp
   ModelParts/Trees/TreeParts.cpp )
 
-add_executable( simPLEX SimPLEX.cpp)
+add_library(libSimPLEX STATIC ${SRCS})
 
 find_package(Boost 1.5 REQUIRED)
 if(Boost_FOUND)
-  target_include_directories( simPLEX PUBLIC ${Boost_INCLUDE_DIRS})
-  target_link_libraries( simPLEX PUBLIC ${Boost_LIBRARIES})
+  target_include_directories( libSimPLEX PUBLIC ${Boost_INCLUDE_DIRS})
+  target_link_libraries( libSimPLEX PUBLIC ${Boost_LIBRARIES})
 endif()
 
 find_package(Lua 5 REQUIRED)
 if(Lua_FOUND)
-  target_include_directories( simPLEX PUBLIC ${LUA_INCLUDE_DIR})
-  target_link_libraries( simPLEX PUBLIC ${LUA_LIBRARIES} )
+  target_include_directories( libSimPLEX PUBLIC ${LUA_INCLUDE_DIR})
+  target_link_libraries( libSimPLEX PUBLIC ${LUA_LIBRARIES} )
 endif()
 
-target_sources( simPLEX PUBLIC ${SRCS} )
+target_include_directories( libSimPLEX PUBLIC ../libs )
 
-target_include_directories( simPLEX PUBLIC ../libs )
-
+# Main executable.
+add_executable( simPLEX SimPLEX.cpp)
+target_link_libraries( simPLEX PUBLIC libSimPLEX )
 set_target_properties( simPLEX PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin" )

@@ -40,6 +40,30 @@ void addSequence(IO::RawMSA& msa, std::string name, std::string seq) {
 }
 
 namespace IO {
+  // Operators
+  bool operator==(const RawMSA& lhs, const RawMSA& rhs) {
+    if(lhs.n != rhs.n or lhs.cols != rhs.cols) {
+      return(false);
+    }
+
+    for(auto it = lhs.seqs.begin(); it != lhs.seqs.end(); ++it) {
+      if((*it).second != rhs.seqs.at((*it).first)) {
+	//std::cerr << (*it).second << " " << rhs.seqs.at((*it).first) << std::endl;
+	return(false);
+      }
+    }
+
+    return(true); 
+  }
+
+  std::ostream& operator<<(std::ostream& os, const RawMSA& msa) {
+    os << "<< MSA: n:" << msa.n << " cols:" << msa.cols << " >>" << std::endl;
+    for(auto it = msa.seqs.begin(); it != msa.seqs.end(); ++it) {
+      os << (*it).first << " " << (*it).second << std::endl;
+    }
+    return(os);
+  }
+
   RawMSA* readRawMSA(std::string file_name) {
     RawMSA* raw_msa = new RawMSA();
     raw_msa->n = 0;
@@ -81,7 +105,7 @@ namespace IO {
 
   std::list<std::string> getRawMSANames(const RawMSA& msa) {
     std::list<std::string> names = {};
-    for(auto it = msa.seqs.begin(); it != msa.seqs.end(); ++it) {
+    for(auto it = msa.seqs.rbegin(); it != msa.seqs.rend(); ++it) {
       names.push_front((*it).first);
     }
     return(names);
