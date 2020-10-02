@@ -78,19 +78,3 @@ model.add_rate_vector(RV_a)
 model.add_rate_vector(RV_t)
 model.add_rate_vector(RV_c)
 model.add_rate_vector(RV_g)
-
---[[
-Q = {}
-
-for i=1,#model_states do
-	Q[i] = {}
-	for j=1,#model_states do
-	   if i ~= j then
-	      Q[i][j] = x
-	   else
-	      Q[i][j] = Parameter.new("virtual-"..tostring(model_states[i]), "virtual", {})
-	   end
-	end
-	model.add_x_vector(RateVector.new("RV-"..tostring(model_states[i]), {state = model_states[i], pos = {}}, Q[i]))
-   end
---]]
