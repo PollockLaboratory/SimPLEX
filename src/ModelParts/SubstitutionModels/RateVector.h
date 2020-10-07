@@ -53,7 +53,7 @@ class RateVectorSet {
 public:
   RateVectorSet();
   std::vector<RateVector*> col;
-  void Initialize();
+  void Initialize(States* states);
 
   void add(RateVector* v, IO::rv_use_class);
   void organize(int seqLen, int numStates);

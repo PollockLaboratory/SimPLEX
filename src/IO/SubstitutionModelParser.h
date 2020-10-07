@@ -1,6 +1,8 @@
 #ifndef SubstitutionModelParser_h_
 #define SubstitutionModelParser_h_
 
+#define SOL_EXCEPTIONS_SAFE_PROPAGATION
+
 #include <string>
 #include <iostream>
 #include <list>

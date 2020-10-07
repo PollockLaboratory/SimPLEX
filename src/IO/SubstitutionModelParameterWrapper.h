@@ -1,6 +1,8 @@
 #ifndef RawParameterTypes_h_
 #define RawParameterTypes_h_
 
+#define SOL_EXCEPTIONS_SAFE_PROPAGATION
+
 #include <iostream>
 #include <list>
 

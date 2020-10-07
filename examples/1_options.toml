@@ -5,7 +5,8 @@ seed = 0
 [TREE]
   max_segment_length = 0.08
   branch_split_algorithm = 1
-  scale_factor = 1.0
+  scale_tree = true
+  target_tree_length = 1.0
   resolve_multifurcation = true
 
 # Uniformization Constant
@@ -17,13 +18,12 @@ seed = 0
   threshold = 0.01
   max_step = 0.005
 
-[DATA]
+[INPUT]
   # This should be TRUE or FALSE
   ancestral_sequences = false
-  substitution_model_file = "1_basic_model.lua"
-
   sequences_file = "data_sets/nucleotide.fasta"
   tree_file = "data_sets/tree.newick"
+
 [OUTPUT]
   output_directory = "/output"
   tree_out_file = "tree_out.newick"
@@ -46,4 +46,5 @@ seed = 0
   print_frequency = 100
 
 [MODEL]
-    step_size = 0.0005
+  script_file = "1_basic_model.lua"
+  step_size = 0.0005

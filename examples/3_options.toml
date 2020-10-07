@@ -46,6 +46,8 @@ seed = 0
   print_frequency = 100
 
 [MODEL]
-  script_file = "2_basic_model.lua"
-  step_size = 0.0005
+  script_file = "3_discrete_parameters.lua"
   states = ['a', 't', 'c', 'g']
+  number_of_categories = 10
+  lower_limit = 0.0000000001
+  upper_limit = 0.04

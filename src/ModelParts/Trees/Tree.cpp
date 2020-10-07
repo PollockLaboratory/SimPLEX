@@ -22,8 +22,19 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
   // Configuration
   max_seg_len = env.get<double>("TREE.max_segment_length");
 
-  // Dynamicly chosen functions.
+  // Dynamicly chosen branch-splitting function.
   splitBranchMethod = pickBranchSplitAlgorithm();
+
+  // Scaling the tree.
+  float scale_factor = 1.0;
+  if(env.get<bool>("TREE.scale_tree")){ 
+    float total_tree_length = IO::findRawTreeTotalLength(raw_tree);
+    float target_length = env.get<double>("TREE.target_tree_length");
+    scale_factor = target_length/total_tree_length;
+    std::cout << "\tRescaling tree from total length " << total_tree_length << " to " << target_length << std::endl;
+  } else {
+    scale_factor = 1.0;
+  }
 
   if(env.ancestral_sequences) {
     treeSamplingMethod = &Tree::step_through_MSAs;
@@ -39,7 +50,7 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
   // Proxys are created to correctly create root node.
   BranchSegment* proxyBranch = new BranchSegment(0.0);
   TreeNode* proxyNode = new TreeNode("Proxy");
-  root = createTreeNode(raw_tree, proxyNode, proxyBranch);
+  root = createTreeNode(raw_tree, proxyNode, proxyBranch, scale_factor);
   delete proxyBranch;
   delete proxyNode;
 
@@ -58,6 +69,8 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
   for(auto b = branchList.begin(); b != branchList.end(); ++b) {
   	(*b)->update();
   }
+
+  std::cout << "\tTree split into " << nodeList.size() << " nodes." << std::endl;
 
   //Setup output.
   files.add_file("tree_out", env.get<std::string>("OUTPUT.tree_out_file"), IOtype::OUTPUT);
@@ -87,17 +100,18 @@ void Tree::connect_nodes(TreeNode* &ancestralNode, BranchSegment* &ancestralBP, 
   newBranchBottom->decendant = decendantNode;
 }
 
-TreeNode* Tree::createTreeNode(IO::RawTreeNode* raw_tree, TreeNode* &ancestralNode, BranchSegment* &ancestralBP) {
+TreeNode* Tree::createTreeNode(IO::RawTreeNode* raw_tree, TreeNode* &ancestralNode, BranchSegment* &ancestralBP, float scale_factor) {
   TreeNode* newTreeNode = new TreeNode(raw_tree);
-  connect_nodes(ancestralNode, ancestralBP, newTreeNode, raw_tree->distance);
+
+  connect_nodes(ancestralNode, ancestralBP, newTreeNode, raw_tree->distance * scale_factor);
   newTreeNode->distance = ancestralBP->distance; // Correct tree node distance for splitting.
 
   if(raw_tree->left != 0) {
-    createTreeNode(raw_tree->left, newTreeNode, newTreeNode->left);
+    createTreeNode(raw_tree->left, newTreeNode, newTreeNode->left, scale_factor);
   }
 
   if(raw_tree->right != 0) {
-    createTreeNode(raw_tree->right, newTreeNode, newTreeNode->right);
+    createTreeNode(raw_tree->right, newTreeNode, newTreeNode->right, scale_factor);
   }
 
   return(newTreeNode);
@@ -229,7 +243,7 @@ sample_status Tree::sample(const std::list<int>& positions) {
   for(auto b = branchList.begin(); b != branchList.end(); ++b) {
     (*b)->update();
   }
-
+  
   return(s);
 }
 
@@ -256,6 +270,7 @@ sample_status Tree::sample_ancestral_states(const std::list<int>& positions) {
     nodes.push(*t);
   }
 
+  // Calculate state probabilites for each node.
   while(not nodes.empty()) {
     if(not nodes.front()->sampledp) {
       nodes.push(nodes.front()->calculate_state_probabilities(positions));
@@ -300,7 +315,11 @@ void Tree::record_substitutions(int gen, double l) {
     std::vector<Substitution> subs = (*it)->get_substitutions();
     for(unsigned int i = 0; i < subs.size(); i++) {
 	if(subs[i].occuredp == true) {
-	  buffer << (*it)->ancestral->state_at_pos(i) << i << (*it)->decendant->state_at_pos(i) << " ";
+	  if((*it)->ancestral->state_at_pos(i) == (*it)->decendant->state_at_pos(i)) {
+	    buffer << (*it)->ancestral->state_at_pos(i) << i << (*it)->decendant->state_at_pos(i) << "* ";
+	  } else {
+	    buffer << (*it)->ancestral->state_at_pos(i) << i << (*it)->decendant->state_at_pos(i) << " ";
+	  }
 	}
     }
     buffer << "]\n";
@@ -369,7 +388,7 @@ sample_status AncestralStatesParameter::sample() {
 }
 
 void AncestralStatesParameter::undo() {
-  std::cout << "Error: TreeParameter update cannot be undone." << std::endl;
+  std::cerr << "Error: TreeParameter update cannot be undone." << std::endl;
   exit(EXIT_FAILURE);
 }
 

@@ -154,7 +154,7 @@ void SubstitutionModel::finalize() {
   states.state_to_int["-"] = -1;
   states.int_to_state[-1] = "-";
 
-  rateVectors.Initialize();
+  rateVectors.Initialize(&states);
 }
 
 // The ITERATOR

@@ -19,6 +19,7 @@ SequenceAlignment::SequenceAlignment(const States* states) {
   state_to_integer = states->state_to_int;
   integer_to_state = states->int_to_state;
   env.state_to_integer = state_to_integer;
+  env.integer_to_state = integer_to_state;
 }
 
 SequenceAlignment::SequenceAlignment(const SequenceAlignment &msa) {

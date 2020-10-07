@@ -41,7 +41,7 @@ void Data::Initialize() {
 }
 
 IO::RawTreeNode* Data::ReadTree() {
-  std::string treefile = env.get<std::string>("DATA.tree_file");
+  std::string treefile = env.get<std::string>("INPUT.tree_file");
   files.add_file("tree_input", treefile, IOtype::INPUT);
 
   std::cout << "Reading tree from:\t" << files.get_info("tree_input").file_name << std::endl;
@@ -53,7 +53,7 @@ IO::RawTreeNode* Data::ReadTree() {
 }
 
 IO::RawMSA* Data::ReadMSA() {
-  files.add_file("sequences_in", env.get<std::string>("DATA.sequences_file"), IOtype::INPUT);
+  files.add_file("sequences_in", env.get<std::string>("INPUT.sequences_file"), IOtype::INPUT);
 
   std::cout << "Reading sequences from:\t" << files.get_info("sequences_in").file_name << std::endl;
 
@@ -63,7 +63,7 @@ IO::RawMSA* Data::ReadMSA() {
 }
 
 IO::raw_substitution_model* Data::ReadSubstitutionModel(const IO::RawMSA* raw_msa, const IO::RawTreeNode* raw_tree) {
-  files.add_file("lua_model", env.get<std::string>("DATA.substitution_model_file"), IOtype::INPUT);
+  files.add_file("lua_model", env.get<std::string>("MODEL.script_file"), IOtype::INPUT);
   std::cout << "Reading Substitution model from:\t" << files.get_info("lua_model").file_name << std::endl;
 
   IO::raw_substitution_model* raw_sm = IO::read_substitution_model("lua_model");

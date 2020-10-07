@@ -41,7 +41,7 @@ private:
   void connect_nodes(TreeNode* &ancestral, BranchSegment* &ancestralBP,
 		     TreeNode* &decendant, float distance);
   TreeNode* createTreeNode(IO::RawTreeNode* raw_tree, TreeNode* &ancestralNode,
-			   BranchSegment* &ancestralBP);
+			   BranchSegment* &ancestralBP, float scale_factor);
   void identify_gaps();
   void configureSequences(TreeNode* n);
 

@@ -147,7 +147,7 @@ IO::RawTreeNode* IO::parseRawTreeNode(std::string node_string, RawTreeNode* up) 
     right = children.second;
     break;
   }
-  *t = {info.name, info.distance * env.get<double>("TREE.scale_factor"), up, left, right};
+  *t = {info.name, info.distance, up, left, right};
   return(t);
 }
 
@@ -206,4 +206,16 @@ void IO::printRawTree(const RawTreeNode* node) {
   if(node->right != nullptr) {
     printRawTree(node->right);
   }
+}
+
+float IO::findRawTreeTotalLength(const RawTreeNode* node) {
+  float total = node->distance;
+  if(node->left != nullptr) {
+    total += findRawTreeTotalLength(node->left);
+  }
+  if(node->right != nullptr) {
+    total += findRawTreeTotalLength(node->right);
+  }
+
+  return(total);
 }

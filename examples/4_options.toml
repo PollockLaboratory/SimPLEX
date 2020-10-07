@@ -46,6 +46,5 @@ seed = 0
   print_frequency = 100
 
 [MODEL]
-  script_file = "2_basic_model.lua"
-  step_size = 0.0005
+  script_file = "4_dynamic_discrete.lua"
   states = ['a', 't', 'c', 'g']

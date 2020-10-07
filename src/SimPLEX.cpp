@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
 
   files.initialize(argv);
   
-  files.add_file("log", env.get<std::string>("OUTPUT.log_out_file"), IOtype::OUTPUT);
+  //files.add_file("log", env.get<std::string>("OUTPUT.log_out_file"), IOtype::OUTPUT);
 
   std::cout << std::endl;
 

@@ -24,6 +24,7 @@ public:
   int n; 			    // sequence length.
   int num_states;		    // number of states, not including gap.
   std::map<std::string, int> state_to_integer;
+  std::map<int, std::string> integer_to_state;
 
   // Logger.
   void log(std::string message);

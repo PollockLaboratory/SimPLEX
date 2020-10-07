@@ -88,8 +88,25 @@ RateCategories::RateCategories(std::string name, std::vector<Valuable*> categori
     if(component != nullptr) {
       add_dependancy(component);
     } else {
-      std::cerr << "Error: cannot add value dependancies to RateCategories." << std::endl;  
+      std::cerr << "Error: cannot add value dependancies to RateCategories." << std::endl;
+      exit(EXIT_FAILURE);
     }
+  }
+
+  // Check that that no value is equal to 0, and they in the right order.
+  float prev_val = 0.0;
+  float val;
+  for(auto it = values.begin(); it != values.end(); ++it) {
+    val = (*it)->get_value();
+    if(val <= prev_val) {
+      if(val == 0.0) {
+	std::cerr << "Error in RateCategories construction: initial categories cannot be set to a value of 0.0" << std::endl;
+	exit(EXIT_FAILURE);
+      }
+      std::cerr << "Error in RateCategories construction: initial rate categories are not ordered (from lowest to highest)." << std::endl;
+      exit(EXIT_FAILURE); 
+    }
+    prev_val = val;
   }
 }
 
@@ -135,12 +152,6 @@ DiscreteFloat::DiscreteFloat(std::string name, RateCategories* categories) : Sam
   prev_i = 0;
   value = (*rc)[i]; 
   previous_value = value;
-
-  if(value == 0) {
-    std::cerr << "Error: category value is 0." << std::endl;
-    std::cerr << value << " : " << i << std::endl;
-    exit(EXIT_FAILURE);
-  }
 }
 
 // Utils
@@ -169,8 +180,7 @@ sample_status DiscreteFloat::sample() {
   value = (*rc)[i];
 
   if(value == 0) {
-    std::cerr << "Error: category value is 0." << std::endl;
-    std::cerr << value << " : " << i << std::endl;
+    std::cerr << "Error: attempted sampling to a category at a value equal to 0.0" << std::endl;
     exit(EXIT_FAILURE);
   }
   
@@ -203,7 +213,7 @@ void DiscreteFloat::refresh() {
 }
 
 std::string DiscreteFloat::get_state_header() {
-  return(name + "-value," + name + "-category");
+  return(name + "," + name + "-category");
 }
 
 std::string DiscreteFloat::get_state() {

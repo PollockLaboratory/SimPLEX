@@ -36,6 +36,7 @@ namespace IO {
   std::list<std::string> getRawTreeNodeTipNames(const RawTreeNode* node);
 
   void printRawTree(const RawTreeNode* node);
+  float findRawTreeTotalLength(const RawTreeNode* node);
 }
 
 #endif

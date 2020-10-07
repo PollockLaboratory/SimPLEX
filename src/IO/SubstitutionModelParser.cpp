@@ -40,11 +40,11 @@ namespace IO {
   void raw_substitution_model::set_states(sol::table tbl) {
     into_list(tbl, states);
 
-    lua["states"]["count"] = states.size();
+    lua["States"]["count"] = states.size();
 
     int i = 1;
     for(auto it = states.begin(); it != states.end(); ++it) {
-      lua["states"][i] = *it;
+      lua["States"][i] = *it;
       i++;
     }
   }
@@ -115,7 +115,7 @@ namespace IO {
     lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::string);
 
     //Main tables.
-    auto model_table = lua["model"].get_or_create<sol::table>();
+    auto model_table = lua["Model"].get_or_create<sol::table>();
     model_table.set_function("set_name", [this](std::string name) -> void {
 					   this->name = name;
 					 });
@@ -123,12 +123,12 @@ namespace IO {
 						  this->add_rate_vector(rv);
 						});
 
-    auto states_table = lua["states"].get_or_create<sol::table>();
+    auto states_table = lua["States"].get_or_create<sol::table>();
     states_table.set_function("set", [this](sol::table tbl) -> void {
 				       this->set_states(tbl);
 				     });
 
-    auto config_table = lua["config"].get_or_create<sol::table>();
+    auto config_table = lua["Config"].get_or_create<sol::table>();
     config_table.set_function("get_int", [](std::string key) -> int {
 					   return(env.get<int>(key));
 					 });
@@ -171,7 +171,13 @@ namespace IO {
 					     });
 
     // Read the file.
-    lua.script(files.read_all(file_name));
+    try {
+      lua.script(files.read_all(file_name));
+    } catch(const sol::error &err) {
+      std::cerr << "Error when reading lua script specifying substitution model:" << std::endl;
+      std::cerr << err.what() << std::endl;
+      exit(EXIT_FAILURE);
+    }
   }
 
   raw_substitution_model* read_substitution_model(std::string file_name) {

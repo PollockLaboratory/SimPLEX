@@ -61,14 +61,15 @@ void RateVector::print() {
 RateVectorSet::RateVectorSet() {
 }
 
-void RateVectorSet::Initialize() {
+void RateVectorSet::Initialize(States* states) {
   // Output file.
   files.add_file("rate_vectors_out", env.get<std::string>("OUTPUT.rate_vectors_out_file"), IOtype::OUTPUT);
 
   std::ostringstream buffer;
   buffer << "I,GEN,LogL,NAME,ANC";
-  for(auto it = env.state_to_integer.begin(); it != env.state_to_integer.end(); ++it) {
-    buffer << "," << it->first;
+  // the count is reduced by -1 to take into account gaps.
+  for(int i = 0; i < states->int_to_state.size() - 1; ++i) {
+    buffer << "," << states->int_to_state[i];
   }
   buffer << std::endl;
 
@@ -143,7 +144,7 @@ void RateVectorSet::saveToFile(int gen, double l) {
 
   std::ostringstream buffer;
   for(auto it = col.begin(); it != col.end(); ++it) {
-    buffer << i << "," << gen << "," << l << "," << (*it)->get_name() << "," << (*it)->state;
+    buffer << i << "," << gen << "," << l << "," << (*it)->get_name() << "," << env.integer_to_state[(*it)->state];
     for(auto jt = (*it)->rates.begin(); jt != (*it)->rates.end(); ++jt) {
       buffer << "," << (*jt)->get_value();
     }

@@ -11,12 +11,12 @@
 
 ]]
 
-model.set_name("JC69 - general")
+Model.set_name("JC69 - general")
 
-model_states = config.get_string_array("MODEL.states")
-states.set(model_states)
+model_states = Config.get_string_array("MODEL.states")
+States.set(model_states)
 
-x = Parameter.new("x", "continuous", {initial_value = 0.001, step_size = config.get_float("MODEL.step_size"), lower_bound = 0.0})
+x = Parameter.new("x", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0})
 
 for i=1,#model_states do
 	rv_list = {}
@@ -24,8 +24,8 @@ for i=1,#model_states do
 	   if i ~= j then
 	      rv_list[j] = x
 	   else
-	      rv_list[j] = Parameter.new("virtual-"..tostring(model_states[i]), "virtual", {})
+	      rv_list[j] = Parameter.new("virtual-"..tostring(States[i]), "virtual", {})
 	   end
 	end
-	model.add_rate_vector(RateVector.new("RV-"..tostring(model_states[i]), {state = model_states[i], pos = {}}, rv_list))
+	Model.add_rate_vector(RateVector.new("RV-"..tostring(States[i]), {state = States[i], pos = {}}, rv_list))
 end

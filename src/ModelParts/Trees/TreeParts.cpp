@@ -76,7 +76,8 @@ void BranchSegment::set_new_substitutions() {
 	// Not sure this is exactly right.
 	float length = distance;
 	double vir_rate = rates[pos]->rates[dec[pos]]->get_value();
-	double p = 1 - (1 / (1 + (vir_rate * distance)));
+	//double p = 1 - (1 / (1 + (vir_rate * distance)));
+	double p = vir_rate / (1 - u + vir_rate);
 	if(Random() < p) {
 	  substitutions[pos] = {true, anc[pos], dec[pos], rates[pos]};
 	} else {
@@ -313,7 +314,7 @@ TreeNode* TreeNode::calculate_state_probabilities(const std::list<int>& position
 	state_probabilities[*pos][sequence->at(*pos)] = 1.0;
       }
     }
-    
+ 
     return(up->ancestral);
   }
 
@@ -335,7 +336,7 @@ TreeNode* TreeNode::calculate_state_probabilities(const std::list<int>& position
     right_node = nullptr;
   }
   
-  // This doesn't deal with branch nodes.
+  // This doesn't deal with branch nodes - not sure if this is true.
   //std::cout << "Calculate State Probabilites: " << name << std::endl;
   for(auto pos = positions.begin(); pos != positions.end(); ++pos){
     if(not gaps[*pos]) {
@@ -358,6 +359,7 @@ TreeNode* TreeNode::calculate_state_probabilities(const std::list<int>& position
 
 int TreeNode::pick_state_from_probabilities(int pos) {
   float* probs = state_probabilities[pos];
+
   double r = Random();
   double acc = 0.0;
   int val = -1;
@@ -396,7 +398,7 @@ void TreeNode::pick_sequences(const std::list<int>& positions) {
     right_node = nullptr;
   }
 
-  // Recalculate state probability vector.
+  // Recalculate state probability vector - including the up branch.
   // No need if at the root.
   if(up != nullptr) {
     for(auto pos = positions.begin(); pos != positions.end(); ++pos){

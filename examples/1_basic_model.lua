@@ -37,17 +37,17 @@
 ]]
 
 -- Set the name of the model - this has not effect on the structure of the model.
-model.set_name("JC69 - nucleotide")
+Model.set_name("JC69 - nucleotide")
 
 -- Set the state of the model.
 model_states = {"a", "t", "c", "g"}
-states.set(model_states)
+States.set(model_states)
 
 -- To create the single free parameter, the Parameter.new function is called, this has three arguments:
 --   - name - STRING - specifies the name of the parameter, which will be used in the output files.
---   - type - STRING - specifies the type of the parameter, either 'continuous', discrete' or 'virtual'.
+--   - type - STRING - specifies the type of the parameter, either 'continuous', discrete', 'fixed' or 'virtual'.
 --   - options - TABLE - specifies the unique options for each parameter type.
-x = Parameter.new("x", "continuous", {initial_value = 0.001, step_size = config.get_float("MODEL.step_size"), lower_bound = 0.0})
+x = Parameter.new("x", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0})
 -- Note: the step_size parameter is set by looking in the options TOML file, enabling model paramters to be tweaked without changing
 -- the lua script.
 
@@ -74,7 +74,7 @@ v_g = Parameter.new("virtual-g", "virtual", {})
 RV_g = RateVector.new("RV-g", {state = "g", pos = {}}, {x, x, x, v_g})
 
 -- Finally, each of the rate vectors must be explicitally added to the complete substitution model using the model.add_rate_vector function.
-model.add_rate_vector(RV_a)
-model.add_rate_vector(RV_t)
-model.add_rate_vector(RV_c)
-model.add_rate_vector(RV_g)
+Model.add_rate_vector(RV_a)
+Model.add_rate_vector(RV_t)
+Model.add_rate_vector(RV_c)
+Model.add_rate_vector(RV_g)
