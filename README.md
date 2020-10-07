@@ -9,8 +9,8 @@ It takes the input of a rooted tree, sequences for the node tips and a substitut
 
 	$ git pull origin master
 
-### Dependancies
-simPLEX has a number of external dependancies that can sometimes to be challenging to link/compile into the final binary. These include lua5.2 and the C++ boost library. To install them on Ubuntu/Debian based linux distributions use:
+### Dependencies
+simPLEX has a number of external dependencies that can sometimes to be challenging to link/compile into the final binary. These include lua5.2 and the C++ boost library. To install them on Ubuntu/Debian based linux distributions use:
 
 	$ sudo apt update
 	
@@ -105,7 +105,7 @@ This is where most of the configuration is done. The model is constructed as a s
   * to_str
   
 ## Parameters
-A new parameter is created through the call *Parmeter.new(String name, String type, lua_table options)*. For example:
+A new parameter is created through the call *Parameter.new(String name, String type, lua_table options)*. For example:
 
 	$ Paramters.new("example_name", "float", {init = 0.01})
 	
@@ -115,7 +115,7 @@ A new parameter is created through the call *Parmeter.new(String name, String ty
 * **Virtual Substitution Rate** Any parameter in the virtual substitution rate postion in the rate vector will be implicitally converted to a VirtualSubstitutionRate parameter.
 * **Rate Vector** 
 
-# Implimentation details of simPLEX
+# Implementation details of simPLEX
 
 This sections intent is to assist anyone who might be interested in editing the code, it is not neccesary for a end user to know this infomation. It is also for me to keep track of all the quirks of each of the more important classes, and remind me exactly what each class was intended for.
 
