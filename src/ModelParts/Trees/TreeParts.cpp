@@ -85,7 +85,7 @@ void BranchSegment::set_new_substitutions() {
 	}
       }
     }
-  } 
+  }
 }
 
 void BranchSegment::update() {

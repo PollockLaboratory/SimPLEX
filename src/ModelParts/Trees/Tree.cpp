@@ -19,10 +19,7 @@ Tree::Tree() {
 
 // Tree Initialize using seqs and states
 void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, SubstitutionModel* &SM) {
-  // Configuration
-  max_seg_len = env.get<double>("TREE.max_segment_length");
-
-  // Dynamicly chosen branch-splitting function.
+  // Set dynamicly chosen branch-splitting function.
   splitBranchMethod = pickBranchSplitAlgorithm();
 
   // Scaling the tree.

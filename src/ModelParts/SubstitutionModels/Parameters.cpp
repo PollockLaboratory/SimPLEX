@@ -128,7 +128,7 @@ void RateCategories::print() {
   std::cout << "Rate Categories - " << name << ": [ ";
   for(int i = 0; i < n; i++) {
     AbstractComponent* component = dynamic_cast<AbstractComponent*>(values[i]);
-    std::cout << component->name << " ";
+    std::cout << component->get_name() << " ";
   }
   std::cout << "]" << std::endl;
 }
@@ -332,8 +332,8 @@ void Arithmatic::print() {
     break;
   }
 
-  std::string name1 = dynamic_cast<AbstractComponent*>(v1)->name;
-  std::string name2 = dynamic_cast<AbstractComponent*>(v2)->name;
+  std::string name1 = dynamic_cast<AbstractComponent*>(v1)->get_name();
+  std::string name2 = dynamic_cast<AbstractComponent*>(v2)->get_name();
 
   std::cout << "ARITH[" << name1 << op_char << name2 << "] " << name << ": " << value << std::endl;
 }
@@ -347,7 +347,81 @@ void Arithmatic::refresh() {
 }
 
 std::string Arithmatic::get_type() {
-  return("Arithmatic");
+  return("ARITHMATIC");
+}
+
+// DEPENDENCY GROUPS
+
+DependencyGroup::DependencyGroup(std::string name) : AbstractComponent(name) {
+  n = 0;
+  parent_parameter = nullptr;
+}
+
+void DependencyGroup::set_parent(Valuable* v) {
+  parent_parameter = nullptr;
+}
+
+void DependencyGroup::print() {
+}
+
+void DependencyGroup::fix() {
+}
+
+void DependencyGroup::refresh() {
+}
+
+std::string DependencyGroup::get_state_header() {
+  return(name + "-size");
+}
+
+std::string DependencyGroup::get_state() {
+  return(std::to_string(n));
+}
+
+std::string DependencyGroup::get_type() {
+  return("DEPENDENCY_GROUP");
+}
+
+DependencyElement::DependencyElement(std::string name, SampleableValue* v) : SampleableValue(name) {
+  external_parameter = v;
+  unified = false;
+  value = 0;
+}
+
+sample_status DependencyElement::sample() {
+  return(sample_status({true, true, false}));
+}
+
+void DependencyElement::undo() {
+}
+
+const double& DependencyElement::get_value() {
+  return(value);
+}
+
+const double& DependencyElement::get_old_value() {
+  return(value);
+}
+
+void DependencyElement::print() {
+}
+
+void DependencyElement::fix() {
+}
+
+void DependencyElement::refresh() {
+}
+
+std::string DependencyElement::get_state_header() {
+  return(name);
+}
+
+std::string DependencyElement::get_state() {
+  return("n/a");
+}
+
+std::string DependencyElement::get_type() {
+  return("DEPENDENCY_ELEMENT");
 }
 
 // VIRTUAL SUBSTITUTION RATE

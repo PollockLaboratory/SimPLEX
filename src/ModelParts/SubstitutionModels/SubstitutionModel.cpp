@@ -175,8 +175,8 @@ inline bool SubstitutionModel::iterator::step_to_next_component() {
     //std::cout << std::endl;
     return(true);
   } else {
-    location = (*current_parameter)->host_vectors.begin();
-    location_iter_end = (*current_parameter)->host_vectors.end();
+    location = (*current_parameter)->get_host_vectors().begin();
+    location_iter_end = (*current_parameter)->get_host_vectors().end();
     return(false);
   }
 }
@@ -201,8 +201,11 @@ SubstitutionModel::iterator::iterator(SubstitutionModel& s, bool e, AbstractComp
   if(current_parameter == valuables_end) {
     endQ = true;
   } else {
-    location = (*current_parameter)->host_vectors.begin();
-    location_iter_end = (*current_parameter)->host_vectors.end();
+    //std::list<rv_loc> host_vectors = (*current_parameter)->get_host_vectors();
+    location = (*current_parameter)->get_host_vectors().begin();
+    location_iter_end = (*current_parameter)->get_host_vectors().end();
+    //location = (*current_parameter)->get_host_vectors().begin();
+    //location_iter_end = (*current_parameter)->get_host_vectors().end();
 
     while(location == location_iter_end) {
       endQ = step_to_next_component();

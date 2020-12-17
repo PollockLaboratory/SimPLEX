@@ -27,9 +27,13 @@ seed = 0
 [OUTPUT]
   output_directory = "/output"
   tree_out_file = "tree_out.newick"
+  output_directory_append_time = false
+  overwrite_output = true
+
   #sequences_out_file = "sequences_out.fasta"
   sequences_out_file = ""
   parameters_out_file = "parameters_out.csv"
+  parameters_counts_out_file = "parameters_out_file.csv"
   rate_vectors_out_file = "rate_vectors_out.csv"
   likelihood_out_file = "likelihoods_out.csv"
   substitutions_out_file = "substitutions.out"

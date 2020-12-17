@@ -32,7 +32,11 @@ std::pair<BranchSegment*, BranchSegment*> splitHalfMethod(float distance) {
    * than the max sequence length.
    */
 
-  static double max_seg_len = env.get<double>("TREE.max_segment_length");
+  static double u = env.get<double>("UNIFORMIZATION.initial_value");
+  static double max_segment_probability = env.get<double>("TREE.max_segment_probability");
+
+  static double max_seg_len = max_segment_probability / ((1.0 - max_segment_probability) * u);
+
   float dist = distance;
 
   // Calculate how many internal nodes are needed for given branch.

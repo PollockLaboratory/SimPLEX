@@ -20,6 +20,7 @@ Model::Model() {
    * The default contructor.
    */
   ready = true;
+  components.set_counts(&counts);
 }
 
 Valuable* Model::create_uniformization_constant() {
@@ -66,8 +67,7 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw
   }
 
   components.add_parameter(tp, env.get<int>("MCMC.tree_sample_frequency"));
-
-  
+ 
   std::cout << "\tPreparing substitution counts." << std::endl;
   cp = new CountsParameter(&counts, tp);
   components.add_parameter(cp);
@@ -125,6 +125,7 @@ double Model::CalculateLikelihood() {
     t = it->first;
     num0subs = it->second.num0subs;
     num1subs = it->second.num1subs;
+
     logL_waiting += num0subs * log(1/(1 + u*t)) + num1subs * log(t/(1 + u*t));
   }
 
@@ -135,7 +136,7 @@ double Model::CalculateLikelihood() {
       logL_subs += C_xy[i] * log((*rv)[i]);
     }
   }
-  
+ 
   return(logL_waiting + logL_subs);
 }
 

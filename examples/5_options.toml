@@ -26,10 +26,14 @@ seed = 0
 
 [OUTPUT]
   output_directory = "/output"
+  output_directory_append_time = false
+  overwrite_output = true 
+
   tree_out_file = "tree_out.newick"
   #sequences_out_file = "sequences_out.fasta"
   sequences_out_file = ""
   parameters_out_file = "parameters_out.csv"
+  parameters_counts_out_file = "parameters_counts_out.csv"
   rate_vectors_out_file = "rate_vectors_out.csv"
   likelihood_out_file = "likelihoods_out.csv"
   substitutions_out_file = "substitutions.out"
@@ -46,6 +50,6 @@ seed = 0
   print_frequency = 100
 
 [MODEL]
-  script_file = "2_basic_model.lua"
-  step_size = 0.0005
+  script_file = "5_compound_parameters.lua"
+  step_size = 0.001
   states = ['a', 't', 'c', 'g']

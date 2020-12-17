@@ -16,6 +16,9 @@ ComponentSet::ComponentSet() {
    */
   steps = 0;
 }
+void ComponentSet::set_counts(SubstitutionCounts* counts) {
+  this->counts = counts;
+}
 
 // Setup.
 
@@ -46,6 +49,7 @@ void ComponentSet::Initialize() {
   // Refreshes all dependancies.
   reset_dependencies();
 
+  // Parameter's value file.
   files.add_file("parameters_out", env.get<std::string>("OUTPUT.parameters_out_file"), IOtype::OUTPUT);
 
   // Set header of components csv output.
@@ -59,6 +63,22 @@ void ComponentSet::Initialize() {
   buffer << std::endl;
 
   files.write_to_file("parameters_out", buffer.str());
+
+  // Parameter's counts out.
+  files.add_file("parameters_counts_out", env.get<std::string>("OUTPUT.parameters_counts_out_file"), IOtype::OUTPUT);
+
+  std::ostringstream counts_buffer;
+  counts_buffer << "I,GEN,LogL";
+  for(unsigned int i = 0; i < all_parameters.size(); i++) {
+    if(all_parameters[i]->get_hidden() != true) {
+      if(dynamic_cast<Valuable*>(all_parameters[i]) != nullptr) {
+	counts_buffer << "," << all_parameters[i]->get_name();
+      }
+    }
+  }
+  counts_buffer << std::endl;
+
+  files.write_to_file("parameters_counts_out", counts_buffer.str());
 }
 
 // Setting up.
@@ -73,9 +93,14 @@ void ComponentSet::add_parameter(AbstractComponent* param, unsigned int max_samp
    */
   if(all_parameters.find(param->get_ID()) == all_parameters.end()) {
     // Check if Parameter has already been seen.
-    SampleableComponent* p = dynamic_cast<SampleableComponent*> (param);
+    SampleableComponent* p = dynamic_cast<SampleableComponent*>(param);
     if(p != NULL) {
       sampleable_parameter_list.push_back({p, max_sample_freq, 0});
+    }
+
+    Valuable* v = dynamic_cast<Valuable*>(param);
+    if(v != NULL) {
+      v->set_counts(counts);
     }
 
     all_parameters[param->get_ID()] = param;
@@ -180,11 +205,11 @@ void ComponentSet::print() {
     if(param->get_hidden() != true) {
       std::string sampleable;
       if(dynamic_cast<SampleableComponent*>(param) != nullptr) {
-	sampleable = "Sampled";
+	sampleable = "Sampled    ";
       } else {
 	sampleable = "Non-sampled";
       }
-      std::cout << "[" << param->get_ID() << "] " << sampleable << "\t";
+      std::cout << "[" << param->get_ID() << "]\t" << sampleable << "\t";
       param->print();
     }
   }
@@ -215,6 +240,7 @@ void ComponentSet::save_to_file(int gen, double l) {
   static int i = -1;
   ++i;
 
+  // Parameter's values.
   std::string line = std::to_string(i) + "," + std::to_string(gen) + "," + std::to_string(l);
 
   for(unsigned int j = 0; j < all_parameters.size(); j++) {
@@ -224,4 +250,18 @@ void ComponentSet::save_to_file(int gen, double l) {
   }
 
   files.write_to_file("parameters_out", line + "\n");
+
+  // Parameter's substitution counts.
+  line = std::to_string(i) + "," + std::to_string(gen) + "," + std::to_string(l);
+
+  for(unsigned int j = 0; j < all_parameters.size(); j++) {
+    if(all_parameters[j]->get_hidden() != true) {
+      Valuable* v = dynamic_cast<Valuable*>(all_parameters[j]);
+      if(v != nullptr) {
+	line += "," + std::to_string(v->find_counts());
+      }
+    }
+  }
+
+  files.write_to_file("parameters_counts_out", line + "\n");
 }

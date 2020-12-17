@@ -11,6 +11,7 @@
 
 // Defined in RateVector.h
 class RateVector;
+class SubstitutionCounts;
 
 typedef struct sample_status {
   bool testp; // true if metropolis hasting sampling is required.
@@ -31,24 +32,29 @@ public:
   virtual const double& get_old_value() = 0;
   void print();
 
-  std::list<rv_loc> get_host_vectors();
+  const std::list<rv_loc>& get_host_vectors();
   void add_host_vector(RateVector*, int);
+
+  void set_counts(SubstitutionCounts* counts);
+  unsigned int find_counts();
+private:
   std::list<rv_loc> host_vectors; // Abstract components do not use this but it is here to avoid dynamic_casting. Pointers to the host RateVectors that a parameter sits within.
+  SubstitutionCounts* counts;
 };
 
 class AbstractComponent {
 protected:
+  int ID;
+  std::string name;
   // Dependencies -> this component -> dependents.
   bool hidden; // If hidden is true will not be printed in the output files.
   std::list<AbstractComponent*> dependencies; // Components that this component depends on.
   std::list<AbstractComponent*> dependents; // Components that depend on this parameter.
-  std::list<AbstractComponent*> refresh_list; // List of AbstractComponent that mush be refreshed when this AbstractComponent changes.
+  std::list<AbstractComponent*> refresh_list; // List of AbstractComponent that must be refreshed when this AbstractComponent changes.
   std::list<Valuable*> valuable_dependents; // List of dependents of valuable type.
 
   std::list<AbstractComponent*> next_dependents(std::list<AbstractComponent*>, std::set<AbstractComponent*>&);
 public:
-  int ID;
-  std::string name;
   AbstractComponent(std::string name);
 
   void add_dependancy(AbstractComponent*);

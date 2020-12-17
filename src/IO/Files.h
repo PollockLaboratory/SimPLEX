@@ -23,6 +23,7 @@ public:
   std::vector<std::string> get_route() const;
   Path parent_dir();
   std::string as_str() const;
+  void add_timestamp();
   friend std::ostream& operator<<(std::ostream& os, const Path& path);
   Path operator+(const Path&);
 };

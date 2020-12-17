@@ -6,6 +6,7 @@
 #include "cpptoml/cpptoml.h"
 
 #include <iostream>
+#include <ctime>
 #include <string.h>
 
 #include <sys/types.h>
@@ -95,6 +96,19 @@ std::string Path::as_str() const {
   return(path);
 }
 
+void Path::add_timestamp() {
+  auto it = --route.end();
+  std::time_t t = std::time(0);
+  std::tm* now = std::localtime(&t);
+
+  char buffer[50];
+  sprintf(buffer, "_%i-%i-%i_%i:%i", (now->tm_year + 1900), (now->tm_mon + 1), now->tm_mday, now->tm_hour, now->tm_min);
+
+  std::cout << "Last element: " << *it << std::endl;
+  *it += buffer;
+  std::cout << "Last element: " << *it << std::endl;
+}
+
 std::ostream& operator<<(std::ostream& os, const Path& p) {
   os << p.as_str();
   return(os);
@@ -154,9 +168,10 @@ void configure_directory(Path dir_path) {
   
   struct stat st;
   if(stat(dir_path.as_str().c_str(), &st) == 0 && S_ISDIR(st.st_mode)) {
-    if (not env.debug) {
-      std::cout << "output dir " << dir_path << " exists. Overwrite? (Y/n)" << std::endl;
-      if (getchar() != 'Y') exit(1);
+    if(not env.get<bool>("OUTPUT.overwrite_output")) {
+      std::cout << "Error: cannot write to the specified output directory, as it already exists." << std::endl;
+      std::cout << "Either change the specified output directory or set OUTPUT.overwrite_output to True." << std::endl;
+      exit(EXIT_FAILURE);
     }
   } else {
     mkdir(dir_path.as_str().c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
@@ -181,7 +196,14 @@ void IO::Files::initialize(char* argv[]) {
 
   std::cout << "Command line specified options file used: " << reference_dir + options_path << std::endl;
 
+  //std::string outdir_name = env.get<std::string>("OUTPUT.output_directory");
+
   relative_outdir = Path(env.get<std::string>("OUTPUT.output_directory"));
+  if(env.get<bool>("OUTPUT.output_directory_append_time")) {
+    relative_outdir.add_timestamp();
+  }
+
+  //if(env.get<bool>("OUTPUT.output
   absolute_outdir = reference_dir + relative_outdir;
 
   std::cout << "Configuring output directory: " << absolute_outdir << std::endl;

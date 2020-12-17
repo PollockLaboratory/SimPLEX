@@ -8,6 +8,7 @@
 #include <set>
 
 #include "AbstractComponent.h"
+#include "../SubstitutionCounts.h"
 
 /*
  * COMPONENT SET
@@ -37,11 +38,15 @@ private:
 
   // Dependancies.
   void refresh_dependancies(AbstractComponent*);
+
+  // Ptr to counts.
+  SubstitutionCounts* counts;
 public:
   ComponentSet();
   void Initialize();
   void add_parameter(AbstractComponent* param);
   void add_parameter(AbstractComponent* param, unsigned int max_sample_freq);
+  void set_counts(SubstitutionCounts* counts);
 
   // Sampling.
   sample_status sample();

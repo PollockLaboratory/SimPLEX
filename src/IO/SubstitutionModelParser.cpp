@@ -160,6 +160,13 @@ namespace IO {
 				       "divide", divide_parameters,
 				       "named_divide", named_divide_parameters);
 
+    lua.new_usertype<DependencyGroupWrapper>("DependencyGroup",
+					     "new", [](std::string name, sol::table tbl) -> DependencyGroupWrapper {
+						      return(new_dependency_group(name, tbl));
+						    },
+					     "name", &DependencyGroupWrapper::get_name);
+
+    // I think this can be tidied up a bit.
     auto CatsTable = lua["Categories"].get_or_create<sol::table>();
     CatsTable.set_function("new", [](std::string name, sol::table tbl) -> ParameterWrapper {
 				    return(new_categories(name, tbl));

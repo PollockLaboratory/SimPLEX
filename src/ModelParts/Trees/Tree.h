@@ -33,7 +33,6 @@ private:
   std::list<TreeNode*> tipList;
 
   // Settings/options.
-  float max_seg_len; // Max segment length.
   int seqLen;
   std::function< std::pair<BranchSegment*, BranchSegment*>(float)> splitBranchMethod; // Algorithm for splitting branches.
 

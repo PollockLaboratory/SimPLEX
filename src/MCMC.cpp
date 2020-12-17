@@ -96,7 +96,12 @@ void MCMC::Run() {
     }
 
     if(gen % print_freq == 0) {
-      std::cout << "Likelihood: " << lnL << std::endl;
+      std::string percent_complete = std::to_string((int)((gen/(float)gens)*100.0));
+      std::cout << "[";
+      for(unsigned int i = 0; i < 3 - percent_complete.length(); i++ ) {
+	std::cout << " ";
+      }
+      std::cout << percent_complete << "%] Likelihood: " << lnL << std::endl;
       // model->printParameters();
     }
 

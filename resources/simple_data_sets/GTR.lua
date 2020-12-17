@@ -1,6 +1,6 @@
 Model.set_name("Mixture Model")
 
-States.set(config.get_string_array("MODEL.states"))
+States.set(Config.get_string_array("MODEL.states"))
 
 N_freq = Parameter.new("N_freq", "continuous", {initial_value = 0.2, step_size = 0.01, lower_bound = 0.0, upper_bound = 1.0 })
 

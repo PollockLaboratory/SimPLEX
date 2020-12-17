@@ -14,6 +14,7 @@ SubstitutionCounts::SubstitutionCounts() {
 }
 
 SubstitutionCounts::SubstitutionCounts(std::vector<RateVector*> rvs, std::list<float> b_lens) {
+  // Make empty structures ready for counts.
   subs_by_rateVector = {};
   subs_by_branch = {};
   for(auto it = rvs.begin(); it != rvs.end(); ++it) {
@@ -62,7 +63,7 @@ CountsParameter::CountsParameter(SubstitutionCounts* counts, AncestralStatesPara
   for(int i = 0; i < rv->size(); i++) {
     buffer << "," << rv->get_state_by_pos(i);
   }
-  buffer << std::endl;
+  buffer << ",Total" << std::endl;
 
   files.write_to_file("substitution_counts_out", buffer.str());
 }
@@ -71,8 +72,10 @@ void CountsParameter::fix() {
 }
 
 void CountsParameter::refresh() {
+  // Create new structs for counts.
   *counts = SubstitutionCounts(tree->get_SM()->get_RateVectors(), tree->get_branch_lengths());
 
+  // Fill in structs.
   const std::list<BranchSegment*> branchList = tree->get_branches();
   for(auto it = branchList.begin(); it != branchList.end(); ++it) {
     BranchSegment* b = *it;
@@ -108,10 +111,12 @@ void CountsParameter::save_to_file(int gen, double l) {
 
   for(auto it = counts->subs_by_rateVector.begin(); it != counts->subs_by_rateVector.end(); ++it) {
     buffer << index << "," << gen << "," << l << "," << it->first->get_name() << "," << it->first->get_state();
+    unsigned int total = 0;
     for(auto jt = it->second.begin(); jt != it->second.end(); ++jt) {
+      total += *jt;
       buffer << "," << *jt;
     }
-    buffer << std::endl;
+    buffer << "," << total << std::endl;
   }
 
   files.write_to_file("substitution_counts_out", buffer.str());

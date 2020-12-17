@@ -133,6 +133,50 @@ private:
   void setup(Valuable*, Valuable*);
 };
 
+// Dependency Groups
+
+class DependencyGroup : public AbstractComponent {
+public:
+  DependencyGroup(std::string name);
+  void set_parent(Valuable*);
+  void print() override;
+
+  void fix() override;
+  void refresh() override;
+
+  std::string get_state_header() override;
+  std::string get_state() override;
+
+  std::string get_type() override;
+private:
+  unsigned int n; // Number of parameters in group.
+  Valuable* parent_parameter; // This is the parameter that all group elements reference when they are in the group.
+};
+
+class DependencyElement : public SampleableValue {
+public:
+  DependencyElement(std::string, SampleableValue*);
+  void print() override;
+  sample_status sample() override;
+
+  const double& get_value() override;
+  const double& get_old_value() override;
+
+  void undo() override;
+  void fix() override;
+  void refresh() override;
+
+  std::string get_state_header() override;
+  std::string get_state() override;
+
+  std::string get_type() override;
+private:
+  double value;
+  DependencyGroup* group;
+  SampleableValue* external_parameter; // The parameter that determines the value when not in a group.
+  bool unified;
+};
+
 // Virtual Substitution rate.
 
 class OutOfBoundsException: public std::exception {

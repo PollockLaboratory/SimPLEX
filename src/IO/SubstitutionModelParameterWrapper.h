@@ -33,6 +33,17 @@ namespace IO {
   ParameterWrapper named_multiply_parameters(std::string, ParameterWrapper, ParameterWrapper);
   ParameterWrapper divide_parameters(ParameterWrapper, ParameterWrapper);
   ParameterWrapper named_divide_parameters(std::string, ParameterWrapper, ParameterWrapper);
+
+  class DependencyGroupWrapper {
+  private:
+    std::string name;
+    DependencyGroup* group;
+  public:
+    DependencyGroupWrapper(DependencyGroup*);
+    std::string get_name();
+  };
+
+  DependencyGroupWrapper new_dependency_group(std::string, sol::table);
 }
 
 #endif

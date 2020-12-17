@@ -28,7 +28,7 @@ namespace IO {
   }
 
   // ParameterWrapper
-  ParameterWrapper::ParameterWrapper(AbstractComponent* parameter) : name(parameter->name) {
+  ParameterWrapper::ParameterWrapper(AbstractComponent* parameter) : name(parameter->get_name()) {
     this->parameter = parameter;
   }
 
@@ -218,5 +218,20 @@ namespace IO {
     Valuable* v2 = extract_Valuable(param2.parameter);
     AbstractComponent* param = new Arithmatic(name, DIVISION, v1, v2);
     return(ParameterWrapper(param));
+  }
+
+  // DependencyGroups
+
+  DependencyGroupWrapper::DependencyGroupWrapper(DependencyGroup* group) : name(group->get_name()) {
+    this->group = group;
+  }
+
+  std::string DependencyGroupWrapper::get_name() {
+    return(this->name);
+  }
+
+  DependencyGroupWrapper new_dependency_group(std::string name, sol::table tbl) {
+    DependencyGroup* group = new DependencyGroup(name);
+    return(DependencyGroupWrapper(group));
   }
 }

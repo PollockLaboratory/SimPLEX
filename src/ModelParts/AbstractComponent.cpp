@@ -4,6 +4,7 @@
 #include "AbstractComponent.h"
 #include "SubstitutionModels/RateVector.h"
 #include "../Environment.h"
+#include "../SubstitutionCounts.h"
 
 extern Environment env;
 
@@ -103,12 +104,24 @@ void Valuable::add_host_vector(RateVector* rv, int pos) {
   host_vectors.push_back(rv_loc {rv, pos});
 }
 
-std::list<rv_loc> Valuable::get_host_vectors() {
+const std::list<rv_loc>& Valuable::get_host_vectors() {
   return(host_vectors);
 }
 
 void Valuable::print() {
   std::cout << this->get_value();
+}
+
+void Valuable::set_counts(SubstitutionCounts *counts) {
+  this->counts = counts;
+}
+
+unsigned int Valuable::find_counts() {
+  unsigned int acc = 0;
+  for(auto it = host_vectors.begin(); it != host_vectors.end(); ++it) {
+    acc += counts->subs_by_rateVector[it->rv][it->pos];
+  }
+  return(acc);
 }
 
 // SampleableComponent.
@@ -148,7 +161,7 @@ double DynamicConstraint::get_value() const {
 
 std::string DynamicConstraint::get_description() const {
   AbstractComponent* component = dynamic_cast<AbstractComponent*>(value);
-  return(component->name);
+  return(component->get_name());
 }
 
 // SampleableValue.
