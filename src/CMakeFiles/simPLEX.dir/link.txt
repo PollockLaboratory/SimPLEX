@@ -1,0 +1,1 @@
+/usr/bin/c++  -w -O3   CMakeFiles/simPLEX.dir/SimPLEX.cpp.o  -o ../bin/simPLEX liblibSimPLEX.a /usr/lib/i386-linux-gnu/liblua5.2.so /usr/lib/i386-linux-gnu/libm.so 

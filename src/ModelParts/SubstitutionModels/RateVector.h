@@ -17,7 +17,7 @@
 struct rv_request {
   // Struct representing a request for a rate vector.
   // More specific requests later, for example branch position.
-  int pos;
+  unsigned int pos;
   int state;
 };
 

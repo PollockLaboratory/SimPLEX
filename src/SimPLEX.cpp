@@ -62,6 +62,8 @@ int main(int argc, char* argv[]) {
   Model model;
   model.Initialize(data.raw_tree, data.raw_msa, data.raw_sm);
 
+  data.Uninitialize();
+
   MCMC mcmc;
   mcmc.Initialize(&model);
 

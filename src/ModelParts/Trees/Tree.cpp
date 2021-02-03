@@ -18,7 +18,7 @@ Tree::Tree() {
 }
 
 // Tree Initialize using seqs and states
-void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, SubstitutionModel* &SM) {
+void Tree::Initialize(IO::RawTreeNode* raw_tree) {
   // Set dynamicly chosen branch-splitting function.
   splitBranchMethod = pickBranchSplitAlgorithm();
 
@@ -39,10 +39,9 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
     treeSamplingMethod = &Tree::sample_ancestral_states;
   }
   
-  this->MSA = MSA;
-  seqLen = MSA->numCols();
-  this->SM = SM;
-  SM->organizeRateVectors(MSA->numCols(), SM->get_states()->n);
+  //this->MSA = MSA;
+  //this->SM = SM;
+  //SM->organizeRateVectors(MSA->numCols(), SM->get_states()->n);
 
   // Proxys are created to correctly create root node.
   BranchSegment* proxyBranch = new BranchSegment(0.0);
@@ -51,29 +50,17 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree, SequenceAlignment* &MSA, Substi
   delete proxyBranch;
   delete proxyNode;
 
-  configureSequences(root);
-
-  for(auto t = nodeList.begin(); t != nodeList.end(); ++t) {
-    if((*t)->isTip()) {
-      tipList.push_back(*t);
-    }
-  }
-
-  // Mark gaps.
-  identify_gaps();
-  
-  // Initial sample to get counts.
-  for(auto b = branchList.begin(); b != branchList.end(); ++b) {
-  	(*b)->update();
-  }
+  buildNodeLists(root);
 
   std::cout << "\tTree split into " << nodeList.size() << " nodes." << std::endl;
 
   //Setup output.
   files.add_file("tree_out", env.get<std::string>("OUTPUT.tree_out_file"), IOtype::OUTPUT);
+  record_tree();
 
   files.add_file("substitutions_out", env.get<std::string>("OUTPUT.substitutions_out_file"), IOtype::OUTPUT);
   files.write_to_file("substitutions_out", "I,GEN,LogL,Ancestral,Decendant,Substitutions\n");
+
 }
 
 // Creation of tree nodes.
@@ -114,66 +101,94 @@ TreeNode* Tree::createTreeNode(IO::RawTreeNode* raw_tree, TreeNode* &ancestralNo
   return(newTreeNode);
 }
 
-// Configure sequences.
-void Tree::configureSequences(TreeNode* n) {
-  /*
-   * Traverses the tree attaching sequences to nodes.
-   * Also adds all the Nodes and Branch segments to their corresponding lists.
-   */
-
-  n->MSA = MSA;
-  n->SM = SM;
-
-  // Add nodes to nodeList and BranchSegments to branchList.
-  // Recursively call cofigureSequences on rest of the tree.
-  nodeList.push_back(n);
+void Tree::buildNodeLists(TreeNode* n) {
+  nodeList.push_front(n);
 
   if(n->left != 0) {
     BranchSegment* b = n->left;
     branchList.push_back(b);
-    configureSequences(b->decendant);
+    buildNodeLists(b->decendant);
   }
 
   if(n->right != 0) {
     BranchSegment* b = n->right;
     branchList.push_back(b);
-    configureSequences(b->decendant);
+    buildNodeLists(b->decendant);
   }
 
-  if(MSA->taxa_names_to_sequences.count(n->name)) {
-    n->sequence = &(MSA->taxa_names_to_sequences.at(n->name));
-  } else {
-    if(env.ancestral_sequences) {
-      // ANCESTRAL SEQUENCES KNOWN
-      // In the case when ancestral sequences are known there can be no missing sequences.
-      // New sequences should not be created.
-      std::cerr << "Error: Missing sequence for \"" << n->name << "\"." << std::endl;
-      exit(EXIT_FAILURE);
+  if(n->isTip()) {
+      tipList.push_back(n);
+  }
+}
+
+void Tree::configureBranches(TreeNode* n, unsigned int n_columns) {
+  if(n->left != 0) {
+    BranchSegment* b = n->left;
+    b->Initialize(n_columns);
+    configureBranches(b->decendant, n_columns);
+  }
+
+  if(n->right != 0) {
+    BranchSegment* b = n->right;
+    b->Initialize(n_columns);
+    configureBranches(b->decendant, n_columns);
+  }
+}
+
+// Configure sequences.
+void Tree::configureSequences(TreeNode* tmp) {
+  /*
+   * Traverses the tree attaching sequences to nodes.
+   * Also adds all the Nodes and Branch segments to their corresponding lists.
+   */
+
+  for(auto it = nodeList.begin(); it != nodeList.end(); ++it) {
+    TreeNode* n = *it;
+    n->MSA = MSA;
+
+    if(MSA->taxa_names_to_sequences.count(n->name)) {
+      n->sequence = &(MSA->taxa_names_to_sequences.at(n->name));
     } else {
-      // NORMAL RUN
-      // only tip sequences are needed.
-      if(n->isTip()){
+      if(env.ancestral_sequences) {
+	// ANCESTRAL SEQUENCES KNOWN
+	// In the case when ancestral sequences are known there can be no missing sequences.
+	// New sequences should not be created.
 	std::cerr << "Error: Missing sequence for \"" << n->name << "\"." << std::endl;
 	exit(EXIT_FAILURE);
       } else {
-	// Add new sequence to sequence alignments.
-	MSA->add(n->name);
-	n->sequence = &(MSA->taxa_names_to_sequences.at(n->name));
-
-	// Fill missing sequences/
-	if(n->left != 0 and n->right == 0) {
-	  // Internal Continous.
-	  TreeNode* dsNode = n->left->decendant; // ds = downstream.
-	  *(n->sequence) = *(dsNode->sequence);
+	// NORMAL RUN
+	// only tip sequences are needed.
+	if(n->isTip()){
+	  std::cerr << "Error: Missing sequence for \"" << n->name << "\"." << std::endl;
+	  exit(EXIT_FAILURE);
 	} else {
-	  // Root or internal branch.
-	  vector<int> dsNodeLseq = *(n->left->decendant->sequence);
-	  vector<int> dsNodeRseq = *(n->right->decendant->sequence);
-	  vector<int> p = MSA->findParsimony(dsNodeLseq, dsNodeRseq);
-	  *(n->sequence) = p;
+	  // Add new sequence to sequence alignments.
+	  MSA->add(n->name);
+	  n->sequence = &(MSA->taxa_names_to_sequences.at(n->name));
+	  
+	  // Fill missing sequences/
+	  if(n->left != 0 and n->right == 0) {
+	    // Internal Continous.
+	    TreeNode* dsNode = n->left->decendant; // ds = downstream.
+	    *(n->sequence) = *(dsNode->sequence);
+	  } else {
+	    // Root or internal branch.
+	    vector<int> dsNodeLseq = *(n->left->decendant->sequence);
+	    vector<int> dsNodeRseq = *(n->right->decendant->sequence);
+	    vector<int> p = MSA->findParsimony(dsNodeLseq, dsNodeRseq);
+	    *(n->sequence) = p;
 	}
       }
     }
+  }
+  }
+}
+
+void Tree::connect_substitution_model(SubstitutionModel* sm) {
+  this->SM = sm;
+
+  for(auto n = nodeList.begin(); n != nodeList.end(); ++n) {
+    (*n)->connect_substitution_model(sm);
   }
 }
 
@@ -184,6 +199,10 @@ SubstitutionModel* Tree::get_SM() {
 // Sampling and likelihood.
 const std::list<BranchSegment*> Tree::get_branches() {
   return(branchList);
+}
+
+const std::list<TreeNode*> Tree::nodes() {
+  return(nodeList);
 }
 
 std::list<float> Tree::get_branch_lengths() {
@@ -202,32 +221,13 @@ std::list<float> Tree::get_branch_lengths() {
   return(lens);
 }
 
+/*
 void Tree::identify_gaps() {
   for(auto n = nodeList.begin(); n != nodeList.end(); ++n) {
-    (*n)->sampledp = false;
-  }
-
-  std::queue<TreeNode*> nodes = {};
-
-  // Add tip nodes to starting nodes.
-  for(auto t = tipList.begin(); t != tipList.end(); ++t) {
-    (*t)->sampledp = false;
-    nodes.push(*t);
-  }
-
-  while(not nodes.empty()) {
-    if(not nodes.front()->sampledp) {
-      nodes.push(nodes.front()->set_gaps());
-    }
-
-    nodes.pop();
-  }
-
-  // Reset all nodes such that the sampled flag is false.
-  for(auto n = nodeList.begin(); n != nodeList.end(); ++n) {
-    (*n)->sampledp = false;
+    (*n)->set_gaps(); 
   }
 }
+*/
 
 //
 // SAMPLING TREE PARAMETERS.
@@ -237,9 +237,9 @@ sample_status Tree::sample(const std::list<int>& positions) {
   sample_status s = (this->*treeSamplingMethod)(positions);
 
   // Update branch list - new substitutions.
-  for(auto b = branchList.begin(); b != branchList.end(); ++b) {
-    (*b)->update();
-  }
+  // for(auto b = branchList.begin(); b != branchList.end(); ++b) {
+  //  (*b)->update();
+  //}
   
   return(s);
 }
@@ -255,6 +255,7 @@ sample_status Tree::sample_ancestral_states(const std::list<int>& positions) {
    */
  
   // Reset all nodes such that the sampled flag is false.
+  /*
   for(auto n = nodeList.begin(); n != nodeList.end(); ++n) {
     (*n)->sampledp = false;
   }
@@ -282,7 +283,7 @@ sample_status Tree::sample_ancestral_states(const std::list<int>& positions) {
   for(auto n = nodeList.begin(); n != nodeList.end(); ++n) {
     (*n)->sampledp = false;
   }
-
+  */
   return(sample_status({false, true, true}));
 }
 
@@ -345,78 +346,36 @@ void Tree::print_nodeList() {
   }
 }
 
-// Ancestral States Parameter
+// RateVectorAssignmentParameter
 
-AncestralStatesParameter::AncestralStatesParameter() : SampleableComponent("AncestralStates") {
-  tree = new Tree();
-  n_samples =  env.get<int>("MCMC.tree_sample_n_positions");
+RateVectorAssignmentParameter::RateVectorAssignmentParameter(Tree* tree) : AbstractComponent("RateVectorassignment") {
+  this->tree = tree;
 }
 
-void AncestralStatesParameter::print() {
-  std::cout << "AncestralStates" << std::endl;
+void RateVectorAssignmentParameter::print() {
+  std::cout << "RateVectorAssignment" << std::endl;
 }
 
-std::string AncestralStatesParameter::get_type() {
-  return("TREE_PARAMETER");
+std::string RateVectorAssignmentParameter::get_type() {
+  return("RateVectorAssignment");
+}
+ 
+void RateVectorAssignmentParameter::fix() {
 }
 
-std::list<int> random_positions(int s_length, int n) {
-  std::list<int> positions = {};
-  if(n > s_length) {
-    for(int i = 0; i < s_length; i++) {
-      positions.push_back(i);
-    }
-  } else {
-    // Very inefficient.
-    int i;
-    while(positions.size() < n) {
-      i = rand() % s_length;
-      positions.push_back(i);
-      positions.unique();
-    }
+void RateVectorAssignmentParameter::refresh() {
+  // Update all branches - new substitutions.
+  std::list<BranchSegment*> branches = tree->get_branches();
+  for(auto b = branches.begin(); b != branches.end(); ++b) {
+    (*b)->update();
   }
-  return(positions);
 }
 
-sample_status AncestralStatesParameter::sample() {
-  // Pick positions.
-  std::list<int> positions = random_positions(env.n, n_samples);
-  return(tree->sample(positions));
-}
-
-void AncestralStatesParameter::undo() {
-  std::cerr << "Error: TreeParameter update cannot be undone." << std::endl;
-  exit(EXIT_FAILURE);
-}
-
-void AncestralStatesParameter::fix() {
-}
-
-void AncestralStatesParameter::refresh() {
-}
-
-void AncestralStatesParameter::Initialize(IO::RawTreeNode* raw_tree, IO::RawMSA* &raw_msa, SubstitutionModel* &SM) {
-  hidden = true;
-  const States* states = SM->get_states();
-  SequenceAlignment* MSA = new SequenceAlignment(states);
-  MSA->Initialize(raw_msa);
-
-  tree->Initialize(raw_tree, MSA, SM);
-  tree->record_tree();
-}
-
-Tree* AncestralStatesParameter::get_tree_ptr() {
-  return(tree);
-}
-
-std::string AncestralStatesParameter::get_state_header() {
+std::string RateVectorAssignmentParameter::get_state_header() {
   return(name);
 }
 
-void AncestralStatesParameter::save_to_file(int gen, double l) {
-  tree->record_state(gen, l);
-}
-
-std::string AncestralStatesParameter::get_state() {
+std::string RateVectorAssignmentParameter::get_state() {
   return("n/a");
 }
+

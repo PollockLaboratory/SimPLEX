@@ -36,9 +36,11 @@ namespace IO {
     ignore_states = {};
   }
 
-  // Lua bindings & Util functions.
+  // STATES
+  // Lua bindings & Util functions - with reading lua file.
   void raw_substitution_model::set_states(sol::table tbl) {
-    into_list(tbl, states);
+    // Fix this function - into_states.
+    states = IO::readStates(extract_list(tbl));
 
     lua["States"]["count"] = states.size();
 
@@ -51,7 +53,43 @@ namespace IO {
 
   // Look into this - not sure the ignore states do anything.
   void raw_substitution_model::set_ignore_states(sol::table tbl) {
-    into_list(tbl, ignore_states);
+    ignore_states = extract_list(tbl);
+  }
+
+  void raw_substitution_model::add_hidden_state(std::string name, sol::table states, sol::table options) {
+    std::cout << "New Hidden states." << std::endl;
+    std::set<std::string> new_states = {};
+    try {
+      new_states = IO::readStates(extract_list(states));
+    } catch(IO::ParseException const &err) {
+      throw IO::ParseException(std::string("error defining new hidden state: ") + err.what());
+    }
+
+    hidden_states[name] = new_states;
+    for(auto e : new_states) {
+      std::cout << e << std::endl;
+    }
+  }
+
+  void raw_substitution_model::read_hidden_state_file(std::string hidden_state, std::string file_name) {
+    auto it = hidden_states.find(hidden_state);
+    if(it == hidden_states.end()) {
+      std::cerr << "Error: attempting to read " << file_name << ", however \"" << hidden_state << "\" is not a recognized hidden state." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    std::string fh = "hidden_state_"+hidden_state;
+    files.add_file(fh, file_name, IOtype::INPUT);
+
+    IO::RawAdvMSA MSA = {};
+    try {
+      MSA = readRawAdvMSA(files.read_all(fh), it->second);
+      IO::printRawAdvMSA(MSA);
+    } catch(IO::ParseException const &err) {
+      throw IO::ParseException(std::string("error reading ") + file_name + ": " + err.what());
+    }
+
+    hidden_states_data[hidden_state] = MSA;
   }
  
   std::list<int> get_positions(sol::table pos_tbl) {
@@ -114,20 +152,36 @@ namespace IO {
   void raw_substitution_model::read_from_file(std::string file_name) {
     lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::string);
 
-    //Main tables.
+    // Main Lua tables.
+    // MODEL
     auto model_table = lua["Model"].get_or_create<sol::table>();
     model_table.set_function("set_name", [this](std::string name) -> void {
 					   this->name = name;
 					 });
+
     model_table.set_function("add_rate_vector", [this](raw_rate_vector rv) -> void {
 						  this->add_rate_vector(rv);
 						});
 
+    // STATES
     auto states_table = lua["States"].get_or_create<sol::table>();
     states_table.set_function("set", [this](sol::table tbl) -> void {
 				       this->set_states(tbl);
 				     });
 
+    states_table.set_function("new_hidden", [this](std::string name, sol::table states, sol::table options) -> void {
+					      this->add_hidden_state(name, states, options);
+					    });
+
+    // DATA - tools to incorperate additional data into the state, primarily hidden states.
+    auto data_table = lua["Data"].get_or_create<sol::table>();
+
+    data_table.set_function("load_hidden_state", [this](std::string hidden_state, std::string file_name) -> void {
+						   read_hidden_state_file(hidden_state, file_name);
+						   
+						 });
+
+        // CONFIGURATION
     auto config_table = lua["Config"].get_or_create<sol::table>();
     config_table.set_function("get_int", [](std::string key) -> int {
 					   return(env.get<int>(key));
@@ -143,6 +197,7 @@ namespace IO {
 
     config_table.set_function("get_string_array", &get_string_tbl);
 
+    // PARAMETERS
     lua.new_usertype<ParameterWrapper>("Parameter",
 				       "new", [](std::string name, std::string parameter_type, sol::table tbl) -> ParameterWrapper {
 						 return(new_parameter(name, parameter_type, tbl));
@@ -160,6 +215,7 @@ namespace IO {
 				       "divide", divide_parameters,
 				       "named_divide", named_divide_parameters);
 
+    // Not fully implimented at all.
     lua.new_usertype<DependencyGroupWrapper>("DependencyGroup",
 					     "new", [](std::string name, sol::table tbl) -> DependencyGroupWrapper {
 						      return(new_dependency_group(name, tbl));
@@ -187,6 +243,22 @@ namespace IO {
     }
   }
 
+  const std::set<std::string> raw_substitution_model::get_states() {
+    return(states);
+  }
+
+  const std::list<std::string> raw_substitution_model::get_ignore_states() {
+    return(ignore_states);
+  }
+
+  const std::list<raw_rate_vector> raw_substitution_model::get_rate_vector_list() {
+    return(rv_list);
+  }
+
+  const std::map<std::string, std::set<std::string>> raw_substitution_model::get_hidden_states() {
+    return(hidden_states);
+  }
+
   raw_substitution_model* read_substitution_model(std::string file_name) {
     raw_substitution_model* raw_model = new raw_substitution_model();
     raw_model->read_from_file(file_name);
@@ -206,6 +278,6 @@ namespace IO {
       os << *it << std::endl;
     }
     return(os);
-  }
+  } 
 }
 

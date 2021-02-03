@@ -70,8 +70,9 @@ public:
   int get_ID() const;
   std::string get_name() const;
   bool get_hidden() const;
+  void hide();
 
-  virtual std::string get_state_header()  = 0; // Returns the column(s) names for the component set output file.
+  virtual std::string get_state_header() = 0; // Returns the column(s) names for the component set output file.
   virtual std::string get_state() = 0; // Returns the current state of the parameter, typically a double that fills the csv column.
 
   virtual void fix() = 0;

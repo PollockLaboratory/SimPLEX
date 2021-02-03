@@ -3,6 +3,7 @@
 
 #include <map>
 #include <list>
+#include <set>
 #include <algorithm>
 #include "Files.h"
 
@@ -22,6 +23,40 @@ namespace IO {
   void printRawMSA(const RawMSA& msa);
   std::list<std::string> getRawMSANames(const RawMSA& msa);
   void convertToGaps(RawMSA& msa, std::list<std::string> remove_list);
+
+  // New functions and struct.
+
+  class ParseException : public std::invalid_argument {
+  public:
+    ParseException(std::string);
+  };
+
+  std::set<std::string> readStates(std::list<std::string> states);
+  
+  typedef struct {
+    char state;
+    float freq;
+  } StateFreq;
+
+  std::string freqListAsStr(std::list<StateFreq> freqs);
+
+  // Type for representing sequences where each position is contains state frequencies.
+  typedef std::list<std::list<StateFreq>> FreqSequence;
+  bool operator==(const FreqSequence& lhs, const FreqSequence& rhs);
+  std::string sequenceAsStr(FreqSequence seq);
+  
+  struct RawAdvMSA {
+    unsigned int n = 0;
+    unsigned int cols = 0;
+    std::map<std::string, FreqSequence> seqs;
+  };
+
+  RawAdvMSA parseRawAdvMSA(std::string data);
+  RawAdvMSA readRawAdvMSA(std::string data, std::set<std::string> states);
+
+  // Utils
+  bool operator==(const RawAdvMSA& lhs, const RawAdvMSA& rhs);
+  void printRawAdvMSA(RawAdvMSA msa);
 }
 
 #endif

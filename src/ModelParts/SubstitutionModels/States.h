@@ -12,4 +12,8 @@ struct States {
   std::map<int, std::string> int_to_state;
 };
 
+void print_States(States);
+
+States add_to_States(States, std::string);
+
 #endif

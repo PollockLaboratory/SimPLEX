@@ -545,6 +545,33 @@ ModelParts/SubstitutionModels/RateVector.cpp.s:
 	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/libSimPLEX.dir/build.make src/CMakeFiles/libSimPLEX.dir/ModelParts/SubstitutionModels/RateVector.cpp.s
 .PHONY : ModelParts/SubstitutionModels/RateVector.cpp.s
 
+ModelParts/SubstitutionModels/States.o: ModelParts/SubstitutionModels/States.cpp.o
+
+.PHONY : ModelParts/SubstitutionModels/States.o
+
+# target to build an object file
+ModelParts/SubstitutionModels/States.cpp.o:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/libSimPLEX.dir/build.make src/CMakeFiles/libSimPLEX.dir/ModelParts/SubstitutionModels/States.cpp.o
+.PHONY : ModelParts/SubstitutionModels/States.cpp.o
+
+ModelParts/SubstitutionModels/States.i: ModelParts/SubstitutionModels/States.cpp.i
+
+.PHONY : ModelParts/SubstitutionModels/States.i
+
+# target to preprocess a source file
+ModelParts/SubstitutionModels/States.cpp.i:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/libSimPLEX.dir/build.make src/CMakeFiles/libSimPLEX.dir/ModelParts/SubstitutionModels/States.cpp.i
+.PHONY : ModelParts/SubstitutionModels/States.cpp.i
+
+ModelParts/SubstitutionModels/States.s: ModelParts/SubstitutionModels/States.cpp.s
+
+.PHONY : ModelParts/SubstitutionModels/States.s
+
+# target to generate assembly for a file
+ModelParts/SubstitutionModels/States.cpp.s:
+	cd /home/hamish/Documents/Code/simplex0_0 && $(MAKE) -f src/CMakeFiles/libSimPLEX.dir/build.make src/CMakeFiles/libSimPLEX.dir/ModelParts/SubstitutionModels/States.cpp.s
+.PHONY : ModelParts/SubstitutionModels/States.cpp.s
+
 ModelParts/SubstitutionModels/SubstitutionModel.o: ModelParts/SubstitutionModels/SubstitutionModel.cpp.o
 
 .PHONY : ModelParts/SubstitutionModels/SubstitutionModel.o
@@ -762,6 +789,9 @@ help:
 	@echo "... ModelParts/SubstitutionModels/RateVector.o"
 	@echo "... ModelParts/SubstitutionModels/RateVector.i"
 	@echo "... ModelParts/SubstitutionModels/RateVector.s"
+	@echo "... ModelParts/SubstitutionModels/States.o"
+	@echo "... ModelParts/SubstitutionModels/States.i"
+	@echo "... ModelParts/SubstitutionModels/States.s"
 	@echo "... ModelParts/SubstitutionModels/SubstitutionModel.o"
 	@echo "... ModelParts/SubstitutionModels/SubstitutionModel.i"
 	@echo "... ModelParts/SubstitutionModels/SubstitutionModel.s"

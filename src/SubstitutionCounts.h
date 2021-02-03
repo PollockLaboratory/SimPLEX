@@ -28,7 +28,7 @@ private:
   SubstitutionCounts* counts;
   Tree* tree;
 public:
-  CountsParameter(SubstitutionCounts*, AncestralStatesParameter*);
+  CountsParameter(SubstitutionCounts*, Tree*);
   void fix() override;
   void refresh() override;
   void print() override;

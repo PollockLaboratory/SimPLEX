@@ -42,7 +42,8 @@ private:
   SubstitutionCounts counts;
   SubstitutionModel* substitution_model;
 
-  AncestralStatesParameter* tp;
+  Tree* tree;
+  SequenceAlignmentParameter* sp;
   CountsParameter* cp;
 };
 

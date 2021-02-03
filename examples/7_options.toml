@@ -3,8 +3,7 @@ seed = 0
 
 # Tree Settings
 [TREE]
-  max_segment_probability = 0.08
-  max_segment_length = 0.08
+  max_segment_probability = 0.05
   branch_split_algorithm = 1
   scale_tree = true
   target_tree_length = 1.0
@@ -28,13 +27,13 @@ seed = 0
 [OUTPUT]
   output_directory = "/output"
   output_directory_append_time = false
-  overwrite_output = true
-  
+  overwrite_output = true 
+
   tree_out_file = "tree_out.newick"
-  #sequences_out_file = "sequences_out.fasta"
-  sequences_out_file = ""
+  sequences_out_file = "sequences_out.fasta"
+  #sequences_out_file = ""
   parameters_out_file = "parameters_out.csv"
-  parameters_counts_out_file = "parameters_out_file.csv"
+  parameters_counts_out_file = "parameters_counts_out.csv"
   rate_vectors_out_file = "rate_vectors_out.csv"
   likelihood_out_file = "likelihoods_out.csv"
   substitutions_out_file = "substitutions.out"
@@ -51,5 +50,6 @@ seed = 0
   print_frequency = 100
 
 [MODEL]
-  script_file = "1_basic_model.lua"
-  step_size = 0.0005
+  script_file = "7_hidden_states.lua"
+  step_size = 0.001
+  states = ['a', 't', 'c', 'g']

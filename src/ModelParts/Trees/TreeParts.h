@@ -33,6 +33,8 @@ public:
   BranchSegment(float distance);
   ~BranchSegment();
 
+  void Initialize(unsigned int n_columns);
+
   float distance;
   TreeNode* ancestral;
   TreeNode* decendant;
@@ -57,11 +59,11 @@ class TreeNode {
   BranchSegment* left;
   BranchSegment* right;
 
-  float** state_probabilities;
-  bool* gaps;
+  //float** state_probabilities;
+  //bool* gaps;
 
-  std::vector<int>* sequence;
-  SequenceAlignment* MSA;
+  std::vector<int>* sequence; // Ptr to the sequence.
+  SequenceAlignment* MSA; // The MSA that the sequence is in.
 
   SubstitutionModel* SM;
 
@@ -69,17 +71,14 @@ class TreeNode {
   TreeNode(IO::RawTreeNode* raw_tree);
   TreeNode(std::string n);
 
-  TreeNode* set_gaps();
+  void connect_substitution_model(SubstitutionModel*);
+
+  //TreeNode* set_gaps();
   
   //Sampling
   bool ready_to_sample();
-  int pick_state_from_probabilities(int pos);
-  void calculate_state_probabilities_pos(int pos, TreeNode* left, TreeNode* right, TreeNode* up);
 
-  TreeNode* calculate_state_probabilities(const std::list<int>&);
-  void pick_sequences(const std::list<int>&);
-
-  // Printing/Display
+   // Printing/Display
   std::string toString();
   std::string get_sequence();
   std::string state_at_pos(int i);

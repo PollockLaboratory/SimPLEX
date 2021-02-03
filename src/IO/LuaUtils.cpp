@@ -1,21 +1,18 @@
 #include "LuaUtils.h"
 
-void into_list(sol::table tbl, std::list<std::string>& list) {
+std::list<std::string> extract_list(sol::table tbl) {
+  std::list<std::string> ret = {};
   for(auto kvp : tbl) {
-      const sol::object& val = kvp.second;
+    const sol::object& val = kvp.second;
+    sol::optional<std::string> maybe_str = val.as<sol::optional<std::string>>();
 
-      sol::optional<std::string> maybe_str = val.as<sol::optional<std::string>>();
-
-      if(maybe_str) {
-	std::string s = maybe_str.value();
-	if(s == "-") {
-	  std::cerr << "Error: the character \"-\" is reserved for gaps. Cannot be manually reassigned." << std::endl;
-	  exit(EXIT_FAILURE);
-	}
-	list.push_back(s);
-      } else {
-	std::cerr << "Error: state is not String."  << std::endl;
-	exit(EXIT_FAILURE);
-      }
+    if(maybe_str) {
+      std::string s = maybe_str.value();
+      ret.push_back(s);
+    } else {
+      std::cerr << "Error: expecting list of strings." << std::endl;
+      exit(EXIT_FAILURE);
     }
+  }
+  return(ret);
 }

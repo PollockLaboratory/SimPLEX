@@ -68,7 +68,7 @@ void RateVectorSet::Initialize(States* states) {
   std::ostringstream buffer;
   buffer << "I,GEN,LogL,NAME,ANC";
   // the count is reduced by -1 to take into account gaps.
-  for(int i = 0; i < states->int_to_state.size() - 1; ++i) {
+  for(unsigned int i = 0; i < states->int_to_state.size() - 1; ++i) {
     buffer << "," << states->int_to_state[i];
   }
   buffer << std::endl;

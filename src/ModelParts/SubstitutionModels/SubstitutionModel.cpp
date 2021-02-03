@@ -11,14 +11,6 @@ SubstitutionModel::SubstitutionModel(Valuable* u) : u(u) {
   states.n = 0;
 }
 
-void SubstitutionModel::add_state(std::string s) {
-  // Check if state is gap.
-  states.possible.insert(s);
-  states.state_to_int[s] = states.n;
-  states.int_to_state[states.n] = s;
-  states.n++;
-}
-
 RateVector* SubstitutionModel::create_rate_vector(IO::raw_rate_vector rv, Valuable* u) {
   std::vector<Valuable*> rates(states.n, nullptr);
   int s = states.state_to_int[rv.uc.state];
@@ -74,27 +66,44 @@ RateVector* SubstitutionModel::create_rate_vector(IO::raw_rate_vector rv, Valuab
   return(new_rv);
 }
 
-void SubstitutionModel::from_raw_model(IO::raw_substitution_model* raw_sm) {
-  // Read in states.
-  for(auto it = raw_sm->states.begin(); it != raw_sm->states.end(); ++it) {
-	add_state(*it);
+void SubstitutionModel::configure_States(std::set<std::string> raw_states) {
+  for(auto it = raw_states.begin(); it != raw_states.end(); ++it) {
+    states = add_to_States(states, *it);
   }
 
-  // Read in rate vectors.
-  for(auto raw_rv = raw_sm->rv_list.begin(); raw_rv != raw_sm->rv_list.end(); ++raw_rv) {
+  // Add Indels to states table.
+  states.state_to_int["-"] = -1;
+  states.int_to_state[-1] = "-";
+}
+
+void SubstitutionModel::configure_RateVectors(std::list<IO::raw_rate_vector> rv_list) {
+  for(auto raw_rv = rv_list.begin(); raw_rv != rv_list.end(); ++raw_rv) {
     RateVector* rv = create_rate_vector(*raw_rv, u);
     rateVectors.add(rv, (*raw_rv).uc);
   }
 
-  finalize();
+  rateVectors.Initialize(&states);
 }
 
-void SubstitutionModel::print_states() {
- std::cout << "States: ";
- for(auto it = states.possible.begin(); it != states.possible.end(); ++it) {
-   std::cout << *it << ":" << states.state_to_int[*it] << " ";
- }
- std::cout << "- n = " << states.possible.size() << std::endl;
+void SubstitutionModel::configure_HiddenStates(std::map<std::string, std::set<std::string>> raw_hidden) {
+  for(auto it = raw_hidden.begin(); it != raw_hidden.end(); ++it) {
+    States cont = {};
+    for(auto s = it->second.begin(); s != it->second.end(); ++s) {
+      cont = add_to_States(cont, *s);
+    }
+
+    hidden_states[it->first] = cont;
+  }
+}
+
+void SubstitutionModel::from_raw_model(IO::raw_substitution_model* raw_sm) {
+  configure_States(raw_sm->get_states());
+
+  configure_RateVectors(raw_sm->get_rate_vector_list());
+
+  configure_HiddenStates(raw_sm->get_hidden_states());
+
+  print_States(states);
 }
 
 const States* SubstitutionModel::get_states() {
@@ -147,14 +156,6 @@ std::vector<RateVector*> SubstitutionModel::get_RateVectors() {
 
 void SubstitutionModel::saveToFile(int gen, double l) {
   rateVectors.saveToFile(gen, l);
-}
-
-void SubstitutionModel::finalize() {
-  // Add Indels to states table.
-  states.state_to_int["-"] = -1;
-  states.int_to_state[-1] = "-";
-
-  rateVectors.Initialize(&states);
 }
 
 // The ITERATOR

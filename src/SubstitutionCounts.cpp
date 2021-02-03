@@ -48,11 +48,12 @@ void SubstitutionCounts::print() {
 
 //std::ofstream CountsParameter::out_file;
 
-CountsParameter::CountsParameter(SubstitutionCounts* counts, AncestralStatesParameter* tp) : AbstractComponent("SubstitutionCounts."), counts(counts) {
+CountsParameter::CountsParameter(SubstitutionCounts* counts, Tree* tree) : AbstractComponent("SubstitutionCounts."), counts(counts) {
   hidden = true;
 
-  this->tree = tp->get_tree_ptr();
-  this->add_dependancy(tp);
+  //this->tree = tp->get_tree_ptr();
+  //this->add_dependancy(tp);
+  this->tree = tree;
 
   files.add_file("substitution_counts_out", env.get<std::string>("OUTPUT.counts_out_file"), IOtype::OUTPUT);
 

@@ -32,6 +32,7 @@ Valuable* Model::create_uniformization_constant() {
     val = u; 
   } else {
     FixedFloat* f = new FixedFloat("U", env.get<double>("UNIFORMIZATION.initial_value"));
+    f->hide();
     components.add_parameter(f);
     val = f;
   }
@@ -57,26 +58,52 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw
 
   // Tree.
   std::cout << "\tConstructing tree." << std::endl;
-  tp = new AncestralStatesParameter();
-  tp->Initialize(raw_tree, raw_msa, substitution_model);
+
+  const States* states = substitution_model->get_states();
+
+  // Set environment variables.
+  env.num_states = states->n;
+  env.state_to_integer = states->state_to_int;
+  env.integer_to_state = states->int_to_state;
+  
+  SequenceAlignment* MSA = new SequenceAlignment(states);
+  MSA->Initialize(raw_msa);
+
+  tree = new Tree();
+
+  tree->Initialize(raw_tree);
+  tree->connect_substitution_model(substitution_model);
+
+  tree->MSA = MSA;
+  tree->configureBranches(tree->root, MSA->n_columns);
+
+  MSA->syncWithTree(tree);
+
+  sp = new SequenceAlignmentParameter(MSA);
+  components.add_parameter(sp, env.get<int>("MCMC.tree_sample_frequency"));
+
+  substitution_model->organizeRateVectors(MSA->numCols(), substitution_model->get_states()->n);
+
+  RateVectorAssignmentParameter* rvap = new RateVectorAssignmentParameter(tree);
+  rvap->add_dependancy(sp);
+  components.add_parameter(rvap);
 
   std::cout << "\tAdding Uniformization constant." << std::endl;
   UniformizationConstant* u_param = dynamic_cast<UniformizationConstant*>(u);
   if(u_param and env.get<bool>("UNIFORMIZATION.refresh_tree_on_update")) {
-      tp->add_dependancy(u_param);
+      sp->add_dependancy(u_param);
   }
-
-  components.add_parameter(tp, env.get<int>("MCMC.tree_sample_frequency"));
  
   std::cout << "\tPreparing substitution counts." << std::endl;
-  cp = new CountsParameter(&counts, tp);
+  cp = new CountsParameter(&counts, tree);
+  cp->add_dependancy(rvap);
   components.add_parameter(cp);
 
   components.Initialize();
 
   std::cout << "\tSetting initial parameter states." << std::endl;
   // Set initial tree state.
-  tp->sample();
+  sp->sample();
   components.reset_dependencies();
 
   counts.print();
@@ -172,7 +199,8 @@ void Model::RecordState(int gen, double l) {
 	components.save_to_file(gen, l);
 	substitution_model->saveToFile(gen, l);
 	// Counts and tree save should be here.
-	tp->save_to_file(gen, l);
+	sp->save_to_file(gen, l);
+	tree->record_substitutions(gen, l);
 	cp->save_to_file(gen, l); 
 }
 

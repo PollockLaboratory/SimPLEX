@@ -161,10 +161,7 @@ IO::RawTreeNode* IO::parseTree(std::string tree_string) {
     std::cout << "Warning: truncating the root branch node." << std::endl;
     t->distance = 0.0;
   };
-
-  // Connect Root Down node.
-
-  //IO::printRawTree(t);
+  
   return(t);
 }
 
@@ -218,4 +215,16 @@ float IO::findRawTreeTotalLength(const RawTreeNode* node) {
   }
 
   return(total);
+}
+
+void IO::deleteTree(RawTreeNode* node) {
+  if(node->left != nullptr) {
+    deleteTree(node->left);
+  }
+
+  if(node->right != nullptr) {
+    deleteTree(node->right);
+  }
+
+  delete node;
 }

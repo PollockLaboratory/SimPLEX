@@ -27,4 +27,6 @@ static T value_from_table(sol::table tbl, std::string name) {
 
 void into_list(sol::table tbl, std::list<std::string>& list);
 
+std::list<std::string> extract_list(sol::table tbl);
+
 #endif

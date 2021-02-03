@@ -339,26 +339,54 @@ void IO::Files::write_to_file(std::string name, std::string data) {
 }
 
 void IO::Files::print() {
+  unsigned int max_name_len = 0;
+  unsigned int max_file_len = 4; // If empty no file_name then 'None' is printed, which is len = 4.
+
+  for(std::map<std::string, int>::iterator it = file_to_index.begin(); it != file_to_index.end(); ++it) {
+    it->first.length() > max_name_len ? max_name_len = it->first.length() : max_name_len = max_name_len;
+    unsigned int file_len = file_values[it->second].file_name.length();
+    file_len > max_file_len ? max_file_len = file_len : max_name_len = max_name_len;
+  }
+
+  max_name_len++;
+  max_file_len++;
+
   std::cout << std::endl << "Files - relative to directory: " << reference_dir << std::endl;
 
   for(std::map<std::string, int>::iterator it = file_to_index.begin(); it != file_to_index.end(); ++it) {
-    if(file_values[it->second].file_name != "") {
-      std::cout << it->first << " : " << file_values[it->second].file_name << " ";
-      if(file_values[it->second].path.null() == false) {
-	std::cout << Path(".") + file_values[it->second].path << " ";
-      } else {
-	std::cout << ". ";
-      }
-    } else {
-      // When empty path is specified.
-      std::cout << it->first << " : None None ";
+    // Reference name.
+    std::cout << it->first;
+    for(unsigned int i = 0; i < max_name_len - it->first.length(); i++) {
+      std::cout << " ";
     }
 
     if(file_values[it->second].t == IOtype::INPUT) {
-      std::cout << "INPUT" << std::endl;
+      std::cout << "[INPUT ] ";
     } else {
-      std::cout << "OUTPUT" << std::endl;
+      std::cout << "[OUTPUT] ";
     }
+
+    // File name.
+    std::string file_name;
+    if(file_values[it->second].file_name != "") {
+      file_name = file_values[it->second].file_name;
+    } else {
+      file_name = "None";
+    }
+
+    std::cout << file_name;
+    for(unsigned int i = 0; i < max_file_len - file_name.length(); i++) {
+      std::cout << " ";
+    }
+
+    // File path
+    if(file_values[it->second].path.null() == false) {
+      std::cout << Path(".") + file_values[it->second].path;
+    } else {
+	std::cout << "None";
+    }
+
+    std::cout << std::endl;
   }
   std::cout << std::endl;
 }

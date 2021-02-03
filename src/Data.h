@@ -15,7 +15,7 @@
 #include "IO/SequencesParser.h"
 
 class Data {
- public:
+public:
   SubstitutionModel* sm;
   SequenceAlignment* MSA;
   std::list<SequenceAlignment*> MSA_list;
@@ -27,7 +27,8 @@ class Data {
   ~Data();
 
   void Initialize();
- private:
+  void Uninitialize();
+private:
   std::set<int> columns_with_gaps;
   std::vector<int> columns_without_gaps;
 
@@ -36,7 +37,7 @@ class Data {
   
   IO::RawTreeNode* ReadTree();
   IO::RawMSA* ReadMSA();
-  IO::raw_substitution_model* ReadSubstitutionModel(const IO::RawMSA*, const IO::RawTreeNode*);
+  IO::raw_substitution_model* ReadSubstitutionModel();
 };
 
 #endif

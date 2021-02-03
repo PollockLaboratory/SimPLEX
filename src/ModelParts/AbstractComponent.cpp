@@ -30,6 +30,10 @@ bool AbstractComponent::get_hidden() const {
   return(hidden);
 }
 
+void AbstractComponent::hide() {
+  hidden = true;
+}
+
 void AbstractComponent::add_dependancy(AbstractComponent* v) {
   dependencies.push_back(v);
 }

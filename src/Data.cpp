@@ -18,26 +18,37 @@ Data::~Data() {
 
 void Data::Initialize() {
   std::cout << "Loading data:" << std::endl;
+  raw_sm = ReadSubstitutionModel();
+
   raw_msa = ReadMSA();
   raw_tree = ReadTree();
-  raw_sm = ReadSubstitutionModel(raw_msa, raw_tree);
 
-  std::cout << "States: " << std::endl;
-  for(auto it = raw_sm->states.begin(); it != raw_sm->states.end(); ++it) {
+  // Print States.
+  std::set<std::string> states = raw_sm->get_states();
+  std::cout << "States: [ ";
+  for(auto it = states.begin(); it != states.end(); ++it) {
     std::cout << *it << " ";
   }
-  std::cout << std::endl;
+  std::cout << "]" << std::endl;
 
-  std::cout << "Ignore states: " << std::endl;
-  for(auto it = raw_sm->ignore_states.begin(); it != raw_sm->ignore_states.end(); ++it) {
+  std::list<std::string> ignore_states = raw_sm->get_ignore_states();
+  std::cout << "Ignore states: [ ";
+  for(auto it = ignore_states.begin(); it != ignore_states.end(); ++it) {
     std::cout << *it << " ";
   }
-  std::cout << std::endl;
+  std::cout << "]" << std::endl;
 
-  IO::convertToGaps(*raw_msa, raw_sm->ignore_states);
+  // Validation.
+  IO::convertToGaps(*raw_msa, ignore_states);
   
   validateInputData(raw_msa, raw_tree);
   std::cout << "Data successfully read." << std::endl;
+}
+
+void Data::Uninitialize() {
+  // Raw imput data should no longer be used during MCMC. Therefore delete data to save space.
+  delete raw_msa;
+  IO::deleteTree(raw_tree);
 }
 
 IO::RawTreeNode* Data::ReadTree() {
@@ -62,7 +73,7 @@ IO::RawMSA* Data::ReadMSA() {
   return(raw_msa);  
 }
 
-IO::raw_substitution_model* Data::ReadSubstitutionModel(const IO::RawMSA* raw_msa, const IO::RawTreeNode* raw_tree) {
+IO::raw_substitution_model* Data::ReadSubstitutionModel() {
   files.add_file("lua_model", env.get<std::string>("MODEL.script_file"), IOtype::INPUT);
   std::cout << "Reading Substitution model from:\t" << files.get_info("lua_model").file_name << std::endl;
 

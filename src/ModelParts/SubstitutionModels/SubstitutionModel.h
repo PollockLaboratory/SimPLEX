@@ -27,9 +27,6 @@ public:
   void from_raw_model(IO::raw_substitution_model*);
 
   // States.
-  States states;
-  void add_state(std::string);
-  void print_states();
   const States* get_states();
 
   // Rate Vectors.
@@ -46,12 +43,17 @@ public:
 
   void saveToFile(int gen, double l);
 private:
-  void finalize();
+  void configure_States(std::set<std::string>);
+  void configure_RateVectors(std::list<IO::raw_rate_vector>);
+  void configure_HiddenStates(std::map<std::string, std::set<std::string>>);
+
+  States states;
+  std::map<std::string, States> hidden_states;
 
   RateVectorSet rateVectors;
 
   // Iterator
-  // Given a AbstractComponent will return an iterator to all the rate vector locations that are modified.
+  // Given a AbstractComponent will return an iterator to the start of all the rate vector locations that are modified.
   class iterator:public std::iterator<std::output_iterator_tag, std::pair<RateVector*, int>> {
   public:
     explicit iterator(SubstitutionModel&, bool, AbstractComponent*);

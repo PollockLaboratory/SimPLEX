@@ -16,6 +16,7 @@ set(SRCS
   ModelParts/AbstractComponent.cpp
   ModelParts/SubstitutionModels/SubstitutionModel.cpp
   ModelParts/SubstitutionModels/RateVector.cpp
+  ModelParts/SubstitutionModels/States.cpp
   ModelParts/SubstitutionModels/Parameters.cpp
   ModelParts/Trees/Tree.cpp
   ModelParts/Trees/BranchSplitting.cpp

@@ -21,8 +21,8 @@ public:
   int seed;                   // random number generator seed
   bool debug;                 // turns debugging on or off
   bool ancestral_sequences;   // true if the ancestral_sequences have already been sampled.
-  int n; 			    // sequence length.
   int num_states;		    // number of states, not including gap.
+
   std::map<std::string, int> state_to_integer;
   std::map<int, std::string> integer_to_state;
 
