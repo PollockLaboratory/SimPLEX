@@ -65,6 +65,9 @@ class TreeNode {
   std::vector<int>* sequence; // Ptr to the sequence.
   SequenceAlignment* MSA; // The MSA that the sequence is in.
 
+  // Hidden States
+  std::vector<std::vector<int>*> hidden_state_sequences;
+
   SubstitutionModel* SM;
 
   TreeNode();

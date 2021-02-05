@@ -23,13 +23,15 @@ void Data::Initialize() {
   raw_msa = ReadMSA();
   raw_tree = ReadTree();
 
-  // Print States.
-  std::set<std::string> states = raw_sm->get_states();
-  std::cout << "States: [ ";
-  for(auto it = states.begin(); it != states.end(); ++it) {
-    std::cout << *it << " ";
+  // Print States
+  std::map<std::string, std::set<std::string>> all_states = raw_sm->get_all_states();
+  for(auto domain = all_states.begin(); domain != all_states.end(); ++domain) {
+    std::cout << domain->first << ": [ ";
+    for(auto it = domain->second.begin(); it != domain->second.end(); ++it) {
+      std::cout << *it << " ";
+    }
+    std::cout << "]" << std::endl;
   }
-  std::cout << "]" << std::endl;
 
   std::list<std::string> ignore_states = raw_sm->get_ignore_states();
   std::cout << "Ignore states: [ ";

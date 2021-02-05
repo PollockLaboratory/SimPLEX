@@ -135,55 +135,6 @@ void Tree::configureBranches(TreeNode* n, unsigned int n_columns) {
   }
 }
 
-// Configure sequences.
-void Tree::configureSequences(TreeNode* tmp) {
-  /*
-   * Traverses the tree attaching sequences to nodes.
-   * Also adds all the Nodes and Branch segments to their corresponding lists.
-   */
-
-  for(auto it = nodeList.begin(); it != nodeList.end(); ++it) {
-    TreeNode* n = *it;
-    n->MSA = MSA;
-
-    if(MSA->taxa_names_to_sequences.count(n->name)) {
-      n->sequence = &(MSA->taxa_names_to_sequences.at(n->name));
-    } else {
-      if(env.ancestral_sequences) {
-	// ANCESTRAL SEQUENCES KNOWN
-	// In the case when ancestral sequences are known there can be no missing sequences.
-	// New sequences should not be created.
-	std::cerr << "Error: Missing sequence for \"" << n->name << "\"." << std::endl;
-	exit(EXIT_FAILURE);
-      } else {
-	// NORMAL RUN
-	// only tip sequences are needed.
-	if(n->isTip()){
-	  std::cerr << "Error: Missing sequence for \"" << n->name << "\"." << std::endl;
-	  exit(EXIT_FAILURE);
-	} else {
-	  // Add new sequence to sequence alignments.
-	  MSA->add(n->name);
-	  n->sequence = &(MSA->taxa_names_to_sequences.at(n->name));
-	  
-	  // Fill missing sequences/
-	  if(n->left != 0 and n->right == 0) {
-	    // Internal Continous.
-	    TreeNode* dsNode = n->left->decendant; // ds = downstream.
-	    *(n->sequence) = *(dsNode->sequence);
-	  } else {
-	    // Root or internal branch.
-	    vector<int> dsNodeLseq = *(n->left->decendant->sequence);
-	    vector<int> dsNodeRseq = *(n->right->decendant->sequence);
-	    vector<int> p = MSA->findParsimony(dsNodeLseq, dsNodeRseq);
-	    *(n->sequence) = p;
-	}
-      }
-    }
-  }
-  }
-}
-
 void Tree::connect_substitution_model(SubstitutionModel* sm) {
   this->SM = sm;
 

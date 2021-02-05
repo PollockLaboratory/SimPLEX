@@ -50,6 +50,7 @@ class SequenceAlignment {
   void print();
   void Initialize(std::list<SequenceAlignment*>*);
   void Initialize(IO::RawMSA* &raw_msa);
+  void Initialize(IO::RawAdvMSA raw_msa);
   void saveToFile(int gen, double l);
 
   // Utilities
@@ -61,6 +62,7 @@ class SequenceAlignment {
 
   // New
   void syncWithTree(Tree* tree);
+  void syncHiddenWithTree(unsigned int id, Tree* tree);
   void identify_gaps();
   sample_status sample();
  private:

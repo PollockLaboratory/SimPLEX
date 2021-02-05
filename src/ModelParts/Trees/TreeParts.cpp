@@ -110,6 +110,7 @@ TreeNode::TreeNode(IO::RawTreeNode* raw_tree) {
   left = 0;
   right = 0;
   sampledp = false;
+  hidden_state_sequences = {};
 }
 
 TreeNode::TreeNode(std::string n) {
@@ -121,6 +122,7 @@ TreeNode::TreeNode(std::string n) {
   left = 0;
   right = 0;
   sampledp = false;
+  hidden_state_sequences = {};
 }
 
 TreeNode::TreeNode() {
@@ -133,6 +135,7 @@ TreeNode::TreeNode() {
   left = 0;
   right = 0;
   sampledp = false;
+  hidden_state_sequences = {};
 }
 
 void TreeNode::connect_substitution_model(SubstitutionModel* sm) {

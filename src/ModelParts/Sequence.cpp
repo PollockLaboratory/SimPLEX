@@ -84,6 +84,16 @@ void SequenceAlignment::Initialize(IO::RawMSA* &raw_msa) {
   n_columns = (*taxa_names_to_sequences.begin()).second.size();
 }
 
+void SequenceAlignment::Initialize(IO::RawAdvMSA raw_msa) {
+  for(auto it = raw_msa.seqs.begin(); it != raw_msa.seqs.end(); ++it) {
+    add_base(it->first, sequenceAsStr(it->second));
+  }
+
+  // Add output file.
+
+  n_columns = (*taxa_names_to_sequences.begin()).second.size();
+}
+
 void SequenceAlignment::saveToFile(int gen, double l) {
   static int i = -1;
   ++i;
@@ -141,7 +151,6 @@ void SequenceAlignment::syncWithTree(Tree* tree){
 	  if(n->left != 0 and n->right == 0) {
 	    // Internal Continous.
 	    TreeNode* dsNode = n->left->decendant; // ds = downstream.
-	    // This should be deep copy!!!
 	    *(n->sequence) = *(dsNode->sequence);
 	  } else {
 	    // Root or internal branch.
@@ -157,11 +166,57 @@ void SequenceAlignment::syncWithTree(Tree* tree){
 
   identify_gaps();
 }
+
+void SequenceAlignment::syncHiddenWithTree(unsigned int id, Tree* tree) {
+  std::cout << "Sync Hidden States: " << id << std::endl;
+  std::list<TreeNode*> nodes = tree->nodes();
+
+  for(auto it = nodes.begin(); it != nodes.end(); ++it) {
+    TreeNode* n = *it;
+
+    if(id < n->hidden_state_sequences.size()) {
+      std::cerr << "Error: syncing hidden states out of order with tree." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    n->hidden_state_sequences.resize(id+1, nullptr);
+
+    if(taxa_names_to_sequences.count(n->name)) {
+      n->hidden_state_sequences[id] = &(taxa_names_to_sequences.at(n->name));
+    } else {
+      // NORMAL RUN
+      // only tip sequences are needed.
+      if(n->isTip()){
+	std::cerr << "Error: Missing sequence for \"" << n->name << "\"." << std::endl;
+	exit(EXIT_FAILURE);
+      } else {
+	// Add new sequence to sequence alignments.
+	add(n->name);
+	n->hidden_state_sequences[id] = &(taxa_names_to_sequences.at(n->name));
+	  
+	// Fill missing sequences/
+	if(n->left != 0 and n->right == 0) {
+	  // Internal Continous.
+	  TreeNode* dsNode = n->left->decendant; // ds = downstream.
+	  *(n->hidden_state_sequences[id]) = *(dsNode->hidden_state_sequences[id]);
+	} else {
+	  // Root or internal branch.
+	  vector<int> dsNodeLseq = *(n->left->decendant->hidden_state_sequences[id]);
+	  vector<int> dsNodeRseq = *(n->right->decendant->hidden_state_sequences[id]);
+	  vector<int> p = findParsimony(dsNodeLseq, dsNodeRseq);
+	  *(n->hidden_state_sequences[id]) = p;
+	}
+      }
+    }
+  }
+
+  //identify_gaps();
+}
 					     
 void SequenceAlignment::identify_gaps() {
   std::list<TreeNode*> nodes = tree->nodes();
   for(auto node = nodes.begin(); node != nodes.end(); ++node) {
-    std::cout << (*node)->name << std::endl;
+    //std::cout << (*node)->name << std::endl;
 
     std::vector<int> sequence = taxa_names_to_sequences[(*node)->name];
     std::vector<bool> gaps(sequence.size(), false);

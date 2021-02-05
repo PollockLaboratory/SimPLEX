@@ -16,6 +16,7 @@ namespace IO {
   // RATE VECTOR
   struct rv_use_class {
     // Structure describing where a rate vector can apply.
+    std::string domain;
     std::string state;
     std::list<int> pos;
   };
@@ -38,21 +39,23 @@ namespace IO {
     friend std::ostream& operator<<(std::ostream&, const IO::raw_substitution_model&);
 
     const std::set<std::string> get_states();
+    const std::map<std::string, std::set<std::string>> get_all_states();
     const std::list<std::string> get_ignore_states();
     const std::list<raw_rate_vector> get_rate_vector_list();
 
     const std::map<std::string, std::set<std::string>> get_hidden_states();
+    const IO::RawAdvMSA get_hidden_states_data(std::string);
+
+    std::map<std::string, std::set<std::string>> all_states;
+    std::list<raw_rate_vector> rv_list;
   private:
     std::list<std::string> ignore_states;
-    std::set<std::string> states;
-    std::list<raw_rate_vector> rv_list;
 
     void set_states(sol::table tbl);
     void set_ignore_states(sol::table tbl);
     void add_rate_vector(raw_rate_vector rv);
 
     // Hidden states.
-    std::map<std::string, std::set<std::string>> hidden_states;
     std::map<std::string, IO::RawAdvMSA> hidden_states_data;
 
     void add_hidden_state(std::string name, sol::table states, sol::table options);

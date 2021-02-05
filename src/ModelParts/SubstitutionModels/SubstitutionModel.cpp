@@ -99,11 +99,11 @@ void SubstitutionModel::configure_HiddenStates(std::map<std::string, std::set<st
 void SubstitutionModel::from_raw_model(IO::raw_substitution_model* raw_sm) {
   configure_States(raw_sm->get_states());
 
-  configure_RateVectors(raw_sm->get_rate_vector_list());
-
   configure_HiddenStates(raw_sm->get_hidden_states());
 
-  print_States(states);
+  configure_RateVectors(raw_sm->get_rate_vector_list());
+
+  //print_States(states);
 }
 
 const States* SubstitutionModel::get_states() {

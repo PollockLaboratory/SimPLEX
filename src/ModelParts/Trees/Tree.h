@@ -69,7 +69,6 @@ public:
   // Sequence stuff.
   TreeNode* root;
   SequenceAlignment* MSA;
-  void configureSequences(TreeNode* n);
   void configureBranches(TreeNode* n, unsigned int n_columnes);
   void connect_substitution_model(SubstitutionModel*);
 };

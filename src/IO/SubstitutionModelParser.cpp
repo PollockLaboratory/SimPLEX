@@ -32,20 +32,19 @@ namespace IO {
 
   // RAW SUBSTITUTION MODEL.
   raw_substitution_model::raw_substitution_model() {
-    states = {};
+    all_states["primary"] = {};
     ignore_states = {};
   }
 
   // STATES
   // Lua bindings & Util functions - with reading lua file.
   void raw_substitution_model::set_states(sol::table tbl) {
-    // Fix this function - into_states.
-    states = IO::readStates(extract_list(tbl));
+    all_states["primary"] = IO::readStates(extract_list(tbl));
 
-    lua["States"]["count"] = states.size();
+    lua["States"]["count"] = all_states["primary"].size();
 
     int i = 1;
-    for(auto it = states.begin(); it != states.end(); ++it) {
+    for(auto it = all_states["primary"].begin(); it != all_states["primary"].end(); ++it) {
       lua["States"][i] = *it;
       i++;
     }
@@ -65,15 +64,15 @@ namespace IO {
       throw IO::ParseException(std::string("error defining new hidden state: ") + err.what());
     }
 
-    hidden_states[name] = new_states;
+    all_states[name] = new_states;
     for(auto e : new_states) {
       std::cout << e << std::endl;
     }
   }
 
   void raw_substitution_model::read_hidden_state_file(std::string hidden_state, std::string file_name) {
-    auto it = hidden_states.find(hidden_state);
-    if(it == hidden_states.end()) {
+    auto it = all_states.find(hidden_state);
+    if(it == all_states.end()) {
       std::cerr << "Error: attempting to read " << file_name << ", however \"" << hidden_state << "\" is not a recognized hidden state." << std::endl;
       exit(EXIT_FAILURE);
     }
@@ -111,10 +110,29 @@ namespace IO {
     return(out);
   }
 
-  raw_rate_vector new_rate_vector(std::string name, sol::table info_tbl, sol::table params_tbl) {
+  raw_rate_vector new_rate_vector(std::string name, sol::table info_tbl, sol::table params_tbl, std::map<std::string, std::set<std::string>> all_states) {
+    std::cout << "New Rate vector" << std::endl;
+
+    // Find the state_set(domain) of the rate vector.
+    // If not set, I will assume it is the primary domain.
+    std::string state_set;
+    if(info_tbl["domain"] == nullptr) {
+      state_set = "primary";
+    } else {
+      state_set = info_tbl["domain"];
+    }
+
+    std::cout << "Domain: [" << state_set << "]" << std::endl;
+
+    // Check the state is specified in the domain.
     std::string state = info_tbl["state"];
+    if(all_states[state_set].find(state) == all_states[state_set].end()) {
+      std::cerr << "Error: " << state << " is not specified within the " << state_set << " domain." << std::endl;
+      exit(EXIT_FAILURE);		 
+    }
+
     std::list<int> possible_pos = get_positions(info_tbl["pos"]);
-    rv_use_class uc = {state, possible_pos};
+    rv_use_class uc = {state_set, state, possible_pos};
     std::list<AbstractComponent*> rates = {};
 
     for(auto kvp : params_tbl) {
@@ -229,8 +247,8 @@ namespace IO {
     			  });
     
     lua.new_usertype<raw_rate_vector>("RateVector",
-				      "new", [](std::string name, sol::table info_tbl, sol::table param_tbl) -> raw_rate_vector {
-					       return(new_rate_vector(name, info_tbl, param_tbl));
+				      "new", [this](std::string name, sol::table info_tbl, sol::table param_tbl) -> raw_rate_vector {
+					       return(new_rate_vector(name, info_tbl, param_tbl, all_states));
 					     });
 
     // Read the file.
@@ -244,7 +262,11 @@ namespace IO {
   }
 
   const std::set<std::string> raw_substitution_model::get_states() {
-    return(states);
+    return(all_states["primary"]);
+  }
+
+  const std::map<std::string, std::set<std::string>> raw_substitution_model::get_all_states() {
+    return(all_states);
   }
 
   const std::list<std::string> raw_substitution_model::get_ignore_states() {
@@ -256,7 +278,11 @@ namespace IO {
   }
 
   const std::map<std::string, std::set<std::string>> raw_substitution_model::get_hidden_states() {
-    return(hidden_states);
+    return(all_states);
+  }
+
+  const IO::RawAdvMSA raw_substitution_model::get_hidden_states_data(std::string name) {
+    return(hidden_states_data[name]);
   }
 
   raw_substitution_model* read_substitution_model(std::string file_name) {
@@ -265,10 +291,10 @@ namespace IO {
     return(raw_model);
   }
 
-  std::ostream& operator<<(std::ostream& os, const raw_substitution_model& sm) {
+  std::ostream& operator<<(std::ostream& os, raw_substitution_model& sm) {
     os << "Raw Substitution Model: " << sm.name << std::endl;
     os << "States: ";
-    for(auto it = sm.states.begin(); it != sm.states.end(); ++it) {
+    for(auto it = sm.all_states["primary"].begin(); it != sm.all_states["primary"].end(); ++it) {
       os << "\"" << *it << "\" ";
     }
     os << std::endl;

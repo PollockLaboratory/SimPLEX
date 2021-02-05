@@ -44,8 +44,8 @@ public:
   void saveToFile(int gen, double l);
 private:
   void configure_States(std::set<std::string>);
-  void configure_RateVectors(std::list<IO::raw_rate_vector>);
   void configure_HiddenStates(std::map<std::string, std::set<std::string>>);
+  void configure_RateVectors(std::list<IO::raw_rate_vector>);
 
   States states;
   std::map<std::string, States> hidden_states;

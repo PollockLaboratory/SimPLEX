@@ -56,28 +56,53 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw
     components.add_parameter(*it);
   }
 
-  // Tree.
-  std::cout << "\tConstructing tree." << std::endl;
-
+  // Primary States.
   const States* states = substitution_model->get_states();
+  std::cout << "Primary states: ";
+  print_States(*states);
+
+  SequenceAlignment* MSA = new SequenceAlignment(states);
+  MSA->Initialize(raw_msa);
+
+  std::list<SequenceAlignment*> hidden_states_MSAs = {};
+  // Secondary/Hidden states.
+  std::map<std::string, std::set<std::string>> hidden_states = raw_sm->get_hidden_states();
+  for(auto it = hidden_states.begin(); it != hidden_states.end(); ++it) {
+    if(it->first != "primary") {
+      States hidden_states = create_States(it->second);
+      std::cout << "Secondary states: ";
+      print_States(hidden_states);
+      SequenceAlignment* hidden_MSA = new SequenceAlignment(&hidden_states);
+      hidden_MSA->Initialize(raw_sm->get_hidden_states_data(it->first));
+
+      hidden_states_MSAs.push_back(hidden_MSA);
+    }
+  }
 
   // Set environment variables.
   env.num_states = states->n;
   env.state_to_integer = states->state_to_int;
   env.integer_to_state = states->int_to_state;
-  
-  SequenceAlignment* MSA = new SequenceAlignment(states);
-  MSA->Initialize(raw_msa);
+
+  // Tree.
+  std::cout << "\tConstructing tree." << std::endl;
 
   tree = new Tree();
-
   tree->Initialize(raw_tree);
   tree->connect_substitution_model(substitution_model);
 
   tree->MSA = MSA;
   tree->configureBranches(tree->root, MSA->n_columns);
 
+  // Configuring sequences.
   MSA->syncWithTree(tree);
+
+  unsigned int ctr = 0;
+  for(auto it = hidden_states_MSAs.begin(); it != hidden_states_MSAs.end(); ++it) {
+    (*it)->syncHiddenWithTree(ctr, tree);
+    ctr++;
+  }
+
 
   sp = new SequenceAlignmentParameter(MSA);
   components.add_parameter(sp, env.get<int>("MCMC.tree_sample_frequency"));
@@ -200,6 +225,7 @@ void Model::RecordState(int gen, double l) {
 	substitution_model->saveToFile(gen, l);
 	// Counts and tree save should be here.
 	sp->save_to_file(gen, l);
+	// Substitutions should be a call to the MSA.
 	tree->record_substitutions(gen, l);
 	cp->save_to_file(gen, l); 
 }

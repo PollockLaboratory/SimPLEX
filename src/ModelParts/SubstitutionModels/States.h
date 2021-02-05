@@ -15,5 +15,6 @@ struct States {
 void print_States(States);
 
 States add_to_States(States, std::string);
+States create_States(std::set<std::string>);
 
 #endif

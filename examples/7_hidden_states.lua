@@ -9,7 +9,8 @@ Model.set_name("GTR")
 model_states = Config.get_string_array("MODEL.states")
 States.set(model_states)
 
-States.new_hidden("order/disorder", {"O", "D"}, {})
+od_states = {"O", "D"}
+States.new_hidden("order/disorder", od_states, {})
 
 Data.load_hidden_state("order/disorder", "data_sets/hidden_state.efasta");
    
@@ -34,3 +35,15 @@ for i=1,#model_states do
 	end
 	Model.add_rate_vector(RateVector.new("RV-"..tostring(States[i]), {state = States[i], pos = {}}, Q[i]))
 end
+
+OtoD = Parameter.new("OtoD", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0 })
+
+DtoO = Parameter.new("DtoO", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0 })
+
+Model.add_rate_vector(RateVector.new("RV-O",
+				     {domain = "order/disorder", state = "O", pos = {}},
+				     {Parameter.new("virtual-O", "virtual", {}), OtoD}))
+
+Model.add_rate_vector(RateVector.new("RV-D",
+				     {domain = "order/disorder", state = "D", pos = {}},
+				     {DtoO, Parameter.new("virtual-D", "virtual", {})}))
