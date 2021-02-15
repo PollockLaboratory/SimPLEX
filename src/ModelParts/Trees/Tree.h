@@ -1,10 +1,7 @@
 #ifndef Tree_h_
 #define Tree_h_
 
-#include <algorithm>
 #include <functional>
-#include <istream>
-#include <fstream>
 #include <string>
 #include <map>
 #include <vector>
@@ -15,7 +12,6 @@
 #include "../../IO/TreeParser.h"
 #include "TreeParts.h"
 #include "BranchSplitting.h"
-#include "../../SubstitutionCounts.h"
 
 using std::string;
 using std::map;
@@ -23,7 +19,6 @@ using std::vector;
 
 class Tree {
 private:
-  SubstitutionModel* SM;
   map<string, vector<int>> names_to_sequences;
   
   // Alternative node access.
@@ -46,6 +41,7 @@ private:
   sample_status sample_ancestral_states(const std::list<int>&); // When the tree is actually being sampled.
   sample_status step_through_MSAs(const std::list<int>&); // When the ancestral sequences have already been determined. 
 public:
+  SubstitutionModel* SM; // Temp - should be private.
   // Constructing/Initializing.
   Tree();
   void Initialize(IO::RawTreeNode* raw_tree);
@@ -56,11 +52,8 @@ public:
   const std::list<TreeNode*> nodes();
   std::list<float> get_branch_lengths();
 
+  //Output
   void record_tree();
-  void record_state(int gen, double l);
-
-  // Output.
-  void record_substitutions(int gen, double l);
 
   // Debug tools.
   void print_branchList();
@@ -69,7 +62,7 @@ public:
   // Sequence stuff.
   TreeNode* root;
   SequenceAlignment* MSA;
-  void configureBranches(TreeNode* n, unsigned int n_columnes);
+  void configureBranches(TreeNode* n, unsigned int n_columnes, std::map<std::string, std::list<std::string>> all_states);
   void connect_substitution_model(SubstitutionModel*);
 };
 

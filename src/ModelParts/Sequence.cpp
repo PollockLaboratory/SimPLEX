@@ -4,6 +4,7 @@
 #include "Sequence.h"
 #include "../Environment.h"
 #include "../IO/Files.h"
+
 #include "Trees/TreeParts.h"
 #include "Trees/Tree.h"
 
@@ -16,23 +17,15 @@ std::vector<std::string> nucleotides({"A", "T", "C", "G"});
 
 // Sequence Alignment class.
 
-SequenceAlignment::SequenceAlignment(const States* states) {
+SequenceAlignment::SequenceAlignment(std::string name, std::string msa_out, std::string subs_out, const States* states) : name(name) {
   this->states = states->possible;
   n_states = states->n;
 
   state_to_integer = states->state_to_int;
   integer_to_state = states->int_to_state;
-}
 
-SequenceAlignment::SequenceAlignment(const SequenceAlignment &msa) {
-  // The copy constructor.
-  // Check whether this is truely copying.
-  taxa_names_to_sequences = msa.taxa_names_to_sequences;
-  states = msa.states;
-  state_to_integer = msa.state_to_integer;
-  integer_to_state = msa.integer_to_state;
-  MSA_list = msa.MSA_list;
-  current_MSA = MSA_list->begin();
+  seqs_out_file = msa_out;
+  substitutions_out_file = subs_out;
 }
 
 static const int gap_indicator = -1;
@@ -50,9 +43,49 @@ void SequenceAlignment::add(std::string name) {
   taxa_names_to_sequences[name] = enc;
 }
 
+float** create_state_probability_vector(unsigned int n_cols, unsigned int n_states) {
+  float** m = new float*[n_cols];
+  for(unsigned int i = 0; i < n_cols; i++) {
+    m[i] = new float[n_states];
+    for(unsigned int j = 0; j < n_states; j++) {
+      m[i][j] = 0.0;
+    }
+  }
+
+  return(m);
+}
+
 void SequenceAlignment::add_base(std::string name, std::string sequence_str) {
   base_sequences.push_front(name);
   add(name, sequence_str);
+
+  // Set State probabilites.
+  // Skip gaps here.
+  const std::vector<int> *seq = &taxa_names_to_sequences[name];
+  base_taxa_state_probs[name] = create_state_probability_vector(seq->size(), n_states);
+
+  for(int pos = 0; pos < seq->size(); pos++) {
+    if(sequence_str.at(pos) != '-') {
+      base_taxa_state_probs[name][pos][state_to_integer[std::string(1, sequence_str.at(pos))]] = 1.0;
+    }
+  }
+}
+
+void SequenceAlignment::add_base(std::string name, const IO::FreqSequence &seq) {
+  base_sequences.push_front(name);
+  add(name, sequenceAsStr(seq));
+
+  base_taxa_state_probs[name] = create_state_probability_vector(seq.size(), n_states);
+
+  int pos = 0;
+  for(auto it = seq.begin(); it != seq.end(); ++it) {
+    for(auto jt = it->begin(); jt != it->end(); ++jt) {
+      if(jt->state != '-') {
+	base_taxa_state_probs[name][pos][state_to_integer[std::string(1, jt->state)]] = jt->freq;
+      }
+    }
+    pos++;
+  }
 }
 
 void SequenceAlignment::print() {
@@ -62,6 +95,7 @@ void SequenceAlignment::print() {
   }
 }
 
+// This is redundant now.
 void SequenceAlignment::Initialize(std::list<SequenceAlignment*>* msa_List) {
   // Process sequences.
   MSA_list = msa_List;
@@ -79,17 +113,28 @@ void SequenceAlignment::Initialize(IO::RawMSA* &raw_msa) {
   }
 
   // Setup output.
-  files.add_file("sequences_out", env.get<std::string>("OUTPUT.sequences_out_file"), IOtype::OUTPUT);
+  seqs_out_identifier = name + "_sequences_out";
+  files.add_file(seqs_out_identifier, seqs_out_file, IOtype::OUTPUT);
+
+  substitutions_out_identifier = name + "_substitutions_out";
+  files.add_file(substitutions_out_identifier, substitutions_out_file, IOtype::OUTPUT);
+  files.write_to_file(substitutions_out_identifier, "I,GEN,LogL,Ancestral,Decendant,Substitutions\n");
 
   n_columns = (*taxa_names_to_sequences.begin()).second.size();
 }
 
 void SequenceAlignment::Initialize(IO::RawAdvMSA raw_msa) {
   for(auto it = raw_msa.seqs.begin(); it != raw_msa.seqs.end(); ++it) {
-    add_base(it->first, sequenceAsStr(it->second));
+    add_base(it->first, it->second);
   }
 
-  // Add output file.
+  // Setup output.
+  seqs_out_identifier = name + "_sequences_out";
+  files.add_file(seqs_out_identifier, seqs_out_file, IOtype::OUTPUT);
+
+  substitutions_out_identifier = name + "_substitutions_out";
+  files.add_file(substitutions_out_identifier, substitutions_out_file, IOtype::OUTPUT);
+  files.write_to_file(substitutions_out_identifier, "I,GEN,LogL,Ancestral,Decendant,Substitutions\n");
 
   n_columns = (*taxa_names_to_sequences.begin()).second.size();
 }
@@ -104,19 +149,31 @@ void SequenceAlignment::saveToFile(int gen, double l) {
     buffer << ">" << it->first << "\n" << decodeSequence(it->second) << std::endl;
   }
 
-  files.write_to_file("sequences_out", buffer.str());
-}
+  files.write_to_file(seqs_out_identifier, buffer.str());
 
-float** create_state_probability_vector(unsigned int n_cols, unsigned int n_states) {
-  float** m = new float*[n_cols];
-  for(unsigned int i = 0; i < n_cols; i++) {
-    m[i] = new float[n_states];
-    for(unsigned int j = 0; j < n_states; j++) {
-      m[i][j] = 0.0;
+  std::ostringstream subs_buffer;
+
+  std::list<BranchSegment*> branches = tree->get_branches();
+  for(auto it = branches.begin(); it != branches.end(); ++it) {
+    subs_buffer << i << "," << gen << "," << l << ",";
+    subs_buffer << (*it)->ancestral->name << "," << (*it)->decendant->name << ",[ ";
+    std::vector<Substitution> subs = (*it)->hidden_substitutions[name];
+    for(unsigned int i = 0; i < subs.size(); i++) {
+      if(subs[i].occuredp == true) {
+	int anc = (*it)->ancestral->hidden_state_sequences[name]->at(i);
+	int dec = (*it)->decendant->hidden_state_sequences[name]->at(i);
+	  if(anc == dec) {
+	    // Virtual Substitution.
+	    subs_buffer << integer_to_state[anc] << i << integer_to_state[dec] << "* ";
+	  } else {
+	    // Normal Substitution.
+	    subs_buffer << integer_to_state[anc] << i << integer_to_state[dec] << " ";
+	  }
+      }
     }
+    subs_buffer << "]\n";
   }
-
-  return(m);
+  files.write_to_file(substitutions_out_identifier, subs_buffer.str());
 }
 
 void SequenceAlignment::syncWithTree(Tree* tree){
@@ -125,10 +182,11 @@ void SequenceAlignment::syncWithTree(Tree* tree){
   std::list<TreeNode*> nodes = tree->nodes();
   for(auto it = nodes.begin(); it != nodes.end(); ++it) {
     TreeNode* n = *it;
-    n->MSA = this;
+    //n->MSA = this;
 
     if(taxa_names_to_sequences.count(n->name)) {
       n->sequence = &(taxa_names_to_sequences.at(n->name));
+      n->hidden_state_sequences[name] = &(taxa_names_to_sequences.at(n->name));
     } else {
       if(env.ancestral_sequences) {
 	// ANCESTRAL SEQUENCES KNOWN
@@ -146,6 +204,7 @@ void SequenceAlignment::syncWithTree(Tree* tree){
 	  // Add new sequence to sequence alignments.
 	  add(n->name);
 	  n->sequence = &(taxa_names_to_sequences.at(n->name));
+	  n->hidden_state_sequences[name] = &(taxa_names_to_sequences.at(n->name));
 	  
 	  // Fill missing sequences/
 	  if(n->left != 0 and n->right == 0) {
@@ -167,22 +226,23 @@ void SequenceAlignment::syncWithTree(Tree* tree){
   identify_gaps();
 }
 
-void SequenceAlignment::syncHiddenWithTree(unsigned int id, Tree* tree) {
-  std::cout << "Sync Hidden States: " << id << std::endl;
+void SequenceAlignment::syncHiddenWithTree(std::string name, unsigned int id, Tree* tree) {
+  this->tree = tree;
+  std::cout << "Sync Hidden States: " << id << " " << name << std::endl;
   std::list<TreeNode*> nodes = tree->nodes();
 
   for(auto it = nodes.begin(); it != nodes.end(); ++it) {
     TreeNode* n = *it;
 
-    if(id < n->hidden_state_sequences.size()) {
-      std::cerr << "Error: syncing hidden states out of order with tree." << std::endl;
-      exit(EXIT_FAILURE);
-    }
+    //  if(id < n->hidden_state_sequences.size()) {
+    //  std::cerr << "Error: syncing hidden states out of order with tree." << std::endl;
+    //  exit(EXIT_FAILURE);
+    //}
 
-    n->hidden_state_sequences.resize(id+1, nullptr);
+    //n->hidden_state_sequences.resize(id+1, nullptr);
 
     if(taxa_names_to_sequences.count(n->name)) {
-      n->hidden_state_sequences[id] = &(taxa_names_to_sequences.at(n->name));
+      n->hidden_state_sequences[name] = &(taxa_names_to_sequences.at(n->name));
     } else {
       // NORMAL RUN
       // only tip sequences are needed.
@@ -192,25 +252,25 @@ void SequenceAlignment::syncHiddenWithTree(unsigned int id, Tree* tree) {
       } else {
 	// Add new sequence to sequence alignments.
 	add(n->name);
-	n->hidden_state_sequences[id] = &(taxa_names_to_sequences.at(n->name));
+	n->hidden_state_sequences[name] = &(taxa_names_to_sequences.at(n->name));
 	  
 	// Fill missing sequences/
 	if(n->left != 0 and n->right == 0) {
 	  // Internal Continous.
 	  TreeNode* dsNode = n->left->decendant; // ds = downstream.
-	  *(n->hidden_state_sequences[id]) = *(dsNode->hidden_state_sequences[id]);
+	  *(n->hidden_state_sequences[name]) = *(dsNode->hidden_state_sequences[name]);
 	} else {
 	  // Root or internal branch.
-	  vector<int> dsNodeLseq = *(n->left->decendant->hidden_state_sequences[id]);
-	  vector<int> dsNodeRseq = *(n->right->decendant->hidden_state_sequences[id]);
+	  vector<int> dsNodeLseq = *(n->left->decendant->hidden_state_sequences[name]);
+	  vector<int> dsNodeRseq = *(n->right->decendant->hidden_state_sequences[name]);
 	  vector<int> p = findParsimony(dsNodeLseq, dsNodeRseq);
-	  *(n->hidden_state_sequences[id]) = p;
+	  *(n->hidden_state_sequences[name]) = p;
 	}
       }
     }
   }
 
-  //identify_gaps();
+  identify_gaps();
 }
 					     
 void SequenceAlignment::identify_gaps() {
@@ -268,8 +328,13 @@ std::vector<int> SequenceAlignment::EncodeSequence(const std::string &sequence) 
     try {
       encoded_sequence.at(site) = state_to_integer.at(current_pos);
     } catch(const std::out_of_range& e) {
-      std::cerr << "Error: state \"" << current_pos << "\" in sequence alignment is not recognised. " << std::endl;
-      exit(EXIT_FAILURE);
+      // Temporary solution.
+      if(current_pos == "-"){
+	encoded_sequence.at(site) = -1;
+      } else {
+	std::cerr << "Error: state \"" << current_pos << "\" in sequence alignment is not recognised. " << std::endl;
+	exit(EXIT_FAILURE);
+      }
     }
   }
   
@@ -343,12 +408,18 @@ void SequenceAlignment::step_to_next_MSA() {
   }
 }
 
-void SequenceAlignment::sample_base_sequences(std::list<int> positions) {
+void SequenceAlignment::reset_base_probabilities(std::list<int> positions) {
   for(auto seq_name = base_sequences.begin(); seq_name != base_sequences.end(); ++seq_name) {
-    for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
-      std::vector<int> seq = taxa_names_to_sequences[*seq_name];
-      taxa_names_to_state_probs[*seq_name][*pos][seq.at(*pos)] = 1.0;
+    //std::cout << *seq_name << " [ ";
+    for(unsigned int i = 0; i < n_columns; i++) {
+      // std::cout << "[ ";
+      for(unsigned int j = 0; j < n_states; j++) {
+	taxa_names_to_state_probs[*seq_name][i][j] = base_taxa_state_probs[*seq_name][i][j];
+	//std::cout << taxa_names_to_state_probs[*seq_name][i][j] << " ";
+      }
+      //std::cout << "] ";
     }
+    //std::cout << "]" << std::endl;
   }
 }
 
@@ -366,22 +437,24 @@ void SequenceAlignment::calculate_state_probabilities_pos(TreeNode* node, unsign
       std::vector<int> left_seq = taxa_names_to_sequences[left_node->name];
       std::vector<bool> left_gaps = taxa_names_to_gaps[left_node->name];
 
-      float left_t_b = left_node->distance;
-
-      left_prob = 0.0;
-      rv = node->SM->selectRateVector({pos, i});
-      for(int j = 0; j < n_states; j++) {
-	if(not left_gaps[pos]) {
+      if(not left_gaps[pos]) {
+	float left_t_b = left_node->distance;
+	
+	left_prob = 0.0;
+	std::map<std::string, int> extended_state = left_node->get_extended_state_by_pos(pos);
+	extended_state[name] = i;
+	rv = node->SM->selectRateVector({pos, i, name, extended_state});
+	for(int j = 0; j < n_states; j++) {
 	  double rate = rv->rates[left_seq.at(pos)]->get_value();
 	  double state_prob = taxa_names_to_state_probs[left_node->name][pos][j];
 	  left_prob += (state_prob * rate * left_t_b)/(1.0 + (u * left_t_b));
-	} else {
-	  left_prob = 1.0;
 	}
-      }
 
-      // Probability of staying the same.
-      left_prob += taxa_names_to_state_probs[left_node->name][pos][i] / (1.0 + (u * left_t_b)); 
+	// Probability of staying the same.
+	left_prob += taxa_names_to_state_probs[left_node->name][pos][i] / (1.0 + (u * left_t_b)); 
+      } else {
+	  left_prob = 1.0;
+      }
     } else {
       left_prob = 1.0;
     }
@@ -391,21 +464,23 @@ void SequenceAlignment::calculate_state_probabilities_pos(TreeNode* node, unsign
       std::vector<int> right_seq = taxa_names_to_sequences[right_node->name];
       std::vector<bool> right_gaps = taxa_names_to_gaps[right_node->name];
 
-      float right_t_b = right_node->distance;
+      if(not right_gaps[pos]) {
+	float right_t_b = right_node->distance;
 
-      right_prob = 0.0;
-      rv = node->SM->selectRateVector({pos, i});
-      for(int j = 0; j < n_states; j++) {
-	if(not right_gaps[pos]) {
+	right_prob = 0.0;
+	std::map<std::string, int> extended_state = right_node->get_extended_state_by_pos(pos);
+	extended_state[name] = i; 
+	rv = node->SM->selectRateVector({pos, i, name, extended_state});
+	for(int j = 0; j < n_states; j++) {
 	  double rate = rv->rates[right_seq.at(pos)]->get_value();
 	  double state_prob = taxa_names_to_state_probs[right_node->name][pos][j];
 	  right_prob += (state_prob * rate * right_t_b)/(1.0 + (u * right_t_b));
-	} else {
-	  right_prob = 1.0;
 	}
-      }
-
-      right_prob += taxa_names_to_state_probs[right_node->name][pos][i] / (1.0 + (u * right_t_b)); 
+	
+	right_prob += taxa_names_to_state_probs[right_node->name][pos][i] / (1.0 + (u * right_t_b)); 
+      } else {
+	right_prob = 1.0;
+      } 
     } else {
       right_prob = 1.0;
     }
@@ -420,7 +495,9 @@ void SequenceAlignment::calculate_state_probabilities_pos(TreeNode* node, unsign
       up_prob = 0.0;
       for(int j = 0; j < n_states; j++) {
 	// Double check this.
-	rv = node->SM->selectRateVector({pos, j});
+	std::map<std::string, int> extended_state = up_node->get_extended_state_by_pos(pos);
+	extended_state[name] = j;
+	rv = node->SM->selectRateVector({pos, j, name, extended_state});
 	double rate = rv->rates[i]->get_value();
 	double state_prob = taxa_names_to_state_probs[up_node->name][pos][j];
 	up_prob += (state_prob * rate * up_t_b)/(1.0 + (u * up_t_b));
@@ -474,6 +551,12 @@ void SequenceAlignment::calculate_state_probabilities(TreeNode* node, std::list<
 int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
   float* probs = taxa_names_to_state_probs[node->name][pos];
 
+  //std::cout << node->name << ": [ ";
+  //for(int i = 0; i < n_states; i++) {
+  // std::cout << probs[i] << " ";
+  //}
+  //std::cout << "]" << std::endl;
+
   double r = Random();
   double acc = 0.0;
   int val = -1;
@@ -507,8 +590,8 @@ sample_status SequenceAlignment::sample() {
     (*n)->sampledp = false;
   }
 
-  // Sample tip nodes if need be.
-  sample_base_sequences(positions);
+  // Sample tip nodes if need be - this should be redundant now.
+  reset_base_probabilities(positions);
 
   // Find state probabilities.
   for(auto n = nodes.begin(); n != nodes.end(); ++n) {
@@ -516,8 +599,21 @@ sample_status SequenceAlignment::sample() {
       std::cerr << "Error: sampling of sequences is incorrectly ordered." << std::endl;
       exit(EXIT_FAILURE);
     } else {
+      //std::cout << (*n)->name << " T: " << (*n)->isTip() << std::endl;
       (*n)->sampledp = true;
-      calculate_state_probabilities(*n, positions); 
+      calculate_state_probabilities(*n, positions);
+
+      // if((*n)->isTip()) {
+      //std::cout << "After: " << (*n)->name << " [ ";
+      //for(int i = 0; i < n_columns; i++) {
+      //  std::cout << "[ ";
+      //  for(int j = 0; j < n_states; j++) {
+      //    std::cout << taxa_names_to_state_probs[(*n)->name][i][j] << " ";
+      //  }
+      //  std::cout << "] ";
+      //}
+      //std::cout << "] " << std::endl;
+      //}
     }
   }
 
@@ -528,7 +624,14 @@ sample_status SequenceAlignment::sample() {
 
     // Reculaculate state probability vector - including up branch.
     // No need if root.
-    if(not (*n)->isTip()) {
+    if(true) {
+      TreeNode* left_node;
+      if(node->left) {
+	left_node = node->left->decendant;
+      } else {
+	left_node = nullptr;
+      }
+
       TreeNode* right_node;
       if(node->right) {
 	right_node = node->right->decendant;
@@ -545,17 +648,51 @@ sample_status SequenceAlignment::sample() {
 
       for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
 	if(not gaps[*pos]) {
-	  calculate_state_probabilities_pos(node, *pos, node->left->decendant, right_node, up_node);
+	  calculate_state_probabilities_pos(node, *pos, left_node, right_node, up_node);
+	}
+
+	// If tip weight by data.
+	if((*n)->isTip()) {
+	  if(not gaps[*pos]) {
+	    float total = 0.0;
+	    for(int i = 0; i < n_states; i++) {
+	      taxa_names_to_state_probs[node->name][*pos][i] *= base_taxa_state_probs[node->name][*pos][i];
+	      total += taxa_names_to_state_probs[node->name][*pos][i];
+	    }
+	    
+	    //Normalize.
+	    for(int i = 0; i< n_states; i++) {
+	      taxa_names_to_state_probs[node->name][*pos][i] /= total;
+	    }
+	  }
 	}
       }
+    }
 
-      // Don't need to go through nodes to update this.
-      for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
-	if(gaps[*pos]) {
-	  (*node->sequence)[*pos] = -1;
-	} else {
-	  (*node->sequence)[*pos] = pick_state_from_probabilities(node, *pos);
-	}
+    //Debug
+    //if((*n)->isTip()) {
+    // std::cout << "Final: " << (*n)->name << " [ ";
+    // for(int i = 0; i < n_columns; i++) {
+    //std::cout << "[ ";
+    //for(int j = 0; j < n_states; j++) {
+    //  std::cout << taxa_names_to_state_probs[(*n)->name][i][j] << " ";
+    //}
+    //std::cout << "] ";
+    // }
+    // std::cout << "] " << std::endl;
+    //} 
+  }
+
+  // Pick state.
+  for(auto n = nodes.rbegin(); n != nodes.rend(); ++n) {
+    TreeNode* node = *n;
+    std::vector<bool> gaps = taxa_names_to_gaps[node->name];
+   
+    for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
+      if(gaps[*pos]) {
+	taxa_names_to_sequences[(*n)->name][*pos] = -1;
+      } else {
+	taxa_names_to_sequences[(*n)->name][*pos] = pick_state_from_probabilities(node, *pos);
       }
     }
   }
@@ -566,6 +703,35 @@ sample_status SequenceAlignment::sample() {
   }
 
   return(sample_status({false, true, true}));
+}
+
+// This need to be much more robust.
+bool SequenceAlignment::match_structure(SequenceAlignment* cmp_msa) {
+  for(auto seq = taxa_names_to_sequences.begin(); seq != taxa_names_to_sequences.end(); ++seq) {
+    // Check there are corresponding sequences.
+    auto it = cmp_msa->taxa_names_to_sequences.find(seq->first);
+    if(it != cmp_msa->taxa_names_to_sequences.end()) {
+      //Check length of sequence matches.
+      if(seq->second.size() != it->second.size()) {
+	std::cerr << "Error: in sequence alignment \"" << name << "\": sequences are not the same length as reference." << std::endl;
+	exit(EXIT_FAILURE);
+	return(false);
+      } else {
+	for(unsigned int i = 0; i < seq->second.size(); i++) {
+	  if(seq->second[i] == -1 xor it->second[i] == -1) {
+	    std::cout << seq->second[i] << " " << it->second[i] << std::endl;
+	    std::cerr << "Error: in sequence alignment \"" << name << "\" in sequence " << seq->first << " at position " << i << " inconsistant gaps." << std::endl;
+	    exit(EXIT_FAILURE);
+	    return(false);
+	  }
+	} 
+      }
+    } else {
+      std::cerr << "Error: in sequence alignment \"" << name << "\": sequence for \"" << seq->first << "\" is not found in reference." << std::endl;
+      return(false);
+    }
+  }
+  return(true);
 }
 
 SequenceAlignmentParameter::SequenceAlignmentParameter(SequenceAlignment* msa) : SampleableComponent("SequenceAlignment") {
@@ -581,6 +747,7 @@ std::string SequenceAlignmentParameter::get_type() {
 }
 
 sample_status SequenceAlignmentParameter::sample() {
+  std::cout << "Sampling: " << msa->name << std::endl;
   sample_status s = msa->sample();
   return(s);
 }

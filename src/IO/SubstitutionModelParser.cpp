@@ -1,4 +1,3 @@
-#include <string>
 #include <iostream>
 
 #include "../Environment.h"
@@ -56,8 +55,7 @@ namespace IO {
   }
 
   void raw_substitution_model::add_hidden_state(std::string name, sol::table states, sol::table options) {
-    std::cout << "New Hidden states." << std::endl;
-    std::set<std::string> new_states = {};
+    std::list<std::string> new_states = {};
     try {
       new_states = IO::readStates(extract_list(states));
     } catch(IO::ParseException const &err) {
@@ -65,8 +63,18 @@ namespace IO {
     }
 
     all_states[name] = new_states;
-    for(auto e : new_states) {
-      std::cout << e << std::endl;
+
+    // Output.
+    if(options["sequences_output"] == nullptr) {
+      states_seqs_output_files[name] = "";
+    } else {
+      states_seqs_output_files[name] = options["sequences_output"];
+    }
+
+    if(options["substitutions_output"] == nullptr) {
+      states_subs_output_files[name] = "";
+    } else {
+      states_subs_output_files[name] = options["substitutions_output"];
     }
   }
 
@@ -83,7 +91,6 @@ namespace IO {
     IO::RawAdvMSA MSA = {};
     try {
       MSA = readRawAdvMSA(files.read_all(fh), it->second);
-      IO::printRawAdvMSA(MSA);
     } catch(IO::ParseException const &err) {
       throw IO::ParseException(std::string("error reading ") + file_name + ": " + err.what());
     }
@@ -110,29 +117,45 @@ namespace IO {
     return(out);
   }
 
-  raw_rate_vector new_rate_vector(std::string name, sol::table info_tbl, sol::table params_tbl, std::map<std::string, std::set<std::string>> all_states) {
-    std::cout << "New Rate vector" << std::endl;
+  raw_rate_vector new_rate_vector(std::string name, sol::table info_tbl, sol::table params_tbl, std::map<std::string, std::list<std::string>> all_states) {
 
     // Find the state_set(domain) of the rate vector.
     // If not set, I will assume it is the primary domain.
-    std::string state_set;
+    std::string state_domain;
     if(info_tbl["domain"] == nullptr) {
-      state_set = "primary";
+      state_domain = "primary";
     } else {
-      state_set = info_tbl["domain"];
+      state_domain = info_tbl["domain"];
+      if(all_states.find(state_domain) == all_states.end()) {
+	std::cerr << "Error: domain \"" << state_domain << "\" has not been specified." << std::endl;
+	exit(EXIT_FAILURE);
+      }
     }
 
-    std::cout << "Domain: [" << state_set << "]" << std::endl;
+    std::map<std::string, std::string> secondary_state = {};
+    // Check Secondary States.
+    for(auto it = all_states.begin(); it != all_states.end(); ++it) {
+      if(it->first != state_domain) {
+	if(info_tbl[it->first] == nullptr) {
+	  std::cerr << "Error: specify for which state (in domain \"" << it->first << "\") rate vector " << name << " applies to." << std::endl;
+	  exit(EXIT_FAILURE);
+	}
+
+	// Check valid state has been specified.
+	secondary_state[it->first] = info_tbl[it->first];
+      }
+    }
 
     // Check the state is specified in the domain.
+    std::set<std::string> state_set(all_states[state_domain].begin(), all_states[state_domain].end());
     std::string state = info_tbl["state"];
-    if(all_states[state_set].find(state) == all_states[state_set].end()) {
-      std::cerr << "Error: " << state << " is not specified within the " << state_set << " domain." << std::endl;
+    if(state_set.find(state) == state_set.end()) {
+      std::cerr << "Error: " << state << " is not specified within the " << state_domain << " domain." << std::endl;
       exit(EXIT_FAILURE);		 
     }
 
     std::list<int> possible_pos = get_positions(info_tbl["pos"]);
-    rv_use_class uc = {state_set, state, possible_pos};
+    rv_use_class uc = {state_domain, state, possible_pos, secondary_state};
     std::list<AbstractComponent*> rates = {};
 
     for(auto kvp : params_tbl) {
@@ -261,11 +284,11 @@ namespace IO {
     }
   }
 
-  const std::set<std::string> raw_substitution_model::get_states() {
+  const std::list<std::string> raw_substitution_model::get_states() {
     return(all_states["primary"]);
   }
 
-  const std::map<std::string, std::set<std::string>> raw_substitution_model::get_all_states() {
+  const std::map<std::string, std::list<std::string>> raw_substitution_model::get_all_states() {
     return(all_states);
   }
 
@@ -275,10 +298,6 @@ namespace IO {
 
   const std::list<raw_rate_vector> raw_substitution_model::get_rate_vector_list() {
     return(rv_list);
-  }
-
-  const std::map<std::string, std::set<std::string>> raw_substitution_model::get_hidden_states() {
-    return(all_states);
   }
 
   const IO::RawAdvMSA raw_substitution_model::get_hidden_states_data(std::string name) {

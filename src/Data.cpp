@@ -1,7 +1,10 @@
 #include "Data.h"
 
+#include <map>
+
 #include "Environment.h"
 #include "IO/Files.h"
+
 
 extern Environment env;
 extern IO::Files files;
@@ -24,7 +27,7 @@ void Data::Initialize() {
   raw_tree = ReadTree();
 
   // Print States
-  std::map<std::string, std::set<std::string>> all_states = raw_sm->get_all_states();
+  std::map<std::string, std::list<std::string>> all_states = raw_sm->get_all_states();
   for(auto domain = all_states.begin(); domain != all_states.end(); ++domain) {
     std::cout << domain->first << ": [ ";
     for(auto it = domain->second.begin(); it != domain->second.end(); ++it) {
@@ -49,7 +52,7 @@ void Data::Initialize() {
 
 void Data::Uninitialize() {
   // Raw imput data should no longer be used during MCMC. Therefore delete data to save space.
-  delete raw_msa;
+  //delete raw_msa;
   IO::deleteTree(raw_tree);
 }
 

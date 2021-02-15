@@ -2,16 +2,11 @@
 #define AbstractValue_h_
 
 #include <string>
-#include <vector>
 #include <list>
 #include <set>
 
 // Given these current class definitions there cannot be a samplable parameter that is also dependent on other
 // parameters - such as category parameters.
-
-// Defined in RateVector.h
-class RateVector;
-class SubstitutionCounts;
 
 typedef struct sample_status {
   bool testp; // true if metropolis hasting sampling is required.
@@ -19,27 +14,12 @@ typedef struct sample_status {
   bool full_recalculation; // True if full likelihood calculation is required.
 } sample_status;
 
-struct rv_loc {
-  // Rate Vector Locations
-  RateVector* rv;
-  int pos;
-};
-
 class Valuable {
 public:
   Valuable();
   virtual const double& get_value() = 0;
   virtual const double& get_old_value() = 0;
   void print();
-
-  const std::list<rv_loc>& get_host_vectors();
-  void add_host_vector(RateVector*, int);
-
-  void set_counts(SubstitutionCounts* counts);
-  unsigned int find_counts();
-private:
-  std::list<rv_loc> host_vectors; // Abstract components do not use this but it is here to avoid dynamic_casting. Pointers to the host RateVectors that a parameter sits within.
-  SubstitutionCounts* counts;
 };
 
 class AbstractComponent {

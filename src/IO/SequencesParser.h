@@ -4,8 +4,6 @@
 #include <map>
 #include <list>
 #include <set>
-#include <algorithm>
-#include "Files.h"
 
 namespace IO {
   struct RawMSA {
@@ -31,7 +29,7 @@ namespace IO {
     ParseException(std::string);
   };
 
-  std::set<std::string> readStates(std::list<std::string> states);
+  std::list<std::string> readStates(std::list<std::string> states);
   
   typedef struct {
     char state;
@@ -39,6 +37,7 @@ namespace IO {
   } StateFreq;
 
   std::string freqListAsStr(std::list<StateFreq> freqs);
+  bool FreqList_gap(std::list<StateFreq> freqs);
 
   // Type for representing sequences where each position is contains state frequencies.
   typedef std::list<std::list<StateFreq>> FreqSequence;
@@ -52,7 +51,7 @@ namespace IO {
   };
 
   RawAdvMSA parseRawAdvMSA(std::string data);
-  RawAdvMSA readRawAdvMSA(std::string data, std::set<std::string> states);
+  RawAdvMSA readRawAdvMSA(std::string data, std::list<std::string> states);
 
   // Utils
   bool operator==(const RawAdvMSA& lhs, const RawAdvMSA& rhs);

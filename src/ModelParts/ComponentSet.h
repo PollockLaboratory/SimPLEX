@@ -2,10 +2,8 @@
 #define ComponentSet_h_
 
 #include <list>
-#include <vector>
 #include <map>
 #include <string>
-#include <set>
 
 #include "AbstractComponent.h"
 #include "../SubstitutionCounts.h"
@@ -30,6 +28,7 @@ class ComponentSet {
 private:
   std::list<SampleCounter> sampleable_parameter_list;
   std::map<int, AbstractComponent*> all_parameters;
+  std::map<int, SubstitutionCounts*> subs_by_parameter;
 
   // Tracking the current parameter.
   std::list<SampleCounter>::iterator current_parameter; //Tracks the current parameter to be sampled, via an iterator across the parameter_list.

@@ -1,7 +1,6 @@
 #ifndef MCMC_h_
 #define MCMC_h_
 
-#include "Environment.h"
 #include "Model.h"
 
 class MCMC {

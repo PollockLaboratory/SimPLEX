@@ -5,7 +5,6 @@
 #include <cmath> // for floor and pow
 #include <unordered_set>
 
-#include "../Sequence.h"
 #include "../../Environment.h"
 #include "../../IO/Files.h"
 
@@ -121,17 +120,17 @@ void Tree::buildNodeLists(TreeNode* n) {
   }
 }
 
-void Tree::configureBranches(TreeNode* n, unsigned int n_columns) {
+void Tree::configureBranches(TreeNode* n, unsigned int n_columns, std::map<std::string, std::list<std::string>> all_states) {
   if(n->left != 0) {
     BranchSegment* b = n->left;
-    b->Initialize(n_columns);
-    configureBranches(b->decendant, n_columns);
+    b->Initialize(n_columns, all_states);
+    configureBranches(b->decendant, n_columns, all_states);
   }
 
   if(n->right != 0) {
     BranchSegment* b = n->right;
-    b->Initialize(n_columns);
-    configureBranches(b->decendant, n_columns);
+    b->Initialize(n_columns, all_states);
+    configureBranches(b->decendant, n_columns, all_states);
   }
 }
 
@@ -171,14 +170,6 @@ std::list<float> Tree::get_branch_lengths() {
   }
   return(lens);
 }
-
-/*
-void Tree::identify_gaps() {
-  for(auto n = nodeList.begin(); n != nodeList.end(); ++n) {
-    (*n)->set_gaps(); 
-  }
-}
-*/
 
 //
 // SAMPLING TREE PARAMETERS.
@@ -251,34 +242,6 @@ void Tree::record_tree() {
    * Records the tree topology with all node names and branch segments.
    */
   files.write_to_file("tree_out", root->toString());
-}
-
-void Tree::record_substitutions(int gen, double l) {
-  static int index = -1;
-  index++;
-
-  std::ostringstream buffer;
-  for(auto it = branchList.begin(); it != branchList.end(); ++it) {
-    buffer << index << "," << gen << "," << l << ",";
-    buffer << (*it)->ancestral->name << "," << (*it)->decendant->name << ",[ ";
-    std::vector<Substitution> subs = (*it)->get_substitutions();
-    for(unsigned int i = 0; i < subs.size(); i++) {
-	if(subs[i].occuredp == true) {
-	  if((*it)->ancestral->state_at_pos(i) == (*it)->decendant->state_at_pos(i)) {
-	    buffer << (*it)->ancestral->state_at_pos(i) << i << (*it)->decendant->state_at_pos(i) << "* ";
-	  } else {
-	    buffer << (*it)->ancestral->state_at_pos(i) << i << (*it)->decendant->state_at_pos(i) << " ";
-	  }
-	}
-    }
-    buffer << "]\n";
-  }
-  files.write_to_file("substitutions_out", buffer.str());
-}
-
-void Tree::record_state(int gen, double l) {
-  MSA->saveToFile(gen, l);
-  record_substitutions(gen, l);
 }
 
 // Debug tools.

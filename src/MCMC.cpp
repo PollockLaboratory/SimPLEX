@@ -1,7 +1,8 @@
-#include "MCMC.h"
 #include <sstream>
 
-#include "Model.h"
+#include "MCMC.h"
+
+#include "Environment.h"
 #include "IO/Files.h"
 
 extern double Random();

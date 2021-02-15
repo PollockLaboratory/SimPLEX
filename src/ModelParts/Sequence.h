@@ -7,12 +7,11 @@
 #include <list>
 #include <set>
 
-#include "SubstitutionModels/SubstitutionModel.h"
+#include "AbstractComponent.h"
 #include "../IO/SequencesParser.h"
+#include "SubstitutionModels/States.h"
 
-// Temporary
-//class Tree;
-
+class Tree;
 class TreeNode;
 
 struct substitution {
@@ -24,10 +23,10 @@ struct substitution {
 class SequenceAlignment {
  public:
   Tree* tree;
+  std::string name; // Domain.
   unsigned int n_columns;
   unsigned int n_states;
-  SequenceAlignment(const States*);
-  SequenceAlignment(const SequenceAlignment &msa);
+  SequenceAlignment(std::string name, std::string msa_out, std::string subs_out, const States*);
 
   std::map<std::string, std::vector<int>> taxa_names_to_sequences;
   std::map<std::string, std::vector<bool>> taxa_names_to_gaps;
@@ -46,6 +45,7 @@ class SequenceAlignment {
   void add(std::string name, std::string sequence_str);
   void add(std::string name);
   void add_base(std::string name, std::string sequence_str);
+  void add_base(std::string name, const IO::FreqSequence &seq);
 
   void print();
   void Initialize(std::list<SequenceAlignment*>*);
@@ -60,9 +60,11 @@ class SequenceAlignment {
   static std::vector<int> findParsimony(const std::vector<int> &s1, const std::vector<int> &s2);
   std::list<std::string> getNodeNames();
 
+  bool match_structure(SequenceAlignment*);
+
   // New
   void syncWithTree(Tree* tree);
-  void syncHiddenWithTree(unsigned int id, Tree* tree);
+  void syncHiddenWithTree(std::string name, unsigned int id, Tree* tree);
   void identify_gaps();
   sample_status sample();
  private:
@@ -71,11 +73,18 @@ class SequenceAlignment {
 
   // Sampling - new
   std::map<std::string, float**> taxa_names_to_state_probs;
+  std::map<std::string, float**> base_taxa_state_probs; // These are fixed.
 
-  void sample_base_sequences(std::list<int>);
+  void reset_base_probabilities(std::list<int>);
   void calculate_state_probabilities(TreeNode*, std::list<int>);
   void calculate_state_probabilities_pos(TreeNode*, unsigned int, TreeNode*, TreeNode*, TreeNode*);
   int pick_state_from_probabilities(TreeNode*, int);
+
+  // Outputs
+  std::string seqs_out_identifier;
+  std::string seqs_out_file;
+  std::string substitutions_out_identifier;
+  std::string substitutions_out_file;
 };
 
 class SequenceAlignmentParameter : public SampleableComponent {

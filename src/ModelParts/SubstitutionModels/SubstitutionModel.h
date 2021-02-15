@@ -1,18 +1,12 @@
 #ifndef SubstitutionModel_h_
 #define SubstitutionModel_h_
 
-#include <fstream>
-#include <sstream>
-
 #include <list>
 #include <set>
-#include <vector>
 #include <map>
 #include <string>
-#include <queue>
 
 #include "../AbstractComponent.h"
-#include "../ComponentSet.h"
 #include "RateVector.h"
 #include "../../IO/SubstitutionModelParser.h"
 #include "States.h"
@@ -27,10 +21,11 @@ public:
   void from_raw_model(IO::raw_substitution_model*);
 
   // States.
-  const States* get_states();
+  const States* get_states(std::string domain);
+  std::map<std::string, States> get_all_states();
 
   // Rate Vectors.
-  void organizeRateVectors(int seqLen, int numStates);
+  void organizeRateVectors(int seqLen);
   RateVector* selectRateVector(rv_request);
   std::vector<RateVector*> get_RateVectors();
   SubstitutionModel::iterator modified_begin(AbstractComponent*);
@@ -40,17 +35,15 @@ public:
   const double& get_u();
 
   std::list<AbstractComponent*> get_all_parameters();
-
-  void saveToFile(int gen, double l);
+  
+  void saveToFile(int gen, double l, std::map<RateVector*, std::vector<int>> counts_by_rv);
 private:
-  void configure_States(std::set<std::string>);
-  void configure_HiddenStates(std::map<std::string, std::set<std::string>>);
+  void configure_States(std::list<std::string>);
+  void configure_HiddenStates(std::map<std::string, std::list<std::string>>);
   void configure_RateVectors(std::list<IO::raw_rate_vector>);
 
-  States states;
-  std::map<std::string, States> hidden_states;
-
   RateVectorSet rateVectors;
+  std::map<std::string, States> all_states; // This includes primary states.
 
   // Iterator
   // Given a AbstractComponent will return an iterator to the start of all the rate vector locations that are modified.

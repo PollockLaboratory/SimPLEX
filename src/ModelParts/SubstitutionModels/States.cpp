@@ -19,17 +19,19 @@ States add_to_States(States states, std::string s) {
   return(states);
 }
 
-States create_States(std::set<std::string> input_states) {
+States create_States(std::list<std::string> input_states) {
+  std::set<std::string> states_set = {};
   std::map<std::string, int> state_to_int = {};
   std::map<int, std::string> int_to_state = {};
 
   int i = 0;
   for(auto it = input_states.begin(); it != input_states.end(); ++it) {
+    states_set.insert(*it);
     state_to_int[*it] = i;
     int_to_state[i] = *it;
     i++;
   }
 
-  States states = {input_states.size(), input_states, state_to_int, int_to_state};
+  States states = {input_states.size(), states_set, state_to_int, int_to_state};
   return(states);
 }

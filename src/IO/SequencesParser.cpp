@@ -1,9 +1,10 @@
-#include "SequencesParser.h"
 #include <iostream>
 #include <algorithm>
 #include <exception>
+#include <stdlib.h>
 
-#include <set>
+#include "SequencesParser.h"
+#include "Files.h"
 
 extern IO::Files files;
 
@@ -128,15 +129,15 @@ namespace IO {
 
   // New structs.
 
-  std::set<std::string> readStates(std::list<std::string> states_list) {
-    std::set<std::string> states = {};
-    std::set<std::string> reserved = {">", "<", ":", "-", "[", "]", ",", ";"};
+  std::list<std::string> readStates(std::list<std::string> states_list) {
+    std::list<std::string> states = {};
+    std::set<std::string> reserved = {">", "<", ":", "-", "[", "]", ",", ";", "(", ")", "*"};
  
     for(auto it = states_list.begin(); it != states_list.end(); ++it) {
       if(reserved.find(*it) != reserved.end()) {
 	throw ParseException("\"" + *it + "\" is a reserved char and cannot be used as a state");
       } else {
-	states.insert(*it);
+	states.push_back(*it);
       }
     }
 							     
@@ -147,8 +148,33 @@ namespace IO {
     if(freqs.size() == 1) {
       return(std::string(1, freqs.front().state));
     } else {
-      return("Fix me");
+      float max_freq = 0.0;
+      char state = '*';
+      for(auto it = freqs.begin(); it != freqs.end(); ++it) {
+	if(it->freq > max_freq) {
+	  max_freq = it->freq;
+	  state = it->state;
+	}
+      }
+      return(std::string(1, state));
     }
+  }
+
+  bool FreqList_gap(std::list<StateFreq> freqs) {
+    if(freqs.empty()) {
+      throw ParseException("empty list of state frequencies.");
+    } else if(freqs.size() >= 2) {
+      for(auto it = freqs.begin(); it != freqs.end(); ++it) {
+	if(it->state == '-') {
+	  throw ParseException("position specifies gap at frequency less that 1.0.");
+	}
+      }
+    } else {
+      if(freqs.front().state == '-') {
+	return(true);
+      }
+    }
+    return(false);
   }
 
   std::string sequenceAsStr(FreqSequence seq) {
@@ -238,13 +264,14 @@ namespace IO {
   ParseException::ParseException(std::string s) : std::invalid_argument(s) {
   }
 
-  enum TokenType { NAME, POS };
+  enum TokenType { NAME, POS, POSEXT };
 
-  enum ParserState { SEQNAME, SEQUENCE };
+  enum ParserState { SEQNAME, SEQUENCE, SEQUENCEEXT };
 
   struct Token {
     std::string val;
     TokenType t;
+    float freq;
   };
 
   // New Parser.
@@ -257,16 +284,62 @@ namespace IO {
       ++cur; 
     }
 
-    struct Token t = {val, NAME};
+    struct Token t = {val, NAME, 0.0};
     return(t);
   }
 
   struct Token next_position(std::string::iterator &cur) {
     std::string val = "";
-    val += *cur;
-    cur++;
 
-    struct Token t = {val, POS};
+    if(*cur == '[') {
+      cur++;
+      while(*cur != ']' and *cur != ',') {
+	val += *cur;
+	cur++;
+      }
+
+      size_t split = val.find(':');
+      std::string state = val.substr(0,split);
+      float freq = std::stod(val.substr(split+1));
+
+      struct Token t;
+      if(*cur == ',') {
+	t = {state, POSEXT, freq};
+      } else if (*cur == ']') {
+	t = {state, POS, freq};
+      }
+
+      cur++;
+
+      return(t);
+    } else {
+      val += *cur;
+      cur++;
+      
+      struct Token t = {val, POS, 1.0};
+      return(t);
+    }
+  }
+
+  struct Token next_position_ext(std::string::iterator &cur) {
+    std::string val = "";
+    while(*cur != ']' and *cur != ',') {
+      val += *cur;
+      cur++;
+    }
+
+    size_t split = val.find(':');
+    std::string state = val.substr(0,split);
+    float freq = std::stod(val.substr(split+1));
+
+    struct Token t;
+    if(*cur == ',') {
+      t = {state, POSEXT, freq};
+    } else if (*cur == ']') {
+      t = {state, POS, freq};
+    }
+
+    cur++;
     return(t);
   }
   
@@ -278,9 +351,17 @@ namespace IO {
     } else if(state == SEQUENCE) {
       t = next_position(cur);
       state = SEQNAME;
+    } else if(state == SEQUENCEEXT) {
+      t = next_position_ext(cur);
+      if(t.t == POS) {
+	state = SEQNAME;
+      }
     }
 
-    if(separator.find(*cur) != separator.end()) {
+    // Do complex logic here.
+    if(t.t == POSEXT) {
+      state = SEQUENCEEXT;
+    } else if(separator.find(*cur) != separator.end()) {
       while(separator.find(*cur) != separator.end()) {
 	++cur;
       }
@@ -334,6 +415,7 @@ namespace IO {
 
     std::string seq_name = "";
     FreqSequence seq = {};
+    std::list<StateFreq> freqs = {};
     while(loc != data.end()) {
       struct Token tok = next_token(loc, data.end(), state);
       if(tok.t == NAME) {
@@ -346,9 +428,15 @@ namespace IO {
 
 	// New name-sequence pair. 
 	seq_name = validate_name(tok.val);
-      } else if (tok.t == POS) {
-	std::list<StateFreq> freqs = validate_pos(tok.val);
+      } else if(tok.t == POS) {
+	// Push onto seq.
+	StateFreq pos = {tok.val.front(), tok.freq};
+	freqs.push_back(pos);
 	seq.push_back(freqs);
+	freqs = {};
+      } else if(tok.t == POSEXT) {
+	StateFreq pos = {tok.val.front(), tok.freq};
+	freqs.push_back(pos);
       }
     }
 
@@ -369,7 +457,10 @@ namespace IO {
     for(auto pos = seq.begin(); pos != seq.end(); ++pos) {
       for(auto s = pos->begin(); s != pos->end(); ++s) {
 	if(states.find(std::string(1, s->state)) == states.end()) {
-	  return(false);
+	  // Need something better here.
+	  if(s->state != '-') {
+	    return(false);
+	  }
 	}
       }
     }
@@ -386,10 +477,30 @@ namespace IO {
     return(true);
   }
 
-  RawAdvMSA readRawAdvMSA(std::string data, std::set<std::string> states) {
+  bool checkEmptyColumns(RawAdvMSA msa) {
+    std::vector<bool> empty_cols(msa.cols, true);
+    for(auto seq = msa.seqs.begin(); seq != msa.seqs.end(); ++seq) {
+      unsigned int i = 0;
+      for(auto pos = seq->second.begin(); pos != seq->second.end(); ++pos) {
+	if(not FreqList_gap(*pos)) {
+	  empty_cols[i] = false;
+	}
+	i++;
+      }
+    }
+    for(auto it = empty_cols.begin(); it != empty_cols.end(); ++it) {
+      if(*it == true) {
+	throw ParseException("empty column (columns containing only gaps)");
+      }
+    }
+  }
+
+  RawAdvMSA readRawAdvMSA(std::string data, std::list<std::string> states) {
     RawAdvMSA msa = parseRawAdvMSA(data);
 
-    validateMSA(msa, states);
+    std::set<std::string> states_set(states.begin(), states.end());
+    validateMSA(msa, states_set);
+    checkEmptyColumns(msa);
 
     return(msa);
   }

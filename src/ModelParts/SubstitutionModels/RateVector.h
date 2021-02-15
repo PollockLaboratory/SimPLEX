@@ -2,8 +2,6 @@
 #define RateVector_h_
 
 #include <vector>
-#include <set>
-#include <unordered_set>
 #include <functional>
 #include <string>
 #include <list>
@@ -11,7 +9,6 @@
 
 #include "States.h"
 #include "../AbstractComponent.h"
-#include "Parameters.h"
 #include "../../IO/SubstitutionModelParser.h"
 
 struct rv_request {
@@ -19,6 +16,8 @@ struct rv_request {
   // More specific requests later, for example branch position.
   unsigned int pos;
   int state;
+  std::string domain;
+  std::map<std::string, int> states;
 };
 
 class BranchSegment; // Defined in Trees/Types/TreeParts.h
@@ -28,6 +27,7 @@ class RateVector {
 private:
   int id;
   static int IDc;
+  std::string domain; // Name of the state set.
   std::string name;
   const States* states;
 public:
@@ -47,26 +47,45 @@ public:
   void print();
 };
 
+struct rv_loc {
+  // Rate Vector Locations
+  RateVector* rv;
+  int pos;
+};
+
+typedef std::map<std::string, std::string> ExtendedState; // Domain -> State;
+ExtendedState ExtendedState_Null();
+std::string ExtendedState_toString(ExtendedState);
+
 // Collections of rate vectors.
 class RateVectorSet {
   // This collection holds all of the rate vectors currently in the substitution model.
 public:
   RateVectorSet();
   std::vector<RateVector*> col;
-  void Initialize(States* states);
+  void Initialize(States states, std::map<std::string, States>);
 
   void add(RateVector* v, IO::rv_use_class);
-  void organize(int seqLen, int numStates);
+  void organize(int seqLen);
 
   RateVector* select(rv_request);
+  const std::list<rv_loc>& get_host_vectors(Valuable*);
 
   void print();
   void saveToFile(int gen, double l);
  private:
-  std::map<int, IO::rv_use_class> id_to_uc;
+  std::map<std::string, States> all_states;
+  unsigned int n_domains;
+  std::list<std::string> domain_names;
+
+  std::map<std::string, std::map<ExtendedState, RateVector*>> ex_state_to_rv; // Domain -> ExState -> RateVector*;
+
+  // Old
+  std::map<int, IO::rv_use_class> id_to_uc; // Only used to before RateVectors are organized.
+
   // Tree structure of Rate Vectors.
   // Organized via positions -> states -> possible RateVectors.
-  std::vector<std::vector<std::list<RateVector*>>> rv_tree; 
+  std::map<Valuable*, std::list<rv_loc>> parameter_locations; // Param ID -> rate vector locations.
 };
 
 #endif

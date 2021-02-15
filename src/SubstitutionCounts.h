@@ -1,8 +1,13 @@
 #ifndef SubstitutionCounts_h_
 #define SubstitutionCounts_h_
 
-#include "ModelParts/SubstitutionModels/RateVector.h"
+#include <map>
+#include <vector>
+
 #include "ModelParts/AbstractComponent.h"
+#include "ModelParts/SubstitutionModels/States.h"
+
+class RateVector;
 
 struct raw_counts {
   int num0subs = 0;
@@ -12,7 +17,7 @@ struct raw_counts {
 class SubstitutionCounts {
  public:
   SubstitutionCounts();
-  SubstitutionCounts(std::vector<RateVector*>, std::list<float>);
+  SubstitutionCounts(std::vector<RateVector*>, std::list<float>, std::map<std::string, States>);
 
   std::map<RateVector*, std::vector<int>> subs_by_rateVector;
   std::map<float, raw_counts> subs_by_branch;
@@ -27,8 +32,9 @@ private:
   static std::ofstream out_file;
   SubstitutionCounts* counts;
   Tree* tree;
+  std::map<std::string, std::list<std::string>> all_states;
 public:
-  CountsParameter(SubstitutionCounts*, Tree*);
+  CountsParameter(SubstitutionCounts*, Tree*, std::map<std::string, std::list<std::string>>);
   void fix() override;
   void refresh() override;
   void print() override;

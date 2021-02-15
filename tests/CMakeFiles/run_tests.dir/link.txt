@@ -1,0 +1,1 @@
+/usr/bin/c++  -w -O3   CMakeFiles/run_tests.dir/all_tests.cpp.o  -o run_tests ../src/liblibSimPLEX.a ../gtest/libgtest.a ../gtest/libgtest_main.a /usr/lib/i386-linux-gnu/liblua5.2.so /usr/lib/i386-linux-gnu/libm.so ../gtest/libgtest.a -lpthread 

@@ -2,9 +2,7 @@
 #include <limits>
 
 #include "AbstractComponent.h"
-#include "SubstitutionModels/RateVector.h"
 #include "../Environment.h"
-#include "../SubstitutionCounts.h"
 
 extern Environment env;
 
@@ -101,31 +99,10 @@ const std::list<Valuable*>& AbstractComponent::get_valuable_dependents() {
 
 // ABSTRACT VALUES
 Valuable::Valuable() {
-  host_vectors = {};
-}
-
-void Valuable::add_host_vector(RateVector* rv, int pos) {
-  host_vectors.push_back(rv_loc {rv, pos});
-}
-
-const std::list<rv_loc>& Valuable::get_host_vectors() {
-  return(host_vectors);
 }
 
 void Valuable::print() {
   std::cout << this->get_value();
-}
-
-void Valuable::set_counts(SubstitutionCounts *counts) {
-  this->counts = counts;
-}
-
-unsigned int Valuable::find_counts() {
-  unsigned int acc = 0;
-  for(auto it = host_vectors.begin(); it != host_vectors.end(); ++it) {
-    acc += counts->subs_by_rateVector[it->rv][it->pos];
-  }
-  return(acc);
 }
 
 // SampleableComponent.

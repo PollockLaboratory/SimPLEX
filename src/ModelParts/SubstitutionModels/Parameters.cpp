@@ -1,6 +1,7 @@
-#include "Parameters.h"
 #include <stdlib.h> //This gives rand.
 #include <limits>
+
+#include "Parameters.h"
 
 // CONTINUOUS FLOAT
 

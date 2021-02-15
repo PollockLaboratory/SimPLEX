@@ -2,7 +2,9 @@
 
 #include "Environment.h"
 #include "IO/Files.h"
+
 #include "ModelParts/Trees/Tree.h"
+#include "ModelParts/SubstitutionModels/RateVector.h"
 
 #include <sstream>
 #include <string>
@@ -13,12 +15,12 @@ extern IO::Files files;
 SubstitutionCounts::SubstitutionCounts() {
 }
 
-SubstitutionCounts::SubstitutionCounts(std::vector<RateVector*> rvs, std::list<float> b_lens) {
+SubstitutionCounts::SubstitutionCounts(std::vector<RateVector*> rvs, std::list<float> b_lens, std::map<std::string, States> all_states) {
   // Make empty structures ready for counts.
   subs_by_rateVector = {};
   subs_by_branch = {};
   for(auto it = rvs.begin(); it != rvs.end(); ++it) {
-    subs_by_rateVector[*it] = std::vector<int>(env.num_states, 0);
+    subs_by_rateVector[*it] = std::vector<int>((*it)->rates.size(), 0);
   }
 
   for(auto it = b_lens.begin(); it != b_lens.end(); ++it) {
@@ -48,14 +50,14 @@ void SubstitutionCounts::print() {
 
 //std::ofstream CountsParameter::out_file;
 
-CountsParameter::CountsParameter(SubstitutionCounts* counts, Tree* tree) : AbstractComponent("SubstitutionCounts."), counts(counts) {
+CountsParameter::CountsParameter(SubstitutionCounts* counts, Tree* tree, std::map<std::string, std::list<std::string>> all_states) : AbstractComponent("SubstitutionCounts."), counts(counts), all_states(all_states) {
   hidden = true;
 
   //this->tree = tp->get_tree_ptr();
   //this->add_dependancy(tp);
   this->tree = tree;
 
-  files.add_file("substitution_counts_out", env.get<std::string>("OUTPUT.counts_out_file"), IOtype::OUTPUT);
+  files.add_file("counts_by_ratevector_out", env.get<std::string>("OUTPUT.counts_out_file"), IOtype::OUTPUT);
 
   // Print csv header to outfile.
   std::ostringstream buffer;
@@ -66,7 +68,7 @@ CountsParameter::CountsParameter(SubstitutionCounts* counts, Tree* tree) : Abstr
   }
   buffer << ",Total" << std::endl;
 
-  files.write_to_file("substitution_counts_out", buffer.str());
+  files.write_to_file("counts_by_ratevector_out", buffer.str());
 }
 
 void CountsParameter::fix() {
@@ -74,10 +76,11 @@ void CountsParameter::fix() {
 
 void CountsParameter::refresh() {
   // Create new structs for counts.
-  *counts = SubstitutionCounts(tree->get_SM()->get_RateVectors(), tree->get_branch_lengths());
+  *counts = SubstitutionCounts(tree->get_SM()->get_RateVectors(), tree->get_branch_lengths(), tree->SM->get_all_states());
 
   // Fill in structs.
   const std::list<BranchSegment*> branchList = tree->get_branches();
+  // Primary.
   for(auto it = branchList.begin(); it != branchList.end(); ++it) {
     BranchSegment* b = *it;
     for(auto sub = b->get_substitutions().begin(); sub != b->get_substitutions().end(); ++sub) {
@@ -87,6 +90,25 @@ void CountsParameter::refresh() {
 	counts->subs_by_rateVector[sub->rate_vector][sub->dec_state] += 1;
       } else {
 	counts->subs_by_branch[b->distance].num0subs += 1;
+      }
+    }
+  }
+
+  // Secondary.
+  for(auto it = branchList.begin(); it != branchList.end(); ++it) {
+    BranchSegment* b = *it;
+    std::map<std::string, States> hidden_states = tree->SM->get_all_states();
+    for(auto jt = hidden_states.begin(); jt != hidden_states.end(); ++jt) {
+      if(jt->first != "primary") {
+	for(auto sub = b->hidden_substitutions[jt->first].begin(); sub != b->hidden_substitutions[jt->first].end(); ++sub) {
+	  if(sub->occuredp == true) {
+	    // Adds both virtual substitutions and normal substitutions.
+	    counts->subs_by_branch[b->distance].num1subs += 1;
+	    counts->subs_by_rateVector[sub->rate_vector][sub->dec_state] += 1;
+	  } else {
+	    counts->subs_by_branch[b->distance].num0subs += 1;
+	  }
+	}
       }
     }
   }
@@ -120,7 +142,7 @@ void CountsParameter::save_to_file(int gen, double l) {
     buffer << "," << total << std::endl;
   }
 
-  files.write_to_file("substitution_counts_out", buffer.str());
+  files.write_to_file("counts_by_ratevector_out", buffer.str());
 }
 
 std::string CountsParameter::get_type() {

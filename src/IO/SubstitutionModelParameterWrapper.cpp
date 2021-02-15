@@ -1,7 +1,8 @@
-#include "SubstitutionModelParameterWrapper.h"
-
-#include "LuaUtils.h"
 #include <limits>
+
+#include "SubstitutionModelParameterWrapper.h"
+#include "../ModelParts/SubstitutionModels/Parameters.h"
+#include "LuaUtils.h"
 
 double inf = std::numeric_limits<double>::infinity();
 double neg_inf = -inf;

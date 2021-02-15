@@ -6,14 +6,10 @@
 #ifndef Model_h_
 #define Model_h_
 
-#include <vector>
-#include <map>
-#include <fstream>
-
 #include "SubstitutionCounts.h"
-#include "ModelParts/ComponentSet.h"
 #include "ModelParts/Trees/Tree.h"
 #include "ModelParts/SubstitutionModels/SubstitutionModel.h"
+#include "ModelParts/ComponentSet.h"
 #include "Data.h"
 
 class Model {
@@ -43,8 +39,9 @@ private:
   SubstitutionModel* substitution_model;
 
   Tree* tree;
-  SequenceAlignmentParameter* sp;
   CountsParameter* cp;
+
+  std::list<SequenceAlignmentParameter*> msa_parameters;
 };
 
 #endif

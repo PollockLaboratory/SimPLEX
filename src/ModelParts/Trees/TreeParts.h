@@ -8,10 +8,10 @@
 #include <math.h>
 
 #include "../../IO/TreeParser.h"
-#include "../Sequence.h"
-#include "../SubstitutionModels/RateVector.h"
-#include "../SubstitutionModels/SubstitutionModel.h"
-#include "../../SubstitutionCounts.h"
+
+//class SequenceAlignment;
+class SubstitutionModel;
+class RateVector;
 
 typedef struct Substitution {
   bool occuredp;
@@ -27,20 +27,23 @@ private:
   std::vector<Substitution> substitutions;
   std::vector<RateVector*> rates; //By site.
 
+  std::map<std::string, std::vector<RateVector*>> hidden_rates; // By site also.
+
   inline void update_rate_vectors();
   void set_new_substitutions(); 
 public:
   BranchSegment(float distance);
   ~BranchSegment();
 
-  void Initialize(unsigned int n_columns);
+  void Initialize(unsigned int n_columns, std::map<std::string, std::list<std::string>> all_states);
 
   float distance;
   TreeNode* ancestral;
   TreeNode* decendant;
 
   const std::vector<Substitution>& get_substitutions();
-  double get_rate(int pos, int dec_state);
+
+  std::map<std::string, std::vector<Substitution>> hidden_substitutions; // Temp - should be private.
 
   // Updating.
   void update();
@@ -59,32 +62,30 @@ class TreeNode {
   BranchSegment* left;
   BranchSegment* right;
 
-  //float** state_probabilities;
-  //bool* gaps;
-
   std::vector<int>* sequence; // Ptr to the sequence.
-  SequenceAlignment* MSA; // The MSA that the sequence is in.
+  //SequenceAlignment* MSA; // The MSA that the sequence is in.
 
   // Hidden States
-  std::vector<std::vector<int>*> hidden_state_sequences;
+  std::map<std::string, std::vector<int>*> hidden_state_sequences; // Name -> sequence.
 
   SubstitutionModel* SM;
 
   TreeNode();
+  ~TreeNode();
   TreeNode(IO::RawTreeNode* raw_tree);
   TreeNode(std::string n);
 
   void connect_substitution_model(SubstitutionModel*);
 
-  //TreeNode* set_gaps();
-  
   //Sampling
   bool ready_to_sample();
 
    // Printing/Display
   std::string toString();
-  std::string get_sequence();
-  std::string state_at_pos(int i);
+  //std::string get_sequence();
+  //std::string state_at_pos(int i);
+
+  std::map<std::string, int> get_extended_state_by_pos(int);
 
   bool isTip();
 };

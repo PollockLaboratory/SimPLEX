@@ -1,7 +1,6 @@
 #ifndef BranchSplitting_h_
 #define BranchSplitting_h_
 
-#include <utility>
 #include <functional>
 #include "TreeParts.h"
 #include <cmath> // for floor and pow

@@ -10,41 +10,49 @@ model_states = Config.get_string_array("MODEL.states")
 States.set(model_states)
 
 od_states = {"O", "D"}
-States.new_hidden("order/disorder", od_states, {})
+States.new_hidden("orderVdisorder", od_states, {sequences_output = "od_sequences.fasta", substitutions_output = "od_substitutions.out"})
 
-Data.load_hidden_state("order/disorder", "data_sets/hidden_state.efasta");
+Data.load_hidden_state("orderVdisorder", "data_sets/hidden_state.efasta");
    
 -- Create parameters for equilibrium frequencies.
 
-equil_freq = {}
-Q = {}
+order_rate = Parameter.new("base-order", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0});
+disorder_rate = Parameter.new("base-disorder", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0});
+
+-- equil_freq = {}
+Q_order = {}
+Q_disorder = {}
+
 for i=1,#model_states do
-   equil_freq[i] = Parameter.new("freq-"..tostring(States[i]), "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0})
-   Q[i] = {}
+   Q_order[i] = {}
+   Q_disorder[i] = {}
 end
 
 for i=1,#model_states do
 	for j=i,#model_states do
 	   if i ~= j then
-	      rate = Parameter.new("base-"..tostring(States[i])..tostring(States[j]), "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0})
-	      Q[i][j] = Parameter.named_multiply(tostring(States[i])..tostring(States[j]), rate, equil_freq[j])
-	      Q[j][i] = Parameter.named_multiply(tostring(States[j])..tostring(States[i]), rate, equil_freq[i])
+	      Q_order[i][j] = order_rate
+	      Q_order[j][i] = order_rate
+
+	      Q_disorder[i][j] = disorder_rate
+	      Q_disorder[j][i] = disorder_rate
 	   else
-	      Q[i][j] = Parameter.new("virtual-"..tostring(States[i]), "virtual", {})
+	      Q_order[i][j] = Parameter.new("order-virtual-"..tostring(States[i]), "virtual", {})
+	      Q_disorder[i][j] = Parameter.new("disorder-virtual-"..tostring(States[i]), "virtual", {})
 	   end
 	end
-	Model.add_rate_vector(RateVector.new("RV-"..tostring(States[i]), {state = States[i], pos = {}}, Q[i]))
+	Model.add_rate_vector(RateVector.new("RV-order-"..tostring(States[i]), {state = States[i], orderVdisorder="O", pos = {}}, Q_order[i]))
+	Model.add_rate_vector(RateVector.new("RV-disorder-"..tostring(States[i]), {state = States[i], orderVdisorder="D", pos = {}}, Q_disorder[i]))
 end
---[[
+
 OtoD = Parameter.new("OtoD", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0 })
 
 DtoO = Parameter.new("DtoO", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0 })
 
 Model.add_rate_vector(RateVector.new("RV-O",
-				     {domain = "order/disorder", state = "O", pos = {}},
+				     {domain = "orderVdisorder", state = "O", primary="*", pos = {}},
 				     {Parameter.new("virtual-O", "virtual", {}), OtoD}))
 
 Model.add_rate_vector(RateVector.new("RV-D",
-				     {domain = "order/disorder", state = "D", pos = {}},
+				     {domain = "orderVdisorder", state = "D", primary="*", pos = {}},
 				     {DtoO, Parameter.new("virtual-D", "virtual", {})}))
-]]--

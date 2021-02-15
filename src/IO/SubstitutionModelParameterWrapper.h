@@ -6,8 +6,10 @@
 #include <iostream>
 #include <list>
 
-#include "../ModelParts/SubstitutionModels/Parameters.h"
 #include "sol2/sol.hpp"
+
+class DependencyGroup;
+class AbstractComponent;
 
 namespace IO { 
   class ParameterWrapper {

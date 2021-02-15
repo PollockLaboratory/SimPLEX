@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <set>
+#include <list>
 
 struct States {
   int n; // Careful about indels.
@@ -15,6 +16,6 @@ struct States {
 void print_States(States);
 
 States add_to_States(States, std::string);
-States create_States(std::set<std::string>);
+States create_States(std::list<std::string>);
 
 #endif

@@ -45,6 +45,7 @@ seed = 0
   #generations = 800
   full_update_freq = 200
   tree_sample_frequency = 200
+  hidden_sample_frequency = 250
   tree_sample_n_positions = 10000
   output_frequency = 100
   print_frequency = 100

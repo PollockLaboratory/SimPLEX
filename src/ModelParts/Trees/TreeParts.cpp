@@ -10,7 +10,9 @@
 
 #include "TreeParts.h"
 #include "../../Environment.h"
-#include "../../SubstitutionCounts.h"
+
+#include "../SubstitutionModels/RateVector.h"
+#include "../SubstitutionModels/SubstitutionModel.h"
 
 extern double Random();
 extern Environment env;
@@ -21,9 +23,14 @@ BranchSegment::BranchSegment(float distance) {
   this->distance = distance;
 }
 
-void BranchSegment::Initialize(unsigned int n_columns) {
+void BranchSegment::Initialize(unsigned int n_columns, std::map<std::string, std::list<std::string>> all_states) {
   rates = std::vector<RateVector*>(n_columns, NULL);
   substitutions = std::vector<Substitution>(n_columns, Substitution({false, 0, 0, nullptr}));
+
+  for(auto it = all_states.begin(); it != all_states.end(); ++it) {
+    hidden_rates[it->first] = std::vector<RateVector*>(n_columns, NULL);
+    hidden_substitutions[it->first] = std::vector<Substitution>(n_columns, Substitution({false, 0, 0, nullptr}));
+  }
 }
 
 BranchSegment::~BranchSegment() {
@@ -39,15 +46,6 @@ const std::vector<Substitution>& BranchSegment::get_substitutions() {
   return(substitutions);
 }
 
-double BranchSegment::get_rate(int pos, int dec_state) {
-  double r = rates[pos]->rates[dec_state]->get_value();
-  // Might not need this anymore.
-  if(isnan(log(r))) {
-    rates[pos]->rates[dec_state]->print();
-  }
-  return(r);
-}
-
 // Key Statistics
 inline void BranchSegment::update_rate_vectors() {
   std::vector<int>* seq = ancestral->sequence;
@@ -55,8 +53,15 @@ inline void BranchSegment::update_rate_vectors() {
     if((*seq)[pos] == -1) {
       rates[pos] = NULL;
     } else {
-      rv_request rq = {pos, (*seq)[pos]};
+      std::map<std::string, int> states = ancestral->get_extended_state_by_pos(pos);
+      rv_request rq = {pos, (*seq)[pos], "primary", states};
       rates[pos] = ancestral->SM->selectRateVector(rq);
+
+      // Set hidden state rate vector - and primary.
+      for(auto it = ancestral->hidden_state_sequences.begin(); it != ancestral->hidden_state_sequences.end(); ++it) {
+	rv_request rq = {pos, (*(ancestral->hidden_state_sequences[it->first]))[pos], it->first, states};
+	hidden_rates[it->first][pos] = ancestral->SM->selectRateVector(rq);
+      }
     }
   }
 }
@@ -64,27 +69,59 @@ inline void BranchSegment::update_rate_vectors() {
 void BranchSegment::set_new_substitutions() {
   double u = decendant->SM->get_u();
 
-  std::vector<int> anc = *(ancestral->sequence);
-  std::vector<int> dec = *(decendant->sequence);
+  std::vector<int> *anc = (ancestral->sequence);
+  std::vector<int> *dec = (decendant->sequence);
 
-  for(unsigned int pos = 0; pos < anc.size(); pos++) {
-    if(anc[pos] == -1 or dec[pos] == -1) {
-      substitutions[pos] = {false, anc[pos], dec[pos], rates[pos]};
+  for(int pos = 0; pos < anc->size(); pos++) {
+    // Primary.
+    if(anc->at(pos) == -1 or dec->at(pos) == -1) {
+      //substitutions[pos] = {false, anc[pos], dec[pos], rates[pos]};
     } else {
-      if(anc[pos] != dec[pos]) {
+      if(anc->at(pos) != dec->at(pos)) {
 	// Normal substitutions.
-	substitutions[pos] = {true, anc[pos], dec[pos], rates[pos]};
+	substitutions[pos] = {true, anc->at(pos), dec->at(pos), rates[pos]};
       } else {
 	// Possibility of virtual substitution.
 	// Not sure this is exactly right.
 	//float length = distance;
-	double vir_rate = rates[pos]->rates[dec[pos]]->get_value();
+
+	double vir_rate = rates[pos]->rates[dec->at(pos)]->get_value();
 	//double p = 1 - (1 / (1 + (vir_rate * distance)));
 	double p = vir_rate / (1 - u + vir_rate);
 	if(Random() < p) {
-	  substitutions[pos] = {true, anc[pos], dec[pos], rates[pos]};
+	  substitutions[pos] = {true, anc->at(pos), dec->at(pos), rates[pos]};
 	} else {
-	  substitutions[pos] = {false, anc[pos], dec[pos], rates[pos]};
+	  substitutions[pos] = {false, anc->at(pos), dec->at(pos), rates[pos]};
+	}
+      }
+    }
+
+    // Hidden states here - and primary there is alot of redundancy now.
+    for(auto domain = hidden_substitutions.begin(); domain != hidden_substitutions.end(); ++domain) {
+      std::vector<int> *hidden_anc = (ancestral->hidden_state_sequences[domain->first]);
+      std::vector<int> *hidden_dec = (decendant->hidden_state_sequences[domain->first]);
+      
+      for(unsigned int pos = 0; pos < hidden_anc->size(); pos++) {
+	if(hidden_anc->at(pos) == -1 or hidden_dec->at(pos) == -1) {
+	  hidden_substitutions[domain->first][pos] = {false, hidden_anc->at(pos), hidden_dec->at(pos), hidden_rates[domain->first][pos]};
+	} else {
+	  if(hidden_anc->at(pos) != hidden_dec->at(pos)) {
+	    // Normal substitutions.
+	    hidden_substitutions[domain->first][pos] = {true, hidden_anc->at(pos), hidden_dec->at(pos), hidden_rates[domain->first][pos]};
+	  } else {
+	    // Possibility of virtual substitution.
+	    // Not sure this is exactly right.
+	    //float length = distance;
+	    
+	    double vir_rate = hidden_rates[domain->first][pos]->rates[hidden_dec->at(pos)]->get_value();
+	    //double p = 1 - (1 / (1 + (vir_rate * distance)));
+	    double p = vir_rate / (1 - u + vir_rate);
+	    if(Random() < p) {
+	      hidden_substitutions[domain->first][pos] = {true, hidden_anc->at(pos), hidden_dec->at(pos), hidden_rates[domain->first][pos]};
+	    } else {
+	      hidden_substitutions[domain->first][pos] = {false, hidden_anc->at(pos), hidden_dec->at(pos), hidden_rates[domain->first][pos]};
+	    }
+	  }
 	}
       }
     }
@@ -138,6 +175,9 @@ TreeNode::TreeNode() {
   hidden_state_sequences = {};
 }
 
+TreeNode::~TreeNode() {
+}
+
 void TreeNode::connect_substitution_model(SubstitutionModel* sm) {
   SM = sm;
 }
@@ -168,16 +208,16 @@ std::string TreeNode::toString() {
   }
 }
 
-std::string TreeNode::get_sequence() {
-  std::string seq = "";
-  for(unsigned int i = 0; i < sequence->size(); i++) {
-    seq.append(MSA->integer_to_state[(*sequence)[i]]);
-  }
-  return(seq);
-}
+std::map<std::string, int> TreeNode::get_extended_state_by_pos(int pos) {
+  std::map<std::string, int> states = {};
+  states["primary"] = (*sequence)[pos];
 
-std::string TreeNode::state_at_pos(int i) {
-  return(MSA->integer_to_state[(*sequence)[i]]);
+  // Debug
+  for(auto it = hidden_state_sequences.begin(); it != hidden_state_sequences.end(); ++it) {
+    states[it->first] = (*(it->second))[pos];
+  }
+
+  return(states);
 }
 
 bool TreeNode::isTip() {

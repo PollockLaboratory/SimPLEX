@@ -3,8 +3,6 @@
 #include "../Environment.h"
 #include "../IO/Files.h"
 
-#include <algorithm>
-
 extern Environment env;
 extern IO::Files files;
 
@@ -225,6 +223,4 @@ void IO::deleteTree(RawTreeNode* node) {
   if(node->right != nullptr) {
     deleteTree(node->right);
   }
-
-  delete node;
 }

@@ -1,21 +1,26 @@
 #include <iostream>
+#include <vector>
 
 #include "SubstitutionModel.h"
+
 #include "../../Environment.h"
 #include "../../IO/Files.h"
+
+#include "Parameters.h"
 
 extern Environment env;
 extern IO::Files files;
 
 SubstitutionModel::SubstitutionModel(Valuable* u) : u(u) {
-  states.n = 0;
 }
 
 RateVector* SubstitutionModel::create_rate_vector(IO::raw_rate_vector rv, Valuable* u) {
-  std::vector<Valuable*> rates(states.n, nullptr);
-  int s = states.state_to_int[rv.uc.state];
+  States* domain_states = &all_states[rv.uc.domain];
 
-  // Setup Virtual Substitution rate.
+  std::vector<Valuable*> rates(domain_states->n, nullptr);
+  int s = domain_states->state_to_int[rv.uc.state];
+
+  // Find and configure the Virtual Substitution rate.
   auto ptr_vir = rv.rates.begin();
   int i = 0;
   while(i != s) {
@@ -23,9 +28,8 @@ RateVector* SubstitutionModel::create_rate_vector(IO::raw_rate_vector rv, Valuab
     i++;
   }
 
-  // Test code.
   VirtualSubstitutionRate* vir_rate = dynamic_cast<VirtualSubstitutionRate*>(*ptr_vir);
-
+  
   if(vir_rate == nullptr) {
     std::cerr << "Error: expecting virtual substitution rate at position " << i << " in rate vector " << rv.name << "." << std::endl;
     exit(EXIT_FAILURE);
@@ -34,7 +38,7 @@ RateVector* SubstitutionModel::create_rate_vector(IO::raw_rate_vector rv, Valuab
   vir_rate->set_u(u);
 
   // Add each of the remaining parameters to the rate vector.
-  for(int i = 0; i < states.n; i++) {
+  for(int i = 0; i < domain_states->n; i++) {
     AbstractComponent* param = rv.rates.front();
     if(param == nullptr) {
       std::cerr << "Error: nullptr for parameter in rate vector " << rv.name << " at position " << i << "." << std::endl;
@@ -58,22 +62,22 @@ RateVector* SubstitutionModel::create_rate_vector(IO::raw_rate_vector rv, Valuab
   }
 
   if(not rv.rates.empty()) {
-    std::cerr << "Error: unexpected number of rates - " << states.n << " is expected (given the number of states), however " << rv.rates.size() << " additional rate is found." << std::endl;
+    std::cerr << "Error: unexpected number of rates - " << domain_states->n << " is expected (given the number of states), however " << rv.rates.size() << " additional rate is found." << std::endl;
     exit(EXIT_FAILURE);
   }
 
-  RateVector* new_rv = new RateVector(rv.name, rv.uc.state, &states, rates);
+  RateVector* new_rv = new RateVector(rv.name, rv.uc.state, domain_states, rates);
   return(new_rv);
 }
 
-void SubstitutionModel::configure_States(std::set<std::string> raw_states) {
+void SubstitutionModel::configure_States(std::list<std::string> raw_states) {
   for(auto it = raw_states.begin(); it != raw_states.end(); ++it) {
-    states = add_to_States(states, *it);
+    all_states["primary"] = add_to_States(all_states["primary"], *it);
   }
 
   // Add Indels to states table.
-  states.state_to_int["-"] = -1;
-  states.int_to_state[-1] = "-";
+  all_states["primary"].state_to_int["-"] = -1;
+  all_states["primary"].int_to_state[-1] = "-";
 }
 
 void SubstitutionModel::configure_RateVectors(std::list<IO::raw_rate_vector> rv_list) {
@@ -82,36 +86,64 @@ void SubstitutionModel::configure_RateVectors(std::list<IO::raw_rate_vector> rv_
     rateVectors.add(rv, (*raw_rv).uc);
   }
 
-  rateVectors.Initialize(&states);
+  rateVectors.Initialize(all_states["primary"], all_states);
 }
 
-void SubstitutionModel::configure_HiddenStates(std::map<std::string, std::set<std::string>> raw_hidden) {
+void SubstitutionModel::configure_HiddenStates(std::map<std::string, std::list<std::string>> raw_hidden) {
   for(auto it = raw_hidden.begin(); it != raw_hidden.end(); ++it) {
     States cont = {};
     for(auto s = it->second.begin(); s != it->second.end(); ++s) {
       cont = add_to_States(cont, *s);
     }
+    cont.state_to_int["-"] = -1;
+    cont.int_to_state[-1] = "-";
 
-    hidden_states[it->first] = cont;
+    all_states[it->first] = cont;
   }
 }
 
 void SubstitutionModel::from_raw_model(IO::raw_substitution_model* raw_sm) {
+  // This should be a single function call, I think?
   configure_States(raw_sm->get_states());
-
-  configure_HiddenStates(raw_sm->get_hidden_states());
+  configure_HiddenStates(raw_sm->get_all_states());
 
   configure_RateVectors(raw_sm->get_rate_vector_list());
+
+ // Parameter's counts out.
+  files.add_file("parameters_counts_out", env.get<std::string>("OUTPUT.parameters_counts_out_file"), IOtype::OUTPUT);
+
+  std::ostringstream counts_buffer;
+  counts_buffer << "I,GEN,LogL";
+  std::list<AbstractComponent*> all_parameters = get_all_parameters();
+  for(auto it = all_parameters.begin(); it != all_parameters.end(); it++) {
+    if((*it)->get_hidden() != true) {
+      if(dynamic_cast<Valuable*>(*it) != nullptr) {
+	counts_buffer << "," << (*it)->get_name();
+      }
+    }
+  }
+  counts_buffer << std::endl;
+
+  files.write_to_file("parameters_counts_out", counts_buffer.str());
 
   //print_States(states);
 }
 
-const States* SubstitutionModel::get_states() {
-  return(&states);
+const States* SubstitutionModel::get_states(std::string domain) {
+  auto s = all_states.find(domain);
+  if(s == all_states.end()) {
+    std::cerr << "Error: the domain \"" << domain << "\" is not recognized by the substitution model." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  return(&(s->second));
 }
 
-void SubstitutionModel::organizeRateVectors(int seqLen, int numStates) {
-  rateVectors.organize(seqLen, numStates);
+std::map<std::string, States> SubstitutionModel::get_all_states() {
+  return(all_states);
+}
+
+void SubstitutionModel::organizeRateVectors(int seqLen) {
+  rateVectors.organize(seqLen);
 }
 
 RateVector* SubstitutionModel::selectRateVector(rv_request rq) {
@@ -128,14 +160,19 @@ const double& SubstitutionModel::get_u() {
   return(u->get_value());
 }
 
-void add_all_dependancies(std::list<AbstractComponent*>& all, AbstractComponent* parameter) {
-  all.push_back(parameter);
+void add_all_dependancies(std::list<AbstractComponent*>& all, std::set<AbstractComponent*>& prev_parameters, AbstractComponent* parameter) {
+  if(prev_parameters.find(parameter) == prev_parameters.end()) {
+    prev_parameters.insert(parameter);
+    all.push_back(parameter);
+  }
+
   for(auto it = parameter->get_dependancies().begin(); it != parameter->get_dependancies().end(); ++it) {
-    add_all_dependancies(all, *it);
+    add_all_dependancies(all, prev_parameters, *it);
   }
 }
 
 std::list<AbstractComponent*> SubstitutionModel::get_all_parameters() {
+  std::set<AbstractComponent*> prev_parameters = {};
   std::list<AbstractComponent*> all_deps = {};
   for(auto it = rateVectors.col.begin(); it != rateVectors.col.end(); ++it) {
     for(auto jt = (*it)->rates.begin(); jt != (*it)->rates.end(); ++jt) {
@@ -144,7 +181,7 @@ std::list<AbstractComponent*> SubstitutionModel::get_all_parameters() {
 	std::cerr << "Error: parameter not of AbstractComponent type." << std::endl;
 	exit(EXIT_FAILURE);
       }
-      add_all_dependancies(all_deps, parameter);
+      add_all_dependancies(all_deps, prev_parameters, parameter);
     }
   }
   return(all_deps);
@@ -154,8 +191,30 @@ std::vector<RateVector*> SubstitutionModel::get_RateVectors() {
   return(rateVectors.col);
 }
 
-void SubstitutionModel::saveToFile(int gen, double l) {
+void SubstitutionModel::saveToFile(int gen, double l, std::map<RateVector*, std::vector<int>> counts_by_rv) {
   rateVectors.saveToFile(gen, l);
+
+  static int i = -1;
+  ++i;
+  
+  // Parameter's substitution counts.
+  std::string line = std::to_string(i) + "," + std::to_string(gen) + "," + std::to_string(l);
+  std::list<AbstractComponent*> all_parameters = get_all_parameters();
+  for(auto it = all_parameters.begin(); it != all_parameters.end(); it++) {
+    if((*it)->get_hidden() != true) {
+      Valuable* v = dynamic_cast<Valuable*>(*it);
+      if(v != nullptr) {
+	int total = 0;
+	const std::list<rv_loc> host_rvs = rateVectors.get_host_vectors(v);
+	for(auto it = host_rvs.begin(); it != host_rvs.end(); ++it) {
+	  total += counts_by_rv[it->rv][it->pos];
+	}
+	line += "," + std::to_string(total);//std::to_string(v->find_counts());
+      }
+    }
+  }
+
+  files.write_to_file("parameters_counts_out", line + "\n");
 }
 
 // The ITERATOR
@@ -176,8 +235,8 @@ inline bool SubstitutionModel::iterator::step_to_next_component() {
     //std::cout << std::endl;
     return(true);
   } else {
-    location = (*current_parameter)->get_host_vectors().begin();
-    location_iter_end = (*current_parameter)->get_host_vectors().end();
+    location = sub_model.rateVectors.get_host_vectors(*current_parameter).begin();
+    location_iter_end = sub_model.rateVectors.get_host_vectors(*current_parameter).end();
     return(false);
   }
 }
@@ -202,12 +261,9 @@ SubstitutionModel::iterator::iterator(SubstitutionModel& s, bool e, AbstractComp
   if(current_parameter == valuables_end) {
     endQ = true;
   } else {
-    //std::list<rv_loc> host_vectors = (*current_parameter)->get_host_vectors();
-    location = (*current_parameter)->get_host_vectors().begin();
-    location_iter_end = (*current_parameter)->get_host_vectors().end();
-    //location = (*current_parameter)->get_host_vectors().begin();
-    //location_iter_end = (*current_parameter)->get_host_vectors().end();
-
+    location = sub_model.rateVectors.get_host_vectors(*current_parameter).begin();
+    location_iter_end = sub_model.rateVectors.get_host_vectors(*current_parameter).end();
+    
     while(location == location_iter_end) {
       endQ = step_to_next_component();
       if(endQ) {

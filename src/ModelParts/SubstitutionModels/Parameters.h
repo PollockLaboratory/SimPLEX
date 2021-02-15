@@ -2,12 +2,12 @@
 #define PARAMETERS_h
 
 #include "../AbstractComponent.h"
-//#include "../../IO/RawParameterTypes.h"
 
 #include <string>
 #include <list>
 #include <iostream>
 #include <exception>
+#include <vector>
 
 // Sampleable
 

@@ -1,14 +1,12 @@
 #include <iostream>
-#include <cmath>
-#include <sys/times.h>
-#include <chrono>
+#include <map>
 
 #include "Model.h"
-#include "ModelParts/SubstitutionModels/SubstitutionModel.h"
 
 #include "Environment.h"
 #include "IO/Files.h"
-#include "IO/TreeParser.h"
+
+#include "ModelParts/SubstitutionModels/Parameters.h"
 
 extern Environment env;
 extern IO::Files files;
@@ -57,25 +55,36 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw
   }
 
   // Primary States.
-  const States* states = substitution_model->get_states();
+  const States* states = substitution_model->get_states("primary");
   std::cout << "Primary states: ";
   print_States(*states);
 
-  SequenceAlignment* MSA = new SequenceAlignment(states);
+  SequenceAlignment* MSA = new SequenceAlignment("primary",
+						 env.get<std::string>("OUTPUT.sequences_out_file"),
+						 env.get<std::string>("OUTPUT.substitutions_out_file"),
+						 states);
   MSA->Initialize(raw_msa);
 
-  std::list<SequenceAlignment*> hidden_states_MSAs = {};
+  std::map<std::string, SequenceAlignment*> hidden_states_MSAs = {};
   // Secondary/Hidden states.
-  std::map<std::string, std::set<std::string>> hidden_states = raw_sm->get_hidden_states();
-  for(auto it = hidden_states.begin(); it != hidden_states.end(); ++it) {
+  std::map<std::string, std::list<std::string>> all_states = raw_sm->get_all_states();
+  for(auto it = all_states.begin(); it != all_states.end(); ++it) {
     if(it->first != "primary") {
-      States hidden_states = create_States(it->second);
+      const States *secondary_states = substitution_model->get_states(it->first);
       std::cout << "Secondary states: ";
-      print_States(hidden_states);
-      SequenceAlignment* hidden_MSA = new SequenceAlignment(&hidden_states);
-      hidden_MSA->Initialize(raw_sm->get_hidden_states_data(it->first));
+      print_States(*secondary_states);
+      SequenceAlignment* secondary_MSA = new SequenceAlignment(it->first,
+							       raw_sm->states_seqs_output_files[it->first],
+							       raw_sm->states_subs_output_files[it->first],
+							       secondary_states);
+      secondary_MSA->Initialize(raw_sm->get_hidden_states_data(it->first));
 
-      hidden_states_MSAs.push_back(hidden_MSA);
+      hidden_states_MSAs[it->first] = secondary_MSA;
+
+      if(MSA->match_structure(secondary_MSA) == false) {
+	std::cerr << "Error: sequence alignment for domain \"" << it->first << "\" does not have a matching structure to the primary alignment." << std::endl;
+	exit(EXIT_FAILURE);
+      }
     }
   }
 
@@ -92,25 +101,33 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw
   tree->connect_substitution_model(substitution_model);
 
   tree->MSA = MSA;
-  tree->configureBranches(tree->root, MSA->n_columns);
+  tree->configureBranches(tree->root, MSA->n_columns, all_states);
 
   // Configuring sequences.
   MSA->syncWithTree(tree);
 
+  RateVectorAssignmentParameter* rvap = new RateVectorAssignmentParameter(tree);
+
   unsigned int ctr = 0;
   for(auto it = hidden_states_MSAs.begin(); it != hidden_states_MSAs.end(); ++it) {
-    (*it)->syncHiddenWithTree(ctr, tree);
+    it->second->syncHiddenWithTree(it->first, ctr, tree);
     ctr++;
+    SequenceAlignmentParameter* hidden_parameter = new SequenceAlignmentParameter(it->second);
+    components.add_parameter(hidden_parameter, env.get<int>("MCMC.hidden_sample_frequency"));
+    rvap->add_dependancy(hidden_parameter);
+    msa_parameters.push_back(hidden_parameter);
   }
 
+  SequenceAlignmentParameter* sp = new SequenceAlignmentParameter(MSA);
+  msa_parameters.push_back(sp);
 
-  sp = new SequenceAlignmentParameter(MSA);
   components.add_parameter(sp, env.get<int>("MCMC.tree_sample_frequency"));
 
-  substitution_model->organizeRateVectors(MSA->numCols(), substitution_model->get_states()->n);
+  // This should be closer to RateVector.Initialize() call.
+  substitution_model->organizeRateVectors(MSA->numCols());
 
-  RateVectorAssignmentParameter* rvap = new RateVectorAssignmentParameter(tree);
   rvap->add_dependancy(sp);
+
   components.add_parameter(rvap);
 
   std::cout << "\tAdding Uniformization constant." << std::endl;
@@ -120,7 +137,7 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw
   }
  
   std::cout << "\tPreparing substitution counts." << std::endl;
-  cp = new CountsParameter(&counts, tree);
+  cp = new CountsParameter(&counts, tree, all_states);
   cp->add_dependancy(rvap);
   components.add_parameter(cp);
 
@@ -181,13 +198,19 @@ double Model::CalculateLikelihood() {
     logL_waiting += num0subs * log(1/(1 + u*t)) + num1subs * log(t/(1 + u*t));
   }
 
+  //std::cout << "Counts: ";
   for(auto it = counts.subs_by_rateVector.begin(); it != counts.subs_by_rateVector.end(); ++it) {
     RateVector* rv = it->first;
+    //std::cout << rv->get_name() << " [ ";
     std::vector<int> C_xy = it->second;
-    for(int i = 0; i < env.num_states; i++) {
+    for(int i = 0; i < rv->rates.size(); i++) {
+      // std::cout << C_xy[i] << "|" << log((*rv)[i]) << " ";
       logL_subs += C_xy[i] * log((*rv)[i]);
     }
+    //std::cout << "]" << std::endl;
   }
+
+  //std::cout << logL_waiting << " " << logL_subs << std::endl;
  
   return(logL_waiting + logL_subs);
 }
@@ -222,11 +245,12 @@ void Model::RecordState(int gen, double l) {
 	 * Records the state of both the tree and the substitution model.
 	 */
 	components.save_to_file(gen, l);
-	substitution_model->saveToFile(gen, l);
-	// Counts and tree save should be here.
-	sp->save_to_file(gen, l);
+	substitution_model->saveToFile(gen, l, counts.subs_by_rateVector);
+	for(auto it = msa_parameters.begin(); it != msa_parameters.end(); ++it) {
+	  (*it)->save_to_file(gen, l);
+	}
 	// Substitutions should be a call to the MSA.
-	tree->record_substitutions(gen, l);
+	//tree->record_substitutions(gen, l);
 	cp->save_to_file(gen, l); 
 }
 
