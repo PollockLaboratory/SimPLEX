@@ -24,26 +24,23 @@ class TreeNode;
 
 class BranchSegment {
 private:
-  std::vector<Substitution> substitutions;
-  std::vector<RateVector*> rates; //By site.
+  unsigned int n_pos;
 
-  std::map<std::string, std::vector<RateVector*>> hidden_rates; // By site also.
+  std::map<std::string, std::vector<RateVector*>> rates; // Rate vectors by site also.
+  std::map<std::string, std::vector<Substitution>> substitutions; // Temp - should be private.
 
   inline void update_rate_vectors();
   void set_new_substitutions(); 
 public:
-  BranchSegment(float distance);
-  ~BranchSegment();
-
-  void Initialize(unsigned int n_columns, std::map<std::string, std::list<std::string>> all_states);
-
   float distance;
   TreeNode* ancestral;
   TreeNode* decendant;
 
-  const std::vector<Substitution>& get_substitutions();
+  BranchSegment(float distance);
+  ~BranchSegment();
 
-  std::map<std::string, std::vector<Substitution>> hidden_substitutions; // Temp - should be private.
+  void Initialize(unsigned int n_columns, std::map<std::string, std::list<std::string>> all_states);
+  const std::vector<Substitution>& get_substitutions(std::string domain);
 
   // Updating.
   void update();
@@ -62,11 +59,8 @@ class TreeNode {
   BranchSegment* left;
   BranchSegment* right;
 
-  std::vector<int>* sequence; // Ptr to the sequence.
-  //SequenceAlignment* MSA; // The MSA that the sequence is in.
-
   // Hidden States
-  std::map<std::string, std::vector<int>*> hidden_state_sequences; // Name -> sequence.
+  std::map<std::string, std::vector<signed char>*> sequences; // Name -> sequence.
 
   SubstitutionModel* SM;
 
@@ -77,7 +71,7 @@ class TreeNode {
 
   void connect_substitution_model(SubstitutionModel*);
 
-  //Sampling
+  // Sampling
   bool ready_to_sample();
 
    // Printing/Display

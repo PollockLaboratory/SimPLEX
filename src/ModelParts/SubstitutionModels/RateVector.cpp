@@ -115,13 +115,13 @@ void RateVectorSet::add(RateVector* rv, IO::rv_use_class uc) {
 }
 
 RateVector* RateVectorSet::select(rv_request rq) {
-  if(rq.states.empty() == true) {
+  if(rq.ex_state.empty() == true) {
     std::cerr << "Sort this out." << std::endl;
     exit(EXIT_FAILURE);
   }
 
   ExtendedState state = ExtendedState_Null();
-  for(auto it = rq.states.begin(); it != rq.states.end(); ++it) {
+  for(auto it = rq.ex_state.begin(); it != rq.ex_state.end(); ++it) {
     state[it->first] = all_states[it->first].int_to_state[it->second];
   }
 
@@ -132,6 +132,73 @@ RateVector* RateVectorSet::select(rv_request rq) {
     exit(EXIT_FAILURE);
   }
   return(rv);
+}
+
+std::map<std::string, int> RateVectorSet::get_ExtendedState(const std::map<std::string, std::vector<signed char>*>& sequences, int pos) {
+  std::map<std::string, int> states = {};
+
+  // Adds all states.
+  for(auto it = sequences.begin(); it != sequences.end(); ++it) {
+    states[it->first] = (*(it->second))[pos];
+  }
+
+  return(states);
+}
+
+unsigned long hash(std::list<signed char> seq) {
+  unsigned long hash = 5381;
+  int c;
+
+  for(auto it = seq.begin(); it != seq.end(); ++it) {
+    c = *it;
+    hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+  }
+
+  return(hash);
+}
+
+std::list<signed char> RateVectorSet::ex_to_list(ExtendedState ex) {
+  std::list<signed char> l = {};
+  for(auto domain_it = all_states.begin(); domain_it != all_states.end(); ++domain_it) {
+    l.push_back(domain_it->second.state_to_int[ex[domain_it->first]]);
+  }
+  return(l);
+}
+
+std::list<std::list<signed char>> RateVectorSet::configure_hash(std::map<std::string, States> all_states) {
+  std::set<unsigned long> hash_values = {};
+
+  std::list<std::list<signed char>> new_states = {{}};
+  for(auto domain_it = all_states.begin(); domain_it != all_states.end(); ++domain_it) {
+    std::list<std::list<signed char>> tmp_states = {};
+    for(auto it = new_states.begin(); it != new_states.end(); ++it) {
+      for(auto jt = domain_it->second.possible.begin(); jt != domain_it->second.possible.end(); ++jt) {
+	std::list<signed char> s = *it;
+	s.push_back(domain_it->second.state_to_int[*jt]);
+
+	// Check for hash collision.
+	if(hash_values.find(hash(s)) != hash_values.end()) {
+	  std::cerr << "Error: collision in hash values.\n" << std::endl;
+	  exit(EXIT_FAILURE);
+	}
+
+	tmp_states.push_back(s);
+      }
+    }
+    new_states = tmp_states;
+  }
+
+  std::cout << "All Possible States: [\n";
+  for(auto it = new_states.begin(); it != new_states.end(); ++it) {
+    std::cout << "[ ";
+    for(auto jt = it->begin(); jt != it->end(); ++jt) {
+      std::cout << *jt << " ";
+    }
+    std::cout << "] = " << hash(*it) << std::endl;
+  }
+  std::cout << "]" << std::endl;
+
+  return(new_states);
 }
 
 std::list<ExtendedState> expandStates(std::list<ExtendedState> base, std::map<std::string, States> extension) {
@@ -150,10 +217,61 @@ std::list<ExtendedState> expandStates(std::list<ExtendedState> base, std::map<st
   return(new_states);
 }
 
-void RateVectorSet::organize(int seqLen) {
+void RateVectorSet::organize() {
   /*
    * Organizes RateVectors into logical structure now tree data is known.
    */
+
+  // New
+  std::list<std::list<signed char>> tmp_states = configure_hash(all_states);
+
+  // Make empty tree - new
+  for(auto domain = domain_names.begin(); domain != domain_names.end(); ++domain) {
+    ex_state_to_rv[*domain] = {};
+    for(auto state = tmp_states.begin(); state != tmp_states.end(); ++state) {
+      state_to_rv[*domain][hash(*state)] = nullptr;
+    }
+  }
+
+  for(auto it = col.begin(); it != col.end(); ++it) {
+    if(*it == nullptr) {
+      std::cout << "Error: RateVector is nullptr." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    IO::rv_use_class uc = id_to_uc[(*it)->getID()];
+    ExtendedState s = ExtendedState_Null();
+    s[uc.domain] = uc.state;
+    std::list<ExtendedState> applicable_states = {s};
+
+    // Find all Extended states that apply.
+    for(auto it = uc.secondary_state.begin(); it != uc.secondary_state.end(); ++it) {
+      if(it->second == "*") {
+	// Applies to all states in domain.
+	std::map<std::string, States> extension_domain = {};
+	extension_domain[it->first] = all_states[it->first];
+	applicable_states = expandStates(applicable_states, extension_domain);
+      } else {
+	// Applies to specific states in domain.
+	for(auto jt = applicable_states.begin(); jt != applicable_states.end(); ++jt) {
+	  (*jt)[it->first] = it->second;
+	}
+      }
+    }
+
+    // Set ptrs to rate vectors based on applicable state.
+    std::cout << "Hashes: " << std::endl;
+    for(auto jt = applicable_states.begin(); jt != applicable_states.end(); ++jt) {
+      unsigned long h = hash(ex_to_list(*jt));
+      if(state_to_rv[uc.domain][h] != nullptr) {
+	std::cerr << "Error: rate vector has already been assigned." << std::endl;
+	exit(EXIT_FAILURE);
+      } else {
+	state_to_rv[uc.domain][h] = *it;
+      }
+      std::cout << h << std::endl;
+    }
+  }
 
   // Looks at possible states.
   //std::cout << "Domains: [ ";
@@ -162,6 +280,7 @@ void RateVectorSet::organize(int seqLen) {
   //}
   //std::cout << "]" << std::endl;
 
+  // Old
   // Calculated extended states.
   std::list<ExtendedState> extended_states = expandStates({ExtendedState_Null()}, all_states);
 
@@ -179,7 +298,7 @@ void RateVectorSet::organize(int seqLen) {
     }
   }
 
-  // Fill tree - loop through vector.
+  // Fill tree - loop through each vector. col = collection.
   for(auto it = col.begin(); it != col.end(); ++it) {
     if(*it == nullptr) {
       std::cout << "Error: RateVector is nullptr." << std::endl;
@@ -252,7 +371,7 @@ void RateVectorSet::saveToFile(int gen, double l) {
 
   std::ostringstream buffer;
   for(auto it = col.begin(); it != col.end(); ++it) {
-    buffer << i << "," << gen << "," << l << "," << (*it)->get_name() << "," << env.integer_to_state[(*it)->state];
+    buffer << i << "," << gen << "," << l << "," << (*it)->get_name() << "," << (*it)->get_state();
     for(auto jt = (*it)->rates.begin(); jt != (*it)->rates.end(); ++jt) {
       buffer << "," << (*jt)->get_value();
     }

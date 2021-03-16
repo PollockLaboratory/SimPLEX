@@ -37,7 +37,7 @@ Valuable* Model::create_uniformization_constant() {
   return(val);
 }
 
-void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw_substitution_model* &raw_sm) {
+void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &raw_sm) {
 
   std::cout << "Initializing model:" << std::endl;
 
@@ -54,88 +54,65 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw
     components.add_parameter(*it);
   }
 
-  // Primary States.
-  const States* states = substitution_model->get_states("primary");
-  std::cout << "Primary states: ";
-  print_States(*states);
+  std::list<std::string> tip_sequences = getRawTreeNodeTipNames(raw_tree);
 
-  SequenceAlignment* MSA = new SequenceAlignment("primary",
-						 env.get<std::string>("OUTPUT.sequences_out_file"),
-						 env.get<std::string>("OUTPUT.substitutions_out_file"),
-						 states);
-  MSA->Initialize(raw_msa);
-
-  std::map<std::string, SequenceAlignment*> hidden_states_MSAs = {};
-  // Secondary/Hidden states.
+  // All states.
+  unsigned int n_cols = 0;
+  std::map<std::string, SequenceAlignment*> all_MSAs = {};
   std::map<std::string, std::list<std::string>> all_states = raw_sm->get_all_states();
   for(auto it = all_states.begin(); it != all_states.end(); ++it) {
-    if(it->first != "primary") {
       const States *secondary_states = substitution_model->get_states(it->first);
-      std::cout << "Secondary states: ";
+      std::cout << "Reading new states domain: ";
       print_States(*secondary_states);
       SequenceAlignment* secondary_MSA = new SequenceAlignment(it->first,
 							       raw_sm->states_seqs_output_files[it->first],
 							       raw_sm->states_subs_output_files[it->first],
 							       secondary_states);
-      secondary_MSA->Initialize(raw_sm->get_hidden_states_data(it->first));
+      secondary_MSA->Initialize(raw_sm->get_state_data(it->first));
 
-      hidden_states_MSAs[it->first] = secondary_MSA;
-
-      if(MSA->match_structure(secondary_MSA) == false) {
-	std::cerr << "Error: sequence alignment for domain \"" << it->first << "\" does not have a matching structure to the primary alignment." << std::endl;
+      // Validate MSAs.
+      // Check node names are consistant between tree and sequence alignment.
+      // TODO - Check pattern of gaps is consistant.
+      if(secondary_MSA->validate(tip_sequences, all_MSAs) != true) {
+	std::cerr << "Error: sequence alignment for domain \"" << it->first << "\" cannot be validated." << std::endl;
 	exit(EXIT_FAILURE);
       }
-    }
+
+      all_MSAs[it->first] = secondary_MSA;
+
+      n_cols = secondary_MSA->numCols();
   }
 
-  // Set environment variables.
-  env.num_states = states->n;
-  env.state_to_integer = states->state_to_int;
-  env.integer_to_state = states->int_to_state;
-
-  // Tree.
+  // COnfiguring the Tree.
   std::cout << "\tConstructing tree." << std::endl;
 
   tree = new Tree();
   tree->Initialize(raw_tree);
   tree->connect_substitution_model(substitution_model);
-
-  tree->MSA = MSA;
-  tree->configureBranches(tree->root, MSA->n_columns, all_states);
+  tree->configureBranches(tree->root, n_cols, all_states);
 
   // Configuring sequences.
-  MSA->syncWithTree(tree);
-
   RateVectorAssignmentParameter* rvap = new RateVectorAssignmentParameter(tree);
 
+  UniformizationConstant* u_param = dynamic_cast<UniformizationConstant*>(u);
   unsigned int ctr = 0;
-  for(auto it = hidden_states_MSAs.begin(); it != hidden_states_MSAs.end(); ++it) {
-    it->second->syncHiddenWithTree(it->first, ctr, tree);
+  for(auto it = all_MSAs.begin(); it != all_MSAs.end(); ++it) {
+    it->second->syncWithTree(it->first, ctr, tree);
     ctr++;
-    SequenceAlignmentParameter* hidden_parameter = new SequenceAlignmentParameter(it->second);
-    components.add_parameter(hidden_parameter, env.get<int>("MCMC.hidden_sample_frequency"));
-    rvap->add_dependancy(hidden_parameter);
-    msa_parameters.push_back(hidden_parameter);
+    SequenceAlignmentParameter* msa_parameter = new SequenceAlignmentParameter(it->second);
+    if(u_param and env.get<bool>("UNIFORMIZATION.refresh_tree_on_update")) {
+      msa_parameter->add_dependancy(u_param);
+    }
+    components.add_parameter(msa_parameter, env.get<int>("MCMC.hidden_sample_frequency"));
+    rvap->add_dependancy(msa_parameter);
+    msa_parameters.push_back(msa_parameter);
   }
 
-  SequenceAlignmentParameter* sp = new SequenceAlignmentParameter(MSA);
-  msa_parameters.push_back(sp);
-
-  components.add_parameter(sp, env.get<int>("MCMC.tree_sample_frequency"));
-
   // This should be closer to RateVector.Initialize() call.
-  substitution_model->organizeRateVectors(MSA->numCols());
-
-  rvap->add_dependancy(sp);
+  substitution_model->organizeRateVectors();
 
   components.add_parameter(rvap);
 
-  std::cout << "\tAdding Uniformization constant." << std::endl;
-  UniformizationConstant* u_param = dynamic_cast<UniformizationConstant*>(u);
-  if(u_param and env.get<bool>("UNIFORMIZATION.refresh_tree_on_update")) {
-      sp->add_dependancy(u_param);
-  }
- 
   std::cout << "\tPreparing substitution counts." << std::endl;
   cp = new CountsParameter(&counts, tree, all_states);
   cp->add_dependancy(rvap);
@@ -144,8 +121,7 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::RawMSA* &raw_msa, IO::raw
   components.Initialize();
 
   std::cout << "\tSetting initial parameter states." << std::endl;
-  // Set initial tree state.
-  sp->sample();
+  // Set parameter states.
   components.reset_dependencies();
 
   counts.print();

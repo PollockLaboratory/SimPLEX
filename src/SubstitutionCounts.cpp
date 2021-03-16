@@ -80,34 +80,18 @@ void CountsParameter::refresh() {
 
   // Fill in structs.
   const std::list<BranchSegment*> branchList = tree->get_branches();
-  // Primary.
-  for(auto it = branchList.begin(); it != branchList.end(); ++it) {
-    BranchSegment* b = *it;
-    for(auto sub = b->get_substitutions().begin(); sub != b->get_substitutions().end(); ++sub) {
-      if(sub->occuredp == true) {
-	// Adds both virtual substitutions and normal substitutions.
-	counts->subs_by_branch[b->distance].num1subs += 1;
-	counts->subs_by_rateVector[sub->rate_vector][sub->dec_state] += 1;
-      } else {
-	counts->subs_by_branch[b->distance].num0subs += 1;
-      }
-    }
-  }
 
-  // Secondary.
   for(auto it = branchList.begin(); it != branchList.end(); ++it) {
     BranchSegment* b = *it;
     std::map<std::string, States> hidden_states = tree->SM->get_all_states();
     for(auto jt = hidden_states.begin(); jt != hidden_states.end(); ++jt) {
-      if(jt->first != "primary") {
-	for(auto sub = b->hidden_substitutions[jt->first].begin(); sub != b->hidden_substitutions[jt->first].end(); ++sub) {
-	  if(sub->occuredp == true) {
-	    // Adds both virtual substitutions and normal substitutions.
-	    counts->subs_by_branch[b->distance].num1subs += 1;
-	    counts->subs_by_rateVector[sub->rate_vector][sub->dec_state] += 1;
-	  } else {
-	    counts->subs_by_branch[b->distance].num0subs += 1;
-	  }
+      for(auto sub = b->get_substitutions(jt->first).begin(); sub != b->get_substitutions(jt->first).end(); ++sub) {
+	if(sub->occuredp == true) {
+	  // Adds both virtual substitutions and normal substitutions.
+	  counts->subs_by_branch[b->distance].num1subs += 1;
+	  counts->subs_by_rateVector[sub->rate_vector][sub->dec_state] += 1;
+	} else {
+	  counts->subs_by_branch[b->distance].num0subs += 1;
 	}
       }
     }

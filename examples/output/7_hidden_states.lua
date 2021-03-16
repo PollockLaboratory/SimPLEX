@@ -1,19 +1,21 @@
 --[[
 
-   True GTR
+   Hidden state.
 
-]]
+]]--
 
-Model.set_name("GTR")
+Model.set_name("Hidden State.")
 
+-- Base
 model_states = Config.get_string_array("MODEL.states")
-States.set(model_states)
+States.new_hidden("primary", model_states, {sequences_output = Config.get_str("MODEL.sequences_out_file"), substitutions_output = Config.get_str("MODEL.substitutions_out_file")})
+Data.load_hidden_state("primary", Config.get_str("MODEL.sequences_file"))
 
 od_states = {"O", "D"}
 States.new_hidden("orderVdisorder", od_states, {sequences_output = "od_sequences.fasta", substitutions_output = "od_substitutions.out"})
 
 Data.load_hidden_state("orderVdisorder", "data_sets/hidden_state.efasta");
-   
+
 -- Create parameters for equilibrium frequencies.
 
 order_rate = Parameter.new("base-order", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0});
@@ -37,12 +39,12 @@ for i=1,#model_states do
 	      Q_disorder[i][j] = disorder_rate
 	      Q_disorder[j][i] = disorder_rate
 	   else
-	      Q_order[i][j] = Parameter.new("order-virtual-"..tostring(States[i]), "virtual", {})
-	      Q_disorder[i][j] = Parameter.new("disorder-virtual-"..tostring(States[i]), "virtual", {})
+	      Q_order[i][j] = Parameter.new("order-virtual-"..tostring(States.primary[i]), "virtual", {})
+	      Q_disorder[i][j] = Parameter.new("disorder-virtual-"..tostring(States.primary[i]), "virtual", {})
 	   end
 	end
-	Model.add_rate_vector(RateVector.new("RV-order-"..tostring(States[i]), {state = States[i], orderVdisorder="O", pos = {}}, Q_order[i]))
-	Model.add_rate_vector(RateVector.new("RV-disorder-"..tostring(States[i]), {state = States[i], orderVdisorder="D", pos = {}}, Q_disorder[i]))
+	Model.add_rate_vector(RateVector.new("RV-order-"..tostring(States.primary[i]), {state = States.primary[i], orderVdisorder="O", pos = {}}, Q_order[i]))
+	Model.add_rate_vector(RateVector.new("RV-disorder-"..tostring(States.primary[i]), {state = States.primary[i], orderVdisorder="D", pos = {}}, Q_disorder[i]))
 end
 
 OtoD = Parameter.new("OtoD", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0 })

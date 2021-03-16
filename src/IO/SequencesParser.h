@@ -6,24 +6,6 @@
 #include <set>
 
 namespace IO {
-  struct RawMSA {
-    std::map<std::string, std::string> seqs;
-    unsigned int n = 0;
-    unsigned int cols = 0;
-  };
-
-  // Operators
-  bool operator==(const RawMSA& lhs, const RawMSA& rhs);
-  std::ostream& operator<<(std::ostream& os, const RawMSA& msa);
-
-  // Utils
-  RawMSA* readRawMSA(std::string file_name);
-  void printRawMSA(const RawMSA& msa);
-  std::list<std::string> getRawMSANames(const RawMSA& msa);
-  void convertToGaps(RawMSA& msa, std::list<std::string> remove_list);
-
-  // New functions and struct.
-
   class ParseException : public std::invalid_argument {
   public:
     ParseException(std::string);
@@ -44,18 +26,18 @@ namespace IO {
   bool operator==(const FreqSequence& lhs, const FreqSequence& rhs);
   std::string sequenceAsStr(FreqSequence seq);
   
-  struct RawAdvMSA {
+  struct RawMSA {
     unsigned int n = 0;
     unsigned int cols = 0;
     std::map<std::string, FreqSequence> seqs;
   };
 
-  RawAdvMSA parseRawAdvMSA(std::string data);
-  RawAdvMSA readRawAdvMSA(std::string data, std::list<std::string> states);
+  RawMSA parseRawAdvMSA(std::string data);
+  RawMSA readRawAdvMSA(std::string data, std::list<std::string> states);
 
   // Utils
-  bool operator==(const RawAdvMSA& lhs, const RawAdvMSA& rhs);
-  void printRawAdvMSA(RawAdvMSA msa);
+  bool operator==(const RawMSA& lhs, const RawMSA& rhs);
+  void printRawAdvMSA(RawMSA msa);
 }
 
 #endif

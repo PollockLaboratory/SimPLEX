@@ -21,8 +21,8 @@ States add_to_States(States states, std::string s) {
 
 States create_States(std::list<std::string> input_states) {
   std::set<std::string> states_set = {};
-  std::map<std::string, int> state_to_int = {};
-  std::map<int, std::string> int_to_state = {};
+  std::map<std::string, signed char> state_to_int = {};
+  std::map<signed char, std::string> int_to_state = {};
 
   int i = 0;
   for(auto it = input_states.begin(); it != input_states.end(); ++it) {

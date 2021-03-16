@@ -25,9 +25,11 @@ public:
   std::map<std::string, States> get_all_states();
 
   // Rate Vectors.
-  void organizeRateVectors(int seqLen);
+  void organizeRateVectors();
   RateVector* selectRateVector(rv_request);
   std::vector<RateVector*> get_RateVectors();
+  std::map<std::string, int> get_ExtendedState(const std::map<std::string, std::vector<signed char>*>& sequences, int pos);
+  
   SubstitutionModel::iterator modified_begin(AbstractComponent*);
 
   // Parameters.
@@ -38,7 +40,6 @@ public:
   
   void saveToFile(int gen, double l, std::map<RateVector*, std::vector<int>> counts_by_rv);
 private:
-  void configure_States(std::list<std::string>);
   void configure_HiddenStates(std::map<std::string, std::list<std::string>>);
   void configure_RateVectors(std::list<IO::raw_rate_vector>);
 

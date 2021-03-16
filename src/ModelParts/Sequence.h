@@ -28,48 +28,40 @@ class SequenceAlignment {
   unsigned int n_states;
   SequenceAlignment(std::string name, std::string msa_out, std::string subs_out, const States*);
 
-  std::map<std::string, std::vector<int>> taxa_names_to_sequences;
+  std::map<std::string, std::vector<signed char>> taxa_names_to_sequences;
   std::map<std::string, std::vector<bool>> taxa_names_to_gaps;
   std::list<std::string> base_sequences;
 
   std::set<std::string> states;
-  std::map<std::string, int> state_to_integer;
-  std::map<int, std::string> integer_to_state;
-
-  // Known ancestral sequences.
-  std::list<SequenceAlignment*> *MSA_list; // List of other sequence alignments that could be used.
-  std::list<SequenceAlignment*>::iterator current_MSA; // Iterator pointer to the MSA in use.
-  void step_to_next_MSA();
+  std::map<std::string, signed char> state_to_integer;
+  std::map<signed char, std::string> integer_to_state;
 
   // Adding sequences to alignment.
   void add(std::string name, std::string sequence_str);
   void add(std::string name);
-  void add_base(std::string name, std::string sequence_str);
   void add_base(std::string name, const IO::FreqSequence &seq);
 
   void print();
-  void Initialize(std::list<SequenceAlignment*>*);
-  void Initialize(IO::RawMSA* &raw_msa);
-  void Initialize(IO::RawAdvMSA raw_msa);
+  void Initialize(IO::RawMSA raw_msa);
   void saveToFile(int gen, double l);
 
   // Utilities
   int numCols();
-  std::string decodeChar(int &c);
-  std::string decodeSequence(std::vector<int> &enc_seq);
-  static std::vector<int> findParsimony(const std::vector<int> &s1, const std::vector<int> &s2);
+  std::string decodeChar(signed char &c);
+  std::string decodeSequence(std::vector<signed char> &enc_seq);
+  static std::vector<signed char> findParsimony(const std::vector<signed char> &s1, const std::vector<signed char> &s2);
   std::list<std::string> getNodeNames();
 
   bool match_structure(SequenceAlignment*);
+  bool validate(std::list<std::string> seq_names, std::map<std::string, SequenceAlignment*> other_alignments);
 
   // New
-  void syncWithTree(Tree* tree);
-  void syncHiddenWithTree(std::string name, unsigned int id, Tree* tree);
+  void syncWithTree(std::string name, unsigned int id, Tree* tree);
   void identify_gaps();
   sample_status sample();
  private:
   // Processing input sequences - fasta.
-  std::vector<int> EncodeSequence(const std::string &sequence);
+  std::vector<signed char> EncodeSequence(const std::string &sequence);
 
   // Sampling - new
   std::map<std::string, float**> taxa_names_to_state_probs;

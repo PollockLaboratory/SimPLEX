@@ -8,127 +8,7 @@
 
 extern IO::Files files;
 
-std::string cleanLine(std::string line) {
-  /* 
-   * Cleans up the a line to remove blank spaces a line returns.
-   */
-  //Remove spaces and concatenates words
-  line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
-  //This removes the carriage return in Windows files
-  line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
-  return(line);
-}
-
-void addSequence(IO::RawMSA& msa, std::string name, std::string seq) {
-  if(name == "") {
-    std::cerr << "Error: missing name in sequence alignement." << std::endl;
-    exit(EXIT_FAILURE);
-  }
-
-  if(seq == "") {
-    std::cerr << "Error: missing sequence in sequence alignement." << std::endl;
-    exit(EXIT_FAILURE);
-  }
-
-  if(msa.n == 0) {
-    msa.cols = seq.size();
-  } else {
-    if(seq.size() != msa.cols) {
-      std::cerr << "Error: the sequence \"" << name << "\" is not the expected length." << std::endl;
-      exit(EXIT_FAILURE);
-    }
-  }
-
-  msa.n++;
-  msa.seqs[name] = seq;
-}
-
 namespace IO {
-  // Operators
-  bool operator==(const RawMSA& lhs, const RawMSA& rhs) {
-    if(lhs.n != rhs.n or lhs.cols != rhs.cols) {
-      return(false);
-    }
-
-    for(auto it = lhs.seqs.begin(); it != lhs.seqs.end(); ++it) {
-      if((*it).second != rhs.seqs.at((*it).first)) {
-	//std::cerr << (*it).second << " " << rhs.seqs.at((*it).first) << std::endl;
-	return(false);
-      }
-    }
-
-    return(true); 
-  }
-
-  std::ostream& operator<<(std::ostream& os, const RawMSA& msa) {
-    os << "<< MSA: n:" << msa.n << " cols:" << msa.cols << " >>" << std::endl;
-    for(auto it = msa.seqs.begin(); it != msa.seqs.end(); ++it) {
-      os << (*it).first << " " << (*it).second << std::endl;
-    }
-    return(os);
-  }
-
-  RawMSA* readRawMSA(std::string file_name) {
-    RawMSA* raw_msa = new RawMSA();
-    raw_msa->n = 0;
-
-    std::string name = "";
-    std::string seq = "";
-    std::string line; // = files.get_next_line("sequences_in");
-
-    while(not files.end("sequences_in")) {
-      line = files.get_next_line("sequences_in");
-      std::string clean_line = cleanLine(line);
-
-      //Ignore empty lines or comments.
-      if(clean_line == "" or clean_line.at(0) == '#') {
-	continue;
-      }
-
-      if(clean_line.at(0) == '>') {
-	if (seq != "") {
-	  addSequence(*raw_msa, name, seq);
-	}
-
-	name = clean_line.substr(1);
-	seq = "";
-      } else {
-	seq += clean_line;
-      }
-    }
-    addSequence(*raw_msa, name, seq);
-    return(raw_msa);
-  }
-
-  void printRawMSA(const RawMSA& msa) {
-    std::cout << "Raw Multiple Sequence Alignment:" << std::endl;
-    for(auto it = msa.seqs.begin(); it != msa.seqs.end(); ++it) {
-      std::cout << (*it).first << " " << (*it).second << std::endl;
-    }
-  }
-
-  std::list<std::string> getRawMSANames(const RawMSA& msa) {
-    std::list<std::string> names = {};
-    for(auto it = msa.seqs.rbegin(); it != msa.seqs.rend(); ++it) {
-      names.push_front((*it).first);
-    }
-    return(names);
-  }
-
-  void convertToGaps(RawMSA& msa, std::list<std::string> remove_list) {
-    for(auto it = msa.seqs.begin(); it != msa.seqs.end(); ++it) {
-      std::string *seq = &it->second;
-      for(auto jt = seq->begin(); jt != seq->end(); ++jt) {
-	if(std::find(remove_list.begin(), remove_list.end(), std::string(1, *jt)) != remove_list.end()) {
-	  // Set to gap.
-	  *jt = '-';
-	}
-      }
-    }
-  }
-
-  // New structs.
-
   std::list<std::string> readStates(std::list<std::string> states_list) {
     std::list<std::string> states = {};
     std::set<std::string> reserved = {">", "<", ":", "-", "[", "]", ",", ";", "(", ")", "*"};
@@ -234,7 +114,7 @@ namespace IO {
     return(true);
   }
 
-  bool operator==(const RawAdvMSA& lhs, const RawAdvMSA& rhs) {
+  bool operator==(const RawMSA& lhs, const RawMSA& rhs) {
     if(lhs.n != rhs.n) {
       return(false);
     }
@@ -407,9 +287,8 @@ namespace IO {
     return(count);
   }
   
-  RawAdvMSA parseRawAdvMSA(std::string data) {
-    std::cout << "Reading file: " << data.size() << std::endl;
-    RawAdvMSA msa = {0, 0, {}};
+  RawMSA parseRawAdvMSA(std::string data) {
+    RawMSA msa = {0, 0, {}};
     auto loc = data.begin();
     ParserState state = SEQNAME;
 
@@ -468,7 +347,7 @@ namespace IO {
     return(true);
   }
 
-  bool validateMSA(RawAdvMSA msa, std::set<std::string> states) {
+  bool validateMSA(RawMSA msa, std::set<std::string> states) {
     for(auto it = msa.seqs.begin(); it != msa.seqs.end(); ++it) {
       if(not validSequence(it->second, states)) {
 	throw ParseException("sequence for " + it->first + " contains unrecognized state");
@@ -477,7 +356,7 @@ namespace IO {
     return(true);
   }
 
-  bool checkEmptyColumns(RawAdvMSA msa) {
+  bool checkEmptyColumns(RawMSA msa) {
     std::vector<bool> empty_cols(msa.cols, true);
     for(auto seq = msa.seqs.begin(); seq != msa.seqs.end(); ++seq) {
       unsigned int i = 0;
@@ -495,8 +374,8 @@ namespace IO {
     }
   }
 
-  RawAdvMSA readRawAdvMSA(std::string data, std::list<std::string> states) {
-    RawAdvMSA msa = parseRawAdvMSA(data);
+  RawMSA readRawAdvMSA(std::string data, std::list<std::string> states) {
+    RawMSA msa = parseRawAdvMSA(data);
 
     std::set<std::string> states_set(states.begin(), states.end());
     validateMSA(msa, states_set);
@@ -505,7 +384,7 @@ namespace IO {
     return(msa);
   }
 
-  void printRawAdvMSA(RawAdvMSA msa) {
+  void printRawAdvMSA(RawMSA msa) {
    for(auto it = msa.seqs.begin(); it != msa.seqs.end(); ++it) {
      std::cout << it->first << " - " << sequenceAsStr(it->second) << std::endl;
    }

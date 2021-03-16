@@ -35,11 +35,7 @@ private:
 		     TreeNode* &decendant, float distance);
   TreeNode* createTreeNode(IO::RawTreeNode* raw_tree, TreeNode* &ancestralNode,
 			   BranchSegment* &ancestralBP, float scale_factor);
-
-  // Possible sampling methods.
-  sample_status(Tree::*treeSamplingMethod)(const std::list<int>&); 
-  sample_status sample_ancestral_states(const std::list<int>&); // When the tree is actually being sampled.
-  sample_status step_through_MSAs(const std::list<int>&); // When the ancestral sequences have already been determined. 
+  
 public:
   SubstitutionModel* SM; // Temp - should be private.
   // Constructing/Initializing.
@@ -61,7 +57,6 @@ public:
 
   // Sequence stuff.
   TreeNode* root;
-  SequenceAlignment* MSA;
   void configureBranches(TreeNode* n, unsigned int n_columnes, std::map<std::string, std::list<std::string>> all_states);
   void connect_substitution_model(SubstitutionModel*);
 };

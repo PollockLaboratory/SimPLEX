@@ -31,13 +31,7 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree) {
   } else {
     scale_factor = 1.0;
   }
-
-  if(env.ancestral_sequences) {
-    treeSamplingMethod = &Tree::step_through_MSAs;
-  } else {
-    treeSamplingMethod = &Tree::sample_ancestral_states;
-  }
-  
+ 
   //this->MSA = MSA;
   //this->SM = SM;
   //SM->organizeRateVectors(MSA->numCols(), SM->get_states()->n);
@@ -57,8 +51,8 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree) {
   files.add_file("tree_out", env.get<std::string>("OUTPUT.tree_out_file"), IOtype::OUTPUT);
   record_tree();
 
-  files.add_file("substitutions_out", env.get<std::string>("OUTPUT.substitutions_out_file"), IOtype::OUTPUT);
-  files.write_to_file("substitutions_out", "I,GEN,LogL,Ancestral,Decendant,Substitutions\n");
+  //files.add_file("substitutions_out", env.get<std::string>("OUTPUT.substitutions_out_file"), IOtype::OUTPUT);
+  //files.write_to_file("substitutions_out", "I,GEN,LogL,Ancestral,Decendant,Substitutions\n");
 
 }
 
@@ -171,70 +165,6 @@ std::list<float> Tree::get_branch_lengths() {
   return(lens);
 }
 
-//
-// SAMPLING TREE PARAMETERS.
-//
-
-sample_status Tree::sample(const std::list<int>& positions) {
-  sample_status s = (this->*treeSamplingMethod)(positions);
-
-  // Update branch list - new substitutions.
-  // for(auto b = branchList.begin(); b != branchList.end(); ++b) {
-  //  (*b)->update();
-  //}
-  
-  return(s);
-}
-
-//
-// Two options for changing ancestral states.
-//
-
-// Option 1.
-sample_status Tree::sample_ancestral_states(const std::list<int>& positions) {
-  /*
-   * Both recalculates substitution events and recalculates the ancestral sequences.
-   */
- 
-  // Reset all nodes such that the sampled flag is false.
-  /*
-  for(auto n = nodeList.begin(); n != nodeList.end(); ++n) {
-    (*n)->sampledp = false;
-  }
-
-  std::queue<TreeNode*> nodes = {};
-  
-  // Add tip nodes to nodes.
-  for(auto t = tipList.begin(); t != tipList.end(); ++t) {
-    (*t)->sampledp = false;
-    nodes.push(*t);
-  }
-
-  // Calculate state probabilites for each node.
-  while(not nodes.empty()) {
-    if(not nodes.front()->sampledp) {
-      nodes.push(nodes.front()->calculate_state_probabilities(positions));
-    }
-
-    nodes.pop();
-  }
-
-  root->pick_sequences(positions);
-
-  // Reset all nodes such that the sampled flag is false.
-  for(auto n = nodeList.begin(); n != nodeList.end(); ++n) {
-    (*n)->sampledp = false;
-  }
-  */
-  return(sample_status({false, true, true}));
-}
-
-// Option 2.
-sample_status Tree::step_through_MSAs(const std::list<int>& positions) {
-  // This is not going to work anymore as the tree resampling algorithm has changed.
-  MSA->step_to_next_MSA();
-  return(sample_status({false, true, true}));
-}
 
 // Record State data.
 void Tree::record_tree() {

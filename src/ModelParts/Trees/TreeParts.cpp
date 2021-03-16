@@ -24,12 +24,11 @@ BranchSegment::BranchSegment(float distance) {
 }
 
 void BranchSegment::Initialize(unsigned int n_columns, std::map<std::string, std::list<std::string>> all_states) {
-  rates = std::vector<RateVector*>(n_columns, NULL);
-  substitutions = std::vector<Substitution>(n_columns, Substitution({false, 0, 0, nullptr}));
+  n_pos = n_columns;
 
   for(auto it = all_states.begin(); it != all_states.end(); ++it) {
-    hidden_rates[it->first] = std::vector<RateVector*>(n_columns, NULL);
-    hidden_substitutions[it->first] = std::vector<Substitution>(n_columns, Substitution({false, 0, 0, nullptr}));
+    rates[it->first] = std::vector<RateVector*>(n_columns, NULL);
+    substitutions[it->first] = std::vector<Substitution>(n_columns, Substitution({false, 0, 0, nullptr}));
   }
 }
 
@@ -42,25 +41,26 @@ std::ostream& operator<< (std::ostream &out, const BranchSegment &b) {
   return out;
 }
 
-const std::vector<Substitution>& BranchSegment::get_substitutions() {
-  return(substitutions);
+const std::vector<Substitution>& BranchSegment::get_substitutions(std::string domain) {
+  auto it = substitutions.find(domain);
+  if(it == substitutions.end()) {
+    std::cerr << "Error: domain not recognized in BranchSegment." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  return(substitutions.at(domain));
 }
 
 // Key Statistics
 inline void BranchSegment::update_rate_vectors() {
-  std::vector<int>* seq = ancestral->sequence;
+  std::vector<signed char>* seq = ancestral->sequences.begin()->second;
   for(unsigned int pos = 0; pos < seq->size(); pos++) {
-    if((*seq)[pos] == -1) {
-      rates[pos] = NULL;
-    } else {
-      std::map<std::string, int> states = ancestral->get_extended_state_by_pos(pos);
-      rv_request rq = {pos, (*seq)[pos], "primary", states};
-      rates[pos] = ancestral->SM->selectRateVector(rq);
+    if((*seq)[pos] != -1) {
+      std::map<std::string, int> ex_state = ancestral->get_extended_state_by_pos(pos);
 
-      // Set hidden state rate vector - and primary.
-      for(auto it = ancestral->hidden_state_sequences.begin(); it != ancestral->hidden_state_sequences.end(); ++it) {
-	rv_request rq = {pos, (*(ancestral->hidden_state_sequences[it->first]))[pos], it->first, states};
-	hidden_rates[it->first][pos] = ancestral->SM->selectRateVector(rq);
+      // Set the rate vectors for each of the states..
+      for(auto it = ancestral->sequences.begin(); it != ancestral->sequences.end(); ++it) {
+	rv_request rq = {pos, (*(ancestral->sequences[it->first]))[pos], it->first, ex_state};
+	rates[it->first][pos] = ancestral->SM->selectRateVector(rq);
       }
     }
   }
@@ -69,57 +69,31 @@ inline void BranchSegment::update_rate_vectors() {
 void BranchSegment::set_new_substitutions() {
   double u = decendant->SM->get_u();
 
-  std::vector<int> *anc = (ancestral->sequence);
-  std::vector<int> *dec = (decendant->sequence);
-
-  for(int pos = 0; pos < anc->size(); pos++) {
-    // Primary.
-    if(anc->at(pos) == -1 or dec->at(pos) == -1) {
-      //substitutions[pos] = {false, anc[pos], dec[pos], rates[pos]};
-    } else {
-      if(anc->at(pos) != dec->at(pos)) {
-	// Normal substitutions.
-	substitutions[pos] = {true, anc->at(pos), dec->at(pos), rates[pos]};
-      } else {
-	// Possibility of virtual substitution.
-	// Not sure this is exactly right.
-	//float length = distance;
-
-	double vir_rate = rates[pos]->rates[dec->at(pos)]->get_value();
-	//double p = 1 - (1 / (1 + (vir_rate * distance)));
-	double p = vir_rate / (1 - u + vir_rate);
-	if(Random() < p) {
-	  substitutions[pos] = {true, anc->at(pos), dec->at(pos), rates[pos]};
-	} else {
-	  substitutions[pos] = {false, anc->at(pos), dec->at(pos), rates[pos]};
-	}
-      }
-    }
-
-    // Hidden states here - and primary there is alot of redundancy now.
-    for(auto domain = hidden_substitutions.begin(); domain != hidden_substitutions.end(); ++domain) {
-      std::vector<int> *hidden_anc = (ancestral->hidden_state_sequences[domain->first]);
-      std::vector<int> *hidden_dec = (decendant->hidden_state_sequences[domain->first]);
+  for(unsigned int pos = 0; pos < n_pos; pos++) {
+    // Set new substitutions for all states..
+    for(auto domain = substitutions.begin(); domain != substitutions.end(); ++domain) {
+      std::vector<signed char> *anc_seq = (ancestral->sequences[domain->first]);
+      std::vector<signed char> *dec_seq = (decendant->sequences[domain->first]);
       
-      for(unsigned int pos = 0; pos < hidden_anc->size(); pos++) {
-	if(hidden_anc->at(pos) == -1 or hidden_dec->at(pos) == -1) {
-	  hidden_substitutions[domain->first][pos] = {false, hidden_anc->at(pos), hidden_dec->at(pos), hidden_rates[domain->first][pos]};
+      for(unsigned int pos = 0; pos < anc_seq->size(); pos++) {
+	if(anc_seq->at(pos) == -1 or dec_seq->at(pos) == -1) {
+	  substitutions[domain->first][pos] = {false, anc_seq->at(pos), dec_seq->at(pos), rates[domain->first][pos]};
 	} else {
-	  if(hidden_anc->at(pos) != hidden_dec->at(pos)) {
+	  if(anc_seq->at(pos) != dec_seq->at(pos)) {
 	    // Normal substitutions.
-	    hidden_substitutions[domain->first][pos] = {true, hidden_anc->at(pos), hidden_dec->at(pos), hidden_rates[domain->first][pos]};
+	    substitutions[domain->first][pos] = {true, anc_seq->at(pos), dec_seq->at(pos), rates[domain->first][pos]};
 	  } else {
 	    // Possibility of virtual substitution.
 	    // Not sure this is exactly right.
 	    //float length = distance;
 	    
-	    double vir_rate = hidden_rates[domain->first][pos]->rates[hidden_dec->at(pos)]->get_value();
+	    double vir_rate = rates[domain->first][pos]->rates[dec_seq->at(pos)]->get_value();
 	    //double p = 1 - (1 / (1 + (vir_rate * distance)));
 	    double p = vir_rate / (1 - u + vir_rate);
 	    if(Random() < p) {
-	      hidden_substitutions[domain->first][pos] = {true, hidden_anc->at(pos), hidden_dec->at(pos), hidden_rates[domain->first][pos]};
+	      substitutions[domain->first][pos] = {true, anc_seq->at(pos), dec_seq->at(pos), rates[domain->first][pos]};
 	    } else {
-	      hidden_substitutions[domain->first][pos] = {false, hidden_anc->at(pos), hidden_dec->at(pos), hidden_rates[domain->first][pos]};
+	      substitutions[domain->first][pos] = {false, anc_seq->at(pos), dec_seq->at(pos), rates[domain->first][pos]};
 	    }
 	  }
 	}
@@ -147,7 +121,7 @@ TreeNode::TreeNode(IO::RawTreeNode* raw_tree) {
   left = 0;
   right = 0;
   sampledp = false;
-  hidden_state_sequences = {};
+  sequences = {};
 }
 
 TreeNode::TreeNode(std::string n) {
@@ -159,7 +133,7 @@ TreeNode::TreeNode(std::string n) {
   left = 0;
   right = 0;
   sampledp = false;
-  hidden_state_sequences = {};
+  sequences = {};
 }
 
 TreeNode::TreeNode() {
@@ -172,7 +146,7 @@ TreeNode::TreeNode() {
   left = 0;
   right = 0;
   sampledp = false;
-  hidden_state_sequences = {};
+  sequences = {};
 }
 
 TreeNode::~TreeNode() {
@@ -209,15 +183,14 @@ std::string TreeNode::toString() {
 }
 
 std::map<std::string, int> TreeNode::get_extended_state_by_pos(int pos) {
-  std::map<std::string, int> states = {};
-  states["primary"] = (*sequence)[pos];
+  //std::map<std::string, int> states = {};
 
-  // Debug
-  for(auto it = hidden_state_sequences.begin(); it != hidden_state_sequences.end(); ++it) {
-    states[it->first] = (*(it->second))[pos];
-  }
+  // Adds all states.
+  //for(auto it = sequences.begin(); it != sequences.end(); ++it) {
+  // states[it->first] = (*(it->second))[pos];
+  // }
 
-  return(states);
+  return(SM->get_ExtendedState(sequences, pos));
 }
 
 bool TreeNode::isTip() {

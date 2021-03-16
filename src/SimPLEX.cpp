@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
   std::cout << std::endl;
   
   Model model;
-  model.Initialize(data.raw_tree, data.raw_msa, data.raw_sm);
+  model.Initialize(data.raw_tree, data.raw_sm);
 
   data.Uninitialize();
 

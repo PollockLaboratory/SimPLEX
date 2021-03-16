@@ -13,7 +13,6 @@
 
 class Data {
 public:
-  IO::RawMSA* raw_msa;
   IO::RawTreeNode* raw_tree;
   IO::raw_substitution_model* raw_sm;
 
@@ -23,14 +22,7 @@ public:
   void Initialize();
   void Uninitialize();
 private:
-  std::set<int> columns_with_gaps;
-  std::vector<int> columns_without_gaps;
-
-  void validateInputData(const IO::RawMSA* raw_msa, const IO::RawTreeNode* raw_tree);
-  void matchNodeNames(std::list<std::string> names1, std::list<std::string> names2);
-  
   IO::RawTreeNode* ReadTree();
-  IO::RawMSA* ReadMSA();
   IO::raw_substitution_model* ReadSubstitutionModel();
 };
 

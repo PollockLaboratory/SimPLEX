@@ -70,16 +70,6 @@ RateVector* SubstitutionModel::create_rate_vector(IO::raw_rate_vector rv, Valuab
   return(new_rv);
 }
 
-void SubstitutionModel::configure_States(std::list<std::string> raw_states) {
-  for(auto it = raw_states.begin(); it != raw_states.end(); ++it) {
-    all_states["primary"] = add_to_States(all_states["primary"], *it);
-  }
-
-  // Add Indels to states table.
-  all_states["primary"].state_to_int["-"] = -1;
-  all_states["primary"].int_to_state[-1] = "-";
-}
-
 void SubstitutionModel::configure_RateVectors(std::list<IO::raw_rate_vector> rv_list) {
   for(auto raw_rv = rv_list.begin(); raw_rv != rv_list.end(); ++raw_rv) {
     RateVector* rv = create_rate_vector(*raw_rv, u);
@@ -104,7 +94,7 @@ void SubstitutionModel::configure_HiddenStates(std::map<std::string, std::list<s
 
 void SubstitutionModel::from_raw_model(IO::raw_substitution_model* raw_sm) {
   // This should be a single function call, I think?
-  configure_States(raw_sm->get_states());
+  //configure_States(raw_sm->get_states());
   configure_HiddenStates(raw_sm->get_all_states());
 
   configure_RateVectors(raw_sm->get_rate_vector_list());
@@ -142,8 +132,8 @@ std::map<std::string, States> SubstitutionModel::get_all_states() {
   return(all_states);
 }
 
-void SubstitutionModel::organizeRateVectors(int seqLen) {
-  rateVectors.organize(seqLen);
+void SubstitutionModel::organizeRateVectors() {
+  rateVectors.organize();
 }
 
 RateVector* SubstitutionModel::selectRateVector(rv_request rq) {
@@ -152,6 +142,10 @@ RateVector* SubstitutionModel::selectRateVector(rv_request rq) {
    * Given infomation about a BranchSegment and state of interest will return the corresponding rate vector.
    */
   return(rateVectors.select(rq));
+}
+
+std::map<std::string, int> SubstitutionModel::get_ExtendedState(const std::map<std::string, std::vector<signed char>*>& sequences, int pos) {
+  return(rateVectors.get_ExtendedState(sequences, pos));
 }
 
 // Getters

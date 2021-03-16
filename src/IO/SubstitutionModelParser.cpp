@@ -32,29 +32,10 @@ namespace IO {
   // RAW SUBSTITUTION MODEL.
   raw_substitution_model::raw_substitution_model() {
     all_states["primary"] = {};
-    ignore_states = {};
   }
 
   // STATES
-  // Lua bindings & Util functions - with reading lua file.
-  void raw_substitution_model::set_states(sol::table tbl) {
-    all_states["primary"] = IO::readStates(extract_list(tbl));
-
-    lua["States"]["count"] = all_states["primary"].size();
-
-    int i = 1;
-    for(auto it = all_states["primary"].begin(); it != all_states["primary"].end(); ++it) {
-      lua["States"][i] = *it;
-      i++;
-    }
-  }
-
-  // Look into this - not sure the ignore states do anything.
-  void raw_substitution_model::set_ignore_states(sol::table tbl) {
-    ignore_states = extract_list(tbl);
-  }
-
-  void raw_substitution_model::add_hidden_state(std::string name, sol::table states, sol::table options) {
+  void raw_substitution_model::add_state(std::string name, sol::table states, sol::table options) {
     std::list<std::string> new_states = {};
     try {
       new_states = IO::readStates(extract_list(states));
@@ -63,6 +44,7 @@ namespace IO {
     }
 
     all_states[name] = new_states;
+    lua["States"][name] = new_states;
 
     // Output.
     if(options["sequences_output"] == nullptr) {
@@ -78,24 +60,24 @@ namespace IO {
     }
   }
 
-  void raw_substitution_model::read_hidden_state_file(std::string hidden_state, std::string file_name) {
-    auto it = all_states.find(hidden_state);
+  void raw_substitution_model::read_state_file(std::string domain, std::string file_name) {
+    auto it = all_states.find(domain);
     if(it == all_states.end()) {
-      std::cerr << "Error: attempting to read " << file_name << ", however \"" << hidden_state << "\" is not a recognized hidden state." << std::endl;
+      std::cerr << "Error: attempting to read " << file_name << ", however \"" << domain << "\" is not a recognized hidden state." << std::endl;
       exit(EXIT_FAILURE);
     }
 
-    std::string fh = "hidden_state_"+hidden_state;
+    std::string fh = "state_"+domain;
     files.add_file(fh, file_name, IOtype::INPUT);
 
-    IO::RawAdvMSA MSA = {};
+    IO::RawMSA MSA = {};
     try {
       MSA = readRawAdvMSA(files.read_all(fh), it->second);
     } catch(IO::ParseException const &err) {
       throw IO::ParseException(std::string("error reading ") + file_name + ": " + err.what());
     }
 
-    hidden_states_data[hidden_state] = MSA;
+    state_data[domain] = MSA;
   }
  
   std::list<int> get_positions(sol::table pos_tbl) {
@@ -206,19 +188,16 @@ namespace IO {
 
     // STATES
     auto states_table = lua["States"].get_or_create<sol::table>();
-    states_table.set_function("set", [this](sol::table tbl) -> void {
-				       this->set_states(tbl);
-				     });
 
     states_table.set_function("new_hidden", [this](std::string name, sol::table states, sol::table options) -> void {
-					      this->add_hidden_state(name, states, options);
+					      this->add_state(name, states, options);
 					    });
 
     // DATA - tools to incorperate additional data into the state, primarily hidden states.
     auto data_table = lua["Data"].get_or_create<sol::table>();
 
     data_table.set_function("load_hidden_state", [this](std::string hidden_state, std::string file_name) -> void {
-						   read_hidden_state_file(hidden_state, file_name);
+						   read_state_file(hidden_state, file_name);
 						   
 						 });
 
@@ -292,16 +271,12 @@ namespace IO {
     return(all_states);
   }
 
-  const std::list<std::string> raw_substitution_model::get_ignore_states() {
-    return(ignore_states);
-  }
-
   const std::list<raw_rate_vector> raw_substitution_model::get_rate_vector_list() {
     return(rv_list);
   }
 
-  const IO::RawAdvMSA raw_substitution_model::get_hidden_states_data(std::string name) {
-    return(hidden_states_data[name]);
+  const IO::RawMSA raw_substitution_model::get_state_data(std::string name) {
+    return(state_data[name]);
   }
 
   raw_substitution_model* read_substitution_model(std::string file_name) {

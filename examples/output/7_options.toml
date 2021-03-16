@@ -21,7 +21,6 @@ seed = 0
 [INPUT]
   # This should be TRUE or FALSE
   ancestral_sequences = false
-  sequences_file = "data_sets/nucleotide.fasta"
   tree_file = "data_sets/tree.newick"
 
 [OUTPUT]
@@ -30,13 +29,10 @@ seed = 0
   overwrite_output = true 
 
   tree_out_file = "tree_out.newick"
-  sequences_out_file = "sequences_out.fasta"
-  #sequences_out_file = ""
   parameters_out_file = "parameters_out.csv"
   parameters_counts_out_file = "parameters_counts_out.csv"
   rate_vectors_out_file = "rate_vectors_out.csv"
   likelihood_out_file = "likelihoods_out.csv"
-  substitutions_out_file = "substitutions.out"
   counts_out_file = "counts.csv"
   log_out_file = "run.log"
 
@@ -52,5 +48,8 @@ seed = 0
 
 [MODEL]
   script_file = "7_hidden_states.lua"
+  sequences_out_file = "sequences_out.fasta"
+  substitutions_out_file = "substitutions.out"
+  sequences_file = "data_sets/nucleotide.fasta"
   step_size = 0.001
   states = ['a', 't', 'c', 'g']

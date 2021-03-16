@@ -40,10 +40,9 @@ namespace IO {
     
     const std::list<std::string> get_states();
     const std::map<std::string, std::list<std::string>> get_all_states();
-    const std::list<std::string> get_ignore_states();
     const std::list<raw_rate_vector> get_rate_vector_list();
 
-    const IO::RawAdvMSA get_hidden_states_data(std::string);
+    const IO::RawMSA get_state_data(std::string);
 
     std::map<std::string, std::list<std::string>> all_states;
     std::map<std::string, std::string> states_seqs_output_files;
@@ -51,17 +50,12 @@ namespace IO {
 
     std::list<raw_rate_vector> rv_list;
   private:
-    std::list<std::string> ignore_states;
-
-    void set_states(sol::table tbl);
-    void set_ignore_states(sol::table tbl); // Just remove ignore states - remove this from PLEX.
     void add_rate_vector(raw_rate_vector rv);
 
-    // Hidden states.
-    std::map<std::string, IO::RawAdvMSA> hidden_states_data;
+    std::map<std::string, IO::RawMSA> state_data;
 
-    void add_hidden_state(std::string name, sol::table states, sol::table options);
-    void read_hidden_state_file(std::string hidden_state, std::string file_name);
+    void add_state(std::string name, sol::table states, sol::table options);
+    void read_state_file(std::string domain, std::string file_name);
   };
 
   raw_substitution_model* read_substitution_model(std::string file_name);

@@ -9,8 +9,8 @@
 struct States {
   int n; // Careful about indels.
   std::set<std::string> possible;
-  std::map<std::string, int> state_to_int;
-  std::map<int, std::string> int_to_state;
+  std::map<std::string, signed char> state_to_int;
+  std::map<signed char, std::string> int_to_state;
 };
 
 void print_States(States);
