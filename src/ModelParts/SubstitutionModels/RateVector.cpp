@@ -115,34 +115,23 @@ void RateVectorSet::add(RateVector* rv, IO::rv_use_class uc) {
 }
 
 RateVector* RateVectorSet::select(rv_request rq) {
-  if(rq.ex_state.empty() == true) {
-    std::cerr << "Sort this out." << std::endl;
-    exit(EXIT_FAILURE);
-  }
+  //if(rq.ex_state.empty() == true) {
+  // std::cerr << "Sort this out." << std::endl;
+  // exit(EXIT_FAILURE);
+  //}
 
-  ExtendedState state = ExtendedState_Null();
-  for(auto it = rq.ex_state.begin(); it != rq.ex_state.end(); ++it) {
-    state[it->first] = all_states[it->first].int_to_state[it->second];
-  }
+  //ExtendedState state = ExtendedState_Null();
+  //for(auto it = rq.ex_state.begin(); it != rq.ex_state.end(); ++it) {
+  // state[it->first] = all_states[it->first].int_to_state[it->second];
+  //}
 
   //std::cout << "Select: " << rq.state << " " << rq.domain << " " << ExtendedState_toString(state) << std::endl;
-  RateVector* rv = ex_state_to_rv[rq.domain][state];
-  if(rv == nullptr) {
-    std::cout << "Error: attempting to dispatch nullptr instead of RateVector*" << std::endl;
-    exit(EXIT_FAILURE);
-  }
+  RateVector* rv = state_to_rv[rq.domain][rq.ex_state];
+  //if(rv == nullptr) {
+  // std::cout << "Error: attempting to dispatch nullptr instead of RateVector*" << std::endl;
+  // exit(EXIT_FAILURE);
+  //}
   return(rv);
-}
-
-std::map<std::string, int> RateVectorSet::get_ExtendedState(const std::map<std::string, std::vector<signed char>*>& sequences, int pos) {
-  std::map<std::string, int> states = {};
-
-  // Adds all states.
-  for(auto it = sequences.begin(); it != sequences.end(); ++it) {
-    states[it->first] = (*(it->second))[pos];
-  }
-
-  return(states);
 }
 
 unsigned long hash(std::list<signed char> seq) {
@@ -155,6 +144,20 @@ unsigned long hash(std::list<signed char> seq) {
   }
 
   return(hash);
+}
+
+unsigned long hash_step(unsigned long h, signed char c) {
+  return(((h << 5) + h) + c);
+}
+
+unsigned long RateVectorSet::get_hash_state(const std::map<std::string, std::vector<signed char>*>& sequences, int pos) const {
+  unsigned long h = 5381;
+  for(auto domain_it = all_states.begin(); domain_it != all_states.end(); ++domain_it) {
+    const std::vector<signed char>* s = sequences.at(domain_it->first);
+    h = hash_step(h, (*s)[pos]);
+  }
+
+  return(h);
 }
 
 std::list<signed char> RateVectorSet::ex_to_list(ExtendedState ex) {
@@ -222,12 +225,11 @@ void RateVectorSet::organize() {
    * Organizes RateVectors into logical structure now tree data is known.
    */
 
-  // New
   std::list<std::list<signed char>> tmp_states = configure_hash(all_states);
 
-  // Make empty tree - new
+  // Make empty tree
   for(auto domain = domain_names.begin(); domain != domain_names.end(); ++domain) {
-    ex_state_to_rv[*domain] = {};
+    state_to_rv[*domain] = {};
     for(auto state = tmp_states.begin(); state != tmp_states.end(); ++state) {
       state_to_rv[*domain][hash(*state)] = nullptr;
     }
@@ -273,82 +275,13 @@ void RateVectorSet::organize() {
     }
   }
 
-  // Looks at possible states.
-  //std::cout << "Domains: [ ";
-  //for(auto it = domain_names.begin(); it != domain_names.end(); ++it) {
-  // std::cout << *it << " ";
-  //}
-  //std::cout << "]" << std::endl;
-
-  // Old
-  // Calculated extended states.
-  std::list<ExtendedState> extended_states = expandStates({ExtendedState_Null()}, all_states);
-
-  //std::cout << "Extended States: [ ";
-  //for(auto it = extended_states.begin(); it != extended_states.end(); ++it) {
-  // std::cout << ExtendedState_toString(*it) << " ";
-  //}
-  //std::cout << "]" << std::endl;
-
-  // Make empty tree.
-  for(auto domain = domain_names.begin(); domain != domain_names.end(); ++domain) {
-    ex_state_to_rv[*domain] = {};
-    for(auto state = extended_states.begin(); state != extended_states.end(); ++state) {
-      ex_state_to_rv[*domain][*state] = nullptr;
-    }
-  }
-
-  // Fill tree - loop through each vector. col = collection.
-  for(auto it = col.begin(); it != col.end(); ++it) {
-    if(*it == nullptr) {
-      std::cout << "Error: RateVector is nullptr." << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    IO::rv_use_class uc = id_to_uc[(*it)->getID()];
-    ExtendedState s = ExtendedState_Null();
-    s[uc.domain] = uc.state;
-    std::list<ExtendedState> applicable_states = {s};
-
-    // Find all Extended states that apply.
-    for(auto it = uc.secondary_state.begin(); it != uc.secondary_state.end(); ++it) {
-      if(it->second == "*") {
-	// Applies to all states in domain.
-	std::map<std::string, States> extension_domain = {};
-	extension_domain[it->first] = all_states[it->first];
-	applicable_states = expandStates(applicable_states, extension_domain);
-      } else {
-	// Applies to specific states in domain.
-	for(auto jt = applicable_states.begin(); jt != applicable_states.end(); ++jt) {
-	  (*jt)[it->first] = it->second;
-	}
-      }
-    }
-
-    // Print for Debug.
-    //std::cout << (*it)->get_name() << ": [ ";
-    //for(auto jt = applicable_states.begin(); jt != applicable_states.end(); ++jt) {
-    // std::cout << ExtendedState_toString(*jt) << " ";
-    //}
-    //std::cout << "]" << std::endl;
-
-    // Set ptrs to rate vectors based on applicable state.
-    for(auto jt = applicable_states.begin(); jt != applicable_states.end(); ++jt) {
-      if(ex_state_to_rv[uc.domain][*jt] != nullptr) {
-	std::cerr << "Error: rate vector has already been assigned." << std::endl;
-	exit(EXIT_FAILURE);
-      } else {
-	ex_state_to_rv[uc.domain][*jt] = *it;
-      }
-    }
-  }
-
   // Check there are no nullpts remaining.
   for(auto domain = domain_names.begin(); domain != domain_names.end(); ++domain) {
     //std::cout << "Domain check: " << *domain << " " << extended_states.empty() << std::endl;
-    for(auto state = extended_states.begin(); state != extended_states.end(); ++state) {
+    for(auto state = tmp_states.begin(); state != tmp_states.end(); ++state) {
       //std::cout << "Check: " << *domain << " " << ExtendedState_toString(*state) << " " << (ex_state_to_rv[*domain][*state] == nullptr) << std::endl;
-      if(ex_state_to_rv[*domain][*state] == nullptr) {
-	std::cerr << "Error: no rate vector specified for " << ExtendedState_toString(*state) << " in domain \"" << *domain << "\"." << std::endl;
+      if(state_to_rv[*domain][hash(*state)] == nullptr) {
+	std::cerr << "Error: no rate vector specified for " << hash(*state) << " in domain \"" << *domain << "\"." << std::endl;
 	exit(EXIT_FAILURE);
       }
     }

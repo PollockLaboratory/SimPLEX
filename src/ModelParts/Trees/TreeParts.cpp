@@ -55,7 +55,7 @@ inline void BranchSegment::update_rate_vectors() {
   std::vector<signed char>* seq = ancestral->sequences.begin()->second;
   for(unsigned int pos = 0; pos < seq->size(); pos++) {
     if((*seq)[pos] != -1) {
-      std::map<std::string, int> ex_state = ancestral->get_extended_state_by_pos(pos);
+      unsigned long ex_state = ancestral->get_hash_state_by_pos(pos);
 
       // Set the rate vectors for each of the states..
       for(auto it = ancestral->sequences.begin(); it != ancestral->sequences.end(); ++it) {
@@ -182,7 +182,7 @@ std::string TreeNode::toString() {
   }
 }
 
-std::map<std::string, int> TreeNode::get_extended_state_by_pos(int pos) {
+unsigned long TreeNode::get_hash_state_by_pos(int pos) {
   //std::map<std::string, int> states = {};
 
   // Adds all states.
@@ -190,7 +190,7 @@ std::map<std::string, int> TreeNode::get_extended_state_by_pos(int pos) {
   // states[it->first] = (*(it->second))[pos];
   // }
 
-  return(SM->get_ExtendedState(sequences, pos));
+  return(SM->get_hash_state(sequences, pos));
 }
 
 bool TreeNode::isTip() {

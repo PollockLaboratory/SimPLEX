@@ -144,8 +144,8 @@ RateVector* SubstitutionModel::selectRateVector(rv_request rq) {
   return(rateVectors.select(rq));
 }
 
-std::map<std::string, int> SubstitutionModel::get_ExtendedState(const std::map<std::string, std::vector<signed char>*>& sequences, int pos) {
-  return(rateVectors.get_ExtendedState(sequences, pos));
+unsigned long SubstitutionModel::get_hash_state(const std::map<std::string, std::vector<signed char>*>& sequences, int pos) {
+  return(rateVectors.get_hash_state(sequences, pos));
 }
 
 // Getters

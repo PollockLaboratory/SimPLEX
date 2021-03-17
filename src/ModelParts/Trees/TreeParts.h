@@ -79,7 +79,7 @@ class TreeNode {
   //std::string get_sequence();
   //std::string state_at_pos(int i);
 
-  std::map<std::string, int> get_extended_state_by_pos(int);
+  unsigned long get_hash_state_by_pos(int);
 
   bool isTip();
 };

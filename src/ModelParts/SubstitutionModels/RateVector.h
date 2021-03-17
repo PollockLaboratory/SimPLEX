@@ -17,7 +17,7 @@ struct rv_request {
   unsigned int pos;
   int state;
   std::string domain;
-  std::map<std::string, int> ex_state; // Extended state.
+  unsigned long ex_state; // Extended state - as hash.
 };
 
 class BranchSegment; // Defined in Trees/Types/TreeParts.h
@@ -71,7 +71,7 @@ public:
   void organize();
 
   RateVector* select(rv_request);
-  std::map<std::string, int> get_ExtendedState(const std::map<std::string, std::vector<signed char>*>& sequences, int pos);
+  unsigned long get_hash_state(const std::map<std::string, std::vector<signed char>*>& sequences, int pos) const;
   const std::list<rv_loc>& get_host_vectors(Valuable*);
 
   void print();
@@ -81,8 +81,7 @@ public:
   unsigned int n_domains;
   std::list<std::string> domain_names;
 
-  std::map<std::string, std::map<ExtendedState, RateVector*>> ex_state_to_rv; // Domain -> ExState -> RateVector*;
-  std::map<std::string, std::map<unsigned long, RateVector*>> state_to_rv; // Domain -> ExState -> RateVector*;
+  std::map<std::string, std::map<unsigned long, RateVector*>> state_to_rv; // Domain -> hash(ExState) -> RateVector*;
 
   // Hash stuff
   std::list<signed char> ex_to_list(ExtendedState);

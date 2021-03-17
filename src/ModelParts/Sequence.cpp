@@ -327,8 +327,8 @@ void SequenceAlignment::calculate_state_probabilities_pos(TreeNode* node, unsign
 	float left_t_b = left_node->distance;
 	
 	left_prob = 0.0;
-	std::map<std::string, int> extended_state = left_node->get_extended_state_by_pos(pos);
-	extended_state[name] = i;
+	unsigned long extended_state = left_node->get_hash_state_by_pos(pos);
+	//extended_state[name] = i;
 	rv = node->SM->selectRateVector({pos, i, name, extended_state});
 	for(int j = 0; j < n_states; j++) {
 	  double rate = rv->rates[left_seq.at(pos)]->get_value();
@@ -354,8 +354,8 @@ void SequenceAlignment::calculate_state_probabilities_pos(TreeNode* node, unsign
 	float right_t_b = right_node->distance;
 
 	right_prob = 0.0;
-	std::map<std::string, int> extended_state = right_node->get_extended_state_by_pos(pos);
-	extended_state[name] = i; 
+	unsigned long extended_state = right_node->get_hash_state_by_pos(pos);
+	//extended_state[name] = i; 
 	rv = node->SM->selectRateVector({pos, i, name, extended_state});
 	for(int j = 0; j < n_states; j++) {
 	  double rate = rv->rates[right_seq.at(pos)]->get_value();
@@ -381,8 +381,8 @@ void SequenceAlignment::calculate_state_probabilities_pos(TreeNode* node, unsign
       up_prob = 0.0;
       for(int j = 0; j < n_states; j++) {
 	// Double check this.
-	std::map<std::string, int> extended_state = up_node->get_extended_state_by_pos(pos);
-	extended_state[name] = j;
+	unsigned long extended_state = up_node->get_hash_state_by_pos(pos);
+	//extended_state[name] = j;
 	rv = node->SM->selectRateVector({pos, j, name, extended_state});
 	double rate = rv->rates[i]->get_value();
 	double state_prob = taxa_names_to_state_probs[up_node->name][pos][j];
