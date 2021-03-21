@@ -43,7 +43,7 @@ class SequenceAlignment {
 
   void print();
   void Initialize(IO::RawMSA raw_msa);
-  void saveToFile(int gen, double l);
+  void saveToFile(int i, int gen, double l);
 
   // Utilities
   int numCols();
@@ -82,6 +82,7 @@ class SequenceAlignment {
 class SequenceAlignmentParameter : public SampleableComponent {
 private:
   SequenceAlignment* msa;
+  int save_count;
 public:
   SequenceAlignmentParameter(SequenceAlignment*);
 

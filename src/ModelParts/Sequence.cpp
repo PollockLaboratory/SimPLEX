@@ -95,12 +95,9 @@ void SequenceAlignment::Initialize(IO::RawMSA raw_msa) {
   n_columns = (*taxa_names_to_sequences.begin()).second.size();
 }
 
-void SequenceAlignment::saveToFile(int gen, double l) {
-  static int i = -1;
-  ++i;
-
+void SequenceAlignment::saveToFile(int save_count, int gen, double l) {
   std::ostringstream buffer;
-  buffer << "#" << i << ":" << gen << ":" << l << std::endl;
+  buffer << "#" << save_count << ":" << gen << ":" << l << std::endl;
   for(auto it = taxa_names_to_sequences.begin(); it != taxa_names_to_sequences.end(); ++it) {
     buffer << ">" << it->first << "\n" << decodeSequence(it->second) << std::endl;
   }
@@ -111,17 +108,17 @@ void SequenceAlignment::saveToFile(int gen, double l) {
 
   std::list<BranchSegment*> branches = tree->get_branches();
   for(auto it = branches.begin(); it != branches.end(); ++it) {
-    subs_buffer << i << "," << gen << "," << l << ",";
+    subs_buffer << save_count << "," << gen << "," << l << ",";
     subs_buffer << (*it)->ancestral->name << "," << (*it)->decendant->name << ",[ ";
     std::vector<Substitution> subs = (*it)->get_substitutions(name);
     for(unsigned int pos = 0; pos < subs.size(); pos++) {
-      if(subs[i].occuredp == true) {
+      if(subs[pos].occuredp == true) {
 	int anc = (*it)->ancestral->sequences[name]->at(pos);
 	int dec = (*it)->decendant->sequences[name]->at(pos);
-	  if(anc == dec) {
+	if(anc != dec) {
 	    // Virtual Substitution.
 	    //subs_buffer << integer_to_state[anc] << pos << integer_to_state[dec] << "* ";
-	  } else {
+	  //} else {
 	    // Normal Substitution.
 	    subs_buffer << integer_to_state[anc] << pos << integer_to_state[dec] << " ";
 	  }
@@ -632,6 +629,7 @@ bool SequenceAlignment::match_structure(SequenceAlignment* cmp_msa) {
 }
 
 SequenceAlignmentParameter::SequenceAlignmentParameter(SequenceAlignment* msa) : SampleableComponent("SequenceAlignment") {
+  save_count = -1;
   this->msa = msa;
 }
 
@@ -669,5 +667,6 @@ std::string SequenceAlignmentParameter::get_state() {
 }
 
 void SequenceAlignmentParameter::save_to_file(int gen, double l) {
-  msa->saveToFile(gen, l);
+  save_count += 1;
+  msa->saveToFile(save_count, gen, l);
 }
