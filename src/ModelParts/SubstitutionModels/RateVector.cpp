@@ -75,9 +75,9 @@ RateVectorSet::RateVectorSet() {
   domain_names = {};
 }
 
-void RateVectorSet::Initialize(States states, std::map<std::string, States> hidden_states) {
+void RateVectorSet::Initialize(std::map<std::string, States> all_states) {
   // Set States.
-  all_states = hidden_states;
+  this->all_states = all_states;
 
   // Set Domain names.
   for(auto it = all_states.begin(); it != all_states.end(); ++it) {
@@ -88,12 +88,8 @@ void RateVectorSet::Initialize(States states, std::map<std::string, States> hidd
   files.add_file("rate_vectors_out", env.get<std::string>("OUTPUT.rate_vectors_out_file"), IOtype::OUTPUT);
 
   std::ostringstream buffer;
-  buffer << "I,GEN,LogL,NAME,ANC";
+  buffer << "I,GEN,LogL,NAME,ANC,VECTOR" << std::endl;
   // the count is reduced by -1 to take into account gaps.
-  for(unsigned int i = 0; i < states.int_to_state.size() - 1; ++i) {
-    buffer << "," << states.int_to_state[i];
-  }
-  buffer << std::endl;
 
   files.write_to_file("rate_vectors_out", buffer.str());
 }
@@ -115,17 +111,6 @@ void RateVectorSet::add(RateVector* rv, IO::rv_use_class uc) {
 }
 
 RateVector* RateVectorSet::select(rv_request rq) {
-  //if(rq.ex_state.empty() == true) {
-  // std::cerr << "Sort this out." << std::endl;
-  // exit(EXIT_FAILURE);
-  //}
-
-  //ExtendedState state = ExtendedState_Null();
-  //for(auto it = rq.ex_state.begin(); it != rq.ex_state.end(); ++it) {
-  // state[it->first] = all_states[it->first].int_to_state[it->second];
-  //}
-
-  //std::cout << "Select: " << rq.state << " " << rq.domain << " " << ExtendedState_toString(state) << std::endl;
   RateVector* rv = state_to_rv[rq.domain][rq.ex_state];
   //if(rv == nullptr) {
   // std::cout << "Error: attempting to dispatch nullptr instead of RateVector*" << std::endl;
@@ -191,16 +176,6 @@ std::list<std::list<signed char>> RateVectorSet::configure_hash(std::map<std::st
     new_states = tmp_states;
   }
 
-  std::cout << "All Possible States: [\n";
-  for(auto it = new_states.begin(); it != new_states.end(); ++it) {
-    std::cout << "[ ";
-    for(auto jt = it->begin(); jt != it->end(); ++jt) {
-      std::cout << *jt << " ";
-    }
-    std::cout << "] = " << hash(*it) << std::endl;
-  }
-  std::cout << "]" << std::endl;
-
   return(new_states);
 }
 
@@ -262,7 +237,6 @@ void RateVectorSet::organize() {
     }
 
     // Set ptrs to rate vectors based on applicable state.
-    std::cout << "Hashes: " << std::endl;
     for(auto jt = applicable_states.begin(); jt != applicable_states.end(); ++jt) {
       unsigned long h = hash(ex_to_list(*jt));
       if(state_to_rv[uc.domain][h] != nullptr) {
@@ -271,7 +245,6 @@ void RateVectorSet::organize() {
       } else {
 	state_to_rv[uc.domain][h] = *it;
       }
-      std::cout << h << std::endl;
     }
   }
 

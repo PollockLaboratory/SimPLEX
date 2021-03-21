@@ -76,10 +76,10 @@ void SubstitutionModel::configure_RateVectors(std::list<IO::raw_rate_vector> rv_
     rateVectors.add(rv, (*raw_rv).uc);
   }
 
-  rateVectors.Initialize(all_states["primary"], all_states);
+  rateVectors.Initialize(all_states);
 }
 
-void SubstitutionModel::configure_HiddenStates(std::map<std::string, std::list<std::string>> raw_hidden) {
+void SubstitutionModel::configure_States(std::map<std::string, std::list<std::string>> raw_hidden) {
   for(auto it = raw_hidden.begin(); it != raw_hidden.end(); ++it) {
     States cont = {};
     for(auto s = it->second.begin(); s != it->second.end(); ++s) {
@@ -93,9 +93,7 @@ void SubstitutionModel::configure_HiddenStates(std::map<std::string, std::list<s
 }
 
 void SubstitutionModel::from_raw_model(IO::raw_substitution_model* raw_sm) {
-  // This should be a single function call, I think?
-  //configure_States(raw_sm->get_states());
-  configure_HiddenStates(raw_sm->get_all_states());
+  configure_States(raw_sm->get_all_states());
 
   configure_RateVectors(raw_sm->get_rate_vector_list());
 
@@ -203,7 +201,7 @@ void SubstitutionModel::saveToFile(int gen, double l, std::map<RateVector*, std:
 	for(auto it = host_rvs.begin(); it != host_rvs.end(); ++it) {
 	  total += counts_by_rv[it->rv][it->pos];
 	}
-	line += "," + std::to_string(total);//std::to_string(v->find_counts());
+	line += "," + std::to_string(total);
       }
     }
   }

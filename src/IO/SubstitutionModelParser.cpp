@@ -31,7 +31,6 @@ namespace IO {
 
   // RAW SUBSTITUTION MODEL.
   raw_substitution_model::raw_substitution_model() {
-    all_states["primary"] = {};
   }
 
   // STATES
@@ -102,7 +101,7 @@ namespace IO {
   raw_rate_vector new_rate_vector(std::string name, sol::table info_tbl, sol::table params_tbl, std::map<std::string, std::list<std::string>> all_states) {
 
     // Find the state_set(domain) of the rate vector.
-    // If not set, I will assume it is the primary domain.
+    // If not set, will be assumed its name is "primary".
     std::string state_domain;
     if(info_tbl["domain"] == nullptr) {
       state_domain = "primary";
@@ -189,14 +188,14 @@ namespace IO {
     // STATES
     auto states_table = lua["States"].get_or_create<sol::table>();
 
-    states_table.set_function("new_hidden", [this](std::string name, sol::table states, sol::table options) -> void {
+    states_table.set_function("new", [this](std::string name, sol::table states, sol::table options) -> void {
 					      this->add_state(name, states, options);
 					    });
 
     // DATA - tools to incorperate additional data into the state, primarily hidden states.
     auto data_table = lua["Data"].get_or_create<sol::table>();
 
-    data_table.set_function("load_hidden_state", [this](std::string hidden_state, std::string file_name) -> void {
+    data_table.set_function("load_state", [this](std::string hidden_state, std::string file_name) -> void {
 						   read_state_file(hidden_state, file_name);
 						   
 						 });
@@ -263,10 +262,6 @@ namespace IO {
     }
   }
 
-  const std::list<std::string> raw_substitution_model::get_states() {
-    return(all_states["primary"]);
-  }
-
   const std::map<std::string, std::list<std::string>> raw_substitution_model::get_all_states() {
     return(all_states);
   }
@@ -284,20 +279,5 @@ namespace IO {
     raw_model->read_from_file(file_name);
     return(raw_model);
   }
-
-  std::ostream& operator<<(std::ostream& os, raw_substitution_model& sm) {
-    os << "Raw Substitution Model: " << sm.name << std::endl;
-    os << "States: ";
-    for(auto it = sm.all_states["primary"].begin(); it != sm.all_states["primary"].end(); ++it) {
-      os << "\"" << *it << "\" ";
-    }
-    os << std::endl;
-
-    os << "Rate Vectors: " << std::endl;
-    for(auto it = sm.rv_list.begin(); it != sm.rv_list.end(); ++it) {
-      os << *it << std::endl;
-    }
-    return(os);
-  } 
 }
 

@@ -63,7 +63,7 @@ class RateVectorSet {
 public:
   RateVectorSet();
   std::vector<RateVector*> col;
-  void Initialize(States states, std::map<std::string, States>);
+  void Initialize(std::map<std::string, States>);
 
   std::list<std::list<signed char>> configure_hash(std::map<std::string, States> all_states);
 

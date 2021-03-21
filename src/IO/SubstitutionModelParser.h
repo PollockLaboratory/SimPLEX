@@ -36,9 +36,7 @@ namespace IO {
     std::string name;
     raw_substitution_model();
     void read_from_file(std::string file_name);
-    friend std::ostream& operator<<(std::ostream&, const IO::raw_substitution_model&);
     
-    const std::list<std::string> get_states();
     const std::map<std::string, std::list<std::string>> get_all_states();
     const std::list<raw_rate_vector> get_rate_vector_list();
 

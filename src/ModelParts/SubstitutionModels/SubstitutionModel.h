@@ -40,11 +40,11 @@ public:
   
   void saveToFile(int gen, double l, std::map<RateVector*, std::vector<int>> counts_by_rv);
 private:
-  void configure_HiddenStates(std::map<std::string, std::list<std::string>>);
+  void configure_States(std::map<std::string, std::list<std::string>>);
   void configure_RateVectors(std::list<IO::raw_rate_vector>);
 
   RateVectorSet rateVectors;
-  std::map<std::string, States> all_states; // This includes primary states.
+  std::map<std::string, States> all_states;
 
   // Iterator
   // Given a AbstractComponent will return an iterator to the start of all the rate vector locations that are modified.

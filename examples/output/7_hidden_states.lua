@@ -8,13 +8,13 @@ Model.set_name("Hidden State.")
 
 -- Base
 model_states = Config.get_string_array("MODEL.states")
-States.new_hidden("primary", model_states, {sequences_output = Config.get_str("MODEL.sequences_out_file"), substitutions_output = Config.get_str("MODEL.substitutions_out_file")})
-Data.load_hidden_state("primary", Config.get_str("MODEL.sequences_file"))
+States.new("primary", model_states, {sequences_output = Config.get_str("MODEL.sequences_out_file"), substitutions_output = Config.get_str("MODEL.substitutions_out_file")})
+Data.load_state("primary", Config.get_str("MODEL.sequences_file"))
 
 od_states = {"O", "D"}
-States.new_hidden("orderVdisorder", od_states, {sequences_output = "od_sequences.fasta", substitutions_output = "od_substitutions.out"})
+States.new("orderVdisorder", od_states, {sequences_output = "od_sequences.fasta", substitutions_output = "od_substitutions.out"})
 
-Data.load_hidden_state("orderVdisorder", "data_sets/hidden_state.efasta");
+Data.load_state("orderVdisorder", "data_sets/hidden_state.efasta");
 
 -- Create parameters for equilibrium frequencies.
 

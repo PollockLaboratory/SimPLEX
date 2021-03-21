@@ -114,16 +114,16 @@ void SequenceAlignment::saveToFile(int gen, double l) {
     subs_buffer << i << "," << gen << "," << l << ",";
     subs_buffer << (*it)->ancestral->name << "," << (*it)->decendant->name << ",[ ";
     std::vector<Substitution> subs = (*it)->get_substitutions(name);
-    for(unsigned int i = 0; i < subs.size(); i++) {
+    for(unsigned int pos = 0; pos < subs.size(); pos++) {
       if(subs[i].occuredp == true) {
-	int anc = (*it)->ancestral->sequences[name]->at(i);
-	int dec = (*it)->decendant->sequences[name]->at(i);
+	int anc = (*it)->ancestral->sequences[name]->at(pos);
+	int dec = (*it)->decendant->sequences[name]->at(pos);
 	  if(anc == dec) {
 	    // Virtual Substitution.
-	    subs_buffer << integer_to_state[anc] << i << integer_to_state[dec] << "* ";
+	    //subs_buffer << integer_to_state[anc] << pos << integer_to_state[dec] << "* ";
 	  } else {
 	    // Normal Substitution.
-	    subs_buffer << integer_to_state[anc] << i << integer_to_state[dec] << " ";
+	    subs_buffer << integer_to_state[anc] << pos << integer_to_state[dec] << " ";
 	  }
       }
     }
