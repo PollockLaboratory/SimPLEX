@@ -103,7 +103,7 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &
     if(u_param and env.get<bool>("UNIFORMIZATION.refresh_tree_on_update")) {
       msa_parameter->add_dependancy(u_param);
     }
-    components.add_parameter(msa_parameter, env.get<int>("MCMC.hidden_sample_frequency"));
+    components.add_state_parameter(msa_parameter, env.get<int>("MCMC.alignment_sample_frequency"));
     rvap->add_dependancy(msa_parameter);
     msa_parameters.push_back(msa_parameter);
   }
@@ -179,7 +179,7 @@ double Model::CalculateLikelihood() {
     RateVector* rv = it->first;
     //std::cout << rv->get_name() << " [ ";
     std::vector<int> C_xy = it->second;
-    for(int i = 0; i < rv->rates.size(); i++) {
+    for(unsigned int i = 0; i < rv->rates.size(); i++) {
       // std::cout << C_xy[i] << "|" << log((*rv)[i]) << " ";
       logL_subs += C_xy[i] * log((*rv)[i]);
     }

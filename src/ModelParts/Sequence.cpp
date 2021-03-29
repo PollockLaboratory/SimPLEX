@@ -15,6 +15,8 @@ extern IO::Files files;
 std::vector<std::string> aa({"A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"});
 std::vector<std::string> nucleotides({"A", "T", "C", "G"});
 
+static const signed char gap_indicator = -1;
+
 // Sequence Alignment class.
 
 SequenceAlignment::SequenceAlignment(std::string name, std::string msa_out, std::string subs_out, const States* states) : name(name) {
@@ -27,8 +29,6 @@ SequenceAlignment::SequenceAlignment(std::string name, std::string msa_out, std:
   seqs_out_file = msa_out;
   substitutions_out_file = subs_out;
 }
-
-static const signed char gap_indicator = -1;
 
 void SequenceAlignment::add(std::string name, std::string sequence_str) {
   // Adds extant sequence to alignment. This will not be sampled during the MCMC.
@@ -116,10 +116,6 @@ void SequenceAlignment::saveToFile(int save_count, int gen, double l) {
 	int anc = (*it)->ancestral->sequences[name]->at(pos);
 	int dec = (*it)->decendant->sequences[name]->at(pos);
 	if(anc != dec) {
-	    // Virtual Substitution.
-	    //subs_buffer << integer_to_state[anc] << pos << integer_to_state[dec] << "* ";
-	  //} else {
-	    // Normal Substitution.
 	    subs_buffer << integer_to_state[anc] << pos << integer_to_state[dec] << " ";
 	  }
       }
@@ -147,8 +143,6 @@ void SequenceAlignment::syncWithTree(std::string name, unsigned int id, Tree* tr
     if(taxa_names_to_sequences.count(n->name)) {
       n->sequences[name] = &(taxa_names_to_sequences.at(n->name));
     } else {
-      // NORMAL RUN
-      // only tip sequences are needed.
       if(n->isTip()){
 	std::cerr << "Error: Missing sequence for \"" << n->name << "\"." << std::endl;
 	exit(EXIT_FAILURE);
@@ -195,10 +189,10 @@ void SequenceAlignment::identify_gaps() {
 	}
       }
     } else {
-      // This doesn't deal with branch nodes.
-      //std::cout << "Calculate State Probabilites: " << name << std::endl;
       for(int pos = 0; pos < sequence.size(); pos++) {
+	// Checks left branch first - there is always a left branch, except tips.
 	if(taxa_names_to_gaps[(*node)->left->decendant->name][pos]) {
+	  // Checks right branch next - right branches only on branching segment.
 	  if((*node)->right) {
 	    if(taxa_names_to_gaps[(*node)->right->decendant->name][pos]) {
 	      gaps[pos] = true;
@@ -293,16 +287,11 @@ std::list<std::string> SequenceAlignment::getNodeNames() {
 
 void SequenceAlignment::reset_base_probabilities(std::list<int> positions) {
   for(auto seq_name = base_sequences.begin(); seq_name != base_sequences.end(); ++seq_name) {
-    //std::cout << *seq_name << " [ ";
     for(unsigned int i = 0; i < n_columns; i++) {
-      // std::cout << "[ ";
       for(unsigned int j = 0; j < n_states; j++) {
 	taxa_names_to_state_probs[*seq_name][i][j] = base_taxa_state_probs[*seq_name][i][j];
-	//std::cout << taxa_names_to_state_probs[*seq_name][i][j] << " ";
       }
-      //std::cout << "] ";
     }
-    //std::cout << "]" << std::endl;
   }
 }
 
@@ -473,7 +462,7 @@ sample_status SequenceAlignment::sample() {
     (*n)->sampledp = false;
   }
 
-  // Sample tip nodes if need be - this should be redundant now.
+  // Sample tip nodes if need be - this should be redundant now?
   reset_base_probabilities(positions);
 
   // Find state probabilities.

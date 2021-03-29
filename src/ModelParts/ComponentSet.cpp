@@ -50,6 +50,8 @@ void ComponentSet::Initialize() {
   // Refreshes all dependancies.
   reset_dependencies();
 
+  // Spread out state parameters.
+
   // Parameter's value file.
   files.add_file("parameters_out", env.get<std::string>("OUTPUT.parameters_out_file"), IOtype::OUTPUT);
 
@@ -76,6 +78,7 @@ void ComponentSet::add_parameter(AbstractComponent* param, unsigned int max_samp
    * Adds the pointer to an actual parameter onto the parameter_list, and to the
    * name_to_adress map.
    */
+
   if(all_parameters.find(param->get_ID()) == all_parameters.end()) {
     // Check if Parameter has already been seen.
     SampleableComponent* p = dynamic_cast<SampleableComponent*>(param);
@@ -85,6 +88,11 @@ void ComponentSet::add_parameter(AbstractComponent* param, unsigned int max_samp
 
     all_parameters[param->get_ID()] = param;
   }
+}
+
+void ComponentSet::add_state_parameter(AbstractComponent* param, unsigned int max_sample_freq) {
+  add_parameter(param, max_sample_freq);
+  state_parameters.push_back(param->get_ID());
 }
 
 // Utils.
