@@ -120,7 +120,6 @@ TreeNode::TreeNode(IO::RawTreeNode* raw_tree) {
   up = 0;
   left = 0;
   right = 0;
-  sampledp = false;
   sequences = {};
 }
 
@@ -132,7 +131,6 @@ TreeNode::TreeNode(std::string n) {
   up = 0;
   left = 0;
   right = 0;
-  sampledp = false;
   sequences = {};
 }
 
@@ -145,7 +143,6 @@ TreeNode::TreeNode() {
   up = 0;
   left = 0;
   right = 0;
-  sampledp = false;
   sequences = {};
 }
 
@@ -154,19 +151,6 @@ TreeNode::~TreeNode() {
 
 void TreeNode::connect_substitution_model(SubstitutionModel* sm) {
   SM = sm;
-}
-
-bool TreeNode::ready_to_sample() {
-  bool rightp = true;
-  if(right) {
-    rightp = right->decendant->sampledp;
-  }
-
-  bool leftp = true;
-  if(left) {
-    leftp = left->decendant->sampledp;
-  }
-  return(leftp and rightp);
 }
 
 std::string TreeNode::toString() {

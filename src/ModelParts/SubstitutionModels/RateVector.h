@@ -15,7 +15,7 @@ struct rv_request {
   // Struct representing a request for a rate vector.
   // More specific requests later, for example branch position.
   unsigned int pos;
-  int state;
+  signed char state;
   std::string domain;
   unsigned long ex_state; // Extended state - as hash.
 };

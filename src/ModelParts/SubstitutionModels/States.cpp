@@ -5,7 +5,7 @@
 void print_States(States states) {
   std::cout << "[ ";
  for(auto it = states.state_to_int.begin(); it != states.state_to_int.end(); ++it) {
-   std::cout << it->first << ":" << it->second << " ";
+   std::cout << it->first << ":" << (int)it->second << " ";
  }
  std::cout << "]- n = " << states.possible.size() << std::endl;
 }

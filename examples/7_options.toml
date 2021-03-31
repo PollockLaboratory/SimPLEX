@@ -37,11 +37,11 @@ seed = 0
   log_out_file = "run.log"
 
 [MCMC]
-  generations = 1001
+  generations = 2001
   #generations = 800
   full_update_freq = 200
-  alignment_sample_frequency = 250
-  output_frequency = 100
+  alignment_sample_frequency = 500
+  output_frequency = 50
   print_frequency = 100
 
 [MODEL]

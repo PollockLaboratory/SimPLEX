@@ -15,7 +15,7 @@ ComponentSet::ComponentSet() {
   /*
    * The default parameter set constructor.
    */
-  steps = 0;
+  steps = env.get<int>("MCMC.alignment_sample_frequency");
 }
 void ComponentSet::set_counts(SubstitutionCounts* counts) {
   this->counts = counts;
@@ -50,7 +50,21 @@ void ComponentSet::Initialize() {
   // Refreshes all dependancies.
   reset_dependencies();
 
-  // Spread out state parameters.
+  // Spread out state parameters so the don't update all at once.
+  unsigned int len = state_parameters.size();
+  int freq = env.get<int>("MCMC.alignment_sample_frequency");
+  int offset = 0;
+
+  std::cout << "Size: " << len << " " << freq << std::endl;
+  for(auto it = state_parameters.begin(); it != state_parameters.end(); ++it) {
+    for(auto jt = sampleable_parameter_list.begin(); jt != sampleable_parameter_list.end(); ++jt) {
+      if(jt->ptr->get_ID() == *it) {
+	jt->last_sample = offset;
+	offset += freq/len;
+	std::cout << "Here: " << *it << " " << offset << std::endl;
+      }
+    }
+  }
 
   // Parameter's value file.
   files.add_file("parameters_out", env.get<std::string>("OUTPUT.parameters_out_file"), IOtype::OUTPUT);
@@ -145,7 +159,7 @@ sample_status ComponentSet::sample() {
     s = sample();
   }
 
-  (*current_parameter).last_sample = steps;
+  current_parameter->last_sample = steps;
 
   return(s);
 }
@@ -159,7 +173,7 @@ inline void ComponentSet::stepToNextParameter() {
     current_parameter = sampleable_parameter_list.begin();
   }
 
-  if((steps - (*current_parameter).last_sample) + 1 < (*current_parameter).freq) {
+  if((steps - current_parameter->last_sample) + 1 < current_parameter->freq) {
     stepToNextParameter();
   }
 }

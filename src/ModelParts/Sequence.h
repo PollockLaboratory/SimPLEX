@@ -23,7 +23,7 @@ struct substitution {
 class SequenceAlignment {
  public:
   Tree* tree;
-  std::string name; // Domain.
+  std::string domain_name; // Domain.
   unsigned int n_columns;
   unsigned int n_states;
   SequenceAlignment(std::string name, std::string msa_out, std::string subs_out, const States*);
@@ -47,7 +47,7 @@ class SequenceAlignment {
 
   // Utilities
   int numCols();
-  std::string decodeChar(signed char &c);
+  std::string decodeChar(signed char c);
   std::string decodeSequence(std::vector<signed char> &enc_seq);
   static std::vector<signed char> findParsimony(const std::vector<signed char> &s1, const std::vector<signed char> &s2);
   std::list<std::string> getNodeNames();
@@ -67,9 +67,10 @@ class SequenceAlignment {
   std::map<std::string, float**> taxa_names_to_state_probs;
   std::map<std::string, float**> base_taxa_state_probs; // These are fixed.
 
-  void reset_base_probabilities(std::list<int>);
+  void reset_base_probabilities();
   void calculate_state_probabilities(TreeNode*, std::list<int>);
   void calculate_state_probabilities_pos(TreeNode*, unsigned int, TreeNode*, TreeNode*, TreeNode*);
+  float calculate_single_state_probability(unsigned int pos, unsigned char c, std::vector<Valuable*> rv, TreeNode* node);
   int pick_state_from_probabilities(TreeNode*, int);
 
   // Outputs

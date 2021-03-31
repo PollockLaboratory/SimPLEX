@@ -71,10 +71,7 @@ class TreeNode {
 
   void connect_substitution_model(SubstitutionModel*);
 
-  // Sampling
-  bool ready_to_sample();
-
-   // Printing/Display
+  // Printing/Display
   std::string toString();
   //std::string get_sequence();
   //std::string state_at_pos(int i);

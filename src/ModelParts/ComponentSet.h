@@ -30,7 +30,7 @@ private:
   std::map<int, AbstractComponent*> all_parameters;
   std::map<int, SubstitutionCounts*> subs_by_parameter;
   std::list<int> state_parameters;
-
+ 
   // Tracking the current parameter.
   std::list<SampleCounter>::iterator current_parameter; //Tracks the current parameter to be sampled, via an iterator across the parameter_list.
   unsigned int steps; // Number of times sample() has been called. Used as reference for differant frequencies of component samples.
