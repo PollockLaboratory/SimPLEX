@@ -21,7 +21,6 @@ seed = 0
 [INPUT]
   # This should be TRUE or FALSE
   ancestral_sequences = false
-  initial_noise = 0.3
   tree_file = "data_sets/tree.newick"
 
 [OUTPUT]

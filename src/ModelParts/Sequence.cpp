@@ -32,7 +32,7 @@ SequenceAlignment::SequenceAlignment(std::string name, std::string msa_out, std:
 
 void SequenceAlignment::add(std::string name, std::string sequence_str) {
   // Adds extant sequence to alignment. This will not be sampled during the MCMC.
-  std::vector<signed char> enc = EncodeSequence(sequence_str);
+  std::vector<signed char> enc = encode_sequence(sequence_str);
   taxa_names_to_sequences[name] = enc;
 }
 
@@ -125,24 +125,6 @@ void SequenceAlignment::saveToFile(int save_count, int gen, double l) {
   files.write_to_file(substitutions_out_identifier, subs_buffer.str());
 }
 
-std::vector<signed char> SequenceAlignment::add_noise(std::vector<signed char> base) {
-  static float noise = 1.0 - env.get<double>("INPUT.initial_noise");
-  
-  for(auto it = base.begin(); it != base.end(); ++it) {
-    if(not (*it == -1)) {
-      if(Random() > noise) {
-	unsigned char previous = *it;
-	unsigned char proposed = previous;
-	while(previous == proposed) {
-	  proposed = (signed char)(std::rand() % n_states);
-	}
-	*it = proposed;
-      }
-    }
-  }
-  return(base);
-}
-
 void SequenceAlignment::syncWithTree(std::string name, unsigned int id, Tree* tree) {
   /*
     Connects all the tree nodes on the matching sequences in the MSAs for each state domain.
@@ -173,12 +155,11 @@ void SequenceAlignment::syncWithTree(std::string name, unsigned int id, Tree* tr
 	  // Internal Continous.
 	  TreeNode* dsNode = n->left->decendant; // ds = downstream.
 	  *(n->sequences[name]) = *(dsNode->sequences[name]);
-	  *(n->sequences[name]) = add_noise(*(n->sequences[name]));
 	} else {
 	  // Root or internal branch.
 	  vector<signed char> dsNodeLseq = *(n->left->decendant->sequences[name]);
 	  vector<signed char> dsNodeRseq = *(n->right->decendant->sequences[name]);
-	  vector<signed char> p = add_noise(findParsimony(dsNodeLseq, dsNodeRseq));
+	  vector<signed char> p = findParsimony(dsNodeLseq, dsNodeRseq);
 	  *(n->sequences[name]) = p;
 	}
       }
@@ -225,13 +206,12 @@ void SequenceAlignment::identify_gaps() {
 	}
       }
     }
-
     taxa_names_to_gaps[(*node)->name] = gaps;
   }
 }
 
 // Reading Fasta files.
-std::vector<signed char> SequenceAlignment::EncodeSequence(const std::string &sequence) {
+std::vector<signed char> SequenceAlignment::encode_sequence(const std::string &sequence) {
   /*
    * Takes a string representation of a sequence and returns vector of integers.
    * Also tracks the gaps in the alignment.
@@ -418,14 +398,65 @@ void SequenceAlignment::calculate_state_probabilities(TreeNode* node, std::list<
   }
 }
 
+void SequenceAlignment::incorperate_up_node(TreeNode* node, unsigned int pos, TreeNode* up_node) {
+  /*
+   * This does the same as calculate_state_probabilies_pos, but given the likelihood of the lower branches
+   * has already been calculated on the first tree traversal. They don't have to be recalculated.
+   */
+
+  double u = node->SM->get_u();
+  RateVector* rv;
+  float up_prob = 0.0;
+  double normalize_total = 0.0;
+
+  for(signed char i = 0; i < (signed char)n_states; i++) {
+    // Contribution of up branch.
+    if(up_node != nullptr) {
+      //float up_t_b = node->distance;
+
+      float up_t_b = node->distance;
+
+      up_prob = 0.0;
+
+      for(signed char state_j = 0; state_j < (signed char)n_states; state_j++) {
+	unsigned long extended_state = up_node->get_hash_state_by_pos(pos);
+	rv = node->SM->selectRateVector({pos, state_j, domain_name, extended_state});
+	double rate = rv->rates[i]->get_value();
+
+	double state_prob = taxa_names_to_state_probs[up_node->name][pos][state_j];
+	up_prob += (state_prob * rate * up_t_b)/(1.0 + (u * up_t_b));
+      }
+
+      // Probability of staying the same.
+      up_prob += taxa_names_to_state_probs[up_node->name][pos][i] / (1.0 + (u * up_t_b));  
+    } else {
+      up_prob = 1.0;
+    }
+
+    float total = taxa_names_to_state_probs[node->name][pos][i] * up_prob;
+    normalize_total += total;
+
+    taxa_names_to_state_probs[node->name][pos][i] = total;
+  }
+
+  // Normalize
+  if(normalize_total != 0.0) {
+    for(unsigned int i = 0; i < n_states; i++) {
+      taxa_names_to_state_probs[node->name][pos][i] /= normalize_total;
+    }
+  }
+}
+
 int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
   float* probs = taxa_names_to_state_probs[node->name][pos];
 
-  //std::cout << node->name << "- before : [ ";
-  //for(int i = 0; i < n_states; i++) {
-  // std::cout << probs[i] << " ";
-  //}
-  //std::cout << "]" << std::endl;
+  /*
+  std::cout << node->name << "- picking : [ ";
+  for(int i = 0; i < n_states; i++) {
+    std::cout << probs[i] << " ";
+  }
+  std::cout << "]" << std::endl;
+  */
 
   double r = Random();
   double acc = 0.0;
@@ -500,8 +531,8 @@ sample_status SequenceAlignment::sample() {
       }
 
       for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
-	if(not gaps[*pos]) {
-	  calculate_state_probabilities_pos(node, *pos, left_node, right_node, up_node);
+	if((not gaps[*pos]) and (not (up_node == nullptr))) {
+	  incorperate_up_node(node, *pos, up_node);
 	}
 
 	// If tip weight by data.

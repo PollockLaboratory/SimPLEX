@@ -57,13 +57,12 @@ class SequenceAlignment {
   bool validate(std::list<std::string> seq_names, std::map<std::string, SequenceAlignment*> other_alignments);
 
   // New
-  std::vector<signed char> add_noise(std::vector<signed char> base);
   void syncWithTree(std::string name, unsigned int id, Tree* tree);
   void identify_gaps();
   sample_status sample();
  private:
   // Processing input sequences - fasta.
-  std::vector<signed char> EncodeSequence(const std::string &sequence);
+  std::vector<signed char> encode_sequence(const std::string &sequence);
 
   // Sampling - new
   std::map<std::string, float**> taxa_names_to_state_probs;
@@ -73,6 +72,7 @@ class SequenceAlignment {
   void calculate_state_probabilities(TreeNode*, std::list<int>);
   void calculate_state_probabilities_pos(TreeNode*, unsigned int, TreeNode*, TreeNode*, TreeNode*);
   float calculate_single_state_probability(unsigned int pos, unsigned char c, std::vector<Valuable*> rv, TreeNode* node);
+  void incorperate_up_node(TreeNode* node, unsigned int pos, TreeNode* up_node);
   int pick_state_from_probabilities(TreeNode*, int);
 
   // Outputs
