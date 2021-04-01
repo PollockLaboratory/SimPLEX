@@ -125,9 +125,28 @@ void SequenceAlignment::saveToFile(int save_count, int gen, double l) {
   files.write_to_file(substitutions_out_identifier, subs_buffer.str());
 }
 
+std::vector<signed char> SequenceAlignment::add_noise(std::vector<signed char> base) {
+  static float noise = 1.0 - env.get<double>("INPUT.initial_noise");
+  
+  for(auto it = base.begin(); it != base.end(); ++it) {
+    if(not (*it == -1)) {
+      if(Random() > noise) {
+	unsigned char previous = *it;
+	unsigned char proposed = previous;
+	while(previous == proposed) {
+	  proposed = (signed char)(std::rand() % n_states);
+	}
+	*it = proposed;
+      }
+    }
+  }
+  return(base);
+}
+
 void SequenceAlignment::syncWithTree(std::string name, unsigned int id, Tree* tree) {
   /*
     Connects all the tree nodes on the matching sequences in the MSAs for each state domain.
+    Add new sequences to MSA for nodes present on the tree but missing in the alignment.
     This results in pointers from the TreeNodes to the sequence vectors.
    */
 
@@ -154,11 +173,12 @@ void SequenceAlignment::syncWithTree(std::string name, unsigned int id, Tree* tr
 	  // Internal Continous.
 	  TreeNode* dsNode = n->left->decendant; // ds = downstream.
 	  *(n->sequences[name]) = *(dsNode->sequences[name]);
+	  *(n->sequences[name]) = add_noise(*(n->sequences[name]));
 	} else {
 	  // Root or internal branch.
 	  vector<signed char> dsNodeLseq = *(n->left->decendant->sequences[name]);
 	  vector<signed char> dsNodeRseq = *(n->right->decendant->sequences[name]);
-	  vector<signed char> p = findParsimony(dsNodeLseq, dsNodeRseq);
+	  vector<signed char> p = add_noise(findParsimony(dsNodeLseq, dsNodeRseq));
 	  *(n->sequences[name]) = p;
 	}
       }

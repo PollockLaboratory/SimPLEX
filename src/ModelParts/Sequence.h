@@ -52,10 +52,12 @@ class SequenceAlignment {
   static std::vector<signed char> findParsimony(const std::vector<signed char> &s1, const std::vector<signed char> &s2);
   std::list<std::string> getNodeNames();
 
+  // Validation.
   bool match_structure(SequenceAlignment*);
   bool validate(std::list<std::string> seq_names, std::map<std::string, SequenceAlignment*> other_alignments);
 
   // New
+  std::vector<signed char> add_noise(std::vector<signed char> base);
   void syncWithTree(std::string name, unsigned int id, Tree* tree);
   void identify_gaps();
   sample_status sample();
