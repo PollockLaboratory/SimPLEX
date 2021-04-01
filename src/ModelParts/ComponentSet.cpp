@@ -61,7 +61,6 @@ void ComponentSet::Initialize() {
       if(jt->ptr->get_ID() == *it) {
 	jt->last_sample = offset;
 	offset += freq/len;
-	std::cout << "Here: " << *it << " " << offset << std::endl;
       }
     }
   }

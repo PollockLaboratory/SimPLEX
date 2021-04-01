@@ -319,7 +319,7 @@ void SequenceAlignment::calculate_state_probabilities_pos(TreeNode* node, unsign
   float up_prob = 0.0;
 
   double normalize_total = 0.0;
-  
+
   for(signed char i = 0; i < (signed char)n_states; i++) {
     unsigned long extended_state = node->get_hash_state_by_pos(pos);
     rv = node->SM->selectRateVector({pos, i, domain_name, extended_state});
@@ -401,7 +401,7 @@ void SequenceAlignment::calculate_state_probabilities(TreeNode* node, std::list<
 int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
   float* probs = taxa_names_to_state_probs[node->name][pos];
 
-  //std::cout << node->name << ": [ ";
+  //std::cout << node->name << "- before : [ ";
   //for(int i = 0; i < n_states; i++) {
   // std::cout << probs[i] << " ";
   //}
@@ -451,7 +451,7 @@ sample_status SequenceAlignment::sample() {
 
   // Reverse recursion.
   // Skip first element of reverse list as thats the root - no need to sample second time.
-  for(auto n = ++(nodes.rbegin()); n != nodes.rend(); ++n) {
+  for(auto n = nodes.rbegin(); n != nodes.rend(); ++n) {
     TreeNode* node = *n;
     std::vector<bool> gaps = taxa_names_to_gaps[node->name];
 
@@ -499,22 +499,15 @@ sample_status SequenceAlignment::sample() {
 	    }
 	  }
 	}
+
+	// Pick sequence.
+	if(gaps[*pos]) {
+	  taxa_names_to_sequences[(*n)->name][*pos] = -1;
+	} else {
+	  taxa_names_to_sequences[(*n)->name][*pos] = pick_state_from_probabilities(node, *pos);
+	}
       }
     } 
-  }
-
-  // Pick state.
-  for(auto n = nodes.rbegin(); n != nodes.rend(); ++n) {
-    TreeNode* node = *n;
-    std::vector<bool> gaps = taxa_names_to_gaps[node->name];
-   
-    for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
-      if(gaps[*pos]) {
-	taxa_names_to_sequences[(*n)->name][*pos] = -1;
-      } else {
-	taxa_names_to_sequences[(*n)->name][*pos] = pick_state_from_probabilities(node, *pos);
-      }
-    }
   }
 
   return(sample_status({false, true, true}));
