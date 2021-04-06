@@ -450,14 +450,15 @@ void SequenceAlignment::incorperate_up_node(TreeNode* node, unsigned int pos, Tr
 int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
   float* probs = taxa_names_to_state_probs[node->name][pos];
 
-  /*
-  std::cout << node->name << "- picking : [ ";
-  for(int i = 0; i < n_states; i++) {
-    std::cout << probs[i] << " ";
-  }
-  std::cout << "]" << std::endl;
-  */
 
+  if(node->name == "BNode0") {
+    std::cout << node->name << " - " << pos << " - picking : [ ";
+    for(unsigned int i = 0; i < n_states; i++) {
+      std::cout << probs[i] << " ";
+    }
+    std::cout << "]";
+  }
+  
   double r = Random();
   double acc = 0.0;
   int val = -1;
@@ -474,6 +475,11 @@ int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
   if(val == -1) {
     std::cerr << "Error: incorrectly picking a state: " <<  pos << " " << node->name << std::endl;
     exit(EXIT_FAILURE);
+  }
+  
+  if(node->name == "BNode0") {
+    std::cout << " r: " << r << " val: " << val;
+    std::cout << std::endl;
   }
 
   return(val);
@@ -509,19 +515,19 @@ sample_status SequenceAlignment::sample() {
     // Reculaculate state probability vector - including up branch.
     // No need if root.
     if(true) {
-      TreeNode* left_node;
-      if(node->left) {
-	left_node = node->left->decendant;
-      } else {
-	left_node = nullptr;
-      }
+      // TreeNode* left_node;
+      //if(node->left) {
+      //left_node = node->left->decendant;
+      //} else {
+      //left_node = nullptr;
+      //}
 
-      TreeNode* right_node;
-      if(node->right) {
-	right_node = node->right->decendant;
-      } else {
-	right_node = nullptr;
-      }
+      //TreeNode* right_node;
+      //if(node->right) {
+      //	right_node = node->right->decendant;
+      //} else {
+      //	right_node = nullptr;
+      //}
 
       TreeNode* up_node;
       if(node->up) {
