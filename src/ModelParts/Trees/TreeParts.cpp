@@ -55,11 +55,11 @@ inline void BranchSegment::update_rate_vectors() {
   std::vector<signed char>* seq = ancestral->sequences.begin()->second;
   for(unsigned int pos = 0; pos < seq->size(); pos++) {
     if((*seq)[pos] != -1) {
-      unsigned long ex_state = ancestral->get_hash_state_by_pos(pos);
+      unsigned long ex_state = ancestral->get_hash_state(pos);
 
       // Set the rate vectors for each of the states..
       for(auto it = ancestral->sequences.begin(); it != ancestral->sequences.end(); ++it) {
-	rv_request rq = {pos, (*(ancestral->sequences[it->first]))[pos], it->first, ex_state};
+	rv_request rq = {pos, it->first, ex_state};
 	rates[it->first][pos] = ancestral->SM->selectRateVector(rq);
       }
     }
@@ -166,7 +166,7 @@ std::string TreeNode::toString() {
   }
 }
 
-unsigned long TreeNode::get_hash_state_by_pos(int pos) {
+unsigned long TreeNode::get_hash_state(unsigned int pos) {
   //std::map<std::string, int> states = {};
 
   // Adds all states.
@@ -175,6 +175,10 @@ unsigned long TreeNode::get_hash_state_by_pos(int pos) {
   // }
 
   return(SM->get_hash_state(sequences, pos));
+}
+
+unsigned long TreeNode::get_hypothetical_hash_state(unsigned int pos, std::string domain, signed char state) {
+  return(SM->get_hypothetical_hash_state(sequences, pos, domain, state));
 }
 
 bool TreeNode::isTip() {

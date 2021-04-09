@@ -28,7 +28,8 @@ public:
   void organizeRateVectors();
   RateVector* selectRateVector(rv_request);
   std::vector<RateVector*> get_RateVectors();
-  unsigned long get_hash_state(const std::map<std::string, std::vector<signed char>*>& sequences, int pos);
+  unsigned long get_hash_state(const std::map<std::string, std::vector<signed char>*>& sequences, unsigned int pos);
+  unsigned long get_hypothetical_hash_state(const std::map<std::string, std::vector<signed char>*>& sequences, unsigned int pos, std::string domain_name, signed char state);
   
   SubstitutionModel::iterator modified_begin(AbstractComponent*);
 

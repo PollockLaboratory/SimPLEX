@@ -69,7 +69,7 @@ class SequenceAlignment {
   std::map<std::string, float**> base_taxa_state_probs; // These are fixed.
 
   void reset_base_probabilities();
-  void calculate_state_probabilities(TreeNode*, std::list<int>);
+  void calculate_state_probabilities(TreeNode*, std::list<unsigned int>);
   void calculate_state_probabilities_pos(TreeNode*, unsigned int, TreeNode*, TreeNode*, TreeNode*);
   float calculate_single_state_probability(unsigned int pos, unsigned char c, std::vector<Valuable*> rv, TreeNode* node);
   void incorperate_up_node(TreeNode* node, unsigned int pos, TreeNode* up_node);

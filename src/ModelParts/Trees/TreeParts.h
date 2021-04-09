@@ -76,7 +76,8 @@ class TreeNode {
   //std::string get_sequence();
   //std::string state_at_pos(int i);
 
-  unsigned long get_hash_state_by_pos(int);
+  unsigned long get_hash_state(unsigned int);
+  unsigned long get_hypothetical_hash_state(unsigned int pos, std::string domain, signed char state);
 
   bool isTip();
 };

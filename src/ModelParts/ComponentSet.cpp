@@ -55,7 +55,6 @@ void ComponentSet::Initialize() {
   int freq = env.get<int>("MCMC.alignment_sample_frequency");
   int offset = 0;
 
-  std::cout << "Size: " << len << " " << freq << std::endl;
   for(auto it = state_parameters.begin(); it != state_parameters.end(); ++it) {
     for(auto jt = sampleable_parameter_list.begin(); jt != sampleable_parameter_list.end(); ++jt) {
       if(jt->ptr->get_ID() == *it) {

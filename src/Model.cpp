@@ -62,7 +62,7 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &
   std::map<std::string, std::list<std::string>> all_states = raw_sm->get_all_states();
   for(auto it = all_states.begin(); it != all_states.end(); ++it) {
       const States *secondary_states = substitution_model->get_states(it->first);
-      std::cout << "Reading new states domain: ";
+      std::cout << "\t\tReading new states domain: ";
       print_States(*secondary_states);
       SequenceAlignment* secondary_MSA = new SequenceAlignment(it->first,
 							       raw_sm->states_seqs_output_files[it->first],
@@ -124,8 +124,10 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &
   // Set parameter states.
   components.reset_dependencies();
 
+  std::cout << "Model succesfully constructed." << std::endl << std::endl;
+
+  std::cout << "Initial substitution counts:" << std::endl;
   counts.print();
-  std::cout << "Model succesfully constructed." << std::endl;
 }
 
 // Sampling

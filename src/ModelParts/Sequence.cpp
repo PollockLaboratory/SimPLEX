@@ -133,7 +133,7 @@ void SequenceAlignment::syncWithTree(std::string name, unsigned int id, Tree* tr
    */
 
   this->tree = tree;
-  std::cout << "Syncing " << name << " states to tree. ID: " << id << std::endl;
+  std::cout << "\t\tSyncing " << name << " states to tree. ID: " << id << std::endl;
   std::list<TreeNode*> nodes = tree->nodes();
 
   for(auto it = nodes.begin(); it != nodes.end(); ++it) {
@@ -302,6 +302,7 @@ float SequenceAlignment::calculate_single_state_probability(unsigned int pos, un
     // Virtual rate is included when i == j.
     double rate = rv[state_j]->get_value();
     double state_prob = taxa_names_to_state_probs[node->name][pos][state_j];
+
     prob += (state_prob * rate * t_b)/(1.0 + (u * t_b));
   }
 
@@ -321,8 +322,9 @@ void SequenceAlignment::calculate_state_probabilities_pos(TreeNode* node, unsign
   double normalize_total = 0.0;
 
   for(signed char i = 0; i < (signed char)n_states; i++) {
-    unsigned long extended_state = node->get_hash_state_by_pos(pos);
-    rv = node->SM->selectRateVector({pos, i, domain_name, extended_state});
+    unsigned long extended_state = node->get_hypothetical_hash_state(pos, domain_name, i);
+
+    rv = node->SM->selectRateVector({pos, domain_name, extended_state});
 
     // Contribution of left branch.
     if(left_node != nullptr) {
@@ -352,10 +354,11 @@ void SequenceAlignment::calculate_state_probabilities_pos(TreeNode* node, unsign
 
       up_prob = 0.0;
       for(signed char state_j = 0; state_j < (signed char)n_states; state_j++) {
-	unsigned long extended_state = up_node->get_hash_state_by_pos(pos);
-	rv = node->SM->selectRateVector({pos, state_j, domain_name, extended_state});
+	unsigned long extended_state = up_node->get_hypothetical_hash_state(pos, domain_name, state_j);
+	rv = node->SM->selectRateVector({pos, domain_name, extended_state});
 	double rate = rv->rates[i]->get_value();
 
+	// This could be trouble.
 	double state_prob = taxa_names_to_state_probs[up_node->name][pos][state_j];
 	up_prob += (state_prob * rate * up_t_b)/(1.0 + (u * up_t_b));
       }
@@ -379,7 +382,7 @@ void SequenceAlignment::calculate_state_probabilities_pos(TreeNode* node, unsign
   }
 }
 
-void SequenceAlignment::calculate_state_probabilities(TreeNode* node, std::list<int> positions) {
+void SequenceAlignment::calculate_state_probabilities(TreeNode* node, std::list<unsigned int> positions) {
   std::string name = node->name;
   std::vector<bool> gaps = taxa_names_to_gaps[name];
   if(not node->isTip()) {
@@ -419,8 +422,8 @@ void SequenceAlignment::incorperate_up_node(TreeNode* node, unsigned int pos, Tr
       up_prob = 0.0;
 
       for(signed char state_j = 0; state_j < (signed char)n_states; state_j++) {
-	unsigned long extended_state = up_node->get_hash_state_by_pos(pos);
-	rv = node->SM->selectRateVector({pos, state_j, domain_name, extended_state});
+	unsigned long extended_state = up_node->get_hypothetical_hash_state(pos, domain_name, state_j);
+	rv = node->SM->selectRateVector({pos, domain_name, extended_state});
 	double rate = rv->rates[i]->get_value();
 
 	double state_prob = taxa_names_to_state_probs[up_node->name][pos][state_j];
@@ -450,14 +453,12 @@ void SequenceAlignment::incorperate_up_node(TreeNode* node, unsigned int pos, Tr
 int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
   float* probs = taxa_names_to_state_probs[node->name][pos];
 
-
-  if(node->name == "BNode0") {
-    std::cout << node->name << " - " << pos << " - picking : [ ";
-    for(unsigned int i = 0; i < n_states; i++) {
-      std::cout << probs[i] << " ";
-    }
-    std::cout << "]";
-  }
+  //std::cout << node->name << " - " << pos << " - picking : [ ";
+  // for(unsigned int i = 0; i < n_states; i++) {
+  //   std::cout << probs[i] << " ";
+  // }
+  // std::cout << "]";
+  //}
   
   double r = Random();
   double acc = 0.0;
@@ -476,11 +477,6 @@ int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
     std::cerr << "Error: incorrectly picking a state: " <<  pos << " " << node->name << std::endl;
     exit(EXIT_FAILURE);
   }
-  
-  if(node->name == "BNode0") {
-    std::cout << " r: " << r << " val: " << val;
-    std::cout << std::endl;
-  }
 
   return(val);
 }
@@ -490,7 +486,7 @@ sample_status SequenceAlignment::sample() {
 
   // Makes list of all positions.
   // Leaving room for a feature where not all positions are sampled each time.
-  std::list<int> positions = {};
+  std::list<unsigned int> positions = {};
   for(unsigned int i = 0; i < n_columns; i++) {
     positions.push_back(i);
   };
@@ -515,19 +511,21 @@ sample_status SequenceAlignment::sample() {
     // Reculaculate state probability vector - including up branch.
     // No need if root.
     if(true) {
-      // TreeNode* left_node;
-      //if(node->left) {
-      //left_node = node->left->decendant;
-      //} else {
-      //left_node = nullptr;
-      //}
+      /*
+      TreeNode* left_node;
+      if(node->left) {
+	left_node = node->left->decendant;
+      } else {
+	left_node = nullptr;
+      }
 
-      //TreeNode* right_node;
-      //if(node->right) {
-      //	right_node = node->right->decendant;
-      //} else {
-      //	right_node = nullptr;
-      //}
+      TreeNode* right_node;
+      if(node->right) {
+      	right_node = node->right->decendant;
+      } else {
+      	right_node = nullptr;
+      }
+      */
 
       TreeNode* up_node;
       if(node->up) {
@@ -538,6 +536,7 @@ sample_status SequenceAlignment::sample() {
 
       for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
 	if((not gaps[*pos]) and (not (up_node == nullptr))) {
+	  //calculate_state_probabilities_pos(node, *pos, left_node, right_node, up_node);
 	  incorperate_up_node(node, *pos, up_node);
 	}
 

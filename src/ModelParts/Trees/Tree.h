@@ -41,7 +41,6 @@ public:
   // Constructing/Initializing.
   Tree();
   void Initialize(IO::RawTreeNode* raw_tree);
-  sample_status sample(const std::list<int>& positions);
   
   SubstitutionModel* get_SM();
   const std::list<BranchSegment*> get_branches();

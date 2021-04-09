@@ -32,7 +32,6 @@ void Environment::ReadOptions(int argc, char* argv[]) {
   ancestral_sequences = get<bool>("INPUT.ancestral_sequences");
 
   InitializeRandomNumberGeneratorSeed();
-  PrintOptions();
 }
 
 void Environment::ReadTOMLfile(std::string file_name) {

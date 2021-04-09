@@ -15,7 +15,6 @@ struct rv_request {
   // Struct representing a request for a rate vector.
   // More specific requests later, for example branch position.
   unsigned int pos;
-  signed char state;
   std::string domain;
   unsigned long ex_state; // Extended state - as hash.
 };
@@ -72,6 +71,7 @@ public:
 
   RateVector* select(rv_request);
   unsigned long get_hash_state(const std::map<std::string, std::vector<signed char>*>& sequences, int pos) const;
+  unsigned long get_hypothetical_hash_state(const std::map<std::string, std::vector<signed char>*>& sequences, int pos, std::string domain_name, signed char state) const;
   const std::list<rv_loc>& get_host_vectors(Valuable*);
 
   void print();
