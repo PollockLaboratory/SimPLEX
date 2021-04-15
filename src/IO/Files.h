@@ -50,14 +50,19 @@ namespace IO {
     void add_file(std::string name, std::string path, IOtype);
     fileInfo& get_info(std::string name);
 
-    bool end(std::string name);
+    // Read
     std::string get_next_line(std::string name);
     std::string read_all(std::string name);
 
+    // Write
     void write_to_file(std::string name, std::string data);
     
+    // Utils.
+    std::string get_root_directory();
+
     void print();
     void clean_and_close();
+
   private:
     int total_files;
     std::map<std::string, int> file_to_index;

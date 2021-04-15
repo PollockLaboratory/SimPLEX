@@ -4,6 +4,8 @@
 
 ]]
 
+-- This has not been fully implimented at all.
+
 Model.set_name("GTR")
 
 model_states = Config.get_string_array("MODEL.states")

@@ -252,16 +252,6 @@ void IO::Files::add_file(std::string name, std::string path, IOtype t) {
   total_files++;
 }
 
-bool IO::Files::end(std::string name) {
-  fileInfo info = get_info(name);
-
-  if(lseek(info.fd, 0, SEEK_CUR) >= info.size) {
-    return(true);
-  } else {
-    return(false);
-  }
-}
-
 std::string IO::Files::get_next_line(std::string name) {
   fileInfo info = get_info(name);
 
@@ -336,6 +326,10 @@ void IO::Files::write_to_file(std::string name, std::string data) {
   }
 
   // Increase size of file in fileInfo.
+}
+
+std::string IO::Files::get_root_directory() {
+  return(reference_dir.as_str());
 }
 
 void IO::Files::print() {

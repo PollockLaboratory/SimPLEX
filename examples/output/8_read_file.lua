@@ -11,7 +11,30 @@
 
 ]]
 
+-- Group residues.
+
 Model.set_name("JC69 - general")
+
+function lines_from(file)
+   lines = {}
+   for line in io.lines(file) do
+      lines[#lines + 1] = line
+      print(line)
+   end
+   return lines
+end
+
+groups = lines_from(Config.get_root_directory().."/data_sets/nucleotide_groups.txt")
+
+subs_to_rate = {}
+for i, str in pairs(groups) do
+   rate = Parameter.new("Group"..tostring(i), "continuous",
+			{initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0})
+   for sub_pair in str:gmatch("%w+") do
+      print(i, sub_pair)
+      subs_to_rate[sub_pair] = rate
+   end
+end
 
 model_states = Config.get_string_array("MODEL.states")
 
@@ -20,16 +43,17 @@ States.new("nucleotide", model_states,
 
 Data.load_state("nucleotide", Config.get_str("MODEL.sequences_file"))
 
-x = Parameter.new("x", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0})
-
 for i=1,#model_states do
 	rv_list = {}
 	for j=1,#model_states do
 	   if i ~= j then
-	      rv_list[j] = x
+	      sub_pair = States.nucleotide[i]..States.nucleotide[j]
+	      print(sub_pair)
+	      rv_list[j] = subs_to_rate[sub_pair]
 	   else
 	      rv_list[j] = Parameter.new("virtual-"..tostring(States.nucleotide[i]), "virtual", {})
 	   end
 	end
 	Model.add_rate_vector(RateVector.new("RV-"..tostring(States.nucleotide[i]), {domain = "nucleotide", state = States.nucleotide[i], pos = {}}, rv_list))
 end
+

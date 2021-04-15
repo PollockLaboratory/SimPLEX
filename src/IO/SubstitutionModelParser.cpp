@@ -131,7 +131,8 @@ namespace IO {
     std::set<std::string> state_set(all_states[state_domain].begin(), all_states[state_domain].end());
     std::string state = info_tbl["state"];
     if(state_set.find(state) == state_set.end()) {
-      std::cerr << "Error: " << state << " is not specified within the " << state_domain << " domain." << std::endl;
+      std::cerr << "Error: the use cases for the rate vector " << name << "are not valid." << std::endl;
+      std::cerr << "The state \'" << state << "\' is not specified within the " << state_domain << " domain." << std::endl;
       exit(EXIT_FAILURE);		 
     }
 
@@ -172,7 +173,7 @@ namespace IO {
   }
 
   void raw_substitution_model::read_from_file(std::string file_name) {
-    lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::string);
+    lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::string, sol::lib::io);
 
     // Main Lua tables.
     // MODEL
@@ -215,6 +216,10 @@ namespace IO {
 					 });
 
     config_table.set_function("get_string_array", &get_string_tbl);
+
+    config_table.set_function("get_root_directory", []() -> std::string {
+						      return(files.get_root_directory());
+						    });
 
     // PARAMETERS
     lua.new_usertype<ParameterWrapper>("Parameter",
