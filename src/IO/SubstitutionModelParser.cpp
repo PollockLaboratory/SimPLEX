@@ -201,8 +201,11 @@ namespace IO {
 						   
 						 });
 
-        // CONFIGURATION
+    // CONFIGURATION
     auto config_table = lua["Config"].get_or_create<sol::table>();
+    config_table.set_function("get_bool", [](std::string key) -> int {
+					    return(env.get<bool>(key));
+					  });
     config_table.set_function("get_int", [](std::string key) -> int {
 					   return(env.get<int>(key));
 					 });

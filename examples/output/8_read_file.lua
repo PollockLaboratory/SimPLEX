@@ -15,6 +15,14 @@
 
 Model.set_name("JC69 - general")
 
+-- Set the states.
+model_states = Config.get_string_array("MODEL.states")
+States.new("nucleotide", model_states,
+	   {sequences_output = Config.get_str("MODEL.sequences_out_file"), substitutions_output = Config.get_str("MODEL.substitutions_out_file")})
+
+Data.load_state("nucleotide", Config.get_str("MODEL.sequences_file"))
+
+-- Read file to group amino acid residues into groups.
 function lines_from(file)
    lines = {}
    for line in io.lines(file) do
@@ -26,6 +34,7 @@ end
 
 groups = lines_from(Config.get_root_directory().."/data_sets/nucleotide_groups.txt")
 
+-- Create rate parameters for each group.
 subs_to_rate = {}
 for i, str in pairs(groups) do
    rate = Parameter.new("Group"..tostring(i), "continuous",
@@ -36,13 +45,7 @@ for i, str in pairs(groups) do
    end
 end
 
-model_states = Config.get_string_array("MODEL.states")
-
-States.new("nucleotide", model_states,
-	   {sequences_output = Config.get_str("MODEL.sequences_out_file"), substitutions_output = Config.get_str("MODEL.substitutions_out_file")})
-
-Data.load_state("nucleotide", Config.get_str("MODEL.sequences_file"))
-
+-- Build rate vectors.
 for i=1,#model_states do
 	rv_list = {}
 	for j=1,#model_states do
