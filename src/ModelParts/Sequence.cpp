@@ -57,7 +57,7 @@ float** create_state_probability_vector(unsigned int n_cols, unsigned int n_stat
 
 void SequenceAlignment::add_base(std::string name, const IO::FreqSequence &seq) {
   base_sequences.push_front(name);
-  add(name, sequenceAsStr(seq));
+  add(name, sequenceAsStr_highestFreq(seq));
 
   base_taxa_state_probs[name] = create_state_probability_vector(seq.size(), n_states);
 

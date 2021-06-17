@@ -60,6 +60,12 @@ inline void BranchSegment::update_rate_vectors() {
       // Set the rate vectors for each of the states..
       for(auto it = ancestral->sequences.begin(); it != ancestral->sequences.end(); ++it) {
 	rv_request rq = {pos, it->first, ex_state};
+	
+	if(ancestral->SM->selectRateVector(rq) == nullptr) {
+	  std::cerr << "Error: cannot find RateVector for position: " << pos << " " << it->first << std::endl;
+	  exit(EXIT_FAILURE);
+	}
+
 	rates[it->first][pos] = ancestral->SM->selectRateVector(rq);
       }
     }
@@ -86,8 +92,9 @@ void BranchSegment::set_new_substitutions() {
 	    // Possibility of virtual substitution.
 	    // Not sure this is exactly right.
 	    //float length = distance;
-	    
+
 	    double vir_rate = rates[domain->first][pos]->rates[dec_seq->at(pos)]->get_value();
+
 	    //double p = 1 - (1 / (1 + (vir_rate * distance)));
 	    double p = vir_rate / (1 - u + vir_rate);
 	    if(Random() < p) {

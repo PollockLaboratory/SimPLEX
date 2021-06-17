@@ -112,10 +112,12 @@ void RateVectorSet::add(RateVector* rv, IO::rv_use_class uc) {
 
 RateVector* RateVectorSet::select(rv_request rq) {
   RateVector* rv = state_to_rv[rq.domain][rq.ex_state];
-  //if(rv == nullptr) {
-  // std::cout << "Error: attempting to dispatch nullptr instead of RateVector*" << std::endl;
-  // exit(EXIT_FAILURE);
-  //}
+
+  if(rv == nullptr) {
+    std::cerr << "Error: attempting to dispatch nullptr instead of RateVector*" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
   return(rv);
 }
 

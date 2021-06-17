@@ -71,12 +71,37 @@ namespace IO {
 
     IO::RawMSA MSA = {};
     try {
-      MSA = readRawAdvMSA(files.read_all(fh), it->second);
+      MSA = readRawMSA(files.read_all(fh), it->second);
     } catch(IO::ParseException const &err) {
       throw IO::ParseException(std::string("error reading ") + file_name + ": " + err.what());
     }
 
     state_data[domain] = MSA;
+  }
+
+  void raw_substitution_model::create_uniform_prior(std::string domain) {
+    // Get the states.
+    std::list<std::string> states = all_states[domain];
+
+    // Find a MSA that is filled with external data.
+    // This template msa is used to find the location of gaps.
+    IO::RawMSA template_msa;
+    for(auto it = state_data.begin(); it != state_data.end(); ++it) {
+      std::cout << it->first << " " << it->second.n << " " << it->second.cols << std::endl;
+      if(it->first == domain) {
+	std::cerr << "Error: cannot create a uniform prior for " << domain << ", as data for that domain already exists." << std::endl;
+	exit(EXIT_FAILURE);
+      } else {
+	template_msa = it->second;
+	break;
+      }
+    }
+
+    IO::RawMSA msa = IO::createUniformPrior(states, template_msa);
+
+    IO::printRawAdvMSA(msa);
+
+    state_data[domain] = msa;
   }
  
   std::list<int> get_positions(sol::table pos_tbl) {
@@ -200,6 +225,11 @@ namespace IO {
 						   read_state_file(hidden_state, file_name);
 						   
 						 });
+
+    data_table.set_function("create_uniform_prior", [this](std::string hidden_state) -> void {
+						      std::cout << "Creating a uniform prior: " << hidden_state << std::endl;
+						      create_uniform_prior(hidden_state);
+						    });
 
     // CONFIGURATION
     auto config_table = lua["Config"].get_or_create<sol::table>();

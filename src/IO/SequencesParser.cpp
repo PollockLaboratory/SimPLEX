@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <iterator>
 #include <exception>
 #include <stdlib.h>
 
@@ -24,7 +25,7 @@ namespace IO {
     return(states);
   }
   
-  std::string freqListAsStr(std::list<StateFreq> freqs) {
+  std::string freqListAsStr_highestFreq(std::list<StateFreq> freqs) {
     if(freqs.size() == 1) {
       return(std::string(1, freqs.front().state));
     } else {
@@ -37,6 +38,24 @@ namespace IO {
 	}
       }
       return(std::string(1, state));
+    }
+  }
+ 
+  std::string freqListAsStr(std::list<StateFreq> freqs) {
+    if(freqs.size() == 1) {
+      return(std::string(1, freqs.front().state));
+    } else {
+      std::string freq_str = "[";
+      char state = '*';
+      for(auto it = freqs.begin(); it != freqs.end(); ++it) {
+	freq_str += std::string(1, it->state) + ":" + std::to_string(it->freq);
+	if(std::next(it) != freqs.end()) {
+	  freq_str += ",";
+	}
+      }
+      freq_str += "]";
+      
+      return(freq_str);
     }
   }
 
@@ -55,6 +74,16 @@ namespace IO {
       }
     }
     return(false);
+  }
+
+  std::string sequenceAsStr_highestFreq(FreqSequence seq) {
+    // Prints a string representation of the FreqSequences, but picks the highest frequences
+    // state to represent the position.
+    std::string out = "";
+    for(auto it = seq.begin(); it != seq.end(); ++it) {
+      out += freqListAsStr_highestFreq(*it);
+    }
+    return(out);
   }
 
   std::string sequenceAsStr(FreqSequence seq) {
@@ -287,7 +316,11 @@ namespace IO {
     return(count);
   }
   
-  RawMSA parseRawAdvMSA(std::string data) {
+  RawMSA parseRawMSA(std::string data) {
+    // Parses MSA with frquency infomation.
+    // A = state 'A' with frequency of 1.0.
+    // [A:1.0] = state 'A' with frequency of 1.0.
+    // [A:0.5,B:0.5] = state 'A' with frequncy of 0.5 and state 'B' with frequency of 0.5.
     RawMSA msa = {0, 0, {}};
     auto loc = data.begin();
     ParserState state = SEQNAME;
@@ -374,8 +407,9 @@ namespace IO {
     }
   }
 
-  RawMSA readRawAdvMSA(std::string data, std::list<std::string> states) {
-    RawMSA msa = parseRawAdvMSA(data);
+  RawMSA readRawMSA(std::string data, std::list<std::string> states) {
+    // Parses MSA with frequency infomation.
+    RawMSA msa = parseRawMSA(data);
 
     std::set<std::string> states_set(states.begin(), states.end());
     validateMSA(msa, states_set);
@@ -384,12 +418,46 @@ namespace IO {
     return(msa);
   }
 
+  RawMSA createUniformPrior(std::list<std::string> states, RawMSA template_msa) {
+    RawMSA msa = {};
+
+    // Construct uniform frequences for single position.
+    float uniform_freq = 1.0 / states.size();
+    std::list<StateFreq> uniform_pos = {};
+    for(auto state_it = states.begin(); state_it != states.end(); ++state_it) {
+      StateFreq sf = {state_it->front(), uniform_freq};
+      uniform_pos.push_back(sf);
+    }
+
+    std::list<StateFreq> gap_pos = {{'-', 1.0}};
+
+    for(auto it = template_msa.seqs.begin(); it != template_msa.seqs.end(); ++it) {
+      std::string seq_name = it->first;
+      FreqSequence seq = it->second;
+
+      msa.seqs[seq_name] = {};
+      // Loop through positions of template MSA, if gap insert gap else add uniform prior.
+      for(auto pos_it = seq.begin(); pos_it != seq.end(); ++pos_it) {
+	if(FreqList_gap(*pos_it)) {
+	  msa.seqs[seq_name].push_back(gap_pos);
+	} else {
+	  msa.seqs[seq_name].push_back(uniform_pos);
+	}
+      }
+    }
+
+    return(msa);
+  }
+
   void printRawAdvMSA(RawMSA msa) {
    for(auto it = msa.seqs.begin(); it != msa.seqs.end(); ++it) {
-     std::cout << it->first << " - " << sequenceAsStr(it->second) << std::endl;
+     std::cout << it->first << " - ";
+     std::string seq_str = sequenceAsStr(it->second);
+     if(seq_str.empty()) {
+       std::cout << "EMPTY_SEQUENCE" << std::endl;
+     } else {
+       std::cout << seq_str << std::endl;
+     }
    }
  }
 }
-
-
-

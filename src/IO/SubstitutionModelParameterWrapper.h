@@ -36,6 +36,7 @@ namespace IO {
   ParameterWrapper divide_parameters(ParameterWrapper, ParameterWrapper);
   ParameterWrapper named_divide_parameters(std::string, ParameterWrapper, ParameterWrapper);
 
+  // Only partially implimented.
   class DependencyGroupWrapper {
   private:
     std::string name;
