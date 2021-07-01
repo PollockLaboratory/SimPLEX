@@ -3,6 +3,7 @@
 \.o$
 debug
 testing/test_run/
+examples/output/
 bin/
 build/
 testing/

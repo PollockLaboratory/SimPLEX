@@ -171,7 +171,8 @@ void Tree::record_tree() {
   /*
    * Records the tree topology with all node names and branch segments.
    */
-  files.write_to_file("tree_out", root->toString());
+  std::string tree_str = root->toString() + ";";
+  files.write_to_file("tree_out", tree_str);
 }
 
 // Debug tools.
