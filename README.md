@@ -5,9 +5,9 @@ It takes the input of a rooted tree, sequences for the node tips and a substitut
 
 ## Installation
 
-### Get the newest version of PLEX from github
+### Download a copy of simPLEX from bitbucket
 
-	$ git pull origin master
+	$ git clone https://bitbucket.org/pollocklaboratory/simplex0_0/
 
 ### Dependencies
 simPLEX has a number of external dependencies that can sometimes to be challenging to link/compile into the final binary. These include lua5.2 and the C++ boost library. To install them on Ubuntu/Debian based linux distributions use:
