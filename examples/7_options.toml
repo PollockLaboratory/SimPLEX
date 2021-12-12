@@ -53,3 +53,5 @@ seed = 0
 
   step_size = 0.001
   states = ['a', 't', 'c', 'g']
+
+  state_name = "nucleotides"

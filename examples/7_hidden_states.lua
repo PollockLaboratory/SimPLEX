@@ -8,7 +8,7 @@ Model.set_name("Hidden State.")
 
 -- Base
 model_states = Config.get_string_array("MODEL.states")
-States.new("primary", model_states, {sequences_output = Config.get_str("MODEL.sequences_out_file"), substitutions_output = Config.get_str("MODEL.substitutions_out_file")})
+States.new(Config.get_str("MODEL.state_name"), model_states, {sequences_output = Config.get_str("MODEL.sequences_out_file"), substitutions_output = Config.get_str("MODEL.substitutions_out_file")})
 Data.load_state("primary", Config.get_str("MODEL.sequences_file"))
 
 od_states = {"O", "D"}

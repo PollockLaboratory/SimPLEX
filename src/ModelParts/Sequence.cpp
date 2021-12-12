@@ -106,6 +106,7 @@ void SequenceAlignment::saveToFile(int save_count, int gen, double l) {
 
   std::ostringstream subs_buffer;
 
+  // Save the substitutions for a particular state.
   std::list<BranchSegment*> branches = tree->get_branches();
   for(auto it = branches.begin(); it != branches.end(); ++it) {
     subs_buffer << save_count << "," << gen << "," << l << ",";
@@ -115,9 +116,9 @@ void SequenceAlignment::saveToFile(int save_count, int gen, double l) {
       if(subs[pos].occuredp == true) {
 	int anc = (*it)->ancestral->sequences[domain_name]->at(pos);
 	int dec = (*it)->decendant->sequences[domain_name]->at(pos);
-	if(anc != dec) {
-	    subs_buffer << integer_to_state[anc] << pos << integer_to_state[dec] << " ";
-	  }
+
+	// Includes virtual substitutions.
+	subs_buffer << integer_to_state[anc] << pos << integer_to_state[dec] << " ";
       }
     }
     subs_buffer << "]\n";
@@ -497,6 +498,7 @@ sample_status SequenceAlignment::sample() {
   // Find state probabilities.
   // Nodes are ordered in the list such that they are visted in order up the tree.
   for(auto n = nodes.begin(); n != nodes.end(); ++n) {
+    // This is worrying - I'm not sure tips should be skipped.
     if(not (*n)->isTip()) {
       calculate_state_probabilities(*n, positions);
     }
@@ -511,6 +513,7 @@ sample_status SequenceAlignment::sample() {
     // Reculaculate state probability vector - including up branch.
     // No need if root.
     if(true) {
+      // The likelihood contribution of these nodes has already been calculated in the upwards reursion.
       /*
       TreeNode* left_node;
       if(node->left) {
