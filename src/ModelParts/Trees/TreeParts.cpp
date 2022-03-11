@@ -95,8 +95,8 @@ void BranchSegment::set_new_substitutions() {
 
 	    double vir_rate = rates[domain->first][pos]->rates[dec_seq->at(pos)]->get_value();
 
-	    //double p = 1 - (1 / (1 + (vir_rate * distance)));
-	    double p = vir_rate / (1 - u + vir_rate);
+	    double p = 1 - (1 / (1 + (vir_rate * distance)));
+	    //double p = vir_rate / (1 - u + vir_rate);
 	    if(Random() < p) {
 	      substitutions[domain->first][pos] = {true, anc_seq->at(pos), dec_seq->at(pos), rates[domain->first][pos]};
 	    } else {

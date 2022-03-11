@@ -300,16 +300,21 @@ float SequenceAlignment::calculate_single_state_probability(unsigned int pos, un
   float t_b = node->distance;
 
   for(signed char state_j = 0; state_j < (signed char)n_states; state_j++) {
+    double rate = rv[state_j]->get_value();
+    double state_prob = taxa_names_to_state_probs[node->name][pos][state_j];
+    
     // Virtual rate is included when i == j.
     if(state_i != state_j) {
-      double rate = rv[state_j]->get_value();
-      double state_prob = taxa_names_to_state_probs[node->name][pos][state_j];
       prob += (state_prob * rate * t_b)/(1.0 + (u * t_b));
     } else {
-      // Probability of staying the same due to waiting time - does not take virtual substitution rate into account.
-      prob += taxa_names_to_state_probs[node->name][pos][state_i] / (1.0 + (u * t_b));
+      // Possible virtual substitution.
+      double prob_virtual = 1 - (1 / (1 + (rate * t_b))); // Probability that there is any virtual substitution at all.
+      prob += prob_virtual * (state_prob * rate * t_b)/(1.0 + (u * t_b));
     }
   }
+
+  // Probability due to waiting time.
+  prob += taxa_names_to_state_probs[node->name][pos][state_i] / (1.0 + (u * t_b));
 
   return(prob);
 }
