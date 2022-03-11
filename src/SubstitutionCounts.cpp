@@ -110,7 +110,7 @@ std::string CountsParameter::get_state() {
   return("n/a");
 }
 
-void CountsParameter::save_to_file(int gen, double l) {
+void CountsParameter::save_to_file(boost::multiprecision::uint128_t gen, double l) {
   static int index = -1;
   index++;
 

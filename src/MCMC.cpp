@@ -28,7 +28,7 @@ void MCMC::Initialize(Model* model) {
   this->model = model; // associate the pointer with the MCMC
 
   // Env settings.
-  gens = env.get<int>("MCMC.generations");
+  gens = uint128_t(env.get<std::string>("MCMC.generations"));
   out_freq = env.get<int>("MCMC.output_frequency");
   print_freq = env.get<int>("MCMC.print_frequency");
   complete_likelihood_update = env.get<int>("MCMC.full_update_freq");
@@ -97,7 +97,7 @@ void MCMC::Run() {
     }
 
     if(gen % print_freq == 0) {
-      std::string percent_complete = std::to_string((int)((gen/(float)gens)*100.0));
+      std::string percent_complete = ((gen*100)/gens).str();
       std::cout << "[";
       for(unsigned int i = 0; i < 3 - percent_complete.length(); i++ ) {
 	std::cout << " ";

@@ -6,10 +6,13 @@
 #include <vector>
 #include <list>
 #include <set>
+#include <boost/multiprecision/cpp_int.hpp>
 
 #include "AbstractComponent.h"
 #include "../IO/SequencesParser.h"
 #include "SubstitutionModels/States.h"
+
+using boost::multiprecision::uint128_t;
 
 class Tree;
 class TreeNode;
@@ -43,7 +46,7 @@ class SequenceAlignment {
 
   void print();
   void Initialize(IO::RawMSA raw_msa);
-  void saveToFile(int i, int gen, double l);
+  void saveToFile(int i, uint128_t gen, double l);
 
   // Utilities
   int numCols();
@@ -100,7 +103,7 @@ public:
   std::string get_state_header() override;
   std::string get_state() override;
 
-  void save_to_file(int gen, double l);
+  void save_to_file(uint128_t gen, double l);
 };
 
 #endif

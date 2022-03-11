@@ -187,14 +187,14 @@ std::vector<RateVector*> SubstitutionModel::get_RateVectors() {
   return(rateVectors.col);
 }
 
-void SubstitutionModel::saveToFile(int gen, double l, std::map<RateVector*, std::vector<int>> counts_by_rv) {
+void SubstitutionModel::saveToFile(uint128_t gen, double l, std::map<RateVector*, std::vector<int>> counts_by_rv) {
   rateVectors.saveToFile(gen, l);
 
   static int i = -1;
   ++i;
   
   // Parameter's substitution counts.
-  std::string line = std::to_string(i) + "," + std::to_string(gen) + "," + std::to_string(l);
+  std::string line = std::to_string(i) + "," + gen.str() + "," + std::to_string(l);
   std::list<AbstractComponent*> all_parameters = get_all_parameters();
   for(auto it = all_parameters.begin(); it != all_parameters.end(); it++) {
     if((*it)->get_hidden() != true) {

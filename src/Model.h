@@ -6,11 +6,15 @@
 #ifndef Model_h_
 #define Model_h_
 
+#include <boost/multiprecision/cpp_int.hpp>
+
 #include "SubstitutionCounts.h"
 #include "ModelParts/Trees/Tree.h"
 #include "ModelParts/SubstitutionModels/SubstitutionModel.h"
 #include "ModelParts/ComponentSet.h"
 #include "Data.h"
+
+using boost::multiprecision::uint128_t;
 
 class Model {
 public:
@@ -25,7 +29,7 @@ public:
   double CalculateChangeInLikelihood();
   double PartialCalculateLikelihood(const double lnL);
 
-  void RecordState(int gen, double l);
+  void RecordState(uint128_t gen, double l);
   void print();
   void printParameters();
 private:

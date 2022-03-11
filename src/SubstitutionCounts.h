@@ -3,6 +3,7 @@
 
 #include <map>
 #include <vector>
+#include <boost/multiprecision/cpp_int.hpp>
 
 #include "ModelParts/AbstractComponent.h"
 #include "ModelParts/SubstitutionModels/States.h"
@@ -44,7 +45,7 @@ public:
 
   std::string get_type() override;
 
-  void save_to_file(int gen, double l);
+  void save_to_file(boost::multiprecision::uint128_t gen, double l);
 };
 
 #endif

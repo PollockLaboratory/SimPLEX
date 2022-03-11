@@ -6,10 +6,13 @@
 #include <string>
 #include <list>
 #include <map>
+#include <boost/multiprecision/cpp_int.hpp>
 
 #include "States.h"
 #include "../AbstractComponent.h"
 #include "../../IO/SubstitutionModelParser.h"
+
+using boost::multiprecision::uint128_t;
 
 struct rv_request {
   // Struct representing a request for a rate vector.
@@ -75,7 +78,7 @@ public:
   const std::list<rv_loc>& get_host_vectors(Valuable*);
 
   void print();
-  void saveToFile(int gen, double l);
+  void saveToFile(uint128_t gen, double l);
  private:
   std::map<std::string, States> all_states;
   unsigned int n_domains;

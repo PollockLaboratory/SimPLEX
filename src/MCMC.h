@@ -3,16 +3,21 @@
 
 #include "Model.h"
 
+#include <boost/multiprecision/cpp_int.hpp> 
+
+using boost::multiprecision::uint128_t;
+
 class MCMC {
 private:
   Model* model;
-  int gen;
+  uint128_t gen;
   double lnL;
   double newLnL;
   bool accepted;
 
   // Settings.
-  int gens; // Number of generations.
+  //int gens; // Number of generations.
+  uint128_t gens; // Number of generations.
   int out_freq; // Frequency of saving state.
   int print_freq; // Frequency of printing likelihood to term.
   int complete_likelihood_update; // Number of generations before force full likelihood calculation.

@@ -4,6 +4,7 @@
 #include <list>
 #include <map>
 #include <string>
+#include <boost/multiprecision/cpp_int.hpp>
 
 #include "AbstractComponent.h"
 #include "../SubstitutionCounts.h"
@@ -61,7 +62,7 @@ public:
   // Output
   void print();
   void print_dependencies();
-  void save_to_file(int gen, double l);
+  void save_to_file(boost::multiprecision::uint128_t gen, double l);
 };
 
 #endif

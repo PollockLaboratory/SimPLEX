@@ -176,19 +176,13 @@ double Model::CalculateLikelihood() {
     logL_waiting += num0subs * log(1/(1 + u*t)) + num1subs * log(t/(1 + u*t));
   }
 
-  //std::cout << "Counts: ";
   for(auto it = counts.subs_by_rateVector.begin(); it != counts.subs_by_rateVector.end(); ++it) {
     RateVector* rv = it->first;
-    //std::cout << rv->get_name() << " [ ";
     std::vector<int> C_xy = it->second;
     for(unsigned int i = 0; i < rv->rates.size(); i++) {
-      // std::cout << C_xy[i] << "|" << log((*rv)[i]) << " ";
       logL_subs += C_xy[i] * log((*rv)[i]);
     }
-    //std::cout << "]" << std::endl;
   }
-
-  //std::cout << logL_waiting << " " << logL_subs << std::endl;
  
   return(logL_waiting + logL_subs);
 }
@@ -203,22 +197,18 @@ double Model::CalculateChangeInLikelihood(){
   RateVector* rv;
   int C_xy;
 
-  //std::cout << std::endl;
   for(auto it = substitution_model->modified_begin(components.get_current_parameter());
       it.at_end() == false; ++it) { 
     rv = (*it).rv;
     C_xy = counts.subs_by_rateVector[rv][(*it).pos];
     delta_logL += C_xy * log(rv->get_rate_ratio((*it).pos));
-    //std::cout << "[" << rv->get_rate_ratio((*it).pos) << " " << C_xy * log(rv->get_rate_ratio((*it).pos)) << "] ";
-    //std::cout << "RV: " << rv->get_name() << " count: " << C_xy << " ratio: " << rv->get_rate_ratio((*it).pos) << " log: " << log(rv->get_rate_ratio((*it).pos)) << " " << delta_logL << std::endl;
   }
 
-  //std::cout << "Delta: " << delta_logL << std::endl;
   return(delta_logL);
 }
 
 // Printing/Recording
-void Model::RecordState(int gen, double l) {
+void Model::RecordState(uint128_t gen, double l) {
 	/*
 	 * Records the state of both the tree and the substitution model.
 	 */

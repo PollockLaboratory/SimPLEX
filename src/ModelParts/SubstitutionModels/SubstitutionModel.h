@@ -5,11 +5,14 @@
 #include <set>
 #include <map>
 #include <string>
+#include <boost/multiprecision/cpp_int.hpp>
 
 #include "../AbstractComponent.h"
 #include "RateVector.h"
 #include "../../IO/SubstitutionModelParser.h"
 #include "States.h"
+
+using boost::multiprecision::uint128_t;
 
 class SubstitutionModel {
   class iterator;
@@ -39,7 +42,7 @@ public:
 
   std::list<AbstractComponent*> get_all_parameters();
   
-  void saveToFile(int gen, double l, std::map<RateVector*, std::vector<int>> counts_by_rv);
+  void saveToFile(uint128_t gen, double l, std::map<RateVector*, std::vector<int>> counts_by_rv);
 private:
   void configure_States(std::map<std::string, std::list<std::string>>);
   void configure_RateVectors(std::list<IO::raw_rate_vector>);

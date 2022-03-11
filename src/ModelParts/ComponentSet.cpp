@@ -231,7 +231,7 @@ void ComponentSet::print_dependencies() {
   std::cout << std::endl;
 }
 
-void ComponentSet::save_to_file(int gen, double l) {
+void ComponentSet::save_to_file(boost::multiprecision::uint128_t gen, double l) {
   /*
    * Saves the current parameter values to the output csv file, contained
    * in the out_file.
@@ -240,7 +240,7 @@ void ComponentSet::save_to_file(int gen, double l) {
   ++i;
 
   // Parameter's values.
-  std::string line = std::to_string(i) + "," + std::to_string(gen) + "," + std::to_string(l);
+  std::string line = std::to_string(i) + "," + gen.str() + "," + std::to_string(l);
 
   for(unsigned int j = 0; j < all_parameters.size(); j++) {
     if(all_parameters[j]->get_hidden() != true) {

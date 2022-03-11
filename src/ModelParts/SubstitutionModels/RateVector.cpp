@@ -289,7 +289,7 @@ void RateVectorSet::print() {
   }
 }
 
-void RateVectorSet::saveToFile(int gen, double l) {
+void RateVectorSet::saveToFile(uint128_t gen, double l) {
   static int i = -1;
   ++i;
 

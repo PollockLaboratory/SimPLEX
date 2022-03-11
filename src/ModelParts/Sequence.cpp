@@ -95,7 +95,7 @@ void SequenceAlignment::Initialize(IO::RawMSA raw_msa) {
   n_columns = (*taxa_names_to_sequences.begin()).second.size();
 }
 
-void SequenceAlignment::saveToFile(int save_count, int gen, double l) {
+void SequenceAlignment::saveToFile(int save_count, uint128_t gen, double l) {
   std::ostringstream buffer;
   buffer << "#" << save_count << ":" << gen << ":" << l << std::endl;
   for(auto it = taxa_names_to_sequences.begin(); it != taxa_names_to_sequences.end(); ++it) {
@@ -301,14 +301,15 @@ float SequenceAlignment::calculate_single_state_probability(unsigned int pos, un
 
   for(signed char state_j = 0; state_j < (signed char)n_states; state_j++) {
     // Virtual rate is included when i == j.
-    double rate = rv[state_j]->get_value();
-    double state_prob = taxa_names_to_state_probs[node->name][pos][state_j];
-
-    prob += (state_prob * rate * t_b)/(1.0 + (u * t_b));
+    if(state_i != state_j) {
+      double rate = rv[state_j]->get_value();
+      double state_prob = taxa_names_to_state_probs[node->name][pos][state_j];
+      prob += (state_prob * rate * t_b)/(1.0 + (u * t_b));
+    } else {
+      // Probability of staying the same due to waiting time - does not take virtual substitution rate into account.
+      prob += taxa_names_to_state_probs[node->name][pos][state_i] / (1.0 + (u * t_b));
+    }
   }
-
-  // Probability of staying the same.
-  prob += taxa_names_to_state_probs[node->name][pos][state_i] / (1.0 + (u * t_b));
 
   return(prob);
 }
@@ -349,7 +350,7 @@ void SequenceAlignment::calculate_state_probabilities_pos(TreeNode* node, unsign
       right_prob = 1.0;
     }
 
-    // Contribution of up branch.
+    // Contribution of up branch - this is never called.
     if(up_node != nullptr) {
       float up_t_b = node->distance;
 
@@ -384,9 +385,15 @@ void SequenceAlignment::calculate_state_probabilities_pos(TreeNode* node, unsign
 }
 
 void SequenceAlignment::calculate_state_probabilities(TreeNode* node, std::list<unsigned int> positions) {
+  /*
+   *
+   */
+  
   std::string name = node->name;
   std::vector<bool> gaps = taxa_names_to_gaps[name];
   if(not node->isTip()) {
+    // Node may or may not be a branch node - therefore may only have one child which is always the left one.
+    // Set to nullptr if no right branch;
     TreeNode* right_node;
     if(node->right) {
       right_node = node->right->decendant;
@@ -498,7 +505,7 @@ sample_status SequenceAlignment::sample() {
   // Find state probabilities.
   // Nodes are ordered in the list such that they are visted in order up the tree.
   for(auto n = nodes.begin(); n != nodes.end(); ++n) {
-    // This is worrying - I'm not sure tips should be skipped.
+    // NOTE This is worrying - I'm not sure tips should be skipped.
     if(not (*n)->isTip()) {
       calculate_state_probabilities(*n, positions);
     }
@@ -650,7 +657,7 @@ std::string SequenceAlignmentParameter::get_state() {
   return("n/a");
 }
 
-void SequenceAlignmentParameter::save_to_file(int gen, double l) {
+void SequenceAlignmentParameter::save_to_file(uint128_t gen, double l) {
   save_count += 1;
   msa->saveToFile(save_count, gen, l);
 }
