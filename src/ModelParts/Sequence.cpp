@@ -8,6 +8,7 @@
 #include "Trees/TreeParts.h"
 #include "Trees/Tree.h"
 
+// Globals
 extern double Random();
 extern Environment env;
 extern IO::Files files;
@@ -295,6 +296,9 @@ void SequenceAlignment::reset_base_probabilities() {
 }
 
 float SequenceAlignment::calculate_single_state_probability(unsigned int pos, unsigned char state_i, std::vector<Valuable*> rv, TreeNode* node) {
+  /*
+   * Calculates the probability of branch (for an indervidual position) given state_i at the top of the branch.
+   */
   double u = node->SM->get_u();
   float prob = 0.0;
   float t_b = node->distance;
@@ -303,28 +307,27 @@ float SequenceAlignment::calculate_single_state_probability(unsigned int pos, un
     double rate = rv[state_j]->get_value();
     double state_prob = taxa_names_to_state_probs[node->name][pos][state_j];
     
-    // Virtual rate is included when i == j.
     if(state_i != state_j) {
-      prob += (state_prob * rate * t_b)/(1.0 + (u * t_b));
+      // Normal Substitution
+      prob += (state_prob * rate * t_b)/(1.0 + (u * t_b)); // Probability of the substitution.
     } else {
-      // Possible virtual substitution.
-      double prob_virtual = 1 - (1 / (1 + (rate * t_b))); // Probability that there is any virtual substitution at all.
-      prob += prob_virtual * (state_prob * rate * t_b)/(1.0 + (u * t_b));
+      // No substitution possibly virtual.
+      // Probability that there is any virtual substitution | given no substitution - equation (9) Rapid Likelihood Analysis on Large Phylogenies.
+      double prob_virtual = 1 - (1 / (1 + (rate * t_b)));
+      double denom = 1.0 / (1.0 + (u * t_b));
+
+      //                    Virtual Substitution                       No substitution
+      prob += state_prob * ((prob_virtual * ((rate * t_b) * denom)) + ((1.0 - prob_virtual) * denom));
     }
   }
-
-  // Probability due to waiting time.
-  prob += taxa_names_to_state_probs[node->name][pos][state_i] / (1.0 + (u * t_b));
 
   return(prob);
 }
 
-void SequenceAlignment::calculate_state_probabilities_pos(TreeNode* node, unsigned int pos, TreeNode* left_node, TreeNode* right_node, TreeNode* up_node) {
-  double u = node->SM->get_u();
+void SequenceAlignment::calculate_state_probabilities_pos(TreeNode* node, unsigned int pos, TreeNode* left_node, TreeNode* right_node) {
   RateVector* rv;
   float left_prob = 0.0;
   float right_prob = 0.0;
-  float up_prob = 0.0;
 
   double normalize_total = 0.0;
 
@@ -355,43 +358,24 @@ void SequenceAlignment::calculate_state_probabilities_pos(TreeNode* node, unsign
       right_prob = 1.0;
     }
 
-    // Contribution of up branch - this is never called.
-    if(up_node != nullptr) {
-      float up_t_b = node->distance;
-
-      up_prob = 0.0;
-      for(signed char state_j = 0; state_j < (signed char)n_states; state_j++) {
-	unsigned long extended_state = up_node->get_hypothetical_hash_state(pos, domain_name, state_j);
-	rv = node->SM->selectRateVector({pos, domain_name, extended_state});
-	double rate = rv->rates[i]->get_value();
-
-	// This could be trouble.
-	double state_prob = taxa_names_to_state_probs[up_node->name][pos][state_j];
-	up_prob += (state_prob * rate * up_t_b)/(1.0 + (u * up_t_b));
-      }
-
-      // Probability of staying the same.
-      up_prob += taxa_names_to_state_probs[up_node->name][pos][i] / (1.0 + (u * up_t_b)); 
-    } else {
-      up_prob = 1.0;
-    }
-
-    float total = left_prob * right_prob * up_prob;
+    float total = left_prob * right_prob;
     taxa_names_to_state_probs[node->name][pos][i] = total;
     normalize_total += total;
   }
 
   // Normalize
+  // NOTE Refactor out.
   if(normalize_total != 0.0) {
     for(unsigned int i = 0; i < n_states; i++) {
-      taxa_names_to_state_probs[node->name][pos][i] /= normalize_total;
-    }
+     taxa_names_to_state_probs[node->name][pos][i] /= normalize_total;
+   }
   }
 }
 
 void SequenceAlignment::calculate_state_probabilities(TreeNode* node, std::list<unsigned int> positions) {
   /*
-   *
+   * Finds the marginal posterior distribution for each position at a given node.
+   * Only uses infomation from nodes below - used for upward recursion.
    */
   
   std::string name = node->name;
@@ -408,7 +392,7 @@ void SequenceAlignment::calculate_state_probabilities(TreeNode* node, std::list<
 
     for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
       if(not gaps[*pos]) {
-	calculate_state_probabilities_pos(node, *pos, node->left->decendant, right_node, nullptr);
+	calculate_state_probabilities_pos(node, *pos, node->left->decendant, right_node);
       }
     }
   }
@@ -423,14 +407,13 @@ void SequenceAlignment::incorperate_up_node(TreeNode* node, unsigned int pos, Tr
   double u = node->SM->get_u();
   RateVector* rv;
   float up_prob = 0.0;
-  double normalize_total = 0.0;
 
   for(signed char i = 0; i < (signed char)n_states; i++) {
     // Contribution of up branch.
     if(up_node != nullptr) {
       //float up_t_b = node->distance;
 
-      float up_t_b = node->distance;
+      float t_b = node->distance;
 
       up_prob = 0.0;
 
@@ -438,41 +421,35 @@ void SequenceAlignment::incorperate_up_node(TreeNode* node, unsigned int pos, Tr
 	unsigned long extended_state = up_node->get_hypothetical_hash_state(pos, domain_name, state_j);
 	rv = node->SM->selectRateVector({pos, domain_name, extended_state});
 	double rate = rv->rates[i]->get_value();
-
 	double state_prob = taxa_names_to_state_probs[up_node->name][pos][state_j];
-	up_prob += (state_prob * rate * up_t_b)/(1.0 + (u * up_t_b));
-      }
 
-      // Probability of staying the same.
-      up_prob += taxa_names_to_state_probs[up_node->name][pos][i] / (1.0 + (u * up_t_b));  
+	if(i != state_j) {
+	  // Normal Substitution.
+	  up_prob += (state_prob * rate * t_b)/(1.0 + (u * t_b));
+	} else {
+	  // No substition - possibly virtual.
+	  double prob_virtual = 1 - (1 / (1 + (rate * t_b)));
+	  double denom = 1.0 / (1.0 + (u * t_b));
+
+	  //                    Virtual Substitution                       No substitution
+	  up_prob += state_prob * ((prob_virtual * ((rate * t_b) * denom)) + ((1.0 - prob_virtual) * denom));
+	}
+
+      }
     } else {
       up_prob = 1.0;
     }
 
-    float total = taxa_names_to_state_probs[node->name][pos][i] * up_prob;
-    normalize_total += total;
-
-    taxa_names_to_state_probs[node->name][pos][i] = total;
-  }
-
-  // Normalize
-  if(normalize_total != 0.0) {
-    for(unsigned int i = 0; i < n_states; i++) {
-      taxa_names_to_state_probs[node->name][pos][i] /= normalize_total;
-    }
+    taxa_names_to_state_probs[node->name][pos][i] *= up_prob;
   }
 }
 
 int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
+  /*
+   * Picks a state from the marginal posterior distribution (taxa_names _to_state_probs).
+   */
   float* probs = taxa_names_to_state_probs[node->name][pos];
-
-  //std::cout << node->name << " - " << pos << " - picking : [ ";
-  // for(unsigned int i = 0; i < n_states; i++) {
-  //   std::cout << probs[i] << " ";
-  // }
-  // std::cout << "]";
-  //}
-  
+ 
   double r = Random();
   double acc = 0.0;
   int val = -1;
@@ -494,6 +471,20 @@ int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
   return(val);
 }
 
+void SequenceAlignment::normalize_state_probs(TreeNode* node, unsigned int pos) {
+  double normalize_total = 0.0;
+
+  for(unsigned int i = 0; i < n_states; i++) {
+    normalize_total += taxa_names_to_state_probs[node->name][pos][i];
+  }
+
+  if(normalize_total != 0.0) {
+    for(unsigned int i = 0; i < n_states; i++) {
+      taxa_names_to_state_probs[node->name][pos][i] /= normalize_total;
+    }
+  }
+}
+
 sample_status SequenceAlignment::sample() {
   const std::list<TreeNode*> nodes = tree->nodes();
 
@@ -509,6 +500,7 @@ sample_status SequenceAlignment::sample() {
 
   // Find state probabilities.
   // Nodes are ordered in the list such that they are visted in order up the tree.
+  // Upward recursion.
   for(auto n = nodes.begin(); n != nodes.end(); ++n) {
     // NOTE This is worrying - I'm not sure tips should be skipped.
     if(not (*n)->isTip()) {
@@ -523,60 +515,25 @@ sample_status SequenceAlignment::sample() {
     std::vector<bool> gaps = taxa_names_to_gaps[node->name];
 
     // Reculaculate state probability vector - including up branch.
-    // No need if root.
-    if(true) {
-      // The likelihood contribution of these nodes has already been calculated in the upwards reursion.
-      /*
-      TreeNode* left_node;
-      if(node->left) {
-	left_node = node->left->decendant;
-      } else {
-	left_node = nullptr;
+    TreeNode* up_node;
+    if(node->up) {
+      up_node = node->up->ancestral;
+    } else {
+      up_node = nullptr;
+    }
+
+    for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
+      if((not gaps[*pos]) and (not (up_node == nullptr))) {
+	//calculate_state_probabilities_pos(node, *pos, left_node, right_node, up_node);
+	incorperate_up_node(node, *pos, up_node);
+	normalize_state_probs(node, *pos);
       }
 
-      TreeNode* right_node;
-      if(node->right) {
-      	right_node = node->right->decendant;
+      // Pick sequence.
+      if(gaps[*pos]) {
+	taxa_names_to_sequences[(*n)->name][*pos] = -1;
       } else {
-      	right_node = nullptr;
-      }
-      */
-
-      TreeNode* up_node;
-      if(node->up) {
-	up_node = node->up->ancestral;
-      } else {
-	up_node = nullptr;
-      }
-
-      for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
-	if((not gaps[*pos]) and (not (up_node == nullptr))) {
-	  //calculate_state_probabilities_pos(node, *pos, left_node, right_node, up_node);
-	  incorperate_up_node(node, *pos, up_node);
-	}
-
-	// If tip weight by data.
-	if((*n)->isTip()) {
-	  if(not gaps[*pos]) {
-	    float total = 0.0;
-	    for(unsigned int i = 0; i < n_states; i++) {
-	      taxa_names_to_state_probs[node->name][*pos][i] *= base_taxa_state_probs[node->name][*pos][i];
-	      total += taxa_names_to_state_probs[node->name][*pos][i];
-	    }
-	    
-	    //Normalize.
-	    for(unsigned int i = 0; i < n_states; i++) {
-	      taxa_names_to_state_probs[node->name][*pos][i] /= total;
-	    }
-	  }
-	}
-
-	// Pick sequence.
-	if(gaps[*pos]) {
-	  taxa_names_to_sequences[(*n)->name][*pos] = -1;
-	} else {
-	  taxa_names_to_sequences[(*n)->name][*pos] = pick_state_from_probabilities(node, *pos);
-	}
+	taxa_names_to_sequences[(*n)->name][*pos] = pick_state_from_probabilities(node, *pos);
       }
     } 
   }

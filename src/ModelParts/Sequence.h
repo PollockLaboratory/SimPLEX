@@ -73,10 +73,13 @@ class SequenceAlignment {
 
   void reset_base_probabilities();
   void calculate_state_probabilities(TreeNode*, std::list<unsigned int>);
-  void calculate_state_probabilities_pos(TreeNode*, unsigned int, TreeNode*, TreeNode*, TreeNode*);
+  void calculate_state_probabilities_pos(TreeNode*, unsigned int, TreeNode*, TreeNode*);
   float calculate_single_state_probability(unsigned int pos, unsigned char c, std::vector<Valuable*> rv, TreeNode* node);
   void incorperate_up_node(TreeNode* node, unsigned int pos, TreeNode* up_node);
   int pick_state_from_probabilities(TreeNode*, int);
+
+  // NEW
+  void normalize_state_probs(TreeNode* node, unsigned int pos);
 
   // Outputs
   std::string seqs_out_identifier;

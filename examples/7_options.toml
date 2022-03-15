@@ -36,7 +36,7 @@ seed = 0
   counts_out_file = "counts.csv"
 
 [MCMC]
-  generations = 2001
+  generations = "2001"
   #generations = 800
   full_update_freq = 200
   alignment_sample_frequency = 500

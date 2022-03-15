@@ -76,7 +76,7 @@ void BranchSegment::set_new_substitutions() {
   double u = decendant->SM->get_u();
 
   for(unsigned int pos = 0; pos < n_pos; pos++) {
-    // Set new substitutions for all states..
+    // Set new substitutions for all state domains.
     for(auto domain = substitutions.begin(); domain != substitutions.end(); ++domain) {
       std::vector<signed char> *anc_seq = (ancestral->sequences[domain->first]);
       std::vector<signed char> *dec_seq = (decendant->sequences[domain->first]);
@@ -89,17 +89,16 @@ void BranchSegment::set_new_substitutions() {
 	    // Normal substitutions.
 	    substitutions[domain->first][pos] = {true, anc_seq->at(pos), dec_seq->at(pos), rates[domain->first][pos]};
 	  } else {
-	    // Possibility of virtual substitution.
-	    // Not sure this is exactly right.
-	    //float length = distance;
-
+	    // No substitution - possibility of virtual substitution.
 	    double vir_rate = rates[domain->first][pos]->rates[dec_seq->at(pos)]->get_value();
 
-	    double p = 1 - (1 / (1 + (vir_rate * distance)));
+	    double p = 1.0 - (1.0 / (1.0 + (vir_rate * distance)));
 	    //double p = vir_rate / (1 - u + vir_rate);
 	    if(Random() < p) {
+	      // Virtual Substitution.
 	      substitutions[domain->first][pos] = {true, anc_seq->at(pos), dec_seq->at(pos), rates[domain->first][pos]};
 	    } else {
+	      // No Virtual Substitution.
 	      substitutions[domain->first][pos] = {false, anc_seq->at(pos), dec_seq->at(pos), rates[domain->first][pos]};
 	    }
 	  }

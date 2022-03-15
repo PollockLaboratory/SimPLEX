@@ -26,8 +26,9 @@ class BranchSegment {
 private:
   unsigned int n_pos;
 
+  // String Key is the state domain.
   std::map<std::string, std::vector<RateVector*>> rates; // Rate vectors by site also.
-  std::map<std::string, std::vector<Substitution>> substitutions; // Temp - should be private.
+  std::map<std::string, std::vector<Substitution>> substitutions; // Substitutions by site
 
   inline void update_rate_vectors();
   void set_new_substitutions(); 

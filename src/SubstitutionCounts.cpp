@@ -78,13 +78,13 @@ void CountsParameter::refresh() {
   // Create new structs for counts.
   *counts = SubstitutionCounts(tree->get_SM()->get_RateVectors(), tree->get_branch_lengths(), tree->SM->get_all_states());
 
-  // Fill in structs.
+  // Track counts by branch segment length and rate vector.
   const std::list<BranchSegment*> branchList = tree->get_branches();
 
   for(auto it = branchList.begin(); it != branchList.end(); ++it) {
     BranchSegment* b = *it;
-    std::map<std::string, States> hidden_states = tree->SM->get_all_states();
-    for(auto jt = hidden_states.begin(); jt != hidden_states.end(); ++jt) {
+    std::map<std::string, States> all_state_domains = tree->SM->get_all_states();
+    for(auto jt = all_state_domains.begin(); jt != all_state_domains.end(); ++jt) {
       for(auto sub = b->get_substitutions(jt->first).begin(); sub != b->get_substitutions(jt->first).end(); ++sub) {
 	if(sub->occuredp == true) {
 	  // Adds both virtual substitutions and normal substitutions.
