@@ -21,11 +21,18 @@ class Tree {
 private:
   map<string, vector<int>> names_to_sequences;
   
-  // Alternative node access.
+  // Cache fast node access.
+  void cache_node_access();
   void buildNodeLists(TreeNode*);
+  void build_recursion_path(TreeNode*, std::list<TreeNode*>&);
+
   std::list<BranchSegment*> branchList; // Potentially should be vectors.
-  std::list<TreeNode*> nodeList;
+  std::list<TreeNode*> nodeList; // In order of tree recursion.
   std::list<TreeNode*> tipList;
+
+  std::vector<TreeNode*> nodeVector;
+
+  std::map<TreeNode*, std::list<TreeNode*>> recursion_paths;
 
   // Settings/options.
   std::function< std::pair<BranchSegment*, BranchSegment*>(float)> splitBranchMethod; // Algorithm for splitting branches.
@@ -44,9 +51,13 @@ public:
   void Initialize(IO::RawTreeNode* raw_tree);
   
   SubstitutionModel* get_SM();
-  const std::list<BranchSegment*> get_branches();
-  const std::list<TreeNode*> nodes();
+
+  const std::list<BranchSegment*>& get_branches();
+  const std::list<TreeNode*>& nodes();
+  const std::list<TreeNode*>& get_recursion_path(TreeNode*);
+
   std::list<float> get_branch_lengths();
+
 
   TreeNode* rand_node();
 

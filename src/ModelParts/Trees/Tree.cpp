@@ -27,14 +27,10 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree) {
     float total_tree_length = IO::findRawTreeTotalLength(raw_tree);
     float target_length = env.get<double>("TREE.target_tree_length");
     scale_factor = target_length/total_tree_length;
-    std::cout << "\tRescaling tree from total length " << total_tree_length << " to " << target_length << std::endl;
+    std::cout << "\t\tRescaling tree from total length " << total_tree_length << " to " << target_length << std::endl;
   } else {
     scale_factor = 1.0;
   }
- 
-  //this->MSA = MSA;
-  //this->SM = SM;
-  //SM->organizeRateVectors(MSA->numCols(), SM->get_states()->n);
 
   // Proxys are created to correctly create root node.
   BranchSegment* proxyBranch = new BranchSegment(0.0);
@@ -43,9 +39,10 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree) {
   delete proxyBranch;
   delete proxyNode;
 
-  buildNodeLists(root);
+  std::cout << "\t\tTree split into " << nodeList.size() << " nodes." << std::endl;
 
-  std::cout << "\tTree split into " << nodeList.size() << " nodes." << std::endl;
+  // Cache
+  cache_node_access();
 
   //Setup output.
   files.add_file("tree_out", env.get<std::string>("OUTPUT.tree_out_file"), IOtype::OUTPUT);
@@ -94,16 +91,42 @@ TreeNode* Tree::createTreeNode(IO::RawTreeNode* raw_tree, TreeNode* &ancestralNo
   return(newTreeNode);
 }
 
+void Tree::cache_node_access() {
+  /*
+   * Sets up data structures that allow fast recursion and access to tree nodes.
+   */
+
+  std::cout << "\t\tCaching recursion paths." << std::endl;
+
+  buildNodeLists(root);
+
+  nodeVector = std::vector<TreeNode*>(nodeList.size(), nullptr);
+  int i = 0;
+  for(auto it = nodeList.begin(); it != nodeList.end(); it++) {
+    nodeVector[i++] = *it;
+  }
+
+  // Recursion Paths.
+  for(auto it = nodeList.begin(); it != nodeList.end(); it++) {
+    build_recursion_path(*it, recursion_paths[*it]);
+
+    // Clear tags.
+    for(auto jt = nodeList.begin(); jt != nodeList.end(); jt++) {
+      (*jt)->tagp = false;
+    }
+  }
+}
+
 void Tree::buildNodeLists(TreeNode* n) {
   nodeList.push_front(n);
 
-  if(n->left != 0) {
+  if(n->left) {
     BranchSegment* b = n->left;
     branchList.push_back(b);
     buildNodeLists(b->decendant);
   }
 
-  if(n->right != 0) {
+  if(n->right) {
     BranchSegment* b = n->right;
     branchList.push_back(b);
     buildNodeLists(b->decendant);
@@ -111,6 +134,23 @@ void Tree::buildNodeLists(TreeNode* n) {
 
   if(n->isTip()) {
       tipList.push_back(n);
+  }
+}
+
+void Tree::build_recursion_path(TreeNode* node, std::list<TreeNode*>& node_path) {
+  node_path.push_back(node);
+  node->tagp = true;
+
+  if(node->left and (not node->left->decendant->tagp)) {
+    build_recursion_path(node->left->decendant, node_path);
+  }
+
+  if(node->right and (not node->right->decendant->tagp)) {
+    build_recursion_path(node->right->decendant, node_path);
+  }
+
+  if(node->up and (not node->up->ancestral->tagp)) {
+    build_recursion_path(node->up->ancestral, node_path);
   }
 }
 
@@ -141,12 +181,16 @@ SubstitutionModel* Tree::get_SM() {
 }
 
 // Sampling and likelihood.
-const std::list<BranchSegment*> Tree::get_branches() {
+const std::list<BranchSegment*>& Tree::get_branches() {
   return(branchList);
 }
 
-const std::list<TreeNode*> Tree::nodes() {
+const std::list<TreeNode*>& Tree::nodes() {
   return(nodeList);
+}
+
+const std::list<TreeNode*>& Tree::get_recursion_path(TreeNode* node) {
+  return(recursion_paths[node]);
 }
 
 std::list<float> Tree::get_branch_lengths() {
@@ -166,12 +210,8 @@ std::list<float> Tree::get_branch_lengths() {
 }
 
 TreeNode* Tree::rand_node() {
-  // NOTE probably a faster way to do this, but its not a critical function call.
-  auto it = nodeList.begin();
-  for(int offset = rand() % nodeList.size(); offset > 0; offset--) {
-    it++;
-  }
-  return(*it);
+  int r = rand() % nodeVector.size();
+  return(nodeVector[r]);
 }
 
 // Record State data.

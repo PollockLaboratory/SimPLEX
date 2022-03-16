@@ -135,7 +135,7 @@ void SequenceAlignment::syncWithTree(std::string name, unsigned int id, Tree* tr
    */
 
   this->tree = tree;
-  std::cout << "\t\tSyncing " << name << " states to tree. ID: " << id << std::endl;
+  std::cout << "\tAttaching " << name << "[" << id << "] states to tree." << std::endl;
   std::list<TreeNode*> nodes = tree->nodes();
 
   for(auto it = nodes.begin(); it != nodes.end(); ++it) {
@@ -486,10 +486,6 @@ void SequenceAlignment::find_state_probs_all(TreeNode* node, std::list<unsigned 
 
 // Second recursion.
 void SequenceAlignment::update_state_probs(TreeNode* node, unsigned int pos, TreeNode* up_node) {
-  /*
-   *
-   */
-
   double u = node->SM->get_u();
   float up_prob = 0.0;
 
@@ -503,6 +499,33 @@ void SequenceAlignment::update_state_probs(TreeNode* node, unsigned int pos, Tre
     }
 
     taxa_names_to_state_probs[node->name][pos][state_j] *= up_prob;
+  }
+}
+
+void SequenceAlignment::fast_update_state_probs_tips(TreeNode* node, unsigned int pos, TreeNode* up_node) {
+  /*
+   * Only valid for tips.
+   * Equivilent of:
+   * reset_to_base()
+   * update_state_probs(node, *pos, node->up->ancestral);
+   */
+
+  double u = node->SM->get_u();
+  float up_prob = 0.0;
+
+  float* state_probs = taxa_names_to_state_probs[node->name][pos];
+  float* base_state_probs = base_taxa_state_probs[node->name][pos];
+  
+  for(signed char state_j = 0; state_j < (signed char)n_states; state_j++) {
+    if(up_node != nullptr) {
+      float t_b = node->distance;
+
+      up_prob = find_state_prob_given_anc_branch(state_j, taxa_names_to_state_probs[up_node->name][pos], up_node, t_b, u, pos);
+    } else {
+      up_prob = 1.0;
+    }
+
+    state_probs[state_j] = base_state_probs[state_j] * up_prob;
   }
 }
 
@@ -549,44 +572,34 @@ void SequenceAlignment::pick_states_for_node(TreeNode* node, const std::list<uns
   }
 }
 
-void SequenceAlignment::reconstruct_expand(TreeNode* node,  const std::list<unsigned int>& positions) {
+void SequenceAlignment::reconstruct_expand(const std::list<TreeNode*>& recursion_path, const std::list<unsigned int>& positions) {
   /*
    * This function needs a better name.
    * This recalculates the marginal posteriors of each node and picks sequences, which again alters the posterior
    * distribution.
    * Starts at a randomly chosen node and propagates outwards from there.
    */
-  node->tagp = true;
 
-  if(node->isTip()) {
-    // Tip Node.
-    reset_to_base(node->name, positions);
+  for(auto it = recursion_path.begin(); it != recursion_path.end(); it++) {
+    TreeNode* node = *it;
+    if(node->isTip()) {
+      // Tip Node.
+      //reset_to_base(node->name, positions);
 
-    std::vector<bool> gaps = taxa_names_to_gaps[node->name];
+      std::vector<bool> gaps = taxa_names_to_gaps[node->name];
 
-    for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
-      if(not gaps[*pos]) {
-	update_state_probs(node, *pos, node->up->ancestral);
-	normalize_state_probs(node, *pos);
+      for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
+	if(not gaps[*pos]) {
+	  //update_state_probs(node, *pos, node->up->ancestral);
+	  fast_update_state_probs_tips(node, *pos, node->up->ancestral);
+	  normalize_state_probs(node, *pos);
+	}
       }
+    } else {
+      find_state_probs_all(node, positions);
     }
-  } else {
-    find_state_probs_all(node, positions);
-  }
 
-  pick_states_for_node(node, positions);
-
-  // Recur ancestral reconstruction.
-  if(node->left and not node->left->decendant->tagp) {
-    reconstruct_expand(node->left->decendant, positions);
-  }
-
-  if(node->right and not node->right->decendant->tagp) {
-    reconstruct_expand(node->right->decendant, positions);
-  }
-
-  if(node->up and not node->up->ancestral->tagp) {
-    reconstruct_expand(node->up->ancestral, positions);
+    pick_states_for_node(node, positions);
   }
 }
 
@@ -628,12 +641,7 @@ sample_status SequenceAlignment::sample(const std::list<unsigned int>& positions
   }
 
   // 3rd Recursion - picking states.
-  TreeNode* node = tree->rand_node();
-  reconstruct_expand(node, positions);
-
-  for(auto n = nodes.begin(); n != nodes.end(); ++n) {
-    (*n)->tagp = false;
-  }
+  reconstruct_expand(tree->get_recursion_path(tree->rand_node()), positions);
 
   return(sample_status({false, true, true}));
 }

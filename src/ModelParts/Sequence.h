@@ -69,7 +69,7 @@ class SequenceAlignment {
 
   // Sampling
   std::map<std::string, float**> taxa_names_to_state_probs;
-  std::map<std::string, float**> base_taxa_state_probs; // These are fixed.
+  std::map<std::string, float**> base_taxa_state_probs; // These are the priors.
 
   void reset_to_base(std::string name, const std::list<unsigned int>& positions);
   void normalize_state_probs(TreeNode* node, unsigned int pos);
@@ -84,11 +84,14 @@ class SequenceAlignment {
   void update_state_probs(TreeNode* node, unsigned int pos, TreeNode* up_node); // Second Recursion
   void find_state_probs_all(TreeNode*, std::list<unsigned int>); // Third Recursion
 
+  // Optimize
+  void fast_update_state_probs_tips(TreeNode* node, unsigned int pos, TreeNode* up_node); // Second Recursion
+
   // Picking states
   int pick_state_from_probabilities(TreeNode*, int);
   void pick_states_for_node(TreeNode*, const std::list<unsigned int>&);
 
-  void reconstruct_expand(TreeNode*, const std::list<unsigned int>&);
+  void reconstruct_expand(const std::list<TreeNode*>&, const std::list<unsigned int>&);
 
   // Outputs
   std::string seqs_out_identifier;
