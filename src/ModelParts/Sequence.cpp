@@ -584,10 +584,12 @@ sample_status SequenceAlignment::sample() {
     TreeNode* node = *n;
     std::vector<bool> gaps = taxa_names_to_gaps[node->name];
 
+    if(not (*n)->isTip()) {
+      calculate_state_probabilities_full(*n, positions);
+    }
+
     for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
-      if(not (*n)->isTip()) {
-	calculate_state_probabilities(*n, positions);
-      }
+      normalize_state_probs(node, *pos);
 
       // Pick sequence.
       if(gaps[*pos]) {
