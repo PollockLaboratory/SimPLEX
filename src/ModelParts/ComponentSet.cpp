@@ -15,6 +15,9 @@ ComponentSet::ComponentSet() {
   /*
    * The default parameter set constructor.
    */
+
+  // Creates an offset between ancestral state updates.
+  // TODO make this neater.
   steps = env.get<int>("MCMC.alignment_sample_frequency");
 }
 void ComponentSet::set_counts(SubstitutionCounts* counts) {
@@ -50,6 +53,7 @@ void ComponentSet::Initialize() {
   // Refreshes all dependancies.
   reset_dependencies();
 
+  // TODO offset.
   // Spread out state parameters so the don't update all at once.
   unsigned int len = state_parameters.size();
   int freq = env.get<int>("MCMC.alignment_sample_frequency");

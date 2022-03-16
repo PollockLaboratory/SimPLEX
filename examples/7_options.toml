@@ -36,12 +36,13 @@ seed = 0
   counts_out_file = "counts.csv"
 
 [MCMC]
-  generations = "2001"
+  generations = "3001"
   #generations = 800
-  full_update_freq = 200
-  alignment_sample_frequency = 500
+  alignment_sample_frequency = 250
+  position_sample_count = 10
   output_frequency = 50
   print_frequency = 100
+  full_update_freq = 50
 
 [MODEL]
   script_file = "7_hidden_states.lua"

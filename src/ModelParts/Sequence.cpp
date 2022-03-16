@@ -239,7 +239,7 @@ std::vector<signed char> SequenceAlignment::encode_sequence(const std::string &s
 }
 
 // Utilities
-int SequenceAlignment::numCols() {
+int SequenceAlignment::n_cols() {
   return(n_columns);
 }
 
@@ -286,19 +286,12 @@ std::list<std::string> SequenceAlignment::getNodeNames() {
 }
 
 // TODO positions should be passed as argument.
-void SequenceAlignment::reset_to_base(std::string name) {
+void SequenceAlignment::reset_to_base(std::string name, const std::list<unsigned int>& positions) {
   for(unsigned int i = 0; i < n_columns; i++) {
       for(unsigned int j = 0; j < n_states; j++) {
 	taxa_names_to_state_probs[name][i][j] = base_taxa_state_probs[name][i][j];
       }
   } 
-}
-
-// TODO refactor - probably can loop over tips rather than base_sequences.
-void SequenceAlignment::reset_base_probabilities() {
-  for(auto seq_name = base_sequences.begin(); seq_name != base_sequences.end(); ++seq_name) {
-    reset_to_base(*seq_name);
-  }
 }
 
 void SequenceAlignment::normalize_state_probs(TreeNode* node, unsigned int pos) {
@@ -567,7 +560,7 @@ void SequenceAlignment::reconstruct_expand(TreeNode* node,  const std::list<unsi
 
   if(node->isTip()) {
     // Tip Node.
-    reset_to_base(node->name);
+    reset_to_base(node->name, positions);
 
     std::vector<bool> gaps = taxa_names_to_gaps[node->name];
 
@@ -597,18 +590,8 @@ void SequenceAlignment::reconstruct_expand(TreeNode* node,  const std::list<unsi
   }
 }
 
-sample_status SequenceAlignment::sample() {
+sample_status SequenceAlignment::sample(const std::list<unsigned int>& positions) {
   const std::list<TreeNode*> nodes = tree->nodes();
-
-  // Makes list of all positions.
-  // Leaving room for a feature where not all positions are sampled each time.
-  std::list<unsigned int> positions = {};
-  for(unsigned int i = 0; i < n_columns; i++) {
-    positions.push_back(i);
-  };
-
-  // This is important as states at tips can be uncertain.
-  reset_base_probabilities();
 
   // Find state probabilities.
   // Nodes are ordered in the list such that they are visted in order up the tree.
@@ -616,6 +599,9 @@ sample_status SequenceAlignment::sample() {
   for(auto n = nodes.begin(); n != nodes.end(); ++n) {
     if(not (*n)->isTip()) {
       find_state_probs_dec_only(*n, positions);
+    } else {
+      // This is important as states at tips can be uncertain.
+      reset_to_base((*n)->name, positions);
     }
   }
 
@@ -693,9 +679,27 @@ bool SequenceAlignment::match_structure(SequenceAlignment* cmp_msa) {
   return(true);
 }
 
-SequenceAlignmentParameter::SequenceAlignmentParameter(SequenceAlignment* msa) : SampleableComponent("SequenceAlignment") {
+SequenceAlignmentParameter::SequenceAlignmentParameter(SequenceAlignment* msa, unsigned int n_sample) : SampleableComponent("SequenceAlignment") {
   save_count = -1;
   this->msa = msa;
+  this->n_sample = n_sample;
+  this->n_cols = msa->n_cols();
+
+  // Exit program if invalid environment settings.
+  if(n_sample < 1) {
+    std::cerr << "Error: MCMC.position_sample_count must be greater than 0." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  if(n_sample > n_cols) {
+    std::cerr << "Error: cannot sample " << n_sample << " from alignment with " << n_cols << " columms." << std::endl;
+    std::cerr << "Maximum value of MCMC.position_sample_count is " << n_cols << "." << std::endl;
+    exit(EXIT_FAILURE);
+  } else if(n_sample == n_cols) {
+    this->sample_loc = 0;
+  } else {
+    this->sample_loc = rand() % n_cols;
+  }
 }
 
 void SequenceAlignmentParameter::print() {
@@ -707,8 +711,32 @@ std::string SequenceAlignmentParameter::get_type() {
 }
 
 sample_status SequenceAlignmentParameter::sample() {
-  std::cout << "Sampling: " << msa->domain_name << std::endl;
-  sample_status s = msa->sample();
+  // Makes list of all positions.
+  // Leaving room for a feature where not all positions are sampled each time.
+
+  std::cout << "Sampling " << msa->domain_name << ": "<< sample_loc << "->";
+
+  unsigned int last_pos = 0;
+  std::list<unsigned int> positions = {};
+  while(positions.size() < n_sample) {
+    positions.push_back(sample_loc);
+    last_pos = sample_loc;
+
+    sample_loc++;
+    if(sample_loc >= n_cols) {
+      if(not (positions.size() == n_sample)) {
+	std::cout << last_pos << ",0->";
+      }
+      sample_loc = 0;
+    }
+  }
+
+  std::cout << last_pos << std::endl;
+  //for(unsigned int i = 0; i < msa->n_cols(); i++) {
+  // positions.push_back(i);
+  //};
+
+  sample_status s = msa->sample(positions);
   return(s);
 }
 

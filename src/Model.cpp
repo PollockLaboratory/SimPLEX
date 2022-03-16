@@ -80,10 +80,10 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &
 
       all_MSAs[it->first] = secondary_MSA;
 
-      n_cols = secondary_MSA->numCols();
+      n_cols = secondary_MSA->n_cols();
   }
 
-  // COnfiguring the Tree.
+  // Configuring the Tree.
   std::cout << "\tConstructing tree." << std::endl;
 
   tree = new Tree();
@@ -92,6 +92,7 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &
   tree->configureBranches(tree->root, n_cols, all_states);
 
   // Configuring sequences.
+  unsigned int n_sample = env.get<unsigned int>("MCMC.position_sample_count");
   RateVectorAssignmentParameter* rvap = new RateVectorAssignmentParameter(tree);
 
   UniformizationConstant* u_param = dynamic_cast<UniformizationConstant*>(u);
@@ -99,7 +100,7 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &
   for(auto it = all_MSAs.begin(); it != all_MSAs.end(); ++it) {
     it->second->syncWithTree(it->first, ctr, tree);
     ctr++;
-    SequenceAlignmentParameter* msa_parameter = new SequenceAlignmentParameter(it->second);
+    SequenceAlignmentParameter* msa_parameter = new SequenceAlignmentParameter(it->second, n_sample);
     if(u_param and env.get<bool>("UNIFORMIZATION.refresh_tree_on_update")) {
       msa_parameter->add_dependancy(u_param);
     }

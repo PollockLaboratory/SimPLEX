@@ -49,7 +49,7 @@ class SequenceAlignment {
   void saveToFile(int i, uint128_t gen, double l);
 
   // Utilities
-  int numCols();
+  int n_cols();
   std::string decodeChar(signed char c);
   std::string decodeSequence(std::vector<signed char> &enc_seq);
   static std::vector<signed char> findParsimony(const std::vector<signed char> &s1, const std::vector<signed char> &s2);
@@ -59,20 +59,19 @@ class SequenceAlignment {
   bool match_structure(SequenceAlignment*);
   bool validate(std::list<std::string> seq_names, std::map<std::string, SequenceAlignment*> other_alignments);
 
-  // New
   void syncWithTree(std::string name, unsigned int id, Tree* tree);
   void identify_gaps();
-  sample_status sample();
+
+  sample_status sample(const std::list<unsigned int>&);
  private:
   // Processing input sequences - fasta.
   std::vector<signed char> encode_sequence(const std::string &sequence);
 
-  // Sampling - new
+  // Sampling
   std::map<std::string, float**> taxa_names_to_state_probs;
   std::map<std::string, float**> base_taxa_state_probs; // These are fixed.
 
-  void reset_to_base(std::string name);
-  void reset_base_probabilities();
+  void reset_to_base(std::string name, const std::list<unsigned int>& positions);
   void normalize_state_probs(TreeNode* node, unsigned int pos);
 
   // Marginal Calculations for indervidual positions.
@@ -101,9 +100,13 @@ class SequenceAlignment {
 class SequenceAlignmentParameter : public SampleableComponent {
 private:
   SequenceAlignment* msa;
+  unsigned int n_sample; // Number of positions sampled each time.
+  unsigned int n_cols; // Number of columns in the MSA.
+  unsigned int sample_loc; // position of last sample.
+
   int save_count;
 public:
-  SequenceAlignmentParameter(SequenceAlignment*);
+  SequenceAlignmentParameter(SequenceAlignment*, unsigned int n_sample);
 
   void print() override;
   std::string get_type() override;
