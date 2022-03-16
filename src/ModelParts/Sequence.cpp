@@ -335,15 +335,17 @@ float SequenceAlignment::find_state_prob_given_dec_branch(unsigned char state_i,
   float prob = 0.0;
 
   for(signed char state_j = 0; state_j < (signed char)n_states; state_j++) {
-    double rate = rv[state_j]->get_value();
     double state_prob = state_probs[state_j];
-    
-    if(state_i != state_j) {
-      // Normal Substitution
-      prob += state_prob * calc_substitution_prob(rate, t_b, u); // Probability of the substitution.
-    } else {
-      // No substitution - possibly virtual.
-      prob += state_prob * calc_no_substitution_prob(rate, t_b, u);
+
+    if(state_prob != 0.0) {
+      double rate = rv[state_j]->get_value();
+      if(state_i != state_j) {
+	// Normal Substitution
+	prob += state_prob * calc_substitution_prob(rate, t_b, u); // Probability of the substitution.
+      } else {
+	// No substitution - possibly virtual.
+	prob += state_prob * calc_no_substitution_prob(rate, t_b, u);
+      }
     }
   }
 
@@ -358,19 +360,21 @@ float SequenceAlignment::find_state_prob_given_anc_branch(unsigned char state_j,
   float prob = 0.0;
 
   for(signed char state_i = 0; state_i < (signed char)n_states; state_i++) {
-    unsigned long extended_state = up_node->get_hypothetical_hash_state(pos, domain_name, state_i);
-    RateVector* rv = up_node->SM->selectRateVector({pos, domain_name, extended_state});
 
-    // Is this the right rate.
-    double rate = rv->rates[state_j]->get_value(); // i -> j rate.
     double state_prob = state_probs[state_i];
 
-    if(state_i != state_j) {
-      // Normal Substitution.
-      prob += state_prob * calc_substitution_prob(rate, t_b, u); // Probability of the substitution.
-    } else {
-      // No substition - possibly virtual.
-      prob += state_prob * calc_no_substitution_prob(rate, t_b, u);
+    if(state_prob != 0.0) {
+      unsigned long extended_state = up_node->get_hypothetical_hash_state(pos, domain_name, state_i);
+      RateVector* rv = up_node->SM->selectRateVector({pos, domain_name, extended_state});
+      // Is this the right rate.
+      double rate = rv->rates[state_j]->get_value(); // i -> j rate.
+      if(state_i != state_j) {
+	// Normal Substitution.
+	prob += state_prob * calc_substitution_prob(rate, t_b, u); // Probability of the substitution.
+      } else {
+	// No substition - possibly virtual.
+	prob += state_prob * calc_no_substitution_prob(rate, t_b, u);
+      }
     }
   }
 
