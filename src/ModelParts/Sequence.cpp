@@ -606,7 +606,6 @@ void SequenceAlignment::reconstruct_expand(const std::list<TreeNode*>& recursion
 sample_status SequenceAlignment::sample(const std::list<unsigned int>& positions) {
   const std::list<TreeNode*> nodes = tree->nodes();
 
-  std::cout << "Recursion 1" << std::endl;
   // Find state probabilities.
   // Nodes are ordered in the list such that they are visted in order up the tree.
   // Upward recursion.
@@ -619,7 +618,6 @@ sample_status SequenceAlignment::sample(const std::list<unsigned int>& positions
     }
   }
 
-  std::cout << "Recursion 2" << std::endl;
   // 2nd Recursion - Reverse recursion.
   // Skip first element of reverse list as thats the root - no need to sample second time.
   for(auto n = nodes.rbegin(); n != nodes.rend(); ++n) {
@@ -643,10 +641,8 @@ sample_status SequenceAlignment::sample(const std::list<unsigned int>& positions
   }
 
   // 3rd Recursion - picking states.
-  std::cout << "Recursion 3" << std::endl;
   reconstruct_expand(tree->get_recursion_path(tree->rand_node()), positions);
 
-  std::cout << "Complete" << std::endl;
   return(sample_status({false, true, true}));
 }
 
