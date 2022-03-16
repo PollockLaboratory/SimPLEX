@@ -72,14 +72,17 @@ class SequenceAlignment {
   std::map<std::string, float**> base_taxa_state_probs; // These are fixed.
 
   void reset_base_probabilities();
-  void calculate_state_probabilities(TreeNode*, std::list<unsigned int>);
-  void calculate_state_probabilities_pos(TreeNode*, unsigned int, TreeNode*, TreeNode*);
-  float calculate_single_state_probability(unsigned int pos, unsigned char c, std::vector<Valuable*> rv, TreeNode* node);
-  void incorperate_up_node(TreeNode* node, unsigned int pos, TreeNode* up_node);
-  int pick_state_from_probabilities(TreeNode*, int);
-
-  // NEW
   void normalize_state_probs(TreeNode* node, unsigned int pos);
+
+  float find_state_prob_given_dec_branch(unsigned char state_i, float* state_probs, std::vector<Valuable*> rv, float t_b, double u);
+  float find_state_prob_given_anc_branch(unsigned char state_i, float* state_probs, TreeNode* node, float t_b, double u, unsigned int pos);
+
+  void calculate_state_probabilities(TreeNode*, std::list<unsigned int>);
+  void calculate_state_probabilities_full(TreeNode*, std::list<unsigned int>);
+  void find_new_state_probs_at_pos(TreeNode*, unsigned int, TreeNode*, TreeNode*, TreeNode*);
+  void update_state_probs(TreeNode* node, unsigned int pos, TreeNode* up_node);
+
+  int pick_state_from_probabilities(TreeNode*, int);
 
   // Outputs
   std::string seqs_out_identifier;

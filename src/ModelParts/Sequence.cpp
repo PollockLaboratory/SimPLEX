@@ -295,51 +295,105 @@ void SequenceAlignment::reset_base_probabilities() {
   }
 }
 
-float SequenceAlignment::calculate_single_state_probability(unsigned int pos, unsigned char state_i, std::vector<Valuable*> rv, TreeNode* node) {
+void SequenceAlignment::normalize_state_probs(TreeNode* node, unsigned int pos) {
+  double normalize_total = 0.0;
+
+  for(unsigned int i = 0; i < n_states; i++) {
+    normalize_total += taxa_names_to_state_probs[node->name][pos][i];
+  }
+
+  if(normalize_total != 0.0) {
+    for(unsigned int i = 0; i < n_states; i++) {
+      taxa_names_to_state_probs[node->name][pos][i] /= normalize_total;
+    }
+  }
+}
+
+// Calculating Probabilities.
+inline double calc_substitution_prob(double rate, float t_b, double u) {
   /*
-   * Calculates the probability of branch (for an indervidual position) given state_i at the top of the branch.
+   * rate = substitution rate.
+   * t_b = branch length.
+   * u = uniformisation constant.
    */
-  double u = node->SM->get_u();
+  return((rate * t_b) / (1.0 + (u * t_b)));
+}
+
+inline double calc_no_substitution_prob(double rate, float t_b, double u) {
+  // Probability that there is any virtual substitution | given no substitution - equation (9) Rapid Likelihood Analysis on Large Phylogenies.
+  double prob_virtual = 1.0 - (1.0 / (1.0 + (rate * t_b)));
+  double denom = 1.0 / (1.0 + (u * t_b));
+
+  //     Virtual Substitution                       No substitution
+  return((prob_virtual * ((rate * t_b) * denom)) + ((1.0 - prob_virtual) * denom));
+}
+
+float SequenceAlignment::find_state_prob_given_dec_branch(unsigned char state_i, float* state_probs, std::vector<Valuable*> rv, float t_b, double u) {
+  /*
+   * Find state probability given decendent branch
+   * state_probs = the marginal posterior distribution of the state at the node below.
+   */
   float prob = 0.0;
-  float t_b = node->distance;
 
   for(signed char state_j = 0; state_j < (signed char)n_states; state_j++) {
     double rate = rv[state_j]->get_value();
-    double state_prob = taxa_names_to_state_probs[node->name][pos][state_j];
+    double state_prob = state_probs[state_j];
     
     if(state_i != state_j) {
       // Normal Substitution
-      prob += (state_prob * rate * t_b)/(1.0 + (u * t_b)); // Probability of the substitution.
+      prob += state_prob * calc_substitution_prob(rate, t_b, u); // Probability of the substitution.
     } else {
-      // No substitution possibly virtual.
-      // Probability that there is any virtual substitution | given no substitution - equation (9) Rapid Likelihood Analysis on Large Phylogenies.
-      double prob_virtual = 1 - (1 / (1 + (rate * t_b)));
-      double denom = 1.0 / (1.0 + (u * t_b));
-
-      //                    Virtual Substitution                       No substitution
-      prob += state_prob * ((prob_virtual * ((rate * t_b) * denom)) + ((1.0 - prob_virtual) * denom));
+      // No substitution - possibly virtual.
+      prob += state_prob * calc_no_substitution_prob(rate, t_b, u);
     }
   }
 
   return(prob);
 }
 
-void SequenceAlignment::calculate_state_probabilities_pos(TreeNode* node, unsigned int pos, TreeNode* left_node, TreeNode* right_node) {
+float SequenceAlignment::find_state_prob_given_anc_branch(unsigned char state_j, float* state_probs, TreeNode* up_node, float t_b, double u, unsigned int pos) {
+  /*
+   * Find state probability given ancestor branch.
+   */
+
+  float prob = 0.0;
+
+  for(signed char state_i = 0; state_i < (signed char)n_states; state_i++) {
+    unsigned long extended_state = up_node->get_hypothetical_hash_state(pos, domain_name, state_i);
+    RateVector* rv = up_node->SM->selectRateVector({pos, domain_name, extended_state});
+
+    // Is this the right rate.
+    double rate = rv->rates[state_j]->get_value(); // i -> j rate.
+    double state_prob = state_probs[state_i];
+
+    if(state_i != state_j) {
+      // Normal Substitution.
+      prob += state_prob * calc_substitution_prob(rate, t_b, u); // Probability of the substitution.
+    } else {
+      // No substition - possibly virtual.
+      prob += state_prob * calc_no_substitution_prob(rate, t_b, u);
+    }
+  }
+
+  return(prob);
+}
+
+void SequenceAlignment::find_new_state_probs_at_pos(TreeNode* node, unsigned int pos, TreeNode* left_node, TreeNode* right_node, TreeNode* up_node) {
+  double u = node->SM->get_u();
   RateVector* rv;
-  float left_prob = 0.0;
-  float right_prob = 0.0;
+  float left_prob = 1.0;
+  float right_prob = 1.0;
+  float up_prob = 1.0;
 
-  double normalize_total = 0.0;
-
-  for(signed char i = 0; i < (signed char)n_states; i++) {
-    unsigned long extended_state = node->get_hypothetical_hash_state(pos, domain_name, i);
+  for(signed char state_i = 0; state_i < (signed char)n_states; state_i++) {
+    unsigned long extended_state = node->get_hypothetical_hash_state(pos, domain_name, state_i);
 
     rv = node->SM->selectRateVector({pos, domain_name, extended_state});
 
     // Contribution of left branch.
     if(left_node != nullptr) {
       if(not taxa_names_to_gaps[left_node->name].at(pos)) {
-	left_prob = calculate_single_state_probability(pos, i, rv->rates, left_node);
+	left_prob = find_state_prob_given_dec_branch(state_i, taxa_names_to_state_probs[left_node->name][pos], rv->rates, left_node->distance, u);
       } else {
 	  left_prob = 1.0;
       }
@@ -350,7 +404,7 @@ void SequenceAlignment::calculate_state_probabilities_pos(TreeNode* node, unsign
     // Contribution of right branch.
     if(right_node != nullptr) {
       if(not taxa_names_to_gaps[right_node->name][pos]) {
-	right_prob = calculate_single_state_probability(pos, i, rv->rates, right_node);
+	right_prob = find_state_prob_given_dec_branch(state_i, taxa_names_to_state_probs[right_node->name][pos], rv->rates, right_node->distance, u);
       } else {
 	right_prob = 1.0;
       } 
@@ -358,17 +412,16 @@ void SequenceAlignment::calculate_state_probabilities_pos(TreeNode* node, unsign
       right_prob = 1.0;
     }
 
-    float total = left_prob * right_prob;
-    taxa_names_to_state_probs[node->name][pos][i] = total;
-    normalize_total += total;
-  }
+    if(up_node != nullptr) {
+      if(not taxa_names_to_gaps[up_node->name][pos]) {
+	up_prob = find_state_prob_given_anc_branch(state_i, taxa_names_to_state_probs[up_node->name][pos], up_node, up_node->distance, u, pos);
+      }
+    } else {
+      up_prob = 1.0;
+    }
 
-  // Normalize
-  // NOTE Refactor out.
-  if(normalize_total != 0.0) {
-    for(unsigned int i = 0; i < n_states; i++) {
-     taxa_names_to_state_probs[node->name][pos][i] /= normalize_total;
-   }
+    float total = left_prob * right_prob * up_prob;
+    taxa_names_to_state_probs[node->name][pos][state_i] = total;
   }
 }
 
@@ -392,55 +445,66 @@ void SequenceAlignment::calculate_state_probabilities(TreeNode* node, std::list<
 
     for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
       if(not gaps[*pos]) {
-	calculate_state_probabilities_pos(node, *pos, node->left->decendant, right_node);
+	find_new_state_probs_at_pos(node, *pos, node->left->decendant, right_node, nullptr);
+	normalize_state_probs(node, *pos);
       }
     }
   }
 }
 
-void SequenceAlignment::incorperate_up_node(TreeNode* node, unsigned int pos, TreeNode* up_node) {
+// TODO refactor.
+void SequenceAlignment::calculate_state_probabilities_full(TreeNode* node, std::list<unsigned int> positions) {
   /*
-   * This does the same as calculate_state_probabilies_pos, but given the likelihood of the lower branches
-   * has already been calculated on the first tree traversal. They don't have to be recalculated.
+   * Finds the marginal posterior distribution for each position at a given node.
+   * Only uses infomation from nodes below - used for upward recursion.
+   */
+  
+  std::string name = node->name;
+  std::vector<bool> gaps = taxa_names_to_gaps[name];
+  if(not node->isTip()) {
+    // Node may or may not be a branch node - therefore may only have one child which is always the left one.
+    // Set to nullptr if no right branch;
+    TreeNode* right_node;
+    if(node->right) {
+      right_node = node->right->decendant;
+    } else {
+      right_node = nullptr;
+    }
+
+    TreeNode* up_node;
+    if(node->up) {
+      up_node = node->up->ancestral;
+    } else {
+      up_node = nullptr;
+    }
+
+    for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
+      if(not gaps[*pos]) {
+	find_new_state_probs_at_pos(node, *pos, node->left->decendant, right_node, up_node);
+	normalize_state_probs(node, *pos);
+      }
+    }
+  }
+}
+
+void SequenceAlignment::update_state_probs(TreeNode* node, unsigned int pos, TreeNode* up_node) {
+  /*
+   *
    */
 
   double u = node->SM->get_u();
-  RateVector* rv;
   float up_prob = 0.0;
 
-  for(signed char i = 0; i < (signed char)n_states; i++) {
-    // Contribution of up branch.
+  for(signed char state_j = 0; state_j < (signed char)n_states; state_j++) {
     if(up_node != nullptr) {
-      //float up_t_b = node->distance;
-
       float t_b = node->distance;
 
-      up_prob = 0.0;
-
-      for(signed char state_j = 0; state_j < (signed char)n_states; state_j++) {
-	unsigned long extended_state = up_node->get_hypothetical_hash_state(pos, domain_name, state_j);
-	rv = node->SM->selectRateVector({pos, domain_name, extended_state});
-	double rate = rv->rates[i]->get_value();
-	double state_prob = taxa_names_to_state_probs[up_node->name][pos][state_j];
-
-	if(i != state_j) {
-	  // Normal Substitution.
-	  up_prob += (state_prob * rate * t_b)/(1.0 + (u * t_b));
-	} else {
-	  // No substition - possibly virtual.
-	  double prob_virtual = 1 - (1 / (1 + (rate * t_b)));
-	  double denom = 1.0 / (1.0 + (u * t_b));
-
-	  //                    Virtual Substitution                       No substitution
-	  up_prob += state_prob * ((prob_virtual * ((rate * t_b) * denom)) + ((1.0 - prob_virtual) * denom));
-	}
-
-      }
+      up_prob = find_state_prob_given_anc_branch(state_j, taxa_names_to_state_probs[up_node->name][pos], up_node, t_b, u, pos);
     } else {
       up_prob = 1.0;
     }
 
-    taxa_names_to_state_probs[node->name][pos][i] *= up_prob;
+    taxa_names_to_state_probs[node->name][pos][state_j] *= up_prob;
   }
 }
 
@@ -471,20 +535,6 @@ int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
   return(val);
 }
 
-void SequenceAlignment::normalize_state_probs(TreeNode* node, unsigned int pos) {
-  double normalize_total = 0.0;
-
-  for(unsigned int i = 0; i < n_states; i++) {
-    normalize_total += taxa_names_to_state_probs[node->name][pos][i];
-  }
-
-  if(normalize_total != 0.0) {
-    for(unsigned int i = 0; i < n_states; i++) {
-      taxa_names_to_state_probs[node->name][pos][i] /= normalize_total;
-    }
-  }
-}
-
 sample_status SequenceAlignment::sample() {
   const std::list<TreeNode*> nodes = tree->nodes();
 
@@ -502,7 +552,6 @@ sample_status SequenceAlignment::sample() {
   // Nodes are ordered in the list such that they are visted in order up the tree.
   // Upward recursion.
   for(auto n = nodes.begin(); n != nodes.end(); ++n) {
-    // NOTE This is worrying - I'm not sure tips should be skipped.
     if(not (*n)->isTip()) {
       calculate_state_probabilities(*n, positions);
     }
@@ -524,9 +573,20 @@ sample_status SequenceAlignment::sample() {
 
     for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
       if((not gaps[*pos]) and (not (up_node == nullptr))) {
-	//calculate_state_probabilities_pos(node, *pos, left_node, right_node, up_node);
-	incorperate_up_node(node, *pos, up_node);
+	update_state_probs(node, *pos, up_node);
 	normalize_state_probs(node, *pos);
+      }
+    }
+  }
+
+  // 3rd Recursion.
+  for(auto n = nodes.rbegin(); n != nodes.rend(); ++n) {
+    TreeNode* node = *n;
+    std::vector<bool> gaps = taxa_names_to_gaps[node->name];
+
+    for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
+      if(not (*n)->isTip()) {
+	calculate_state_probabilities(*n, positions);
       }
 
       // Pick sequence.
@@ -537,6 +597,10 @@ sample_status SequenceAlignment::sample() {
       }
     } 
   }
+
+  // Test
+  //TreeNode* node = nodes[rand() % nodes.size()];
+  //std::cout << node->name << std::endl;
 
   return(sample_status({false, true, true}));
 }
