@@ -150,6 +150,8 @@ TreeNode::TreeNode() {
   left = 0;
   right = 0;
   sequences = {};
+
+  tagp = false;
 }
 
 TreeNode::~TreeNode() {

@@ -54,7 +54,10 @@ class TreeNode {
   static int unique_id;
   std::string name;
   double distance;
-  bool sampledp;
+
+  // This is a general utility to mark a node temporarily.
+  // For example, useful when recursively navigating the tree and marking previously visited nodes.
+  bool tagp;
 
   BranchSegment* up;
   BranchSegment* left;

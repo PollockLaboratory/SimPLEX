@@ -151,11 +151,14 @@ unsigned long RateVectorSet::get_hypothetical_hash_state(const std::map<std::str
   unsigned long h = 5381;
   signed char c;
   for(auto domain_it = all_states.begin(); domain_it != all_states.end(); ++domain_it) {
+    //std::cout << domain_it->first << " ";
     if(domain_it->first == domain_name) {
       c = state;
+      //std::cout << "primary " << (unsigned int)c << std::endl;
     } else {
       const std::vector<signed char>* s = sequences.at(domain_it->first);
       c = (*s)[pos];
+      //std::cout << "alt " << (unsigned int)c << std::endl;
     }
     h = hash_step(h, c);
   }

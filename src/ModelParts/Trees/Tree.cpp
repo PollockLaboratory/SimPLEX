@@ -165,6 +165,14 @@ std::list<float> Tree::get_branch_lengths() {
   return(lens);
 }
 
+TreeNode* Tree::rand_node() {
+  // NOTE probably a faster way to do this, but its not a critical function call.
+  auto it = nodeList.begin();
+  for(int offset = rand() % nodeList.size(); offset > 0; offset--) {
+    it++;
+  }
+  return(*it);
+}
 
 // Record State data.
 void Tree::record_tree() {

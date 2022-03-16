@@ -71,18 +71,25 @@ class SequenceAlignment {
   std::map<std::string, float**> taxa_names_to_state_probs;
   std::map<std::string, float**> base_taxa_state_probs; // These are fixed.
 
+  void reset_to_base(std::string name);
   void reset_base_probabilities();
   void normalize_state_probs(TreeNode* node, unsigned int pos);
 
+  // Marginal Calculations for indervidual positions.
   float find_state_prob_given_dec_branch(unsigned char state_i, float* state_probs, std::vector<Valuable*> rv, float t_b, double u);
   float find_state_prob_given_anc_branch(unsigned char state_i, float* state_probs, TreeNode* node, float t_b, double u, unsigned int pos);
-
-  void calculate_state_probabilities(TreeNode*, std::list<unsigned int>);
-  void calculate_state_probabilities_full(TreeNode*, std::list<unsigned int>);
   void find_new_state_probs_at_pos(TreeNode*, unsigned int, TreeNode*, TreeNode*, TreeNode*);
-  void update_state_probs(TreeNode* node, unsigned int pos, TreeNode* up_node);
 
+  // Marginal posterior calculations for whole sequences.
+  void find_state_probs_dec_only(TreeNode*, std::list<unsigned int>); // First Recursion.
+  void update_state_probs(TreeNode* node, unsigned int pos, TreeNode* up_node); // Second Recursion
+  void find_state_probs_all(TreeNode*, std::list<unsigned int>); // Third Recursion
+
+  // Picking states
   int pick_state_from_probabilities(TreeNode*, int);
+  void pick_states_for_node(TreeNode*, const std::list<unsigned int>&);
+
+  void reconstruct_expand(TreeNode*, const std::list<unsigned int>&);
 
   // Outputs
   std::string seqs_out_identifier;

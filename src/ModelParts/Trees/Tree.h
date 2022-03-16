@@ -38,6 +38,7 @@ private:
   
 public:
   SubstitutionModel* SM; // Temp - should be private.
+
   // Constructing/Initializing.
   Tree();
   void Initialize(IO::RawTreeNode* raw_tree);
@@ -46,6 +47,8 @@ public:
   const std::list<BranchSegment*> get_branches();
   const std::list<TreeNode*> nodes();
   std::list<float> get_branch_lengths();
+
+  TreeNode* rand_node();
 
   //Output
   void record_tree();

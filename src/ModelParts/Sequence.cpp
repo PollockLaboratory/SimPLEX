@@ -285,13 +285,19 @@ std::list<std::string> SequenceAlignment::getNodeNames() {
   return(names);
 }
 
+// TODO positions should be passed as argument.
+void SequenceAlignment::reset_to_base(std::string name) {
+  for(unsigned int i = 0; i < n_columns; i++) {
+      for(unsigned int j = 0; j < n_states; j++) {
+	taxa_names_to_state_probs[name][i][j] = base_taxa_state_probs[name][i][j];
+      }
+  } 
+}
+
+// TODO refactor - probably can loop over tips rather than base_sequences.
 void SequenceAlignment::reset_base_probabilities() {
   for(auto seq_name = base_sequences.begin(); seq_name != base_sequences.end(); ++seq_name) {
-    for(unsigned int i = 0; i < n_columns; i++) {
-      for(unsigned int j = 0; j < n_states; j++) {
-	taxa_names_to_state_probs[*seq_name][i][j] = base_taxa_state_probs[*seq_name][i][j];
-      }
-    }
+    reset_to_base(*seq_name);
   }
 }
 
@@ -425,7 +431,7 @@ void SequenceAlignment::find_new_state_probs_at_pos(TreeNode* node, unsigned int
   }
 }
 
-void SequenceAlignment::calculate_state_probabilities(TreeNode* node, std::list<unsigned int> positions) {
+void SequenceAlignment::find_state_probs_dec_only(TreeNode* node, std::list<unsigned int> positions) {
   /*
    * Finds the marginal posterior distribution for each position at a given node.
    * Only uses infomation from nodes below - used for upward recursion.
@@ -453,10 +459,8 @@ void SequenceAlignment::calculate_state_probabilities(TreeNode* node, std::list<
 }
 
 // TODO refactor.
-void SequenceAlignment::calculate_state_probabilities_full(TreeNode* node, std::list<unsigned int> positions) {
+void SequenceAlignment::find_state_probs_all(TreeNode* node, std::list<unsigned int> positions) {
   /*
-   * Finds the marginal posterior distribution for each position at a given node.
-   * Only uses infomation from nodes below - used for upward recursion.
    */
   
   std::string name = node->name;
@@ -487,6 +491,7 @@ void SequenceAlignment::calculate_state_probabilities_full(TreeNode* node, std::
   }
 }
 
+// Second recursion.
 void SequenceAlignment::update_state_probs(TreeNode* node, unsigned int pos, TreeNode* up_node) {
   /*
    *
@@ -508,6 +513,7 @@ void SequenceAlignment::update_state_probs(TreeNode* node, unsigned int pos, Tre
   }
 }
 
+// Third Recursion
 int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
   /*
    * Picks a state from the marginal posterior distribution (taxa_names _to_state_probs).
@@ -535,6 +541,62 @@ int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
   return(val);
 }
 
+void SequenceAlignment::pick_states_for_node(TreeNode* node, const std::list<unsigned int>& positions) {
+  std::vector<bool> gaps = taxa_names_to_gaps[node->name];
+
+  for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
+    normalize_state_probs(node, *pos);
+
+    // Pick state from marginal distributions.
+    if(gaps[*pos]) {
+      taxa_names_to_sequences[node->name][*pos] = -1;
+    } else {
+      taxa_names_to_sequences[node->name][*pos] = pick_state_from_probabilities(node, *pos);
+    }
+  }
+}
+
+void SequenceAlignment::reconstruct_expand(TreeNode* node,  const std::list<unsigned int>& positions) {
+  /*
+   * This function needs a better name.
+   * This recalculates the marginal posteriors of each node and picks sequences, which again alters the posterior
+   * distribution.
+   * Starts at a randomly chosen node and propagates outwards from there.
+   */
+  node->tagp = true;
+
+  if(node->isTip()) {
+    // Tip Node.
+    reset_to_base(node->name);
+
+    std::vector<bool> gaps = taxa_names_to_gaps[node->name];
+
+    for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
+      if(not gaps[*pos]) {
+	update_state_probs(node, *pos, node->up->ancestral);
+	normalize_state_probs(node, *pos);
+      }
+    }
+  } else {
+    find_state_probs_all(node, positions);
+  }
+
+  pick_states_for_node(node, positions);
+
+  // Recur ancestral reconstruction.
+  if(node->left and not node->left->decendant->tagp) {
+    reconstruct_expand(node->left->decendant, positions);
+  }
+
+  if(node->right and not node->right->decendant->tagp) {
+    reconstruct_expand(node->right->decendant, positions);
+  }
+
+  if(node->up and not node->up->ancestral->tagp) {
+    reconstruct_expand(node->up->ancestral, positions);
+  }
+}
+
 sample_status SequenceAlignment::sample() {
   const std::list<TreeNode*> nodes = tree->nodes();
 
@@ -553,7 +615,7 @@ sample_status SequenceAlignment::sample() {
   // Upward recursion.
   for(auto n = nodes.begin(); n != nodes.end(); ++n) {
     if(not (*n)->isTip()) {
-      calculate_state_probabilities(*n, positions);
+      find_state_probs_dec_only(*n, positions);
     }
   }
 
@@ -579,34 +641,18 @@ sample_status SequenceAlignment::sample() {
     }
   }
 
-  // 3rd Recursion.
-  for(auto n = nodes.rbegin(); n != nodes.rend(); ++n) {
-    TreeNode* node = *n;
-    std::vector<bool> gaps = taxa_names_to_gaps[node->name];
+  // 3rd Recursion - picking states.
+  TreeNode* node = tree->rand_node();
+  reconstruct_expand(node, positions);
 
-    if(not (*n)->isTip()) {
-      calculate_state_probabilities_full(*n, positions);
-    }
-
-    for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
-      normalize_state_probs(node, *pos);
-
-      // Pick sequence.
-      if(gaps[*pos]) {
-	taxa_names_to_sequences[(*n)->name][*pos] = -1;
-      } else {
-	taxa_names_to_sequences[(*n)->name][*pos] = pick_state_from_probabilities(node, *pos);
-      }
-    } 
+  for(auto n = nodes.begin(); n != nodes.end(); ++n) {
+    (*n)->tagp = false;
   }
-
-  // Test
-  //TreeNode* node = nodes[rand() % nodes.size()];
-  //std::cout << node->name << std::endl;
 
   return(sample_status({false, true, true}));
 }
 
+// These functions are not critical they are useful though for other user who may not know how they are breaking simPLEX.
 // This need to be much more robust - add better error handling.
 bool SequenceAlignment::validate(std::list<std::string> seq_names, std::map<std::string, SequenceAlignment*> other_alignments) {
   for(auto n = seq_names.begin(); n != seq_names.end(); ++n) {
