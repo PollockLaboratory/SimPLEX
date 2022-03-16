@@ -19,12 +19,27 @@ SubstitutionCounts::SubstitutionCounts(std::vector<RateVector*> rvs, std::list<f
   // Make empty structures ready for counts.
   subs_by_rateVector = {};
   subs_by_branch = {};
+
   for(auto it = rvs.begin(); it != rvs.end(); ++it) {
     subs_by_rateVector[*it] = std::vector<int>((*it)->rates.size(), 0);
   }
 
   for(auto it = b_lens.begin(); it != b_lens.end(); ++it) {
     subs_by_branch[*it] = {0,0};
+  }
+}
+
+void SubstitutionCounts::clear() {
+  // Clear structures ready for counts.
+  for(auto it = subs_by_rateVector.begin(); it != subs_by_rateVector.end(); ++it) {
+    for(auto jt = it->second.begin(); jt != it->second.end(); ++jt) {
+     *jt = 0;
+    }
+  }
+
+  for(auto it = subs_by_branch.begin(); it != subs_by_branch.end(); it++) {
+    it->second.num0subs = 0;
+    it->second.num1subs = 0;
   }
 }
 
@@ -75,17 +90,26 @@ void CountsParameter::fix() {
 }
 
 void CountsParameter::refresh() {
+  std::cout << "Refreshing counts" << std::endl;
   // Create new structs for counts.
-  *counts = SubstitutionCounts(tree->get_SM()->get_RateVectors(), tree->get_branch_lengths(), tree->SM->get_all_states());
+  static bool updated_table = false;
+  if(not updated_table) {
+    *counts = SubstitutionCounts(tree->get_SM()->get_RateVectors(), tree->get_branch_lengths(), tree->SM->get_all_states());
+    updated_table = true;
+  }
+
+  counts->clear();
+
+  std::map<std::string, States> all_state_domains = tree->SM->get_all_states();
 
   // Track counts by branch segment length and rate vector.
   const std::list<BranchSegment*> branchList = tree->get_branches();
 
   for(auto it = branchList.begin(); it != branchList.end(); ++it) {
     BranchSegment* b = *it;
-    std::map<std::string, States> all_state_domains = tree->SM->get_all_states();
     for(auto jt = all_state_domains.begin(); jt != all_state_domains.end(); ++jt) {
-      for(auto sub = b->get_substitutions(jt->first).begin(); sub != b->get_substitutions(jt->first).end(); ++sub) {
+      std::string domain = jt->first;
+      for(auto sub = b->get_substitutions(domain).begin(); sub != b->get_substitutions(domain).end(); ++sub) {
 	if(sub->occuredp == true) {
 	  // Adds both virtual substitutions and normal substitutions.
 	  counts->subs_by_branch[b->distance].num1subs += 1;

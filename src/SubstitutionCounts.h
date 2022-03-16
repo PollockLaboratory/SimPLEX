@@ -10,7 +10,7 @@
 
 class RateVector;
 
-struct raw_counts {
+struct branch_counts {
   int num0subs = 0;
   int num1subs = 0;
 };
@@ -20,8 +20,10 @@ class SubstitutionCounts {
   SubstitutionCounts();
   SubstitutionCounts(std::vector<RateVector*>, std::list<float>, std::map<std::string, States>);
 
+  void clear();
+
   std::map<RateVector*, std::vector<int>> subs_by_rateVector;
-  std::map<float, raw_counts> subs_by_branch;
+  std::map<float, branch_counts> subs_by_branch;
   void print();
 };
 
