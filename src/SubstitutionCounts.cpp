@@ -90,7 +90,6 @@ void CountsParameter::fix() {
 }
 
 void CountsParameter::refresh() {
-  std::cout << "Refreshing counts" << std::endl;
   // Create new structs for counts.
   static bool updated_table = false;
   if(not updated_table) {
