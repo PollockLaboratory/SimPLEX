@@ -57,7 +57,7 @@ inline void BranchSegment::update_rate_vectors() {
     if((*seq)[pos] != -1) {
       unsigned long ex_state = ancestral->get_hash_state(pos);
 
-      // Set the rate vectors for each of the states..
+      // Set the rate vectors for each of the state.
       for(auto it = ancestral->sequences.begin(); it != ancestral->sequences.end(); ++it) {
 	rv_request rq = {pos, it->first, ex_state};
 	
@@ -73,34 +73,30 @@ inline void BranchSegment::update_rate_vectors() {
 }
 
 void BranchSegment::set_new_substitutions() {
-  double u = decendant->SM->get_u();
+  // Set new substitutions for all state domains.
+  for(auto domain = substitutions.begin(); domain != substitutions.end(); ++domain) {
+    std::vector<signed char> *anc_seq = (ancestral->sequences[domain->first]);
+    std::vector<signed char> *dec_seq = (decendant->sequences[domain->first]);
 
-  for(unsigned int pos = 0; pos < n_pos; pos++) {
-    // Set new substitutions for all state domains.
-    for(auto domain = substitutions.begin(); domain != substitutions.end(); ++domain) {
-      std::vector<signed char> *anc_seq = (ancestral->sequences[domain->first]);
-      std::vector<signed char> *dec_seq = (decendant->sequences[domain->first]);
-      
-      for(unsigned int pos = 0; pos < anc_seq->size(); pos++) {
-	if(anc_seq->at(pos) == -1 or dec_seq->at(pos) == -1) {
-	  substitutions[domain->first][pos] = {false, anc_seq->at(pos), dec_seq->at(pos), rates[domain->first][pos]};
+    std::vector<RateVector*> rv = rates[domain->first];
+    for(unsigned int pos = 0; pos < anc_seq->size(); pos++) {
+      if(anc_seq->at(pos) == -1 or dec_seq->at(pos) == -1) {
+	substitutions[domain->first][pos] = {false, anc_seq->at(pos), dec_seq->at(pos), rv[pos]};
+      } else {
+	if(anc_seq->at(pos) != dec_seq->at(pos)) {
+	  // Normal substitutions.
+	  substitutions[domain->first][pos] = {true, anc_seq->at(pos), dec_seq->at(pos), rv[pos]};
 	} else {
-	  if(anc_seq->at(pos) != dec_seq->at(pos)) {
-	    // Normal substitutions.
-	    substitutions[domain->first][pos] = {true, anc_seq->at(pos), dec_seq->at(pos), rates[domain->first][pos]};
+	  // No substitution - possibility of virtual substitution.
+	  // This could be faster - we just need the virtual substitution rate.
+	  double vir_rate = rv[pos]->rates[dec_seq->at(pos)]->get_value(); 
+	  double p = 1.0 - (1.0 / (1.0 + (vir_rate * distance)));
+	  if(Random() < p) {
+	    // Virtual Substitution.
+	    substitutions[domain->first][pos] = {true, anc_seq->at(pos), dec_seq->at(pos), rv[pos]};
 	  } else {
-	    // No substitution - possibility of virtual substitution.
-	    double vir_rate = rates[domain->first][pos]->rates[dec_seq->at(pos)]->get_value();
-
-	    double p = 1.0 - (1.0 / (1.0 + (vir_rate * distance)));
-	    //double p = vir_rate / (1 - u + vir_rate);
-	    if(Random() < p) {
-	      // Virtual Substitution.
-	      substitutions[domain->first][pos] = {true, anc_seq->at(pos), dec_seq->at(pos), rates[domain->first][pos]};
-	    } else {
-	      // No Virtual Substitution.
-	      substitutions[domain->first][pos] = {false, anc_seq->at(pos), dec_seq->at(pos), rates[domain->first][pos]};
-	    }
+	    // No Virtual Substitution.
+	    substitutions[domain->first][pos] = {false, anc_seq->at(pos), dec_seq->at(pos), rv[pos]};
 	  }
 	}
       }
