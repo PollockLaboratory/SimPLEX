@@ -393,38 +393,39 @@ void SequenceAlignment::find_new_state_probs_at_pos(TreeNode* node, unsigned int
 
     rv = node->SM->selectRateVector({pos, domain_name, extended_state});
 
-    // Contribution of left branch.
-    if(left_node != nullptr) {
-      if(not taxa_names_to_gaps[left_node->name].at(pos)) {
-	left_prob = find_state_prob_given_dec_branch(state_i, taxa_names_to_state_probs[left_node->name][pos], rv->rates, left_node->distance, u);
-      } else {
-	  left_prob = 1.0;
-      }
-    } else {
-      left_prob = 1.0;
-    }
-
-    // Contribution of right branch.
-    if(right_node != nullptr) {
-      if(not taxa_names_to_gaps[right_node->name][pos]) {
-	right_prob = find_state_prob_given_dec_branch(state_i, taxa_names_to_state_probs[right_node->name][pos], rv->rates, right_node->distance, u);
-      } else {
-	right_prob = 1.0;
-      } 
-    } else {
-      right_prob = 1.0;
-    }
-
+    // Most likely to be 0.0 so evaluated first.
     if(up_node != nullptr) {
       if(not taxa_names_to_gaps[up_node->name][pos]) {
 	up_prob = find_state_prob_given_anc_branch(state_i, taxa_names_to_state_probs[up_node->name][pos], up_node, up_node->distance, u, pos);
+
+	// Return if probability if 0.0.
+	if(up_prob == 0.0) {
+	  taxa_names_to_state_probs[node->name][pos][state_i] = 0.0;
+	  return;
+	}
       }
-    } else {
-      up_prob = 1.0;
     }
 
-    float total = left_prob * right_prob * up_prob;
-    taxa_names_to_state_probs[node->name][pos][state_i] = total;
+    // Contribution of left branch.
+    if((left_node != nullptr) and not taxa_names_to_gaps[left_node->name].at(pos)) {
+      left_prob = find_state_prob_given_dec_branch(state_i, taxa_names_to_state_probs[left_node->name][pos], rv->rates, left_node->distance, u);
+
+      if(left_prob == 0.0) {
+	taxa_names_to_state_probs[node->name][pos][state_i] = 0.0;
+	return;
+      }
+    }
+
+    // Contribution of right branch.
+    if((right_node != nullptr) and (not taxa_names_to_gaps[right_node->name][pos])) {
+      right_prob = find_state_prob_given_dec_branch(state_i, taxa_names_to_state_probs[right_node->name][pos], rv->rates, right_node->distance, u);
+      if(right_prob == 0.0) {
+	taxa_names_to_state_probs[node->name][pos][state_i] = 0.0;
+	return;
+      }
+    }
+
+    taxa_names_to_state_probs[node->name][pos][state_i] = left_prob * right_prob * up_prob;
   }
 }
 
@@ -490,19 +491,15 @@ void SequenceAlignment::find_state_probs_all(TreeNode* node, std::list<unsigned 
 
 // Second recursion.
 void SequenceAlignment::update_state_probs(TreeNode* node, unsigned int pos, TreeNode* up_node) {
+  // NOTE we can assume up_node is not a nullptr.
   double u = node->SM->get_u();
-  float up_prob = 0.0;
+  float* state_probs = taxa_names_to_state_probs[node->name][pos];
+  float t_b = node->distance;
 
   for(signed char state_j = 0; state_j < (signed char)n_states; state_j++) {
-    if(up_node != nullptr) {
-      float t_b = node->distance;
-
-      up_prob = find_state_prob_given_anc_branch(state_j, taxa_names_to_state_probs[up_node->name][pos], up_node, t_b, u, pos);
-    } else {
-      up_prob = 1.0;
+    if(state_probs[state_j] != 0.0) {
+      state_probs[state_j] *= find_state_prob_given_anc_branch(state_j, taxa_names_to_state_probs[up_node->name][pos], up_node, t_b, u, pos);
     }
-
-    taxa_names_to_state_probs[node->name][pos][state_j] *= up_prob;
   }
 }
 
@@ -512,24 +509,20 @@ void SequenceAlignment::fast_update_state_probs_tips(TreeNode* node, unsigned in
    * Equivilent of:
    * reset_to_base()
    * update_state_probs(node, *pos, node->up->ancestral);
+   * NOTE we can assume there is an up node at a tip.
    */
 
   double u = node->SM->get_u();
-  float up_prob = 0.0;
-
   float* state_probs = taxa_names_to_state_probs[node->name][pos];
   float* base_state_probs = base_taxa_state_probs[node->name][pos];
-  
+
+  float t_b = node->distance;
   for(signed char state_j = 0; state_j < (signed char)n_states; state_j++) {
-    if(up_node != nullptr) {
-      float t_b = node->distance;
-
-      up_prob = find_state_prob_given_anc_branch(state_j, taxa_names_to_state_probs[up_node->name][pos], up_node, t_b, u, pos);
+    if(base_state_probs[state_j] != 0.0) {
+      state_probs[state_j] = base_state_probs[state_j] * find_state_prob_given_anc_branch(state_j, taxa_names_to_state_probs[up_node->name][pos], up_node, t_b, u, pos);
     } else {
-      up_prob = 1.0;
+      state_probs[state_j] = 0.0;
     }
-
-    state_probs[state_j] = base_state_probs[state_j] * up_prob;
   }
 }
 
@@ -637,6 +630,7 @@ sample_status SequenceAlignment::sample(const std::list<unsigned int>& positions
     }
 
     for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
+      // Note does not call for root node.
       if((not gaps[*pos]) and (not (up_node == nullptr))) {
 	update_state_probs(node, *pos, up_node);
 	normalize_state_probs(node, *pos);
