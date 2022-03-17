@@ -14,7 +14,7 @@ ContinuousFloat::ContinuousFloat(std::string name, double initial_value = 0.0, d
 }
 
 void ContinuousFloat::print() {
-  std::cout << "Continuous float - " << name << ": " << value
+  std::cout << "ContinuousFloat - " << name << ": " << value
 	    << " [" << lower_bound->get_description()
 	    << "->" << upper_bound->get_description() << "]" << std::endl;
 }

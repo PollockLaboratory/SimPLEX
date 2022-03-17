@@ -39,10 +39,10 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree) {
   delete proxyBranch;
   delete proxyNode;
 
-  std::cout << "\t\tTree split into " << nodeList.size() << " nodes." << std::endl;
-
   // Cache
   cache_node_access();
+
+  std::cout << "\t\tTree contains " << nodeList.size() << " nodes." << std::endl;
 
   //Setup output.
   files.add_file("tree_out", env.get<std::string>("OUTPUT.tree_out_file"), IOtype::OUTPUT);
