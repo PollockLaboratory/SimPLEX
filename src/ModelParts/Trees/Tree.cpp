@@ -210,8 +210,14 @@ std::list<float> Tree::get_branch_lengths() {
 }
 
 TreeNode* Tree::rand_node() {
-  int r = rand() % nodeVector.size();
-  return(nodeVector[r]);
+  // Random Tip
+  int r = rand() % tipList.size();
+  auto it = tipList.begin();
+  while(r > 0) {
+    it++;
+    r--;
+  }
+  return(*it);
 }
 
 // Record State data.

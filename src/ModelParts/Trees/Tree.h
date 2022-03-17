@@ -58,7 +58,6 @@ public:
 
   std::list<float> get_branch_lengths();
 
-
   TreeNode* rand_node();
 
   //Output
