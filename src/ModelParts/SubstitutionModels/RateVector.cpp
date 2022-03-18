@@ -166,6 +166,18 @@ unsigned long RateVectorSet::get_hypothetical_hash_state(const std::map<std::str
   return(h);
 }
 
+
+unsigned long RateVectorSet::get_hypothetical_hash_state(std::map<std::string, signed char> states) {
+  unsigned long h = 5381;
+  signed char c;
+
+  for(auto domain_it = all_states.begin(); domain_it != all_states.end(); ++domain_it) {
+    c = states[domain_it->first];
+    h = hash_step(h, c);
+  }
+  return(h);
+}
+
 std::list<signed char> RateVectorSet::ex_to_list(ExtendedState ex) {
   std::list<signed char> l = {};
   for(auto domain_it = all_states.begin(); domain_it != all_states.end(); ++domain_it) {

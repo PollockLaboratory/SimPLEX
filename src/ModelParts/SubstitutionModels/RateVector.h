@@ -75,6 +75,9 @@ public:
   RateVector* select(rv_request);
   unsigned long get_hash_state(const std::map<std::string, std::vector<signed char>*>& sequences, int pos) const;
   unsigned long get_hypothetical_hash_state(const std::map<std::string, std::vector<signed char>*>& sequences, int pos, std::string domain_name, signed char state) const;
+
+  unsigned long get_hypothetical_hash_state(std::map<std::string, signed char> states);
+
   const std::list<rv_loc>& get_host_vectors(Valuable*);
 
   void print();

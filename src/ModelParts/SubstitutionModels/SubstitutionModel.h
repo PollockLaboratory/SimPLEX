@@ -31,9 +31,13 @@ public:
   void organizeRateVectors();
   RateVector* selectRateVector(rv_request);
   std::vector<RateVector*> get_RateVectors();
+
   unsigned long get_hash_state(const std::map<std::string, std::vector<signed char>*>& sequences, unsigned int pos);
   unsigned long get_hypothetical_hash_state(const std::map<std::string, std::vector<signed char>*>& sequences, unsigned int pos, std::string domain_name, signed char state);
-  
+
+  unsigned long get_hypothetical_hash_state(std::map<std::string, signed char>);
+
+  // Navigating parameters.
   SubstitutionModel::iterator modified_begin(AbstractComponent*);
 
   // Parameters.
@@ -52,7 +56,7 @@ private:
 
   // Iterator
   // Given a AbstractComponent will return an iterator to the start of all the rate vector locations that are modified.
-  class iterator:public std::iterator<std::output_iterator_tag, std::pair<RateVector*, int>> {
+  class iterator:public std::iterator<std::output_iterator_tag, const rv_loc*> {
   public:
     explicit iterator(SubstitutionModel&, bool, AbstractComponent*);
     const rv_loc& operator*() const;

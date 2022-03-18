@@ -41,6 +41,16 @@ std::ostream& operator<< (std::ostream &out, const BranchSegment &b) {
   return out;
 }
 
+const Substitution& BranchSegment::get_substitution(std::string domain, unsigned int pos) {
+  auto it = substitutions.find(domain);
+  if(it == substitutions.end()) {
+    std::cerr << "Error: domain not recognized in BranchSegment." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  return(substitutions.at(domain)[pos]);
+}
+
 const std::vector<Substitution>& BranchSegment::get_substitutions(std::string domain) {
   auto it = substitutions.find(domain);
   if(it == substitutions.end()) {
@@ -48,6 +58,82 @@ const std::vector<Substitution>& BranchSegment::get_substitutions(std::string do
     exit(EXIT_FAILURE);
   }
   return(substitutions.at(domain));
+}
+
+signed char BranchSegment::get_alt_domain_state(std::string alt_domain, std::string view_domain, unsigned int pos) {
+  /*
+   * This function returns the state at a given alternative domain, from the view point of the view domain.
+   * Substitutions in different domains may occur on the branch segment at the same time,
+   * and thus affect the rate vector choice in different domains when calculating marginal distributions.
+   * 
+   * The order of substitutions on a branch is the same as the order of the domains.
+   * NOTE maps do not necessarily maintain order.
+   */
+
+  bool past_view_domain = false;
+  for(auto it = substitutions.begin(); it != substitutions.end(); it++) {
+    if(it->first == alt_domain) {
+      Substitution sub = substitutions.at(alt_domain)[pos];
+      return(past_view_domain ? sub.dec_state : sub.anc_state);
+    } else if(it->first == view_domain) {
+      past_view_domain = true;
+    }
+  }
+
+  std::cerr << "Error: domain not recognized in BranchSegment." << std::endl;
+  exit(EXIT_FAILURE);
+}
+
+unsigned long BranchSegment::get_hypothetical_hash_state(std::string domain, signed char state, unsigned int pos) {
+  std::map<std::string, signed char> states = {};
+  for(auto it = substitutions.begin(); it != substitutions.end(); it++) {
+    if(it->first == domain) {
+      states[it->first] = state;
+    } else {
+      states[it->first] = get_alt_domain_state(it->first, domain, pos);
+    }
+  }
+
+  return(decendant->SM->get_hypothetical_hash_state(states));
+}
+
+unsigned long BranchSegment::get_hypothetical_hash_state(std::string focal_domain, std::map<std::string, signed char>& input_states, unsigned int pos) {
+  std::map<std::string, signed char> states = {};
+  for(auto it = substitutions.begin(); it != substitutions.end(); it++) {
+    if(input_states.find(it->first) != input_states.end()) {
+      signed char s = input_states[it->first];
+      states[it->first] = s;
+    } else {
+      states[it->first] = get_alt_domain_state(it->first, focal_domain, pos);
+    }
+  }
+
+  return(decendant->SM->get_hypothetical_hash_state(states));
+}
+
+BranchSegment::iterator::iterator(BranchSegment& branch, unsigned int pos, bool end): branch(branch), pos(pos) {
+  it = end ? branch.substitutions.end() : branch.substitutions.begin();
+}
+
+std::pair<std::string, Substitution> BranchSegment::iterator::operator*() const {
+  return(std::pair<std::string, Substitution>(it->first, branch.get_substitution(it->first, pos)));
+}
+
+BranchSegment::iterator& BranchSegment::iterator::operator++(int i) {
+  it++;
+  return(*this);
+}
+
+bool BranchSegment::iterator::operator!=(const iterator& rhs) const {
+  return(this->it != rhs.it);
+}
+
+BranchSegment::iterator BranchSegment::begin(unsigned int pos) {
+  return(BranchSegment::iterator(*this, pos, false));
+}
+
+BranchSegment::iterator BranchSegment::end() {
+  return(BranchSegment::iterator(*this, 0, true));
 }
 
 // Key Statistics
@@ -181,9 +267,9 @@ unsigned long TreeNode::get_hash_state(unsigned int pos) {
   return(SM->get_hash_state(sequences, pos));
 }
 
-unsigned long TreeNode::get_hypothetical_hash_state(unsigned int pos, std::string domain, signed char state) {
-  return(SM->get_hypothetical_hash_state(sequences, pos, domain, state));
-}
+//unsigned long TreeNode::get_hypothetical_hash_state(unsigned int pos, std::string domain, signed char state) {
+// return(SM->get_hypothetical_hash_state(sequences, pos, domain, state));
+//}
 
 bool TreeNode::isTip() {
   if(this->left == 0 and this->right == 0) {

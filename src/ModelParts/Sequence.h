@@ -16,12 +16,7 @@ using boost::multiprecision::uint128_t;
 
 class Tree;
 class TreeNode;
-
-struct substitution {
-	int pos;
-	int anc;
-	int dec;
-};
+class BranchSegment;
 
 class SequenceAlignment {
  public:
@@ -31,10 +26,7 @@ class SequenceAlignment {
   unsigned int n_states;
   SequenceAlignment(std::string name, std::string msa_out, std::string subs_out, const States*);
 
-  std::map<std::string, std::vector<signed char>> taxa_names_to_sequences;
-  std::map<std::string, std::vector<bool>> taxa_names_to_gaps;
-  std::list<std::string> base_sequences;
-
+  // States
   std::set<std::string> states;
   std::map<std::string, signed char> state_to_integer;
   std::map<signed char, std::string> integer_to_state;
@@ -67,16 +59,24 @@ class SequenceAlignment {
   // Processing input sequences - fasta.
   std::vector<signed char> encode_sequence(const std::string &sequence);
 
-  // Sampling
-  std::map<std::string, float**> taxa_names_to_state_probs;
-  std::map<std::string, float**> base_taxa_state_probs; // These are the priors.
+  // Probability distributions of each state.
+  // Taxa name -> residue position -> state -> probability.
+  // double** is a matrix where i is the sequence position and j is the state id.
+  std::map<std::string, double**> prior_state_distribution; // These are the priors.
+  std::map<std::string, double**> marginal_state_distribution;
+
+  // Sequences
+  std::map<std::string, std::vector<signed char>> taxa_names_to_sequences;
+
+  // Gaps
+  std::map<std::string, std::vector<bool>> taxa_names_to_gaps;
 
   void reset_to_base(std::string name, const std::list<unsigned int>& positions);
   void normalize_state_probs(TreeNode* node, unsigned int pos);
 
   // Marginal Calculations for indervidual positions.
-  float find_state_prob_given_dec_branch(unsigned char state_i, float* state_probs, std::vector<Valuable*> rv, float t_b, double u);
-  float find_state_prob_given_anc_branch(unsigned char state_i, float* state_probs, TreeNode* node, float t_b, double u, unsigned int pos);
+  double find_state_prob_given_dec_branch(BranchSegment* branch, unsigned char state_i, double* state_probs, std::vector<Valuable*> rv, double u, unsigned int pos);
+  double find_state_prob_given_anc_branch(BranchSegment* branch, unsigned char state_i, double* state_probs, TreeNode* node, double u, unsigned int pos);
   void find_new_state_probs_at_pos(TreeNode*, unsigned int, TreeNode*, TreeNode*, TreeNode*);
 
   // Marginal posterior calculations for whole sequences.

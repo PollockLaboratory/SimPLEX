@@ -44,10 +44,10 @@ void SequenceAlignment::add(std::string name) {
   taxa_names_to_sequences[name] = enc;
 }
 
-float** create_state_probability_vector(unsigned int n_cols, unsigned int n_states) {
-  float** m = new float*[n_cols];
+double** create_state_probability_vector(unsigned int n_cols, unsigned int n_states) {
+  double** m = new double*[n_cols];
   for(unsigned int i = 0; i < n_cols; i++) {
-    m[i] = new float[n_states];
+    m[i] = new double[n_states];
     for(unsigned int j = 0; j < n_states; j++) {
       m[i][j] = 0.0;
     }
@@ -57,16 +57,15 @@ float** create_state_probability_vector(unsigned int n_cols, unsigned int n_stat
 }
 
 void SequenceAlignment::add_base(std::string name, const IO::FreqSequence &seq) {
-  base_sequences.push_front(name);
   add(name, sequenceAsStr_highestFreq(seq));
 
-  base_taxa_state_probs[name] = create_state_probability_vector(seq.size(), n_states);
+  prior_state_distribution[name] = create_state_probability_vector(seq.size(), n_states);
 
   int pos = 0;
   for(auto it = seq.begin(); it != seq.end(); ++it) {
     for(auto jt = it->begin(); jt != it->end(); ++jt) {
       if(jt->state != '-') {
-	base_taxa_state_probs[name][pos][state_to_integer[std::string(1, jt->state)]] = jt->freq;
+	prior_state_distribution[name][pos][state_to_integer[std::string(1, jt->state)]] = jt->freq;
       }
     }
     pos++;
@@ -179,7 +178,7 @@ void SequenceAlignment::identify_gaps() {
     std::vector<signed char> sequence = taxa_names_to_sequences[(*node)->name];
     std::vector<bool> gaps(sequence.size(), false);
 
-    taxa_names_to_state_probs[(*node)->name] = create_state_probability_vector(n_columns, n_states);
+    marginal_state_distribution[(*node)->name] = create_state_probability_vector(n_columns, n_states);
 
     if((*node)->isTip()) {
       for(unsigned int pos = 0; pos < sequence.size(); pos++) {
@@ -289,7 +288,7 @@ std::list<std::string> SequenceAlignment::getNodeNames() {
 void SequenceAlignment::reset_to_base(std::string name, const std::list<unsigned int>& positions) {
   for(unsigned int i = 0; i < n_columns; i++) {
       for(unsigned int j = 0; j < n_states; j++) {
-	taxa_names_to_state_probs[name][i][j] = base_taxa_state_probs[name][i][j];
+	marginal_state_distribution[name][i][j] = prior_state_distribution[name][i][j];
       }
   } 
 }
@@ -298,12 +297,12 @@ void SequenceAlignment::normalize_state_probs(TreeNode* node, unsigned int pos) 
   double normalize_total = 0.0;
 
   for(unsigned int i = 0; i < n_states; i++) {
-    normalize_total += taxa_names_to_state_probs[node->name][pos][i];
+    normalize_total += marginal_state_distribution[node->name][pos][i];
   }
 
   if(normalize_total != 0.0) {
     for(unsigned int i = 0; i < n_states; i++) {
-      taxa_names_to_state_probs[node->name][pos][i] /= normalize_total;
+      marginal_state_distribution[node->name][pos][i] /= normalize_total;
     }
   }
 }
@@ -327,54 +326,114 @@ inline double calc_no_substitution_prob(double rate, float t_b, double u) {
   return((prob_virtual * ((rate * t_b) * denom)) + ((1.0 - prob_virtual) * denom));
 }
 
-float SequenceAlignment::find_state_prob_given_dec_branch(unsigned char state_i, float* state_probs, std::vector<Valuable*> rv, float t_b, double u) {
+double SequenceAlignment::find_state_prob_given_dec_branch(BranchSegment* branch, unsigned char state_i, double* state_probs, std::vector<Valuable*> rv, double u, unsigned int pos) {
   /*
    * Find state probability given decendent branch
    * state_probs = the marginal posterior distribution of the state at the node below.
    */
-  float prob = 0.0;
+
+  double prob = 0.0;
+  double focal_domain_prob = 0.0;
+  double alt_domain_prob = 1.0;
+
+  float t_b = branch->distance;
+
+  //bool past_focal_domain = false;
 
   for(signed char state_j = 0; state_j < (signed char)n_states; state_j++) {
     double state_prob = state_probs[state_j];
 
     if(state_prob != 0.0) {
-      double rate = rv[state_j]->get_value();
-      if(state_i != state_j) {
-	// Normal Substitution
-	prob += state_prob * calc_substitution_prob(rate, t_b, u); // Probability of the substitution.
-      } else {
-	// No substitution - possibly virtual.
-	prob += state_prob * calc_no_substitution_prob(rate, t_b, u);
+      // Likelihood contribution of all substitutions - including alternate domains.
+      for(BranchSegment::iterator it = branch->begin(pos); it != branch->end(); it++) {
+	std::string alt_domain = (*it).first;
+	if(alt_domain == this->domain_name) {
+	  //past_focal_domain = true;
+
+	  double rate = rv[state_j]->get_value();
+	  if(state_i != state_j) {
+	    // Normal Substitution
+	    focal_domain_prob = calc_substitution_prob(rate, t_b, u); // Probability of the substitution.
+	  } else {
+	    // No substitution - possibly virtual.
+	    focal_domain_prob = calc_no_substitution_prob(rate, t_b, u);
+	  }
+	} else {
+	  // Subsitutions in non focal domain.
+	  if((*it).second.occuredp) {
+	    // Substitution including virtual substitutions.
+	    //signed char focal_state_context = past_focal_domain ? state_j : state_i;
+	    signed char focal_state_context = state_j;
+	    std::map<std::string, signed char> context = {{alt_domain, (*it).second.anc_state},
+							  {this->domain_name, focal_state_context}};
+
+	    unsigned long alt_hash_state = branch->get_hypothetical_hash_state(alt_domain, context, pos);
+	    RateVector* rv = branch->ancestral->SM->selectRateVector({pos, alt_domain, alt_hash_state});
+	    alt_domain_prob *= calc_substitution_prob(rv->rates[(*it).second.dec_state]->get_value(), t_b, u);
+	  } else {
+	    alt_domain_prob *= (1.0 / (1.0 + (t_b * u)));
+	  }
+	}
       }
+      //past_focal_domain = false;
+
+      prob += state_prob * focal_domain_prob * alt_domain_prob;
     }
   }
 
   return(prob);
 }
 
-float SequenceAlignment::find_state_prob_given_anc_branch(unsigned char state_j, float* state_probs, TreeNode* up_node, float t_b, double u, unsigned int pos) {
+double SequenceAlignment::find_state_prob_given_anc_branch(BranchSegment* branch, unsigned char state_j, double* state_probs, TreeNode* node, double u, unsigned int pos) {
   /*
    * Find state probability given ancestor branch.
    */
 
-  float prob = 0.0;
+  double prob = 0.0;
+  double focal_domain_prob = 0.0;
+  double alt_domain_prob = 1.0;
+
+  // TODO this needs refactoring.
+  float t_b = branch->distance;
 
   for(signed char state_i = 0; state_i < (signed char)n_states; state_i++) {
-
     double state_prob = state_probs[state_i];
-
     if(state_prob != 0.0) {
-      unsigned long extended_state = up_node->get_hypothetical_hash_state(pos, domain_name, state_i);
-      RateVector* rv = up_node->SM->selectRateVector({pos, domain_name, extended_state});
-      // Is this the right rate.
-      double rate = rv->rates[state_j]->get_value(); // i -> j rate.
-      if(state_i != state_j) {
-	// Normal Substitution.
-	prob += state_prob * calc_substitution_prob(rate, t_b, u); // Probability of the substitution.
-      } else {
-	// No substition - possibly virtual.
-	prob += state_prob * calc_no_substitution_prob(rate, t_b, u);
+      for(BranchSegment::iterator it = branch->begin(pos); it != branch->end(); it++) {
+	std::string alt_domain = (*it).first;
+
+	if(alt_domain == this->domain_name) {
+	  // Focal Domain
+	  unsigned long extended_state = node->up->get_hypothetical_hash_state(domain_name, state_i, pos);
+	  RateVector* rv = node->SM->selectRateVector({pos, domain_name, extended_state});
+	  double rate = rv->rates[state_j]->get_value(); // i -> j rate.
+	  if(state_i != state_j) {
+	    // Normal Substitution.
+	    focal_domain_prob = calc_substitution_prob(rate, t_b, u); // Probability of the substitution.
+	  } else {
+	    // No substition - possibly virtual.
+	    focal_domain_prob = calc_no_substitution_prob(rate, t_b, u);
+	  }
+
+	} else {
+	  // Alternative domains.
+	  if((*it).second.occuredp) {
+	    // Substitution including virtual substitutions.
+	    //signed char focal_state_context = past_focal_domain ? state_j : state_i;
+	    signed char focal_state_context = state_i;
+	    std::map<std::string, signed char> context = {{alt_domain, (*it).second.anc_state},
+							  {this->domain_name, focal_state_context}};
+
+	    unsigned long alt_hash_state = branch->get_hypothetical_hash_state(alt_domain, context, pos);
+	    RateVector* rv = branch->ancestral->SM->selectRateVector({pos, alt_domain, alt_hash_state});
+	    alt_domain_prob *= calc_substitution_prob(rv->rates[(*it).second.dec_state]->get_value(), t_b, u);
+	  } else {
+	    alt_domain_prob *= (1.0 / (1.0 + (t_b * u)));
+	  }
+	}
       }
+
+      prob += state_prob * focal_domain_prob * alt_domain_prob;
     }
   }
 
@@ -383,24 +442,22 @@ float SequenceAlignment::find_state_prob_given_anc_branch(unsigned char state_j,
 
 void SequenceAlignment::find_new_state_probs_at_pos(TreeNode* node, unsigned int pos, TreeNode* left_node, TreeNode* right_node, TreeNode* up_node) {
   double u = node->SM->get_u();
+  double left_prob = 1.0;
+  double right_prob = 1.0;
+  double up_prob = 1.0;
+
+  unsigned long extended_state;
   RateVector* rv;
-  float left_prob = 1.0;
-  float right_prob = 1.0;
-  float up_prob = 1.0;
 
   for(signed char state_i = 0; state_i < (signed char)n_states; state_i++) {
-    unsigned long extended_state = node->get_hypothetical_hash_state(pos, domain_name, state_i);
-
-    rv = node->SM->selectRateVector({pos, domain_name, extended_state});
-
     // Most likely to be 0.0 so evaluated first.
     if(up_node != nullptr) {
       if(not taxa_names_to_gaps[up_node->name][pos]) {
-	up_prob = find_state_prob_given_anc_branch(state_i, taxa_names_to_state_probs[up_node->name][pos], up_node, up_node->distance, u, pos);
+	up_prob = find_state_prob_given_anc_branch(node->up, state_i, marginal_state_distribution[up_node->name][pos], node, u, pos);
 
 	// Return if probability if 0.0.
 	if(up_prob == 0.0) {
-	  taxa_names_to_state_probs[node->name][pos][state_i] = 0.0;
+	  marginal_state_distribution[node->name][pos][state_i] = 0.0;
 	  return;
 	}
       }
@@ -408,24 +465,30 @@ void SequenceAlignment::find_new_state_probs_at_pos(TreeNode* node, unsigned int
 
     // Contribution of left branch.
     if((left_node != nullptr) and not taxa_names_to_gaps[left_node->name].at(pos)) {
-      left_prob = find_state_prob_given_dec_branch(state_i, taxa_names_to_state_probs[left_node->name][pos], rv->rates, left_node->distance, u);
+      extended_state = left_node->up->get_hypothetical_hash_state(domain_name, state_i, pos);
+      rv = node->SM->selectRateVector({pos, domain_name, extended_state});
+
+      left_prob = find_state_prob_given_dec_branch(left_node->up, state_i, marginal_state_distribution[left_node->name][pos], rv->rates, u, pos);
 
       if(left_prob == 0.0) {
-	taxa_names_to_state_probs[node->name][pos][state_i] = 0.0;
+	marginal_state_distribution[node->name][pos][state_i] = 0.0;
 	return;
       }
     }
 
     // Contribution of right branch.
     if((right_node != nullptr) and (not taxa_names_to_gaps[right_node->name][pos])) {
-      right_prob = find_state_prob_given_dec_branch(state_i, taxa_names_to_state_probs[right_node->name][pos], rv->rates, right_node->distance, u);
+      extended_state = right_node->up->get_hypothetical_hash_state(domain_name, state_i, pos);
+      rv = node->SM->selectRateVector({pos, domain_name, extended_state});
+
+      right_prob = find_state_prob_given_dec_branch(right_node->up, state_i, marginal_state_distribution[right_node->name][pos], rv->rates, u, pos);
       if(right_prob == 0.0) {
-	taxa_names_to_state_probs[node->name][pos][state_i] = 0.0;
+	marginal_state_distribution[node->name][pos][state_i] = 0.0;
 	return;
       }
     }
 
-    taxa_names_to_state_probs[node->name][pos][state_i] = left_prob * right_prob * up_prob;
+    marginal_state_distribution[node->name][pos][state_i] = left_prob * right_prob * up_prob;
   }
 }
 
@@ -458,33 +521,30 @@ void SequenceAlignment::find_state_probs_dec_only(TreeNode* node, std::list<unsi
 
 // TODO refactor.
 void SequenceAlignment::find_state_probs_all(TreeNode* node, std::list<unsigned int> positions) {
-  /*
-   */
-  
+  // NOTE assumes not a tip.
   std::string name = node->name;
   std::vector<bool> gaps = taxa_names_to_gaps[name];
-  if(not node->isTip()) {
-    // Node may or may not be a branch node - therefore may only have one child which is always the left one.
-    // Set to nullptr if no right branch;
-    TreeNode* right_node;
-    if(node->right) {
-      right_node = node->right->decendant;
-    } else {
-      right_node = nullptr;
-    }
 
-    TreeNode* up_node;
-    if(node->up) {
-      up_node = node->up->ancestral;
-    } else {
-      up_node = nullptr;
-    }
+  // Node may or may not be a branch node - therefore may only have one child which is always the left one.
+  // Set to nullptr if no right branch;
+  TreeNode* right_node;
+  if(node->right) {
+    right_node = node->right->decendant;
+  } else {
+    right_node = nullptr;
+  }
 
-    for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
-      if(not gaps[*pos]) {
-	find_new_state_probs_at_pos(node, *pos, node->left->decendant, right_node, up_node);
-	normalize_state_probs(node, *pos);
-      }
+  TreeNode* up_node;
+  if(node->up) {
+    up_node = node->up->ancestral;
+  } else {
+    up_node = nullptr;
+  }
+
+  for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
+    if(not gaps[*pos]) {
+      find_new_state_probs_at_pos(node, *pos, node->left->decendant, right_node, up_node);
+      normalize_state_probs(node, *pos);
     }
   }
 }
@@ -493,12 +553,11 @@ void SequenceAlignment::find_state_probs_all(TreeNode* node, std::list<unsigned 
 void SequenceAlignment::update_state_probs(TreeNode* node, unsigned int pos, TreeNode* up_node) {
   // NOTE we can assume up_node is not a nullptr.
   double u = node->SM->get_u();
-  float* state_probs = taxa_names_to_state_probs[node->name][pos];
-  float t_b = node->distance;
+  double* state_probs = marginal_state_distribution[node->name][pos];
 
   for(signed char state_j = 0; state_j < (signed char)n_states; state_j++) {
     if(state_probs[state_j] != 0.0) {
-      state_probs[state_j] *= find_state_prob_given_anc_branch(state_j, taxa_names_to_state_probs[up_node->name][pos], up_node, t_b, u, pos);
+      state_probs[state_j] *= find_state_prob_given_anc_branch(node->up, state_j, marginal_state_distribution[up_node->name][pos], node, u, pos);
     }
   }
 }
@@ -513,13 +572,12 @@ void SequenceAlignment::fast_update_state_probs_tips(TreeNode* node, unsigned in
    */
 
   double u = node->SM->get_u();
-  float* state_probs = taxa_names_to_state_probs[node->name][pos];
-  float* base_state_probs = base_taxa_state_probs[node->name][pos];
+  double* state_probs = marginal_state_distribution[node->name][pos];
+  double* base_state_probs = prior_state_distribution[node->name][pos];
 
-  float t_b = node->distance;
   for(signed char state_j = 0; state_j < (signed char)n_states; state_j++) {
     if(base_state_probs[state_j] != 0.0) {
-      state_probs[state_j] = base_state_probs[state_j] * find_state_prob_given_anc_branch(state_j, taxa_names_to_state_probs[up_node->name][pos], up_node, t_b, u, pos);
+      state_probs[state_j] = base_state_probs[state_j] * find_state_prob_given_anc_branch(node->up, state_j, marginal_state_distribution[up_node->name][pos], node, u, pos);
     } else {
       state_probs[state_j] = 0.0;
     }
@@ -531,7 +589,7 @@ int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
   /*
    * Picks a state from the marginal posterior distribution (taxa_names _to_state_probs).
    */
-  float* probs = taxa_names_to_state_probs[node->name][pos];
+  double* probs = marginal_state_distribution[node->name][pos];
  
   double r = Random();
   double acc = 0.0;
@@ -593,6 +651,7 @@ void SequenceAlignment::reconstruct_expand(const std::list<TreeNode*>& recursion
 	}
       }
     } else {
+      // Internal Node.
       find_state_probs_all(node, positions);
     }
 

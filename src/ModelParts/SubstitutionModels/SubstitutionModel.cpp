@@ -150,6 +150,10 @@ unsigned long SubstitutionModel::get_hypothetical_hash_state(const std::map<std:
   return(rateVectors.get_hypothetical_hash_state(sequences, pos, domain_name, state));
 }
 
+unsigned long SubstitutionModel::get_hypothetical_hash_state(std::map<std::string, signed char> states) {
+  return(rateVectors.get_hypothetical_hash_state(states));
+}
+
 // Getters
 
 const double& SubstitutionModel::get_u() {
