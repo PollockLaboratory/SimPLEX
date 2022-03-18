@@ -198,7 +198,7 @@ namespace IO {
   }
 
   void raw_substitution_model::read_from_file(std::string file_name) {
-    lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::string, sol::lib::io, sol::lib::math);
+    lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::string, sol::lib::io, sol::lib::math, sol::lib::os);
 
     // Main Lua tables.
     // MODEL
