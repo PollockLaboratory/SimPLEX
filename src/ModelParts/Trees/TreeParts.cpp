@@ -74,7 +74,8 @@ signed char BranchSegment::get_alt_domain_state(std::string alt_domain, std::str
   for(auto it = substitutions.begin(); it != substitutions.end(); it++) {
     if(it->first == alt_domain) {
       Substitution sub = substitutions.at(alt_domain)[pos];
-      return(past_view_domain ? sub.dec_state : sub.anc_state);
+      //return(past_view_domain ? sub.dec_state : sub.anc_state);
+      return(sub.anc_state);
     } else if(it->first == view_domain) {
       past_view_domain = true;
     }
