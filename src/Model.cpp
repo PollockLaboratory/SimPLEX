@@ -125,6 +125,13 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &
   // Set parameter states.
   components.reset_dependencies();
 
+  for(auto it = msa_parameters.begin(); it != msa_parameters.end(); it++) {
+    // TODO should always sample all positions.
+    std::cout << "precursor sampling:" << (*it)->get_state_header() << std::endl;
+    (*it)->sample();
+    components.reset_dependencies();
+  }								 
+
   std::cout << "Model succesfully constructed." << std::endl << std::endl;
 
   std::cout << "Initial substitution counts:" << std::endl;
