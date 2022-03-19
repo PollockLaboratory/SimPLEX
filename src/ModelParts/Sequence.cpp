@@ -360,18 +360,20 @@ double SequenceAlignment::find_state_prob_given_dec_branch(BranchSegment* branch
 	  }
 	} else {
 	  // Subsitutions in non focal domain.
-	  if((*it).second.occuredp) {
+	  signed char focal_state_context = state_j;
+	  std::map<std::string, signed char> context = {{alt_domain, (*it).second.anc_state},
+							{this->domain_name, focal_state_context}};
+
+	  unsigned long alt_hash_state = branch->get_hypothetical_hash_state(alt_domain, context, pos);
+	  RateVector* rv = branch->ancestral->SM->selectRateVector({pos, alt_domain, alt_hash_state});
+
+	  if((*it).second.occuredp and ((*it).second.anc_state != (*it).second.dec_state)) {
 	    // Substitution including virtual substitutions.
 	    //signed char focal_state_context = past_focal_domain ? state_j : state_i;
-	    signed char focal_state_context = state_j;
-	    std::map<std::string, signed char> context = {{alt_domain, (*it).second.anc_state},
-							  {this->domain_name, focal_state_context}};
-
-	    unsigned long alt_hash_state = branch->get_hypothetical_hash_state(alt_domain, context, pos);
-	    RateVector* rv = branch->ancestral->SM->selectRateVector({pos, alt_domain, alt_hash_state});
 	    alt_domain_prob *= calc_substitution_prob(rv->rates[(*it).second.dec_state]->get_value(), t_b, u);
 	  } else {
-	    alt_domain_prob *= (1.0 / (1.0 + (t_b * u)));
+	    //alt_domain_prob *= (1.0 / (1.0 + (t_b * u)));
+	    alt_domain_prob = calc_no_substitution_prob(rv->rates[(*it).second.anc_state]->get_value(), t_b, u);
 	  }
 	}
       }
@@ -417,18 +419,20 @@ double SequenceAlignment::find_state_prob_given_anc_branch(BranchSegment* branch
 
 	} else {
 	  // Alternative domains.
-	  if((*it).second.occuredp) {
-	    // Substitution including virtual substitutions.
-	    //signed char focal_state_context = past_focal_domain ? state_j : state_i;
-	    signed char focal_state_context = state_i;
+	  signed char focal_state_context = state_i;
 	    std::map<std::string, signed char> context = {{alt_domain, (*it).second.anc_state},
 							  {this->domain_name, focal_state_context}};
 
 	    unsigned long alt_hash_state = branch->get_hypothetical_hash_state(alt_domain, context, pos);
 	    RateVector* rv = branch->ancestral->SM->selectRateVector({pos, alt_domain, alt_hash_state});
-	    alt_domain_prob *= calc_substitution_prob(rv->rates[(*it).second.dec_state]->get_value(), t_b, u);
+	  if((*it).second.occuredp and ((*it).second.anc_state != (*it).second.dec_state)) {
+	    // Substitution including virtual substitutions.
+	    //signed char focal_state_context = past_focal_domain ? state_j : state_i;
+	    double p = calc_substitution_prob(rv->rates[(*it).second.dec_state]->get_value(), t_b, u);
+	    alt_domain_prob *= p;
 	  } else {
-	    alt_domain_prob *= (1.0 / (1.0 + (t_b * u)));
+	    //alt_domain_prob *= (1.0 / (1.0 + (t_b * u)));
+	    alt_domain_prob *= calc_no_substitution_prob(rv->rates[(*it).second.anc_state]->get_value(), t_b, u);
 	  }
 	}
       }
@@ -696,8 +700,6 @@ sample_status SequenceAlignment::sample(const std::list<unsigned int>& positions
       }
 
     }
-
-    //    pick_states_for_node(node, positions);
   }
 
   // 3rd Recursion - picking states.
