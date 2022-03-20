@@ -8,6 +8,7 @@
 #include <math.h>
 
 #include "../../IO/TreeParser.h"
+#include "../SubstitutionModels/States.h"
 
 //class SequenceAlignment;
 class SubstitutionModel;
@@ -15,8 +16,8 @@ class RateVector;
 
 typedef struct Substitution {
   bool occuredp;
-  signed char anc_state;
-  signed char dec_state;
+  state_element anc_state;
+  state_element dec_state;
   RateVector* rate_vector; // The rate vector this substitution occured under.
 } Substitution;
 
@@ -32,7 +33,11 @@ private:
   std::map<std::string, std::vector<Substitution>> substitutions; // Substitutions by site
 
   inline void update_rate_vectors();
-  void set_new_substitutions(); 
+  void set_new_substitutions();
+
+  // Finding applicable RateVectors.
+  state_element get_alt_domain_state(std::string alt_domain, std::string view_domain, unsigned int pos);
+  unsigned long get_hypothetical_hash_state(std::string focal_domain, std::map<std::string, state_element>& states, unsigned int pos);
 public:
   class iterator;
 
@@ -43,16 +48,15 @@ public:
   BranchSegment(float distance);
   ~BranchSegment();
 
-  void Initialize(unsigned int n_columns, std::map<std::string, std::list<std::string>> all_states);
+  void Initialize(unsigned int n_columns, std::list<std::string> state_domain_names);
 
   const Substitution& get_substitution(std::string domain, unsigned int pos);
   const std::vector<Substitution>& get_substitutions(std::string domain);
 
-  // NEW
-  signed char get_alt_domain_state(std::string alt_domain, std::string view_domain, unsigned int pos);
-  unsigned long get_hypothetical_hash_state(std::string domain, signed char state, unsigned int pos);
-  unsigned long get_hypothetical_hash_state(std::string focal_domain, std::map<std::string, signed char>& states, unsigned int pos);
+  // Finding applicable RateVectors.
+  RateVector* get_hypothetical_rate_vector(std::string focal_domain, std::map<std::string, state_element>& states, unsigned int pos);
 
+  // Loop through substitutions.
   BranchSegment::iterator begin(unsigned int pos);
   BranchSegment::iterator end();
 
@@ -89,8 +93,8 @@ class TreeNode {
   BranchSegment* left;
   BranchSegment* right;
 
-  // State Domains
-  std::map<std::string, std::vector<signed char>*> sequences; // domain_name -> sequence.
+  // State Domain Sequences.
+  std::map<std::string, std::vector<state_element>*> sequences; // domain_name -> sequence.
 
   SubstitutionModel* SM;
 
@@ -101,13 +105,11 @@ class TreeNode {
 
   void connect_substitution_model(SubstitutionModel*);
 
+  unsigned long get_hash_state(unsigned int);
+
   // Printing/Display
   std::string toString();
-  //std::string get_sequence();
-  //std::string state_at_pos(int i);
 
-  unsigned long get_hash_state(unsigned int);
-  //unsigned long get_hypothetical_hash_state(unsigned int pos, std::string domain, signed char state);
 
   bool isTip();
 };

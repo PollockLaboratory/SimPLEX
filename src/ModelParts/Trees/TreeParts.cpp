@@ -23,12 +23,12 @@ BranchSegment::BranchSegment(float distance) {
   this->distance = distance;
 }
 
-void BranchSegment::Initialize(unsigned int n_columns, std::map<std::string, std::list<std::string>> all_states) {
-  n_pos = n_columns;
+void BranchSegment::Initialize(unsigned int n_columns, std::list<std::string> state_domain_names) {
+  this->n_pos = n_columns;
 
-  for(auto it = all_states.begin(); it != all_states.end(); ++it) {
-    rates[it->first] = std::vector<RateVector*>(n_columns, NULL);
-    substitutions[it->first] = std::vector<Substitution>(n_columns, Substitution({false, 0, 0, nullptr}));
+  for(auto it = state_domain_names.begin(); it != state_domain_names.end(); ++it) {
+    rates[*it] = std::vector<RateVector*>(n_columns, NULL);
+    substitutions[*it] = std::vector<Substitution>(n_columns, Substitution({false, 0, 0, nullptr}));
   }
 }
 
@@ -60,7 +60,7 @@ const std::vector<Substitution>& BranchSegment::get_substitutions(std::string do
   return(substitutions.at(domain));
 }
 
-signed char BranchSegment::get_alt_domain_state(std::string alt_domain, std::string view_domain, unsigned int pos) {
+state_element BranchSegment::get_alt_domain_state(std::string alt_domain, std::string view_domain, unsigned int pos) {
   /*
    * This function returns the state at a given alternative domain, from the view point of the view domain.
    * Substitutions in different domains may occur on the branch segment at the same time,
@@ -74,6 +74,7 @@ signed char BranchSegment::get_alt_domain_state(std::string alt_domain, std::str
   for(auto it = substitutions.begin(); it != substitutions.end(); it++) {
     if(it->first == alt_domain) {
       Substitution sub = substitutions.at(alt_domain)[pos];
+      // TODO check if the math is right here.
       //return(past_view_domain ? sub.dec_state : sub.anc_state);
       return(sub.anc_state);
     } else if(it->first == view_domain) {
@@ -85,31 +86,30 @@ signed char BranchSegment::get_alt_domain_state(std::string alt_domain, std::str
   exit(EXIT_FAILURE);
 }
 
-unsigned long BranchSegment::get_hypothetical_hash_state(std::string domain, signed char state, unsigned int pos) {
-  std::map<std::string, signed char> states = {};
-  for(auto it = substitutions.begin(); it != substitutions.end(); it++) {
-    if(it->first == domain) {
-      states[it->first] = state;
-    } else {
-      states[it->first] = get_alt_domain_state(it->first, domain, pos);
-    }
-  }
-
-  return(decendant->SM->get_hypothetical_hash_state(states));
-}
-
-unsigned long BranchSegment::get_hypothetical_hash_state(std::string focal_domain, std::map<std::string, signed char>& input_states, unsigned int pos) {
-  std::map<std::string, signed char> states = {};
+unsigned long BranchSegment::get_hypothetical_hash_state(std::string focal_domain, std::map<std::string, state_element>& input_states, unsigned int pos) {
+  /*
+   * Finds the hypothetical hash_state for the context at the ancestral end of this branch.
+   * Input states have priority over the state present at the ancestral sequences.
+   * Uses substitutions to calculate hash_state.
+   */
+  
+  std::map<std::string, state_element> context = {};
   for(auto it = substitutions.begin(); it != substitutions.end(); it++) {
     if(input_states.find(it->first) != input_states.end()) {
-      signed char s = input_states[it->first];
-      states[it->first] = s;
+      state_element s = input_states[it->first];
+      context[it->first] = s;
     } else {
-      states[it->first] = get_alt_domain_state(it->first, focal_domain, pos);
+      //context[it->first] = get_alt_domain_state(it->first, focal_domain, pos);
+      context[it->first] = substitutions[it->first][pos].anc_state;
     }
   }
 
-  return(decendant->SM->get_hypothetical_hash_state(states));
+  return(decendant->SM->get_hash_state(context));
+}
+
+RateVector* BranchSegment::get_hypothetical_rate_vector(std::string focal_domain, std::map<std::string, state_element>& context, unsigned int pos) {
+  unsigned long extended_state = this->get_hypothetical_hash_state(focal_domain, context, pos);
+  return(ancestral->SM->selectRateVector({pos, focal_domain, extended_state}));
 }
 
 BranchSegment::iterator::iterator(BranchSegment& branch, unsigned int pos, bool end): branch(branch), pos(pos) {
@@ -139,7 +139,7 @@ BranchSegment::iterator BranchSegment::end() {
 
 // Key Statistics
 inline void BranchSegment::update_rate_vectors() {
-  std::vector<signed char>* seq = ancestral->sequences.begin()->second;
+  std::vector<state_element>* seq = ancestral->sequences.begin()->second;
   for(unsigned int pos = 0; pos < seq->size(); pos++) {
     if((*seq)[pos] != -1) {
       unsigned long ex_state = ancestral->get_hash_state(pos);
@@ -147,13 +147,14 @@ inline void BranchSegment::update_rate_vectors() {
       // Set the rate vectors for each of the state.
       for(auto it = ancestral->sequences.begin(); it != ancestral->sequences.end(); ++it) {
 	rv_request rq = {pos, it->first, ex_state};
-	
-	if(ancestral->SM->selectRateVector(rq) == nullptr) {
+
+	RateVector* rv = ancestral->SM->selectRateVector(rq);
+	if(rv == nullptr) {
 	  std::cerr << "Error: cannot find RateVector for position: " << pos << " " << it->first << std::endl;
 	  exit(EXIT_FAILURE);
 	}
 
-	rates[it->first][pos] = ancestral->SM->selectRateVector(rq);
+	rates[it->first][pos] = rv;
       }
     }
   }
@@ -161,29 +162,29 @@ inline void BranchSegment::update_rate_vectors() {
 
 void BranchSegment::set_new_substitutions() {
   // Set new substitutions for all state domains.
-  for(auto domain = substitutions.begin(); domain != substitutions.end(); ++domain) {
-    std::vector<signed char> *anc_seq = (ancestral->sequences[domain->first]);
-    std::vector<signed char> *dec_seq = (decendant->sequences[domain->first]);
+  for(auto domain_it = substitutions.begin(); domain_it != substitutions.end(); ++domain_it) {
+    std::vector<state_element> *anc_seq = (ancestral->sequences[domain_it->first]);
+    std::vector<state_element> *dec_seq = (decendant->sequences[domain_it->first]);
 
-    std::vector<RateVector*> rv = rates[domain->first];
+    std::vector<RateVector*> rv_set = rates[domain_it->first];
     for(unsigned int pos = 0; pos < anc_seq->size(); pos++) {
       if(anc_seq->at(pos) == -1 or dec_seq->at(pos) == -1) {
-	substitutions[domain->first][pos] = {false, anc_seq->at(pos), dec_seq->at(pos), rv[pos]};
+	substitutions[domain_it->first][pos] = {false, -1, -1, nullptr};
       } else {
 	if(anc_seq->at(pos) != dec_seq->at(pos)) {
 	  // Normal substitutions.
-	  substitutions[domain->first][pos] = {true, anc_seq->at(pos), dec_seq->at(pos), rv[pos]};
+	  substitutions[domain_it->first][pos] = {true, anc_seq->at(pos), dec_seq->at(pos), rv_set[pos]};
 	} else {
 	  // No substitution - possibility of virtual substitution.
 	  // This could be faster - we just need the virtual substitution rate.
-	  double vir_rate = rv[pos]->rates[dec_seq->at(pos)]->get_value(); 
+	  double vir_rate = rv_set[pos]->rates[dec_seq->at(pos)]->get_value(); 
 	  double p = 1.0 - (1.0 / (1.0 + (vir_rate * distance)));
 	  if(Random() < p) {
 	    // Virtual Substitution.
-	    substitutions[domain->first][pos] = {true, anc_seq->at(pos), dec_seq->at(pos), rv[pos]};
+	    substitutions[domain_it->first][pos] = {true, anc_seq->at(pos), dec_seq->at(pos), rv_set[pos]};
 	  } else {
 	    // No Virtual Substitution.
-	    substitutions[domain->first][pos] = {false, anc_seq->at(pos), dec_seq->at(pos), rv[pos]};
+	    substitutions[domain_it->first][pos] = {false, anc_seq->at(pos), dec_seq->at(pos), rv_set[pos]};
 	  }
 	}
       }
@@ -258,19 +259,18 @@ std::string TreeNode::toString() {
 }
 
 unsigned long TreeNode::get_hash_state(unsigned int pos) {
-  //std::map<std::string, int> states = {};
+  /*
+   * Returns the hash_state for a particular position in the sequences at this tree node.
+   */
+  std::map<std::string, state_element> context = {};
 
-  // Adds all states.
-  //for(auto it = sequences.begin(); it != sequences.end(); ++it) {
-  // states[it->first] = (*(it->second))[pos];
-  // }
+  // Adds all state domains.
+  for(auto it = this->sequences.begin(); it != this->sequences.end(); ++it) {
+    context[it->first] = (*(it->second))[pos];
+  }
 
-  return(SM->get_hash_state(sequences, pos));
+  return(SM->get_hash_state(context));
 }
-
-//unsigned long TreeNode::get_hypothetical_hash_state(unsigned int pos, std::string domain, signed char state) {
-// return(SM->get_hypothetical_hash_state(sequences, pos, domain, state));
-//}
 
 bool TreeNode::isTip() {
   if(this->left == 0 and this->right == 0) {

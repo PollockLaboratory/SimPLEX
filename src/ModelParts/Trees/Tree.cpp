@@ -154,17 +154,17 @@ void Tree::build_recursion_path(TreeNode* node, std::list<TreeNode*>& node_path)
   }
 }
 
-void Tree::configureBranches(TreeNode* n, unsigned int n_columns, std::map<std::string, std::list<std::string>> all_states) {
+void Tree::configure_branches(TreeNode* n, unsigned int n_columns, std::list<std::string> state_domain_names) {
   if(n->left != 0) {
     BranchSegment* b = n->left;
-    b->Initialize(n_columns, all_states);
-    configureBranches(b->decendant, n_columns, all_states);
+    b->Initialize(n_columns, state_domain_names);
+    configure_branches(b->decendant, n_columns, state_domain_names);
   }
 
   if(n->right != 0) {
     BranchSegment* b = n->right;
-    b->Initialize(n_columns, all_states);
-    configureBranches(b->decendant, n_columns, all_states);
+    b->Initialize(n_columns, state_domain_names);
+    configure_branches(b->decendant, n_columns, state_domain_names);
   }
 }
 
@@ -246,7 +246,7 @@ void Tree::print_nodeList() {
 }
 
 // RateVectorAssignmentParameter
-
+// This parameter is refreshed everytime a SequenceAlignment is sampled.
 RateVectorAssignmentParameter::RateVectorAssignmentParameter(Tree* tree) : AbstractComponent("RateVectorassignment") {
   this->tree = tree;
 }

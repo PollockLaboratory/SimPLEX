@@ -69,10 +69,12 @@ public:
 
   // Sequence stuff.
   TreeNode* root;
-  void configureBranches(TreeNode* n, unsigned int n_columnes, std::map<std::string, std::list<std::string>> all_states);
+  void configure_branches(TreeNode* n, unsigned int n_columnes, std::list<std::string> state_domain_names);
   void connect_substitution_model(SubstitutionModel*);
 };
 
+// Parameter that triggers a refresh of all the RateVector assignments on the Branch segments.
+// Also updates the substitutions on the branch segments as well.
 class RateVectorAssignmentParameter : public AbstractComponent {
 private:
   Tree* tree;

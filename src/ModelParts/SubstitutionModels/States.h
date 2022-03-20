@@ -6,13 +6,13 @@
 #include <set>
 #include <list>
 
-typedef signed char state;
+typedef signed char state_element;
 
 struct States {
   unsigned int n; // Careful about indels.
   std::set<std::string> possible;
-  std::map<std::string, state> state_to_int;
-  std::map<state, std::string> int_to_state;
+  std::map<std::string, state_element> state_to_int;
+  std::map<state_element, std::string> int_to_state;
 };
 
 void print_States(States);

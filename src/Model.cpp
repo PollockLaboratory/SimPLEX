@@ -56,40 +56,47 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &
 
   std::list<std::string> tip_sequences = getRawTreeNodeTipNames(raw_tree);
 
-  // All states.
+  // STATE DOMAINS.
   unsigned int n_cols = 0;
   std::map<std::string, SequenceAlignment*> all_MSAs = {};
-  std::map<std::string, std::list<std::string>> all_states = raw_sm->get_all_states();
-  for(auto it = all_states.begin(); it != all_states.end(); ++it) {
-      const States *secondary_states = substitution_model->get_states(it->first);
-      std::cout << "\t\tReading new states domain: ";
-      print_States(*secondary_states);
-      SequenceAlignment* secondary_MSA = new SequenceAlignment(it->first,
-							       raw_sm->states_seqs_output_files[it->first],
-							       raw_sm->states_subs_output_files[it->first],
-							       secondary_states);
-      secondary_MSA->Initialize(raw_sm->get_state_data(it->first));
+  std::map<std::string, std::list<std::string>> all_state_domains = raw_sm->get_all_states();
+  std::list<std::string> state_domain_names = {};
+  for(auto it = all_state_domains.begin(); it != all_state_domains.end(); ++it) {
+    state_domain_names.push_back(it->first);
+    const States *state_domain = substitution_model->get_state_domain(it->first);
 
-      // Validate MSAs.
-      // Check node names are consistant between tree and sequence alignment.
-      // TODO - Check pattern of gaps is consistant.
-      if(secondary_MSA->validate(tip_sequences, all_MSAs) != true) {
-	std::cerr << "Error: sequence alignment for domain \"" << it->first << "\" cannot be validated." << std::endl;
-	exit(EXIT_FAILURE);
-      }
+    std::cout << "\t\tReading new states domain: ";
+    print_States(*state_domain);
+    SequenceAlignment* MSA = new SequenceAlignment(it->first,
+						   raw_sm->states_seqs_output_files[it->first],
+						   raw_sm->states_subs_output_files[it->first],
+						   state_domain);
+    MSA->Initialize(raw_sm->get_state_data(it->first));
 
-      all_MSAs[it->first] = secondary_MSA;
+    // Validate MSAs.
+    // Check node names are consistant between tree and sequence alignment.
+    // TODO - Check pattern of gaps is consistant.
+    if(MSA->validate(tip_sequences, all_MSAs) != true) {
+      std::cerr << "Error: sequence alignment for domain \"" << it->first << "\" cannot be validated." << std::endl;
+      exit(EXIT_FAILURE);
+    }
 
-      n_cols = secondary_MSA->n_cols();
+    all_MSAs[it->first] = MSA;
+
+    n_cols = MSA->n_cols();
   }
 
   // Configuring the Tree.
   std::cout << "\tConstructing tree." << std::endl;
 
+  for(auto it = state_domain_names.begin(); it != state_domain_names.end(); it++) {
+    std::cout << *it << std::endl;
+  }
+
   tree = new Tree();
   tree->Initialize(raw_tree);
   tree->connect_substitution_model(substitution_model);
-  tree->configureBranches(tree->root, n_cols, all_states);
+  tree->configure_branches(tree->root, n_cols, state_domain_names);
 
   // Configuring sequences.
   unsigned int n_sample = env.get<unsigned int>("MCMC.position_sample_count");
@@ -115,27 +122,21 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &
   components.add_parameter(rvap);
 
   std::cout << "\tPreparing substitution counts." << std::endl;
-  cp = new CountsParameter(&counts, tree, all_states);
+  cp = new CountsParameter(&counts, tree, all_state_domains);
   cp->add_dependancy(rvap);
   components.add_parameter(cp);
 
   components.Initialize();
 
   std::cout << "\tSetting initial parameter states." << std::endl;
+
   // Set parameter states.
   components.reset_dependencies();
 
-  for(auto it = msa_parameters.begin(); it != msa_parameters.end(); it++) {
-    // TODO should always sample all positions.
-    std::cout << "precursor sampling:" << (*it)->get_state_header() << std::endl;
-    (*it)->sample();
-    components.reset_dependencies();
-  }								 
-
   std::cout << "Model succesfully constructed." << std::endl << std::endl;
 
-  std::cout << "Initial substitution counts:" << std::endl;
-  counts.print();
+  //std::cout << "Initial substitution counts:" << std::endl;
+  //counts.print();
 }
 
 // Sampling

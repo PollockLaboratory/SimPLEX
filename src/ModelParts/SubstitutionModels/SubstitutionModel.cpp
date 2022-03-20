@@ -15,7 +15,7 @@ SubstitutionModel::SubstitutionModel(Valuable* u) : u(u) {
 }
 
 RateVector* SubstitutionModel::create_rate_vector(IO::raw_rate_vector rv, Valuable* u) {
-  States* domain_states = &all_states[rv.uc.domain];
+  States* domain_states = &all_state_domains[rv.uc.domain];
 
   std::vector<Valuable*> rates(domain_states->n, nullptr);
   int s = domain_states->state_to_int[rv.uc.state];
@@ -76,19 +76,19 @@ void SubstitutionModel::configure_RateVectors(std::list<IO::raw_rate_vector> rv_
     rateVectors.add(rv, (*raw_rv).uc);
   }
 
-  rateVectors.Initialize(all_states);
+  rateVectors.Initialize(all_state_domains);
 }
 
-void SubstitutionModel::configure_States(std::map<std::string, std::list<std::string>> raw_hidden) {
-  for(auto it = raw_hidden.begin(); it != raw_hidden.end(); ++it) {
-    States cont = {};
+void SubstitutionModel::configure_States(std::map<std::string, std::list<std::string>> raw_state_domains) {
+  for(auto it = raw_state_domains.begin(); it != raw_state_domains.end(); ++it) {
+    States new_state_domain = {};
     for(auto s = it->second.begin(); s != it->second.end(); ++s) {
-      cont = add_to_States(cont, *s);
+      new_state_domain = add_to_States(new_state_domain, *s);
     }
-    cont.state_to_int["-"] = -1;
-    cont.int_to_state[-1] = "-";
+    new_state_domain.state_to_int["-"] = -1;
+    new_state_domain.int_to_state[-1] = "-";
 
-    all_states[it->first] = cont;
+    all_state_domains[it->first] = new_state_domain;
   }
 }
 
@@ -117,17 +117,17 @@ void SubstitutionModel::from_raw_model(IO::raw_substitution_model* raw_sm) {
   //print_States(states);
 }
 
-const States* SubstitutionModel::get_states(std::string domain) {
-  auto s = all_states.find(domain);
-  if(s == all_states.end()) {
-    std::cerr << "Error: the domain \"" << domain << "\" is not recognized by the substitution model." << std::endl;
+const States* SubstitutionModel::get_state_domain(std::string domain_name) {
+  auto s = all_state_domains.find(domain_name);
+  if(s == all_state_domains.end()) {
+    std::cerr << "Error: the domain \"" << domain_name << "\" is not recognized by the substitution model." << std::endl;
     exit(EXIT_FAILURE);
   }
   return(&(s->second));
 }
 
 std::map<std::string, States> SubstitutionModel::get_all_states() {
-  return(all_states);
+  return(all_state_domains);
 }
 
 void SubstitutionModel::organizeRateVectors() {
@@ -142,15 +142,7 @@ RateVector* SubstitutionModel::selectRateVector(rv_request rq) {
   return(rateVectors.select(rq));
 }
 
-unsigned long SubstitutionModel::get_hash_state(const std::map<std::string, std::vector<signed char>*>& sequences, unsigned int pos) {
-  return(rateVectors.get_hash_state(sequences, pos));
-}
-
-unsigned long SubstitutionModel::get_hypothetical_hash_state(const std::map<std::string, std::vector<signed char>*>& sequences, unsigned int pos, std::string domain_name, signed char state) {
-  return(rateVectors.get_hypothetical_hash_state(sequences, pos, domain_name, state));
-}
-
-unsigned long SubstitutionModel::get_hypothetical_hash_state(std::map<std::string, signed char> states) {
+unsigned long SubstitutionModel::get_hash_state(std::map<std::string, signed char> states) {
   return(rateVectors.get_hypothetical_hash_state(states));
 }
 

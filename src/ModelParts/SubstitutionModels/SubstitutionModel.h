@@ -24,7 +24,7 @@ public:
   void from_raw_model(IO::raw_substitution_model*);
 
   // States.
-  const States* get_states(std::string domain);
+  const States* get_state_domain(std::string domain);
   std::map<std::string, States> get_all_states();
 
   // Rate Vectors.
@@ -32,10 +32,7 @@ public:
   RateVector* selectRateVector(rv_request);
   std::vector<RateVector*> get_RateVectors();
 
-  unsigned long get_hash_state(const std::map<std::string, std::vector<signed char>*>& sequences, unsigned int pos);
-  unsigned long get_hypothetical_hash_state(const std::map<std::string, std::vector<signed char>*>& sequences, unsigned int pos, std::string domain_name, signed char state);
-
-  unsigned long get_hypothetical_hash_state(std::map<std::string, signed char>);
+  unsigned long get_hash_state(std::map<std::string, signed char>);
 
   // Navigating parameters.
   SubstitutionModel::iterator modified_begin(AbstractComponent*);
@@ -52,7 +49,7 @@ private:
   void configure_RateVectors(std::list<IO::raw_rate_vector>);
 
   RateVectorSet rateVectors;
-  std::map<std::string, States> all_states;
+  std::map<std::string, States> all_state_domains;
 
   // Iterator
   // Given a AbstractComponent will return an iterator to the start of all the rate vector locations that are modified.
