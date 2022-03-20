@@ -358,23 +358,23 @@ double SequenceAlignment::find_state_prob_given_dec_branch(BranchSegment* branch
 	    // No substitution - possibly virtual.
 	    focal_domain_prob = calc_no_substitution_prob(rate, t_b, u);
 	  }
-	} else {
+	} //else {
 	  // Subsitutions in non focal domain.
-	  std::map<std::string, state_element> context = {{alt_domain, sub.anc_state},
-							  {this->domain_name, state_i}};
+	  //std::map<std::string, state_element> context = {{alt_domain, sub.anc_state},
+	//					  {this->domain_name, state_i}};
 
-	  RateVector* rv = branch->get_hypothetical_rate_vector(alt_domain, context, pos);
+	// RateVector* rv = branch->get_hypothetical_rate_vector(alt_domain, context, pos);
 
-	  if(sub.occuredp and (sub.anc_state != sub.dec_state)) {
+	// if(sub.occuredp and (sub.anc_state != sub.dec_state)) {
 	    // Substitution including virtual substitutions.
 	    //signed char focal_state_context = past_focal_domain ? state_j : state_i;
-	    alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
-	  } else {
+	//   alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
+	// } else {
 	    //alt_domain_prob *= (1.0 / (1.0 + (t_b * u)));
-	    alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
-	  }
+	//   alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
+	// }
 	}
-      }
+      //}
       //past_focal_domain = false;
 
       prob += state_prob * focal_domain_prob * alt_domain_prob;
@@ -415,22 +415,22 @@ double SequenceAlignment::find_state_prob_given_anc_branch(BranchSegment* branch
 	    focal_domain_prob = calc_no_substitution_prob(rate, t_b, u);
 	  }
 
-	} else {
+	} //else {
 	  // Alternative domains.
-	  std::map<std::string, state_element> context = {{alt_domain, sub.anc_state},
-							  {this->domain_name, state_i}};
+	  //std::map<std::string, state_element> context = {{alt_domain, sub.anc_state},
+	  //					  {this->domain_name, state_i}};
 	    
-	  RateVector* rv = branch->get_hypothetical_rate_vector(alt_domain, context, pos);
-	  if(sub.occuredp and (sub.anc_state != sub.dec_state)) {
+	//RateVector* rv = branch->get_hypothetical_rate_vector(alt_domain, context, pos);
+	// if(sub.occuredp and (sub.anc_state != sub.dec_state)) {
 	    // Substitution including virtual substitutions.
 	    //signed char focal_state_context = past_focal_domain ? state_j : state_i;
-	    alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
-	  } else {
+	//   alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
+	// } else {
 	    //alt_domain_prob *= (1.0 / (1.0 + (t_b * u)));
-	    alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
-	  }
+	//   alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
+	// }
+	//}
 	}
-      }
 
       prob += state_prob * focal_domain_prob * alt_domain_prob;
     }

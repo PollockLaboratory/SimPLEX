@@ -89,10 +89,6 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &
   // Configuring the Tree.
   std::cout << "\tConstructing tree." << std::endl;
 
-  for(auto it = state_domain_names.begin(); it != state_domain_names.end(); it++) {
-    std::cout << *it << std::endl;
-  }
-
   tree = new Tree();
   tree->Initialize(raw_tree);
   tree->connect_substitution_model(substitution_model);
