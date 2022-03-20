@@ -697,11 +697,11 @@ sample_status SequenceAlignment::sample(const std::list<unsigned int>& positions
 
     }
 
-    pick_states_for_node(node, positions);
+    //pick_states_for_node(node, positions);
   }
 
   // 3rd Recursion - picking states.
-  //reconstruct_expand(tree->get_recursion_path(tree->rand_node()), positions);
+  reconstruct_expand(tree->get_recursion_path(tree->rand_node()), positions);
 
   return(sample_status({false, true, true}));
 }
