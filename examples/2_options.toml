@@ -6,7 +6,7 @@ seed = 0
   max_segment_probability = 0.08
   branch_split_algorithm = 1
   scale_tree = true
-  target_tree_length = 1.0
+  target_tree_length = 100.0
   resolve_multifurcation = true
 
 # Uniformization Constant
@@ -37,8 +37,9 @@ seed = 0
   log_out_file = "run.log"
 
 [MCMC]
-  generations = 1001
+  generations = "10001"
   #generations = 800
+  position_sample_count = 10
   full_update_freq = 200
   alignment_sample_frequency = 200
   output_frequency = 100

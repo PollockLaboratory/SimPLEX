@@ -353,31 +353,31 @@ double SequenceAlignment::find_state_prob_given_dec_branch(BranchSegment* branch
 	  double rate = rv[state_j]->get_value();
 	  if(state_i != state_j) {
 	    // Normal Substitution
-	    focal_domain_prob = calc_substitution_prob(rate, t_b, u); // Probability of the substitution.
+	    focal_domain_prob = calc_substitution_prob(rate, t_b, u);
 	  } else {
-	    // No substitution - possibly virtual.
+	    // No substitution - or possibly virtual.
 	    focal_domain_prob = calc_no_substitution_prob(rate, t_b, u);
 	  }
-	} //else {
+
+	} else {
 	  // Subsitutions in non focal domain.
-	  //std::map<std::string, state_element> context = {{alt_domain, sub.anc_state},
-	//					  {this->domain_name, state_i}};
+	  std::map<std::string, state_element> context = {{alt_domain, sub.anc_state},
+							  {this->domain_name, state_i}};
 
-	// RateVector* rv = branch->get_hypothetical_rate_vector(alt_domain, context, pos);
+	  RateVector* rv = branch->get_hypothetical_rate_vector(alt_domain, context, pos);
 
-	// if(sub.occuredp and (sub.anc_state != sub.dec_state)) {
+	  if(sub.occuredp and (sub.anc_state != sub.dec_state)) {
 	    // Substitution including virtual substitutions.
 	    //signed char focal_state_context = past_focal_domain ? state_j : state_i;
-	//   alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
-	// } else {
+	    alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
+	  } else {
 	    //alt_domain_prob *= (1.0 / (1.0 + (t_b * u)));
-	//   alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
-	// }
+	    alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
+	  }
 	}
-      //}
-      //past_focal_domain = false;
-
-      prob += state_prob * focal_domain_prob * alt_domain_prob;
+	//past_focal_domain = false;
+	prob += state_prob * focal_domain_prob * alt_domain_prob;
+      }
     }
   }
 
@@ -415,24 +415,23 @@ double SequenceAlignment::find_state_prob_given_anc_branch(BranchSegment* branch
 	    focal_domain_prob = calc_no_substitution_prob(rate, t_b, u);
 	  }
 
-	} //else {
+	} else {
 	  // Alternative domains.
-	  //std::map<std::string, state_element> context = {{alt_domain, sub.anc_state},
-	  //					  {this->domain_name, state_i}};
-	    
-	//RateVector* rv = branch->get_hypothetical_rate_vector(alt_domain, context, pos);
-	// if(sub.occuredp and (sub.anc_state != sub.dec_state)) {
-	    // Substitution including virtual substitutions.
+	  std::map<std::string, state_element> context = {{alt_domain, sub.anc_state},
+							  {this->domain_name, state_i}};
+	  
+	  RateVector* rv = branch->get_hypothetical_rate_vector(alt_domain, context, pos);
+	  if(sub.occuredp and (sub.anc_state != sub.dec_state)) {
+	    //Substitution including virtual substitutions.
 	    //signed char focal_state_context = past_focal_domain ? state_j : state_i;
-	//   alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
-	// } else {
-	    //alt_domain_prob *= (1.0 / (1.0 + (t_b * u)));
-	//   alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
-	// }
-	//}
+	    alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
+	  } else {
+	    // alt_domain_prob *= (1.0 / (1.0 + (t_b * u)));
+	    alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
+	  }
 	}
-
-      prob += state_prob * focal_domain_prob * alt_domain_prob;
+	prob += state_prob * focal_domain_prob * alt_domain_prob;
+      }
     }
   }
 
@@ -591,7 +590,7 @@ int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
    * Picks a state from the marginal posterior distribution (taxa_names _to_state_probs).
    */
   double* probs = marginal_state_distribution[node->name][pos];
- 
+
   double r = Random();
   double acc = 0.0;
   int val = -1;
@@ -697,10 +696,12 @@ sample_status SequenceAlignment::sample(const std::list<unsigned int>& positions
       }
 
     }
+
+    pick_states_for_node(node, positions);
   }
 
   // 3rd Recursion - picking states.
-  reconstruct_expand(tree->get_recursion_path(tree->rand_node()), positions);
+  //reconstruct_expand(tree->get_recursion_path(tree->rand_node()), positions);
 
   return(sample_status({false, true, true}));
 }

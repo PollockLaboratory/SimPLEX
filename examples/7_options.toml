@@ -6,7 +6,7 @@ seed = 0
   max_segment_probability = 0.05
   branch_split_algorithm = 1
   scale_tree = true
-  target_tree_length = 1.0
+  target_tree_length = 100.0
   resolve_multifurcation = true
 
 # Uniformization Constant
@@ -36,10 +36,10 @@ seed = 0
   counts_out_file = "counts.csv"
 
 [MCMC]
-  generations = "3001"
+  generations = "500001"
   #generations = 800
-  alignment_sample_frequency = 250
-  position_sample_count = 10
+  alignment_sample_frequency = 500
+  position_sample_count = 20
   output_frequency = 50
   print_frequency = 100
   full_update_freq = 50
