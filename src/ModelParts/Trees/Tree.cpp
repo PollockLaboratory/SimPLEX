@@ -100,11 +100,15 @@ void Tree::cache_node_access() {
 
   buildNodeLists(root);
 
+  float total_length = 0.0;
   nodeVector = std::vector<TreeNode*>(nodeList.size(), nullptr);
   int i = 0;
   for(auto it = nodeList.begin(); it != nodeList.end(); it++) {
     nodeVector[i++] = *it;
+    total_length += (*it)->distance;
   }
+
+  std::cout << "Total length of tree: " << total_length << std::endl;
 
   // Recursion Paths.
   for(auto it = nodeList.begin(); it != nodeList.end(); it++) {

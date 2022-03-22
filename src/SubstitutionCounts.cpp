@@ -16,6 +16,7 @@ SubstitutionCounts::SubstitutionCounts() {
 }
 
 SubstitutionCounts::SubstitutionCounts(std::vector<RateVector*> rvs, std::list<float> b_lens, std::map<std::string, States> all_states) {
+  this->base_virtual = env.get<int>("MCMC.base_virtual");
   // Make empty structures ready for counts.
   subs_by_rateVector = {};
   subs_by_branch = {};
@@ -32,8 +33,13 @@ SubstitutionCounts::SubstitutionCounts(std::vector<RateVector*> rvs, std::list<f
 void SubstitutionCounts::clear() {
   // Clear structures ready for counts.
   for(auto it = subs_by_rateVector.begin(); it != subs_by_rateVector.end(); ++it) {
-    for(auto jt = it->second.begin(); jt != it->second.end(); ++jt) {
-     *jt = 0;
+    for(unsigned int i = 0; i < it->second.size(); i++ ) {
+      if(i == (it->first)->state) {
+	// Always 1 virtual subtitution.
+	(it->second)[i] = this->base_virtual;
+      } else {
+	(it->second)[i] = 0;
+      }
     }
   }
 

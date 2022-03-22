@@ -1,20 +1,20 @@
 debug = true
-seed = 0
+seed = 123123
 
 # Tree Settings
 [TREE]
-  max_segment_probability = 0.05
+  max_segment_probability = 0.25
   branch_split_algorithm = 1
-  scale_tree = true
+  scale_tree = false
   target_tree_length = 100.0
-  resolve_multifurcation = true
+  resolve_multifurcation = false
 
 # Uniformization Constant
 [UNIFORMIZATION]
   dynamic = false
   sample_frequency = 2000
   refresh_tree_on_update = true
-  initial_value = 0.5
+  initial_value = 0.3
   threshold = 0.01
   max_step = 0.005
 
@@ -36,13 +36,16 @@ seed = 0
   counts_out_file = "counts.csv"
 
 [MCMC]
-  generations = "500001"
+  generations = "10001"
   #generations = 800
-  alignment_sample_frequency = 500
+  alignment_sample_frequency = 250
   position_sample_count = 20
-  output_frequency = 50
+  output_frequency = 100
   print_frequency = 100
-  full_update_freq = 50
+  full_update_freq = 1
+  triple_recursion = false
+  rare_threshold = 0.001
+  base_virtual = 10
 
 [MODEL]
   script_file = "7_hidden_states.lua"
@@ -54,5 +57,3 @@ seed = 0
 
   step_size = 0.001
   states = ['a', 't', 'c', 'g']
-
-  state_name = "nucleotides"

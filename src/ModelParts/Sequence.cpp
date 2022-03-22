@@ -29,6 +29,8 @@ SequenceAlignment::SequenceAlignment(std::string name, std::string msa_out, std:
 
   seqs_out_file = msa_out;
   substitutions_out_file = subs_out;
+
+  this->rare_threshold = env.get<double>("MCMC.rare_threshold");
 }
 
 void SequenceAlignment::add(std::string name, std::string sequence_str) {
@@ -286,10 +288,10 @@ std::list<std::string> SequenceAlignment::getNodeNames() {
 
 // TODO positions should be passed as argument.
 void SequenceAlignment::reset_to_base(std::string name, const std::list<unsigned int>& positions) {
-  for(unsigned int i = 0; i < n_columns; i++) {
-      for(unsigned int j = 0; j < n_states; j++) {
-	marginal_state_distribution[name][i][j] = prior_state_distribution[name][i][j];
-      }
+  for(auto pos_it = positions.begin(); pos_it != positions.end(); pos_it++) {
+    for(unsigned int j = 0; j < n_states; j++) {
+      marginal_state_distribution[name][*pos_it][j] = prior_state_distribution[name][*pos_it][j];
+    }
   } 
 }
 
@@ -344,12 +346,9 @@ double SequenceAlignment::find_state_prob_given_dec_branch(BranchSegment* branch
     if(state_prob != 0.0) {
       // Likelihood contribution of all substitutions - including alternate domains.
       for(BranchSegment::iterator it = branch->begin(pos); it != branch->end(); it++) {
-	std::string alt_domain = (*it).first;
-	Substitution sub = (*it).second;
+	std::string domain = (*it).first;
 
-	if(alt_domain == this->domain_name) {
-	  //past_focal_domain = true;
-
+	if(domain == this->domain_name) {
 	  double rate = rv[state_j]->get_value();
 	  if(state_i != state_j) {
 	    // Normal Substitution
@@ -361,23 +360,24 @@ double SequenceAlignment::find_state_prob_given_dec_branch(BranchSegment* branch
 
 	} else {
 	  // Subsitutions in non focal domain.
-	  std::map<std::string, state_element> context = {{alt_domain, sub.anc_state},
+	  Substitution sub = (*it).second;
+	  std::map<std::string, state_element> context = {{domain, sub.anc_state},
 							  {this->domain_name, state_i}};
 
-	  RateVector* rv = branch->get_hypothetical_rate_vector(alt_domain, context, pos);
+	  RateVector* rv = branch->get_hypothetical_rate_vector(domain, context, pos);
 
 	  if(sub.occuredp and (sub.anc_state != sub.dec_state)) {
 	    // Substitution including virtual substitutions.
 	    //signed char focal_state_context = past_focal_domain ? state_j : state_i;
-	    //alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
+	    alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
 	  } else {
 	    //alt_domain_prob *= (1.0 / (1.0 + (t_b * u)));
-	    //alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
+	    alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
 	  }
-	}
-	//past_focal_domain = false;
-	prob += state_prob * focal_domain_prob * alt_domain_prob;
+	}	
       }
+      //past_focal_domain = false;
+      prob += (state_prob * focal_domain_prob * alt_domain_prob);
     }
   }
 
@@ -399,13 +399,13 @@ double SequenceAlignment::find_state_prob_given_anc_branch(BranchSegment* branch
     double state_prob = state_probs[state_i];
     if(state_prob != 0.0) {
       for(BranchSegment::iterator it = branch->begin(pos); it != branch->end(); it++) {
-	std::string alt_domain = (*it).first;
-	Substitution sub = (*it).second;
+	std::string domain = (*it).first;
 
-	if(alt_domain == this->domain_name) {
+	if(domain == this->domain_name) {
 	  // Focal Domain
 	  std::map<std::string, state_element> context = {{this->domain_name, state_i}};
 	  RateVector* rv = node->up->get_hypothetical_rate_vector(domain_name, context, pos);
+
 	  double rate = rv->rates[state_j]->get_value(); // i -> j rate.
 	  if(state_i != state_j) {
 	    // Normal Substitution.
@@ -417,21 +417,22 @@ double SequenceAlignment::find_state_prob_given_anc_branch(BranchSegment* branch
 
 	} else {
 	  // Alternative domains.
-	  std::map<std::string, state_element> context = {{alt_domain, sub.anc_state},
+	  Substitution sub = (*it).second;
+	  std::map<std::string, state_element> context = {{domain, sub.anc_state},
 							  {this->domain_name, state_i}};
 	  
-	  RateVector* rv = branch->get_hypothetical_rate_vector(alt_domain, context, pos);
+	  RateVector* rv = branch->get_hypothetical_rate_vector(domain, context, pos);
 	  if(sub.occuredp and (sub.anc_state != sub.dec_state)) {
 	    //Substitution including virtual substitutions.
 	    //signed char focal_state_context = past_focal_domain ? state_j : state_i;
-	    //alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
+	    alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
 	  } else {
 	    // alt_domain_prob *= (1.0 / (1.0 + (t_b * u)));
-	    //alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
+	    alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
 	  }
 	}
-	prob += state_prob * focal_domain_prob * alt_domain_prob;
       }
+      prob += (state_prob * focal_domain_prob * alt_domain_prob);
     }
   }
 
@@ -591,33 +592,64 @@ int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
    */
   double* probs = marginal_state_distribution[node->name][pos];
 
+  //state_element e = 0;
+  //std::cout << node->name << " " << pos << " ";
+
+  //if(node->up != nullptr) {
+  //  e = node->up->ancestral->sequences[domain_name]->at(pos);
+  //  std::cout << (signed int)e << " ";
+  //}
+
+  //std::cout << " [ ";
+  //for(unsigned int i = 0; i < n_states; i++) {
+  // std::cout << marginal_state_distribution[node->name][pos][i] << " ";
+  // }
+
   double r = Random();
   double acc = 0.0;
   int val = -1;
+
+  int largest_i = -1;
+  double largest_val = 0.0;
   for(unsigned int i = 0; i < n_states; i++) {
     acc += probs[i];
+
     if(r < acc and val == -1) {
+
+      if(probs[i] < this->rare_threshold) {
+	// Skip rare events
+	probs[i] = 0.0;
+	continue;
+      }
+
       val = i;
       probs[i] = 1.0;
     } else {
+      if(probs[i] > largest_val) {
+	largest_val = probs[i];
+	largest_i = i;
+      }
       probs[i] = 0.0;
     }
   }
 
-  if(val == -1) {
-    std::cerr << "Error: incorrectly picking a state: " <<  pos << " " << node->name << std::endl;
-    exit(EXIT_FAILURE);
-  }
+  //if(val == -1) {
+  // std::cerr << "Error: incorrectly picking a state: " <<  pos << " " << node->name << std::endl;
+  // exit(EXIT_FAILURE);
+  //}
 
-  return(val);
+  if(val == -1) {
+    probs[largest_i] = 1.0;
+    return(largest_i);
+  } else {
+    return(val);
+  }
 }
 
 void SequenceAlignment::pick_states_for_node(TreeNode* node, const std::list<unsigned int>& positions) {
   std::vector<bool> gaps = taxa_names_to_gaps[node->name];
 
   for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
-    normalize_state_probs(node, *pos);
-
     // Pick state from marginal distributions.
     if(gaps[*pos]) {
       taxa_names_to_sequences[node->name][*pos] = -1;
@@ -659,12 +691,16 @@ void SequenceAlignment::reconstruct_expand(const std::list<TreeNode*>& recursion
   }
 }
 
-sample_status SequenceAlignment::sample(const std::list<unsigned int>& positions) {
-  const std::list<TreeNode*> nodes = tree->nodes();
+// SAMPLING AND RECURSION
+void SequenceAlignment::reverse_recursion(const std::list<unsigned int>& positions) {
+  /* 
+   * Initial reverse recurstion to start marginal posterior calculations of states at each node.
+   * Starts at tips and works up the tree to the root.
+   * Nodes are ordered in the list such that they are visted in order up the tree.
+   */ 
 
-  // Find state probabilities.
-  // Nodes are ordered in the list such that they are visted in order up the tree.
-  // Upward recursion.
+  const std::list<TreeNode*> nodes = this->tree->nodes();
+  
   for(auto n = nodes.begin(); n != nodes.end(); ++n) {
     if(not (*n)->isTip()) {
       find_state_probs_dec_only(*n, positions);
@@ -672,7 +708,52 @@ sample_status SequenceAlignment::sample(const std::list<unsigned int>& positions
       // This is important as states at tips can be uncertain.
       reset_to_base((*n)->name, positions);
     }
+
+    //std::cout << (*n)->name << " [ ";
+    //for(signed int i = 0; i < (signed int)n_states; i++) {
+    //  std::cout << marginal_state_distribution[(*n)->name][0][i] << " ";
+    //} 
+    //std::cout << "]" << std::endl;
   }
+}
+
+sample_status SequenceAlignment::sample_with_double_recursion(const std::list<unsigned int>& positions) {
+  const std::list<TreeNode*> nodes = tree->nodes();
+
+  reverse_recursion(positions);
+
+  // 2nd Recursion - Reverse recursion.
+  // Skip first element of reverse list as thats the root - no need to sample second time.
+  for(auto n = nodes.rbegin(); n != nodes.rend(); ++n) {
+    TreeNode* node = *n;
+    std::vector<bool> gaps = taxa_names_to_gaps[node->name];
+
+    // Reculaculate state probability vector - including up branch.
+    TreeNode* up_node;
+    if(node->up) {
+      up_node = node->up->ancestral;
+    } else {
+      up_node = nullptr;
+    }
+
+    for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
+      // Note does not call for root node.
+      if((not gaps[*pos]) and (not (up_node == nullptr))) {
+	update_state_probs(node, *pos, up_node);
+	normalize_state_probs(node, *pos);
+      }
+    }
+
+    pick_states_for_node(node, positions);
+  }
+
+  return(sample_status({false, true, true}));
+}
+
+sample_status SequenceAlignment::sample_with_triple_recursion(const std::list<unsigned int>& positions) {
+  const std::list<TreeNode*> nodes = tree->nodes();
+
+  reverse_recursion(positions);
 
   // 2nd Recursion - Reverse recursion.
   // Skip first element of reverse list as thats the root - no need to sample second time.
@@ -696,8 +777,6 @@ sample_status SequenceAlignment::sample(const std::list<unsigned int>& positions
       }
 
     }
-
-    //pick_states_for_node(node, positions);
   }
 
   // 3rd Recursion - picking states.
@@ -753,6 +832,9 @@ SequenceAlignmentParameter::SequenceAlignmentParameter(SequenceAlignment* msa, u
   this->n_sample = n_sample;
   this->n_cols = msa->n_cols();
 
+  // Options
+  this->triple_recursion = env.get<bool>("MCMC.triple_recursion");
+
   // Exit program if invalid environment settings.
   if(n_sample < 1) {
     std::cerr << "Error: MCMC.position_sample_count must be greater than 0." << std::endl;
@@ -784,6 +866,7 @@ sample_status SequenceAlignmentParameter::sample() {
 
   std::cout << "Sampling " << msa->domain_name << ": "<< sample_loc << "->";
 
+  //Find the positions to be sampled.
   unsigned int last_pos = 0;
   std::list<unsigned int> positions = {};
   while(positions.size() < n_sample) {
@@ -800,12 +883,14 @@ sample_status SequenceAlignmentParameter::sample() {
   }
 
   std::cout << last_pos << std::endl;
-  //for(unsigned int i = 0; i < msa->n_cols(); i++) {
-  // positions.push_back(i);
-  //};
 
-  sample_status s = msa->sample(positions);
-  return(s);
+  if(this->triple_recursion) {
+    // Triple recursion
+    return(msa->sample_with_triple_recursion(positions));
+    // Double recursion
+  } else {
+    return(msa->sample_with_double_recursion(positions));
+  }
 }
 
 void SequenceAlignmentParameter::undo() {

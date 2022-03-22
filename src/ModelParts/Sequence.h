@@ -24,6 +24,9 @@ class SequenceAlignment {
   std::string domain_name; // Domain.
   unsigned int n_columns;
   unsigned int n_states;
+
+  double rare_threshold; // Will not pick ancestral states with marginal posterior less than this value.
+  
   SequenceAlignment(std::string name, std::string msa_out, std::string subs_out, const States*);
 
   // States
@@ -47,14 +50,17 @@ class SequenceAlignment {
   static std::vector<signed char> find_parsimony(const std::vector<state_element> &s1, const std::vector<state_element> &s2);
   std::list<std::string> getNodeNames();
 
-  // Validation.
-  bool match_structure(SequenceAlignment*);
-  bool validate(std::list<std::string> seq_names, std::map<std::string, SequenceAlignment*> other_alignments);
-
   void syncWithTree(std::string name, unsigned int id, Tree* tree);
   void identify_gaps();
 
-  sample_status sample(const std::list<unsigned int>&);
+  // Sampling
+  void reverse_recursion(const std::list<unsigned int>&);
+  sample_status sample_with_double_recursion(const std::list<unsigned int>&);
+  sample_status sample_with_triple_recursion(const std::list<unsigned int>&);
+
+  // Validation.
+  bool match_structure(SequenceAlignment*);
+  bool validate(std::list<std::string> seq_names, std::map<std::string, SequenceAlignment*> other_alignments);
  private:
   // Processing input sequences - fasta.
   std::vector<signed char> encode_sequence(const std::string &sequence);
@@ -106,6 +112,9 @@ private:
   unsigned int n_sample; // Number of positions sampled each time.
   unsigned int n_cols; // Number of columns in the MSA.
   unsigned int sample_loc; // position of last sample.
+
+  // Options
+  bool triple_recursion;
 
   int save_count;
 public:

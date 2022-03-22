@@ -7,23 +7,24 @@
 Model.set_name("Hidden State.")
 
 -- Base
-model_states = Config.get_string_array("MODEL.states")
-
-state_name = Config.get_str("MODEL.state_name")
-
-States.new(Config.get_str("MODEL.state_name"), model_states, {sequences_output = Config.get_str("MODEL.sequences_out_file"), substitutions_output = Config.get_str("MODEL.substitutions_out_file")})
-
-Data.load_state(state_name, Config.get_str("MODEL.sequences_file"))
-
+-- Intrinsic Order
 od_states = {"O", "D"}
 States.new("orderVdisorder", od_states, {sequences_output = "od_sequences.fasta", substitutions_output = "od_substitutions.out"})
 
 Data.load_state("orderVdisorder", "data_sets/hidden_state.efasta");
 
+-- Nucleotides
+model_states = Config.get_string_array("MODEL.states")
+
+state_name = "primary"
+
+States.new(state_name, model_states, {sequences_output = Config.get_str("MODEL.sequences_out_file"), substitutions_output = Config.get_str("MODEL.substitutions_out_file")})
+
+Data.load_state(state_name, Config.get_str("MODEL.sequences_file"))
 -- Create parameters for equilibrium frequencies.
 
-order_rate = Parameter.new("base-order", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0});
-disorder_rate = Parameter.new("base-disorder", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0});
+order_rate = Parameter.new("base-order", "continuous", {initial_value = 0.0001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0});
+disorder_rate = Parameter.new("base-disorder", "continuous", {initial_value = 0.0001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0});
 
 -- equil_freq = {}
 Q_order = {}
@@ -63,20 +64,18 @@ for i=1,#model_states do
 					     Q_disorder[i]))
 end
 
-OtoD = Parameter.new("OtoD", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0 })
-
-DtoO = Parameter.new("DtoO", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0 })
+OD_transition = Parameter.new("OD-transition", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0 })
 
 order_application = {domain = "orderVdisorder", state = "O", pos = {}}
 order_application[state_name] = "*"
 
 Model.add_rate_vector(RateVector.new("RV-O",
 				     order_application,
-				     {Parameter.new("virtual-O", "virtual", {}), OtoD}))
+				     {Parameter.new("virtual-O", "virtual", {}), OD_transition}))
 
 disorder_application = {domain = "orderVdisorder", state = "D", pos = {}}
 disorder_application[state_name] = "*"
 
 Model.add_rate_vector(RateVector.new("RV-D",
 				     disorder_application,
-				     {DtoO, Parameter.new("virtual-D", "virtual", {})}))
+				     {OD_transition, Parameter.new("virtual-D", "virtual", {})}))

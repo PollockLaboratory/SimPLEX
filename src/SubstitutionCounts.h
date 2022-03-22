@@ -25,6 +25,8 @@ class SubstitutionCounts {
   std::map<RateVector*, std::vector<int>> subs_by_rateVector;
   std::map<float, branch_counts> subs_by_branch;
   void print();
+private:
+  int base_virtual;
 };
 
 class Tree;

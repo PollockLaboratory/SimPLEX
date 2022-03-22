@@ -67,13 +67,12 @@ void MCMC::sample() {
   //std::cout << std::endl;
   if(s.testp) {
     //Metropolis-Hasting method.
-    if (log(Random()) <= (newLnL - lnL)) {
+    float r = Random();
+    if (log(r) <= (newLnL - lnL)) {
       lnL = newLnL;
       model->accept();
-      //std::cout << "Accept" << std::endl;
     } else {
       model->reject();
-      //std::cout << "Reject" << std::endl;
     }
   } else {
     // No Metropolis Hastings needed - Gibbs sampling.

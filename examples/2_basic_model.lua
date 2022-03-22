@@ -20,7 +20,7 @@ States.new("nucleotide", model_states,
 
 Data.load_state("nucleotide", Config.get_str("MODEL.sequences_file"))
 
-x = Parameter.new("x", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0})
+x = Parameter.new("x", "continuous", {initial_value = 0.02, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0})
 
 for i=1,#model_states do
 	rv_list = {}

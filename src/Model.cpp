@@ -131,8 +131,8 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &
 
   std::cout << "Model succesfully constructed." << std::endl << std::endl;
 
-  //std::cout << "Initial substitution counts:" << std::endl;
-  //counts.print();
+  std::cout << "Initial substitution counts:" << std::endl;
+  counts.print();
 }
 
 // Sampling

@@ -1,11 +1,11 @@
 debug = true
-seed = 0
+seed = 23241234
 
 # Tree Settings
 [TREE]
   max_segment_probability = 0.08
   branch_split_algorithm = 1
-  scale_tree = true
+  scale_tree = false
   target_tree_length = 100.0
   resolve_multifurcation = true
 
@@ -14,7 +14,7 @@ seed = 0
   dynamic = false
   sample_frequency = 2000
   refresh_tree_on_update = true
-  initial_value = 0.5
+  initial_value = 0.2
   threshold = 0.01
   max_step = 0.005
 
@@ -30,25 +30,27 @@ seed = 0
  
   tree_out_file = "tree_out.newick"
   parameters_out_file = "parameters_out.csv"
-  parameters_counts_out_file = "parameters_out_file.csv"
+  parameters_counts_out_file = "parameters_counts_out.csv"
   rate_vectors_out_file = "rate_vectors_out.csv"
   likelihood_out_file = "likelihoods_out.csv"
   counts_out_file = "counts.csv"
   log_out_file = "run.log"
 
 [MCMC]
-  generations = "10001"
-  #generations = 800
-  position_sample_count = 10
-  full_update_freq = 200
-  alignment_sample_frequency = 200
-  output_frequency = 100
-  print_frequency = 100
+  #generations = "1000001"
+  generations = "1000000"
+  position_sample_count = 6
+  full_update_freq = 100
+  alignment_sample_frequency = 2500
+  output_frequency = 1000
+  print_frequency = 1000
+  triple_recursion = true
+  rare_threshold = 0.001
 
 [MODEL]
   script_file = "2_basic_model.lua"
 
-  sequences_file = "data_sets/nucleotide.fasta"
+  sequences_file = "data_sets/nucleotide_single.fasta"
 
   sequences_out_file = ""
   substitutions_out_file = "substitutions.out"
