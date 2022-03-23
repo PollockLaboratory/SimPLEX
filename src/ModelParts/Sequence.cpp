@@ -373,10 +373,10 @@ double SequenceAlignment::find_state_prob_given_dec_branch(BranchSegment* branch
 	  if(sub.occuredp and (sub.anc_state != sub.dec_state)) {
 	    // Substitution including virtual substitutions.
 	    //signed char focal_state_context = past_focal_domain ? state_j : state_i;
-	    //alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
+	    alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
 	  } else {
 	    //alt_domain_prob *= (1.0 / (1.0 + (t_b * u)));
-	    //alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
+	    alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
 	  }
 	}	
       }
@@ -429,10 +429,10 @@ double SequenceAlignment::find_state_prob_given_anc_branch(BranchSegment* branch
 	  if(sub.occuredp and (sub.anc_state != sub.dec_state)) {
 	    //Substitution including virtual substitutions.
 	    //signed char focal_state_context = past_focal_domain ? state_j : state_i;
-	    //alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
+	    alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
 	  } else {
 	    // alt_domain_prob *= (1.0 / (1.0 + (t_b * u)));
-	    //alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
+	    alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
 	  }
 	}
       }
