@@ -343,6 +343,7 @@ double SequenceAlignment::find_state_prob_given_dec_branch(BranchSegment* branch
   for(state_element state_j = 0; state_j < (state_element)n_states; state_j++) {
     double state_prob = state_probs[state_j];
 
+    //std::cout << (unsigned int)state_i << " " << n_states << std::endl;
     if(state_prob != 0.0) {
       // Likelihood contribution of all substitutions - including alternate domains.
       for(BranchSegment::iterator it = branch->begin(pos); it != branch->end(); it++) {
@@ -361,18 +362,21 @@ double SequenceAlignment::find_state_prob_given_dec_branch(BranchSegment* branch
 	} else {
 	  // Subsitutions in non focal domain.
 	  Substitution sub = (*it).second;
+	  //std::cout << (unsigned int)state_i << std::endl;
 	  std::map<std::string, state_element> context = {{domain, sub.anc_state},
 							  {this->domain_name, state_i}};
 
 	  RateVector* rv = branch->get_hypothetical_rate_vector(domain, context, pos);
 
+	  //std::cout << domain_name << " " << (unsigned int)state_i << " " << (unsigned int)sub.anc_state << " " << rv->get_name();
+	  //std::cout << " " << rv->rates[sub.dec_state]->get_value() << std::endl;
 	  if(sub.occuredp and (sub.anc_state != sub.dec_state)) {
 	    // Substitution including virtual substitutions.
 	    //signed char focal_state_context = past_focal_domain ? state_j : state_i;
-	    alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
+	    //alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
 	  } else {
 	    //alt_domain_prob *= (1.0 / (1.0 + (t_b * u)));
-	    alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
+	    //alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
 	  }
 	}	
       }
@@ -395,7 +399,7 @@ double SequenceAlignment::find_state_prob_given_anc_branch(BranchSegment* branch
 
   float t_b = branch->distance;
 
-  for(state_element state_i = 0; state_i < (signed char)n_states; state_i++) {
+  for(state_element state_i = 0; state_i < (signed char)n_states; ++state_i) {
     double state_prob = state_probs[state_i];
     if(state_prob != 0.0) {
       for(BranchSegment::iterator it = branch->begin(pos); it != branch->end(); it++) {
@@ -425,10 +429,10 @@ double SequenceAlignment::find_state_prob_given_anc_branch(BranchSegment* branch
 	  if(sub.occuredp and (sub.anc_state != sub.dec_state)) {
 	    //Substitution including virtual substitutions.
 	    //signed char focal_state_context = past_focal_domain ? state_j : state_i;
-	    alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
+	    //alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
 	  } else {
 	    // alt_domain_prob *= (1.0 / (1.0 + (t_b * u)));
-	    alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
+	    //alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
 	  }
 	}
       }
@@ -558,6 +562,7 @@ void SequenceAlignment::update_state_probs(TreeNode* node, unsigned int pos, Tre
 
   for(state_element state_j = 0; state_j < (signed char)n_states; state_j++) {
     if(state_probs[state_j] != 0.0) {
+      //std::cout << "update: " << (unsigned int)state_j << std::endl;
       state_probs[state_j] *= find_state_prob_given_anc_branch(node->up, state_j, marginal_state_distribution[up_node->name][pos], node, u, pos);
     }
   }
