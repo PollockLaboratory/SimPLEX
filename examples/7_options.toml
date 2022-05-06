@@ -42,6 +42,7 @@ seed = 123123
   triple_recursion = false
   rare_threshold = 0.001
   base_virtual = 10
+  include_alternative_domain = true
 
 [MODEL]
   script_file = "7_hidden_states.lua"
