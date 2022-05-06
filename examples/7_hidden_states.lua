@@ -11,7 +11,7 @@ Model.set_name("Hidden State.")
 od_states = {"O", "D"}
 States.new("orderVdisorder", od_states, {sequences_output = "od_sequences.fasta", substitutions_output = "od_substitutions.out"})
 
-Data.load_state("orderVdisorder", "data_sets/hidden_state.efasta");
+Data.load_state("orderVdisorder", "data_sets/hidden_state_single.efasta");
 
 -- Nucleotides
 model_states = Config.get_string_array("MODEL.states")

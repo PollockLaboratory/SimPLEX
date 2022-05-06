@@ -1,1 +1,1 @@
-(((taxaB:0.6,(taxaA:0.5,taxaC:0.3):0.5):0.4,taxaE:0.4):0.3,taxaD:0.11):0;
+((taxaB:0.6,(taxaA:0.5,taxaC:0.3):0.1):0.3,(taxaD:0.11,taxaE:0.2):0.1):0;

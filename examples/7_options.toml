@@ -3,20 +3,16 @@ seed = 123123
 
 # Tree Settings
 [TREE]
-  max_segment_probability = 0.25
+  max_segment_probability = 0.1
   branch_split_algorithm = 1
-  scale_tree = false
+  scale_tree = true
   target_tree_length = 100.0
   resolve_multifurcation = false
 
 # Uniformization Constant
 [UNIFORMIZATION]
   dynamic = false
-  sample_frequency = 2000
-  refresh_tree_on_update = true
-  initial_value = 0.3
-  threshold = 0.01
-  max_step = 0.005
+  initial_value = 0.1
 
 [INPUT]
   # This should be TRUE or FALSE
@@ -36,10 +32,10 @@ seed = 123123
   counts_out_file = "counts.csv"
 
 [MCMC]
-  generations = "5001"
+  generations = "501"
   #generations = 800
   alignment_sample_frequency = 250
-  position_sample_count = 3
+  position_sample_count = 1
   output_frequency = 100
   print_frequency = 100
   full_update_freq = 1
@@ -53,7 +49,7 @@ seed = 123123
   sequences_out_file = "sequences_out.fasta"
 
   substitutions_out_file = "substitutions.out"
-  sequences_file = "data_sets/nucleotide.fasta"
+  sequences_file = "data_sets/nucleotide_single.fasta"
 
   step_size = 0.001
   states = ['a', 't', 'c', 'g']
