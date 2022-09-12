@@ -68,14 +68,9 @@ void SubstitutionCounts::print() {
 }
 
 // CountsParameter
-
-//std::ofstream CountsParameter::out_file;
-
 CountsParameter::CountsParameter(SubstitutionCounts* counts, Tree* tree, std::map<std::string, std::list<std::string>> all_states) : AbstractComponent("SubstitutionCounts."), counts(counts), all_states(all_states) {
   hidden = true;
 
-  //this->tree = tp->get_tree_ptr();
-  //this->add_dependancy(tp);
   this->tree = tree;
 
   files.add_file("counts_by_ratevector_out", env.get<std::string>("OUTPUT.counts_out_file"), IOtype::OUTPUT);
@@ -110,21 +105,49 @@ void CountsParameter::refresh() {
   // Track counts by branch segment length and rate vector.
   const std::list<BranchSegment*> branchList = tree->get_branches();
 
+  // DEBUG
+  std::map<std::string, std::vector<int>> sub_counts = {};
+  for(auto jt = all_state_domains.begin(); jt != all_state_domains.end(); ++jt) {
+    int n_cols = (*branchList.begin())->get_substitutions(jt->first).size();
+    sub_counts[jt->first] = std::vector<int>(n_cols, 0);
+  }
+
   for(auto it = branchList.begin(); it != branchList.end(); ++it) {
     BranchSegment* b = *it;
     for(auto jt = all_state_domains.begin(); jt != all_state_domains.end(); ++jt) {
       std::string domain = jt->first;
+      int pos = 0;
       for(auto sub = b->get_substitutions(domain).begin(); sub != b->get_substitutions(domain).end(); ++sub) {
 	if(sub->occuredp == true) {
 	  // Adds both virtual substitutions and normal substitutions.
 	  counts->subs_by_branch[b->distance].num1subs += 1;
 	  counts->subs_by_rateVector[sub->rate_vector][sub->dec_state] += 1;
+	  if(sub->anc_state != sub->dec_state) {
+	    sub_counts[domain][pos] += 1;
+	    //std::cout << domain << " " << (unsigned int)sub->anc_state << " " << (unsigned int)sub->dec_state
+	    //	      << " " << b->ancestral->name
+	    //	      << " " << b->decendant->name
+	    //      << std::endl;
+
+	  }
 	} else {
 	  counts->subs_by_branch[b->distance].num0subs += 1;
 	}
+	pos++;
       }
     }
   }
+
+  //DEBUG
+  for(auto it = sub_counts.begin(); it != sub_counts.end(); ++it) {
+    int sum = 0;
+    std::cout << it->first << "[ ";
+    for(auto jt = it->second.begin(); jt != it->second.end(); ++jt) {
+      sum += *jt;
+      std::cout << *jt << " ";
+    }
+    std::cout << "] " << sum << std::endl;
+  }  
 }
 
 void CountsParameter::print() {

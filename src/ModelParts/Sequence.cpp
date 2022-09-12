@@ -1,5 +1,6 @@
 #include <sstream>
 #include <algorithm>
+#include <cassert>
 
 #include "Sequence.h"
 #include "../Environment.h"
@@ -29,21 +30,14 @@ SequenceAlignment::SequenceAlignment(std::string name, std::string msa_out, std:
 
   seqs_out_file = msa_out;
   substitutions_out_file = subs_out;
-
-  this->rare_threshold = env.get<double>("MCMC.rare_threshold");
 }
 
-void SequenceAlignment::add(std::string name, std::string sequence_str) {
-  // Adds extant sequence to alignment. This will not be sampled during the MCMC.
-  std::vector<state_element> enc = encode_sequence(sequence_str);
-  taxa_names_to_sequences[name] = enc;
-}
-
-void SequenceAlignment::add(std::string name) {
+void SequenceAlignment::add_internal(std::string name) {
   // Adds sequence to alignment, that WILL be sampled during MCMC.
   // This is for the ancestral nodes.
-  std::vector<state_element> enc = {};
-  taxa_names_to_sequences[name] = enc;
+  assert(n_columns > 0);
+  taxa_names_to_sequences[name] = std::vector<state_element>(n_columns, -1);
+  taxa_names_to_gaps[name] = std::vector<bool>(n_columns, true);
 }
 
 double** create_state_probability_vector(unsigned int n_cols, unsigned int n_states) {
@@ -59,19 +53,36 @@ double** create_state_probability_vector(unsigned int n_cols, unsigned int n_sta
 }
 
 void SequenceAlignment::add_base(std::string name, const IO::FreqSequence &seq) {
-  add(name, sequenceAsStr_highestFreq(seq));
+  taxa_names_to_sequences[name] = encode_sequence(sequenceAsStr_highestFreq(seq));
 
   prior_state_distribution[name] = create_state_probability_vector(seq.size(), n_states);
 
   int pos = 0;
+  // Loop through each position in Frequency Sequence
   for(auto it = seq.begin(); it != seq.end(); ++it) {
     for(auto jt = it->begin(); jt != it->end(); ++jt) {
+      // Loop through states.
       if(jt->state != '-') {
 	prior_state_distribution[name][pos][state_element_encode[std::string(1, jt->state)]] = jt->freq;
+      } else {
+	assert(jt->freq == 1.0);
       }
     }
     pos++;
   }
+
+  // Set gaps
+  std::vector<state_element> sequence = taxa_names_to_sequences[name];
+  std::vector<bool> gaps(sequence.size(), false);
+  for(unsigned int pos = 0; pos < sequence.size(); pos++) {
+    if(sequence.at(pos) == -1) {
+      gaps[pos] = true;
+    } else {
+      gaps[pos] = false;
+    }
+  }
+
+  taxa_names_to_gaps[name] = gaps;
 }
 
 void SequenceAlignment::print() {
@@ -128,7 +139,7 @@ void SequenceAlignment::saveToFile(int save_count, uint128_t gen, double l) {
   files.write_to_file(substitutions_out_identifier, subs_buffer.str());
 }
 
-void SequenceAlignment::syncWithTree(std::string name, unsigned int id, Tree* tree) {
+void SequenceAlignment::syncWithTree(std::string domain_name, unsigned int id, Tree* tree) {
   /*
     Connects all the tree nodes on the matching sequences in the MSAs for each state domain.
     Add new sequences to MSA for nodes present on the tree but missing in the alignment.
@@ -136,81 +147,65 @@ void SequenceAlignment::syncWithTree(std::string name, unsigned int id, Tree* tr
    */
 
   this->tree = tree;
-  std::cout << "\tAttaching " << name << "[" << id << "] states to tree." << std::endl;
+  std::cout << "\tAttaching " << domain_name << "[" << id << "] states to tree." << std::endl;
   std::list<TreeNode*> nodes = tree->nodes();
 
   for(auto it = nodes.begin(); it != nodes.end(); ++it) {
     TreeNode* n = *it;
+    marginal_state_distribution[n->name] = create_state_probability_vector(n_columns, n_states);
 
     if(taxa_names_to_sequences.count(n->name)) {
-      n->sequences[name] = &(taxa_names_to_sequences.at(n->name));
+      n->sequences[domain_name] = &(taxa_names_to_sequences.at(n->name));
     } else {
       if(n->isTip()){
 	std::cerr << "Error: Missing sequence for \"" << n->name << "\"." << std::endl;
 	exit(EXIT_FAILURE);
       } else {
 	// Add new sequence to sequence alignments.
-	add(n->name);
-	n->sequences[name] = &(taxa_names_to_sequences.at(n->name));
-	  
-	// Fill missing sequences/
-	if(n->left != 0 and n->right == 0) {
-	  // Internal Continous.
-	  TreeNode* dsNode = n->left->decendant; // ds = downstream.
-	  *(n->sequences[name]) = *(dsNode->sequences[name]);
-	} else {
-	  // Root or internal branch.
-	  vector<state_element> dsNodeLseq = *(n->left->decendant->sequences[name]);
-	  vector<state_element> dsNodeRseq = *(n->right->decendant->sequences[name]);
-	  vector<state_element> p = find_parsimony(dsNodeLseq, dsNodeRseq);
-	  *(n->sequences[name]) = p;
-	}
+	add_internal(n->name);
+	n->sequences[domain_name] = &(taxa_names_to_sequences.at(n->name));	
       }
     }
   }
 
-  identify_gaps();
-}
-					     
-void SequenceAlignment::identify_gaps() {
-  std::list<TreeNode*> nodes = tree->nodes();
-  for(auto node = nodes.begin(); node != nodes.end(); ++node) {
-    //std::cout << (*node)->name << std::endl;
+  // Set gaps for internal nodes.
+  for(auto it = nodes.begin(); it != nodes.end(); ++it) {
+    TreeNode* n = *it;
+    if(n->isTip()) {
+      continue;
+    }
 
-    std::vector<state_element> sequence = taxa_names_to_sequences[(*node)->name];
-    std::vector<bool> gaps(sequence.size(), false);
-
-    marginal_state_distribution[(*node)->name] = create_state_probability_vector(n_columns, n_states);
-
-    if((*node)->isTip()) {
-      for(unsigned int pos = 0; pos < sequence.size(); pos++) {
-	if(sequence.at(pos) == -1) {
-	  gaps[pos] = true;
-	} else {
-	  gaps[pos] = false;
-	}
+    if(n->left != 0 and n->right == 0) {
+      // Internal Continous.
+      TreeNode* dsNode = n->left->decendant; // ds = downstream.
+      for(unsigned int i = 0; i < dsNode->sequences[domain_name]->size(); i++) {
+	taxa_names_to_gaps[n->name][i] = taxa_names_to_gaps[dsNode->name][i];
       }
     } else {
-      for(unsigned int pos = 0; pos < sequence.size(); pos++) {
+      for(unsigned int pos = 0; pos < n->sequences[domain_name]->size(); pos++) {
 	// Checks left branch first - there is always a left branch, except tips.
-	if(taxa_names_to_gaps[(*node)->left->decendant->name][pos]) {
+	if(taxa_names_to_gaps[n->left->decendant->name][pos]) {
 	  // Checks right branch next - right branches only on branching segment.
-	  if((*node)->right) {
-	    if(taxa_names_to_gaps[(*node)->right->decendant->name][pos]) {
-	      gaps[pos] = true;
+	  if(n->right) {
+	    if(taxa_names_to_gaps[n->right->decendant->name][pos]) {
+	      taxa_names_to_gaps[n->name][pos] = true;
 	    } else {
-	      gaps[pos] = false;
+	      taxa_names_to_gaps[n->name][pos] = false;
 	    }
 	  } else {
-	    gaps[pos] = true;
+	    taxa_names_to_gaps[n->name][pos] = true;
 	  }
 	} else {
-	  gaps[pos] = false;
+	  taxa_names_to_gaps[n->name][pos] = false;
 	}
       }
     }
-    taxa_names_to_gaps[(*node)->name] = gaps;
   }
+
+  // Set initial states of internal sequences.
+  for(unsigned int i = 0; i < n_columns ; i++) {
+    find_parsimony_by_position(i);
+  } 
 }
 
 // Reading Fasta files.
@@ -256,26 +251,80 @@ std::string SequenceAlignment::decode_state_element_sequence(std::vector<state_e
   return(decoded_sequence);
 }
 
-std::vector<state_element> SequenceAlignment::find_parsimony(const std::vector<state_element> &s1, const std::vector<state_element> &s2) {
-  std::vector<state_element> p = {};
-  for(unsigned int i = 0; i < s1.size(); i++) {
-    if(s1.at(i) == s2.at(i)) {
-      //If states are the same.
-      p.push_back(s1.at(i));
+// PARSIMONY
+state_element pick_most_frequent_state(const std::vector<state_element> &clade_state, state_element above) {
+  std::map<state_element, int> state_counts = {};
+  for(auto it = clade_state.begin(); it != clade_state.end(); ++it) {
+    if(state_counts.find(*it) == state_counts.end()) {
+      state_counts[*it] = 1;
     } else {
-      // If states are differant - check if one of the states is gap ("-").
-      if(s1.at(i) == -1) {
-	p.push_back(s2.at(i));
-      } else if(s2.at(i) == -1) {
-	p.push_back(s1.at(i));
-      } else if(Random() < 0.5) {
-	p.push_back(s1.at(i));
-      } else {
-	p.push_back(s2.at(i));
+      state_counts[*it] += 1;
+    }
+  }
+
+  // Picks the most frequent states from the states in the clade below. If the counts are equal the state
+  // is used to influence the choice.
+  state_element most_frequent = 0;
+  int highest_count = 0;
+  for(auto it = state_counts.begin(); it != state_counts.end(); ++it) {
+    if((it->second > highest_count) or ((it->second == highest_count) and (it->first == above) and (above != -1))) {
+      most_frequent = it->first;
+      highest_count = it->second;
+    }
+  }
+  return(most_frequent);
+}
+
+void SequenceAlignment::find_parsimony_by_position(unsigned int pos) {
+  std::list<TreeNode*> nodes = tree->nodes();
+
+  std::map<std::string, std::vector<state_element>> clade_states = {};
+
+  for(auto it = nodes.begin(); it != nodes.end(); ++it) {
+    TreeNode* n = *it;
+    if(taxa_names_to_gaps[n->name][pos]) {
+      continue;
+    }
+
+    if(n->isTip()) {
+      clade_states[n->name] = {n->sequences[domain_name]->at(pos)};
+    } else {
+      clade_states[n->name] = {};
+    }
+
+    if(n->left != 0) {
+      for(auto it = clade_states[n->left->decendant->name].begin(); it != clade_states[n->left->decendant->name].end(); ++it) {
+	clade_states[n->name].push_back(*it);
+      }
+    }
+    if(n->right != 0) {
+      for(auto it = clade_states[n->right->decendant->name].begin(); it != clade_states[n->right->decendant->name].end(); it++) {
+	clade_states[n->name].push_back(*it);
       }
     }
   }
-  return(p);
+
+  for(auto it = nodes.rbegin(); it != nodes.rend(); ++it) {
+    TreeNode* n = *it;
+    if(n->isTip() or taxa_names_to_gaps[n->name][pos]) {
+      continue;
+    }
+    
+    int state_above;
+    if(n->up == nullptr) {
+      state_above = -1;
+    } else {
+      state_above = (*n->up->ancestral->sequences[domain_name])[pos];
+    }
+
+    //std::cout << n->name << " [ ";
+    //for(auto jt = clade_states[n->name].begin(); jt != clade_states[n->name].end(); ++jt) {
+    //  std::cout << (unsigned int)*jt << " ";
+    //}
+    //std::cout << "] " << (unsigned int)pick_most_frequent_state(clade_states[n->name], state_above) << std::endl;
+    
+    (*n->sequences[domain_name])[pos] = pick_most_frequent_state(clade_states[n->name], state_above);
+  }
 }
 
 std::list<std::string> SequenceAlignment::getNodeNames() {
@@ -286,7 +335,6 @@ std::list<std::string> SequenceAlignment::getNodeNames() {
   return(names);
 }
 
-// TODO positions should be passed as argument.
 void SequenceAlignment::reset_to_base(std::string name, const std::list<unsigned int>& positions) {
   for(auto pos_it = positions.begin(); pos_it != positions.end(); pos_it++) {
     for(unsigned int j = 0; j < n_states; j++) {
@@ -593,9 +641,23 @@ void SequenceAlignment::fast_update_state_probs_tips(TreeNode* node, unsigned in
 }
 
 // Third Recursion
+int random_state_from_distribution(double* distribution, unsigned int n_states) {
+  double r = Random();
+  double acc = 0.0;
+
+  for(unsigned int i = 0; i < n_states; i++) {
+    acc += distribution[i];
+
+    if(r < acc) {
+      return(i);
+    }
+  }
+}
+
 int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
   /*
-   * Picks a state from the marginal posterior distribution (taxa_names _to_state_probs).
+   * Picks a state from the marginal posterior distribution (taxa_names_to_state_probs).
+   * Also resets the marginal posterior distribution to 0 or 1.
    */
   double* probs = marginal_state_distribution[node->name][pos];
 
@@ -617,13 +679,6 @@ int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
     acc += probs[i];
 
     if(r < acc and val == -1) {
-
-      if(probs[i] < this->rare_threshold) {
-	// Skip rare events
-	probs[i] = 0.0;
-	continue;
-      }
-
       val = i;
       probs[i] = 1.0;
     } else {
@@ -789,13 +844,31 @@ sample_status SequenceAlignment::sample_with_triple_recursion(const std::list<un
 
 // These functions are not critical they are useful though for other user who may not know how they are breaking simPLEX.
 // This need to be much more robust - add better error handling.
-bool SequenceAlignment::validate(std::list<std::string> seq_names, std::map<std::string, SequenceAlignment*> other_alignments) {
-  for(auto n = seq_names.begin(); n != seq_names.end(); ++n) {
+bool SequenceAlignment::validate(std::list<std::string> seq_names_on_tree, std::map<std::string, SequenceAlignment*> other_alignments) {
+  // Chck the sequences on the tree are present in the sequence alignment.
+  for(auto n = seq_names_on_tree.begin(); n != seq_names_on_tree.end(); ++n) {
     if(taxa_names_to_sequences.find(*n) == taxa_names_to_sequences.end()) {
       std::cerr << "Error: sequence alignment " << domain_name << " is missing sequence for " << *n << std::endl;
       exit(EXIT_FAILURE);
     }
   }
+
+  // Check gaps match between MSAs.
+  for(auto it = other_alignments.begin(); it != other_alignments.end(); ++it) {
+    SequenceAlignment* alt_msa = it->second;
+    assert(n_columns == alt_msa->n_columns);
+    for(auto n = seq_names_on_tree.begin(); n != seq_names_on_tree.end(); ++n) {
+      std::vector<bool> gaps = taxa_names_to_gaps[*n];
+      std::vector<bool> alt_gaps = alt_msa->taxa_names_to_gaps[*n];
+      for(int i = 0; i < n_columns; i++) {
+	if(gaps[i] != alt_gaps[i]) {
+	  std::cerr << "Error: pattern of gaps do not match in MSAs for sequence " << *n << std::endl;
+	  exit(EXIT_FAILURE);
+	}
+      }
+    }
+  }
+  
   return(true);
 }
 
@@ -828,7 +901,7 @@ bool SequenceAlignment::match_structure(SequenceAlignment* cmp_msa) {
   return(true);
 }
 
-SequenceAlignmentParameter::SequenceAlignmentParameter(SequenceAlignment* msa, unsigned int n_sample) : SampleableComponent("SequenceAlignment") {
+SequenceAlignmentParameter::SequenceAlignmentParameter(SequenceAlignment* msa, unsigned int n_sample) : SampleableComponent("SequenceAlignment-" + msa->domain_name) {
   save_count = -1;
   this->msa = msa;
   this->n_sample = n_sample;

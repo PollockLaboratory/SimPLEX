@@ -25,8 +25,6 @@ class SequenceAlignment {
   unsigned int n_columns;
   unsigned int n_states;
 
-  double rare_threshold; // Will not pick ancestral states with marginal posterior less than this value.
-  
   SequenceAlignment(std::string name, std::string msa_out, std::string subs_out, const States*);
 
   // States
@@ -35,8 +33,7 @@ class SequenceAlignment {
   std::map<state_element, std::string> state_element_decode;
 
   // Adding sequences to alignment.
-  void add(std::string name, std::string sequence_str);
-  void add(std::string name);
+  void add_internal(std::string name);
   void add_base(std::string name, const IO::FreqSequence &seq);
 
   void print();
@@ -47,7 +44,7 @@ class SequenceAlignment {
   int n_cols();
   std::string decode_state_element(state_element c);
   std::string decode_state_element_sequence(std::vector<state_element> &enc_seq);
-  static std::vector<signed char> find_parsimony(const std::vector<state_element> &s1, const std::vector<state_element> &s2);
+  void find_parsimony_by_position(unsigned int pos);
   std::list<std::string> getNodeNames();
 
   void syncWithTree(std::string name, unsigned int id, Tree* tree);
