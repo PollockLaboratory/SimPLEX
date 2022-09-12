@@ -107,9 +107,12 @@ void CountsParameter::refresh() {
 
   // DEBUG
   std::map<std::string, std::vector<int>> sub_counts = {};
+  std::map<std::string, int> vir_sub_counts = {};
+
   for(auto jt = all_state_domains.begin(); jt != all_state_domains.end(); ++jt) {
     int n_cols = (*branchList.begin())->get_substitutions(jt->first).size();
     sub_counts[jt->first] = std::vector<int>(n_cols, 0);
+    vir_sub_counts[jt->first] = 0;
   }
 
   for(auto it = branchList.begin(); it != branchList.end(); ++it) {
@@ -129,6 +132,9 @@ void CountsParameter::refresh() {
 	    //	      << " " << b->decendant->name
 	    //      << std::endl;
 
+	  } else {
+	    // Virtual
+	    vir_sub_counts[domain] += 1;
 	  }
 	} else {
 	  counts->subs_by_branch[b->distance].num0subs += 1;
@@ -141,12 +147,13 @@ void CountsParameter::refresh() {
   //DEBUG
   for(auto it = sub_counts.begin(); it != sub_counts.end(); ++it) {
     int sum = 0;
-    std::cout << it->first << "[ ";
+    std::cout << it->first << " [ ";
     for(auto jt = it->second.begin(); jt != it->second.end(); ++jt) {
       sum += *jt;
       std::cout << *jt << " ";
     }
-    std::cout << "] " << sum << std::endl;
+    std::cout << "] " << sum << " " << vir_sub_counts[it->first]
+	      << " " << (float)vir_sub_counts[it->first]/(sum+vir_sub_counts[it->first]) << std::endl;
   }  
 }
 
