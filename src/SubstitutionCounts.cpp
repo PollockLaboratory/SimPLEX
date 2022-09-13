@@ -91,7 +91,6 @@ void CountsParameter::fix() {
 }
 
 void CountsParameter::refresh() {
-  std::cout << "Refresh counts." << std::endl;
   // Create new structs for counts.
   static bool updated_table = false;
   if(not updated_table) {
@@ -122,8 +121,9 @@ void CountsParameter::refresh() {
       std::string domain = jt->first;
       int pos = 0;
       for(auto sub = b->get_substitutions(domain).begin(); sub != b->get_substitutions(domain).end(); ++sub) {
-	if(sub->anc_state == -1) {
+	if(sub->dec_state == -1) {
 	  // Skip gaps.
+	  pos++;
 	  continue;
 	}
 
@@ -132,10 +132,11 @@ void CountsParameter::refresh() {
 	  counts->subs_by_branch[b->distance].num1subs += 1;
 	  counts->subs_by_rateVector[sub->rate_vector][sub->dec_state] += 1;
 	  sub_counts[domain][pos] += 1;
-	    //std::cout << domain << " " << (unsigned int)sub->anc_state << " " << (unsigned int)sub->dec_state
-	    //	      << " " << b->ancestral->name
-	    //	      << " " << b->decendant->name
-	    //      << std::endl;
+	  //std::cout << domain << " " << (unsigned int)sub->anc_state << " " << (unsigned int)sub->dec_state
+	  //	    << " " << b->ancestral->name
+	  //    << " " << b->decendant->name
+	  //    << " " << pos
+	  //    << std::endl;
 	} else {
 	  // Virtual substitutions.
 	  // Adds the expected virtual substitution count. Unlikely to be integer.

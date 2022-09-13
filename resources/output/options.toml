@@ -48,11 +48,11 @@ seed = 123128
   sequences_out_file = "sequences_out.fasta"
 
   substitutions_out_file = "substitutions.out"
-  sequences_file = "../examples/data_sets/G1LLZ1_Archaea_single.fasta"
-  hidden_sequences_file = "../examples/data_sets/G1LLZ1_Archaea_single_hidden.efasta"
+  #sequences_file = "../examples/data_sets/G1LLZ1_Archaea_single.fasta"
+  #hidden_sequences_file = "../examples/data_sets/G1LLZ1_Archaea_single_hidden.efasta"
 
-  #sequences_file = "../examples/data_sets/G1LLZ1_Archaea.fasta"
-  #hidden_sequences_file = "../examples/data_sets/G1LLZ1_Archaea.iupred.clusters.shift_8.5.efasta"
+  sequences_file = "../examples/data_sets/G1LLZ1_Archaea.fasta"
+  hidden_sequences_file = "../examples/data_sets/G1LLZ1_Archaea.iupred.clusters.shift_8.5.efasta"
 
   step_size = 0.001
   states = ["A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"]
