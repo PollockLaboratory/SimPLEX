@@ -267,6 +267,7 @@ void RateVectorAssignmentParameter::fix() {
 }
 
 void RateVectorAssignmentParameter::refresh() {
+  std::cout << "Update rate vectors." << std::endl;
   // Update all branches - new substitutions.
   std::list<BranchSegment*> branches = tree->get_branches();
   for(auto b = branches.begin(); b != branches.end(); ++b) {

@@ -34,12 +34,12 @@ seed = 123128
 [MCMC]
   generations = "501"
   alignment_sample_frequency = 250
-  position_sample_count = 529
+  position_sample_count = 1
   output_frequency = 100
   print_frequency = 100
   full_update_freq = 1
   triple_recursion = false
-  base_virtual = 0
+  base_virtual = 20
   include_alternative_domain = true
 
 [MODEL]
@@ -48,11 +48,11 @@ seed = 123128
   sequences_out_file = "sequences_out.fasta"
 
   substitutions_out_file = "substitutions.out"
-  #sequences_file = "../examples/data_sets/G1LLZ1_Archaea_single_first.fasta"
-  #hidden_sequences_file = "../examples/data_sets/G1LLZ1_Archaea_single_first_hidden.efasta"
+  sequences_file = "../examples/data_sets/G1LLZ1_Archaea_single.fasta"
+  hidden_sequences_file = "../examples/data_sets/G1LLZ1_Archaea_single_hidden.efasta"
 
-  sequences_file = "../examples/data_sets/G1LLZ1_Archaea.fasta"
-  hidden_sequences_file = "../examples/data_sets/G1LLZ1_Archaea.iupred.clusters.shift_8.5.efasta"
+  #sequences_file = "../examples/data_sets/G1LLZ1_Archaea.fasta"
+  #hidden_sequences_file = "../examples/data_sets/G1LLZ1_Archaea.iupred.clusters.shift_8.5.efasta"
 
   step_size = 0.001
   states = ["A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"]

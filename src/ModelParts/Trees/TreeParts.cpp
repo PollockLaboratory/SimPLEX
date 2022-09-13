@@ -144,7 +144,7 @@ inline void BranchSegment::update_rate_vectors() {
     if((*seq)[pos] != -1) {
       unsigned long ex_state = ancestral->get_hash_state(pos);
 
-      // Set the rate vectors for each of the state.
+      // Set the rate vectors for each domain of the state.
       for(auto it = ancestral->sequences.begin(); it != ancestral->sequences.end(); ++it) {
 	rv_request rq = {pos, it->first, ex_state};
 
@@ -177,8 +177,9 @@ void BranchSegment::set_new_substitutions() {
 	} else {
 	  // No substitution - possibility of virtual substitution.
 	  // This could be faster - we just need the virtual substitution rate.
-	  double vir_rate = rv_set[pos]->rates[dec_seq->at(pos)]->get_value(); 
+	  double vir_rate = rv_set[pos]->rates[dec_seq->at(pos)]->get_value();
 	  double p = 1.0 - (1.0 / (1.0 + (vir_rate * distance)));
+	  //std::cout << vir_rate << " " << p << std::endl;
 	  if(Random() < p) {
 	    // Virtual Substitution.
 	    substitutions[domain_it->first][pos] = {true, anc_seq->at(pos), dec_seq->at(pos), rv_set[pos]};

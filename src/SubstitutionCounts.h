@@ -11,8 +11,8 @@
 class RateVector;
 
 struct branch_counts {
-  int num0subs = 0;
-  int num1subs = 0;
+  double num0subs = 0.0;
+  double num1subs = 0.0;
 };
 
 class SubstitutionCounts {
@@ -22,7 +22,7 @@ class SubstitutionCounts {
 
   void clear();
 
-  std::map<RateVector*, std::vector<int>> subs_by_rateVector;
+  std::map<RateVector*, std::vector<double>> subs_by_rateVector;
   std::map<float, branch_counts> subs_by_branch;
   void print();
 private:

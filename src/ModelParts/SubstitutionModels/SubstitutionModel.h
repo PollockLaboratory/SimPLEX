@@ -43,7 +43,7 @@ public:
 
   std::list<AbstractComponent*> get_all_parameters();
   
-  void saveToFile(uint128_t gen, double l, std::map<RateVector*, std::vector<int>> counts_by_rv);
+  void saveToFile(uint128_t gen, double l, std::map<RateVector*, std::vector<double>> counts_by_rv);
 private:
   void configure_States(std::map<std::string, std::list<std::string>>);
   void configure_RateVectors(std::list<IO::raw_rate_vector>);

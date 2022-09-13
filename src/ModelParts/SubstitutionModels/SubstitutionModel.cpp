@@ -183,7 +183,7 @@ std::vector<RateVector*> SubstitutionModel::get_RateVectors() {
   return(rateVectors.col);
 }
 
-void SubstitutionModel::saveToFile(uint128_t gen, double l, std::map<RateVector*, std::vector<int>> counts_by_rv) {
+void SubstitutionModel::saveToFile(uint128_t gen, double l, std::map<RateVector*, std::vector<double>> counts_by_rv) {
   rateVectors.saveToFile(gen, l);
 
   static int i = -1;
@@ -196,7 +196,7 @@ void SubstitutionModel::saveToFile(uint128_t gen, double l, std::map<RateVector*
     if((*it)->get_hidden() != true) {
       Valuable* v = dynamic_cast<Valuable*>(*it);
       if(v != nullptr) {
-	int total = 0;
+	double total = 0.0;
 	const std::list<rv_loc> host_rvs = rateVectors.get_host_vectors(v);
 	for(auto it = host_rvs.begin(); it != host_rvs.end(); ++it) {
 	  total += counts_by_rv[it->rv][it->pos];

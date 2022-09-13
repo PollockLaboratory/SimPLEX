@@ -22,7 +22,7 @@ SubstitutionCounts::SubstitutionCounts(std::vector<RateVector*> rvs, std::list<f
   subs_by_branch = {};
 
   for(auto it = rvs.begin(); it != rvs.end(); ++it) {
-    subs_by_rateVector[*it] = std::vector<int>((*it)->rates.size(), 0);
+    subs_by_rateVector[*it] = std::vector<double>((*it)->rates.size(), 0.0);
   }
 
   for(auto it = b_lens.begin(); it != b_lens.end(); ++it) {
@@ -38,14 +38,14 @@ void SubstitutionCounts::clear() {
 	// Always 1 virtual subtitution.
 	(it->second)[i] = this->base_virtual;
       } else {
-	(it->second)[i] = 0;
+	(it->second)[i] = 0.0;
       }
     }
   }
 
   for(auto it = subs_by_branch.begin(); it != subs_by_branch.end(); it++) {
-    it->second.num0subs = 0;
-    it->second.num1subs = 0;
+    it->second.num0subs = 0.0;
+    it->second.num1subs = 0.0;
   }
 }
 
@@ -91,6 +91,7 @@ void CountsParameter::fix() {
 }
 
 void CountsParameter::refresh() {
+  std::cout << "Refresh counts." << std::endl;
   // Create new structs for counts.
   static bool updated_table = false;
   if(not updated_table) {
@@ -107,12 +108,12 @@ void CountsParameter::refresh() {
 
   // DEBUG
   std::map<std::string, std::vector<int>> sub_counts = {};
-  std::map<std::string, int> vir_sub_counts = {};
+  std::map<std::string, double> vir_sub_counts = {};
 
   for(auto jt = all_state_domains.begin(); jt != all_state_domains.end(); ++jt) {
     int n_cols = (*branchList.begin())->get_substitutions(jt->first).size();
     sub_counts[jt->first] = std::vector<int>(n_cols, 0);
-    vir_sub_counts[jt->first] = 0;
+    vir_sub_counts[jt->first] = 0.0;
   }
 
   for(auto it = branchList.begin(); it != branchList.end(); ++it) {
@@ -121,24 +122,32 @@ void CountsParameter::refresh() {
       std::string domain = jt->first;
       int pos = 0;
       for(auto sub = b->get_substitutions(domain).begin(); sub != b->get_substitutions(domain).end(); ++sub) {
-	if(sub->occuredp == true) {
-	  // Adds both virtual substitutions and normal substitutions.
+	if(sub->anc_state == -1) {
+	  // Skip gaps.
+	  continue;
+	}
+
+	if(sub->anc_state != sub->dec_state) {
+	  // Normal substitutions.
 	  counts->subs_by_branch[b->distance].num1subs += 1;
 	  counts->subs_by_rateVector[sub->rate_vector][sub->dec_state] += 1;
-	  if(sub->anc_state != sub->dec_state) {
-	    sub_counts[domain][pos] += 1;
+	  sub_counts[domain][pos] += 1;
 	    //std::cout << domain << " " << (unsigned int)sub->anc_state << " " << (unsigned int)sub->dec_state
 	    //	      << " " << b->ancestral->name
 	    //	      << " " << b->decendant->name
 	    //      << std::endl;
-
-	  } else {
-	    // Virtual
-	    vir_sub_counts[domain] += 1;
-	  }
 	} else {
-	  counts->subs_by_branch[b->distance].num0subs += 1;
+	  // Virtual substitutions.
+	  // Adds the expected virtual substitution count. Unlikely to be integer.
+	  double virtual_subs = sub->rate_vector->rates[sub->anc_state]->get_value() * b->distance;
+	  vir_sub_counts[domain] += virtual_subs;
+
+	  counts->subs_by_branch[b->distance].num1subs += virtual_subs;
+	  counts->subs_by_branch[b->distance].num0subs += (1.0 - virtual_subs);
+	  counts->subs_by_rateVector[sub->rate_vector][sub->dec_state] += virtual_subs;
+
 	}
+
 	pos++;
       }
     }

@@ -183,7 +183,7 @@ double Model::CalculateLikelihood() {
 
   for(auto it = counts.subs_by_rateVector.begin(); it != counts.subs_by_rateVector.end(); ++it) {
     RateVector* rv = it->first;
-    std::vector<int> C_xy = it->second;
+    std::vector<double> C_xy = it->second;
     for(unsigned int i = 0; i < rv->rates.size(); i++) {
       logL_subs += C_xy[i] * log((*rv)[i]);
     }
