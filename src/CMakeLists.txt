@@ -39,6 +39,6 @@ endif()
 target_include_directories( libSimPLEX PUBLIC ../libs )
 
 # Main executable.
-add_executable( simPLEX SimPLEX.cpp)
-target_link_libraries( simPLEX PUBLIC libSimPLEX )
-set_target_properties( simPLEX PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin" )
+add_executable( SimPLEX SimPLEX.cpp)
+target_link_libraries( SimPLEX PUBLIC libSimPLEX )
+set_target_properties( SimPLEX PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin" )

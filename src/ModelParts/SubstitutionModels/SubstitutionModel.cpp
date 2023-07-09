@@ -38,14 +38,14 @@ RateVector* SubstitutionModel::create_rate_vector(IO::raw_rate_vector rv, Valuab
   vir_rate->set_u(u);
 
   // Add each of the remaining parameters to the rate vector.
-  for(int i = 0; i < domain_states->n; i++) {
+  for(unsigned int i = 0; i < domain_states->n; i++) {
     AbstractComponent* param = rv.rates.front();
     if(param == nullptr) {
       std::cerr << "Error: nullptr for parameter in rate vector " << rv.name << " at position " << i << "." << std::endl;
       exit(EXIT_FAILURE);
     }
 
-    if(i != s) {
+    if((int)i != s) {
       Valuable* v = dynamic_cast<Valuable*>(param);
       if(v == nullptr) {
 	std::cerr << "Error: parameter in raw_rate_vector is not Valuable." << std::endl;

@@ -7,7 +7,7 @@
 #include <list>
 #include <map>
 
-#include "sol2/sol.hpp"
+#include "sol/sol.hpp"
 #include "SubstitutionModelParameterWrapper.h"
 #include "SequencesParser.h"
 

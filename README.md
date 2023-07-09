@@ -1,13 +1,14 @@
 # SimPLEX
+
 Simplex is a tool for phylogenetic analysis, focussing on fitting complex substitution models to large datasets.
 
 It takes the input of a rooted tree, sequences for the node tips and a substitution model, and returns the posterior distribution of the parameters inside that substitution model.
 
 ## Installation
 
-### Download a copy of simPLEX from bitbucket
+### Download a copy of SimPLEX source code
 
-	$ git clone git@bitbucket.org:pollocklaboratory/simplex0_0.git
+	$ git clone https://github.com/PollockLaboratory/SimPLEX.git
 
 ### Dependencies
 simPLEX has a number of external dependencies that can sometimes to be challenging to link/compile into the final binary. These include lua5.2 and the C++ boost library. To install them on Ubuntu/Debian based linux distributions use:
@@ -43,24 +44,11 @@ Test that everything is working:
 
 	$ ./bin/simPLEX ../resources/options.toml
 	
-Copy the simPLEX binary to a location on your path so simPLEX can be used in any directory:
+Copy the simPLEX binary to a location on your path so simPLEX can be used in any directory, for example:
 
 	$ cp ./bin/simPLEX /usr/bin/simPLEX
 	
-## Building tests
-Ignore this section unless you are trying to edit or develop any additional feature in simPLEX. Tests are not built by default. In order to build the tests, the additional CMake flag (BUILD_TESTS) must be set to ON. For example, from the build directory (./build):
-
-	$ cmake .. -DCMAKE_BUILD_TYPE=DEBUG	-DBUILD_TESTS=ON
-	
-Then compile as normal:
-
-	$ make
-	
-Tests can be run with all_tests executable:
-
-	$ ./tests/all_tests
-	
-### Usage
+## Usage
 
 When configuring simPLEX there are 3 main core input files.
 
@@ -69,7 +57,7 @@ When configuring simPLEX there are 3 main core input files.
 3. Model file - a lua script that configures the substitution model.
 4. Configuration file - a configuration for the Markov Chain parameters.
 
-## Configuration Parameters
+### Configuration Parameters
 
 * **debug** - bool - when true(1) will print extra error messages. This is not really that widely used at the moment.
 * **max_segment_length**- float - the maximum length of a branch segment. The branch splitting algorithm will split branches til all segments are below this length.
@@ -90,59 +78,8 @@ When configuring simPLEX there are 3 main core input files.
 * **parameter_out_file** - file name - the name of the file for the rate parameters.
 * **likelihoods_out_file** - file name - the name of the file for the likelihoods file.
 
-# Lua model script.
+## Citations
 
-This is where most of the configuration is done. The model is constructed as a set of rate vectors that can apply to certain locations on the tree.
+Bioinformatics. 2012 Nov 15;28(22):2989-90. doi: 10.1093/bioinformatics/bts555. Epub 2012 Sep 12. Phylogenetics, likelihood, evolution and complexity A P Jason de Koning 1 , Wanjun Gu, Todd A Castoe, David D Pollock, PMID: 22976081 PMCID: PMC3496332 DOI: 10.1093/bioinformatics/bts555
 
-## Functions
-* **model**
-  * set_name
-  * add_rate_vector
-* **states**
-  * set
-  * print
-  * to_int
-  * to_str
-  
-## Parameters
-A new parameter is created through the call *Parameter.new(String name, String type, lua_table options)*. For example:
-
-	$ Paramters.new("example_name", "float", {init = 0.01})
-	
-* **Continuous Float** Specified by type = "float". Current options are *init* (initial value) a float.
-* **Category Float** Specified by type = "Category". Current options are *values* (lua_table of floats).
-* **Fixed Float**
-* **Virtual Substitution Rate** Any parameter in the virtual substitution rate postion in the rate vector will be implicitally converted to a VirtualSubstitutionRate parameter.
-* **Rate Vector** 
-
-# Implementation details of simPLEX
-
-This sections intent is to assist anyone who might be interested in editing the code, it is not neccesary for a end user to know this infomation. It is also for me to keep track of all the quirks of each of the more important classes, and remind me exactly what each class was intended for.
-
-## Tree
-The tree structure has two type of nodemplimented as two separate classes:
-
-* Tree Nodes - These hold the sequences. Each has 3 pointers: UP going to the branch to the ancestor; LEFT and RIGHT going to the two decendent branchSegments. There are 4 types of TreeNode specified by whether the pointers are connected to anything.
-  * Tip - only the UP pointer is not NULL
-  * Internal Node - All 3 nodes point to branch segments.
-  * Link Internal Node - Only LEFT and UP are connected.
-  * Root - Only the LEFT and RIGHT pointers are connected.
-* BranchSegements - These have the lengths, substitutions and pointers to the ratevector that apply. They also have pointers to the ancestral and decendant nodes.
-
-## Substitution Model
-The substitution model specifies the pattern of substitutions across the tree. At ts simplest the substitution model manages the set of rate parameters. The rate parameters are sorted into two sets of containers:
-
-* Rate Vectors - these are attached to each position and branch on the tree and specifiy the pattern of substitutions. Not all parameters will be in a rate vector, as some parameters act as hyper parameters.
-* List - All parameters are collected into a single list. During sampling this list will be iterated through and each parameter sampled separately.
-
-## Parameter classes
-Parameters classes represent any aspect of the subtitution model that is sampled during MCMC or is unique to a particular substitution model. There are 3 Abstract Base classes that define the types of parameter:
-
-* AbstractComponent - the base of all parameter classes. It can change if parameters it is dependent upon change, however it cannot itself be sampled. An example of this class is the rate categories parameter.
-* AbstractValue - This class represents a value, but cannot itself be sampled. An example of this is the VirtualSubstitutionRate. Its value will change as other parameters are sampled.
-* SampleableValue - same as the AbstractValue, however this class can also be sampled.
-
-Important members of the above classes includes:
-
-* dependent_values - std::list<AbstractComponent*> - list of pointers to all the other parameters a parameter is dependent upon.
-* sample() - bool - the sample function for a parameter. If return TRUE will run metropolis hasting algorithm if FALSE then automatically accept.
+Mol Biol Evol. 2010 Feb;27(2):249-65. Epub 2009 Sep 25. Rapid likelihood analysis on large phylogenies using partial sampling of substitution histories A P Jason de Koning 1 , Wanjun Gu, David D Pollock PMID: 19783593 PMCID: PMC2877550 DOI: 10.1093/molbev/msp228

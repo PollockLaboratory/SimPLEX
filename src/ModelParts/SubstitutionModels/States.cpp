@@ -32,6 +32,6 @@ States create_States(std::list<std::string> input_states) {
     i++;
   }
 
-  States states = {input_states.size(), states_set, state_to_int, int_to_state};
+  States states = {(unsigned int)input_states.size(), states_set, state_to_int, int_to_state};
   return(states);
 }

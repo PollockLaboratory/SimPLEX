@@ -6,7 +6,7 @@
 #include <iostream>
 #include <list>
 
-#include "sol2/sol.hpp"
+#include "sol/sol.hpp"
 
 class DependencyGroup;
 class AbstractComponent;

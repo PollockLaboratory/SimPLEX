@@ -18,7 +18,7 @@ struct branch_counts {
 class SubstitutionCounts {
  public:
   SubstitutionCounts();
-  SubstitutionCounts(std::vector<RateVector*>, std::list<float>, std::map<std::string, States>);
+  SubstitutionCounts(std::vector<RateVector*>, std::list<float>);
 
   void clear();
 

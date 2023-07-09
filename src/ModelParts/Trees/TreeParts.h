@@ -36,8 +36,7 @@ private:
   void set_new_substitutions();
 
   // Finding applicable RateVectors.
-  state_element get_alt_domain_state(std::string alt_domain, std::string view_domain, unsigned int pos);
-  unsigned long get_hypothetical_hash_state(std::string focal_domain, std::map<std::string, state_element>& states, unsigned int pos);
+  unsigned long get_hypothetical_hash_state(std::map<std::string, state_element>& states, unsigned int pos);
 public:
   class iterator;
 

@@ -17,13 +17,10 @@ public:
   void PrintOptions();
   void ReadOptions(int argc, char* argv[]);         // read in default and control files
 
-  // Key values.
+  // Configuration parameters.
   int seed;                   // random number generator seed
   bool debug;                 // turns debugging on or off
   bool ancestral_sequences;   // true if the ancestral_sequences have already been sampled.
-
-  // Logger.
-  void log(std::string message);
 
   template<typename T>
   T get(std::string);

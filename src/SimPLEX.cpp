@@ -3,7 +3,7 @@
  *
  * Author: Hamish Pike
  * hamish.pike@ucdenver.edu
- * 2013-12-05
+ * 2023-05-17
  */
 
 #include "SimPLEX.h"
@@ -16,8 +16,6 @@
 #include "IO/SubstitutionModelParser.h"
 #include "ModelParts/SubstitutionModels/SubstitutionModel.h"
 
-#include "sol2/sol.hpp"
-
 #include <sys/times.h>
 
 //Globals
@@ -29,17 +27,45 @@ double Random() {
   return (std::rand() % 10000) / 10000.0;
 }
 
-//Entry point for SimPLEX.
-int main(int argc, char* argv[]) {
-  std::cout << "<< SimPLEX >>" << std::endl
-	    << "developed by Hamish N.C. Pike" << std::endl
-	    << "hamish.pike@cuanschutz.edu" << std::endl;
+void print_info() {
+  std::cout << "SimPLEX - phylogenetic analysis of complex substitution models" << std::endl << std::endl
+            << "Usage: SimPLEX configuration_file" << std::endl
+            << "\t-v, --version\tshow version of SimPLEX" << std::endl
+            << "\t-h, --help\tshow help and overview of SimPLEX" << std::endl;
+}
+
+void parse_arguments(int argc, char* argv[]) {
+  // an extremely basic argument parser - does nothing except look for version or help.
 
   if(argc <= 1) {
-    return(0);
+    print_info();
+    std::cout << std::endl << "Error: expecting TOML configuration file." << std::endl;
+
+    exit(EXIT_FAILURE);
+  };
+
+  if (strcmp(argv[1], "--version") == 0 or strcmp(argv[1], "-v") == 0) {
+    std::cout << "SimPLEX - phylogenetic analysis of complex substitution models" << std::endl
+              << "v0.1.0" << std::endl;
+    exit(EXIT_SUCCESS);
+  } else if (strcmp(argv[1], "--help") == 0 or strcmp(argv[1], "-h") == 0) {
+    print_info();
+
+    std::cout << std::endl << "description of SimPLEX" << std::endl;
+
+    std::cout << std::endl << "developed by Hamish NC Pike" << std::endl
+              << "hamish.pike@cuanschutz.edu" << std::endl;
+
+    exit(EXIT_SUCCESS);
   } else {
-    std::cout << std::endl;
+    // assumes the only argument is the configuration file - continue program.
+    return;
   }
+}
+
+//Entry point for SimPLEX.
+int main(int argc, char* argv[]) {
+  parse_arguments(argc, argv);
   
   time_t start_time = time(NULL);
   std::cout.precision(17);
@@ -49,8 +75,6 @@ int main(int argc, char* argv[]) {
 
   files.initialize(argv);
   
-  //files.add_file("log", env.get<std::string>("OUTPUT.log_out_file"), IOtype::OUTPUT);
-
   std::cout << std::endl;
 
   // Initiating program.

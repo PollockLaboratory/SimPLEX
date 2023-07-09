@@ -18,7 +18,6 @@ extern double Random();
 extern Environment env;
 
 // BRANCH SEGMENT
-
 BranchSegment::BranchSegment(float distance) {
   this->distance = distance;
 }
@@ -60,33 +59,7 @@ const std::vector<Substitution>& BranchSegment::get_substitutions(std::string do
   return(substitutions.at(domain));
 }
 
-state_element BranchSegment::get_alt_domain_state(std::string alt_domain, std::string view_domain, unsigned int pos) {
-  /*
-   * This function returns the state at a given alternative domain, from the view point of the view domain.
-   * Substitutions in different domains may occur on the branch segment at the same time,
-   * and thus affect the rate vector choice in different domains when calculating marginal distributions.
-   * 
-   * The order of substitutions on a branch is the same as the order of the domains.
-   * NOTE maps do not necessarily maintain order.
-   */
-
-  bool past_view_domain = false;
-  for(auto it = substitutions.begin(); it != substitutions.end(); it++) {
-    if(it->first == alt_domain) {
-      Substitution sub = substitutions.at(alt_domain)[pos];
-      // TODO check if the math is right here.
-      //return(past_view_domain ? sub.dec_state : sub.anc_state);
-      return(sub.anc_state);
-    } else if(it->first == view_domain) {
-      past_view_domain = true;
-    }
-  }
-
-  std::cerr << "Error: domain not recognized in BranchSegment." << std::endl;
-  exit(EXIT_FAILURE);
-}
-
-unsigned long BranchSegment::get_hypothetical_hash_state(std::string focal_domain, std::map<std::string, state_element>& input_states, unsigned int pos) {
+unsigned long BranchSegment::get_hypothetical_hash_state(std::map<std::string, state_element>& input_states, unsigned int pos) {
   /*
    * Finds the hypothetical hash_state for the context at the ancestral end of this branch.
    * Input states have priority over the state present at the ancestral sequences.
@@ -99,7 +72,6 @@ unsigned long BranchSegment::get_hypothetical_hash_state(std::string focal_domai
       state_element s = input_states[it->first];
       context[it->first] = s;
     } else {
-      //context[it->first] = get_alt_domain_state(it->first, focal_domain, pos);
       context[it->first] = substitutions[it->first][pos].anc_state;
     }
   }
@@ -108,7 +80,7 @@ unsigned long BranchSegment::get_hypothetical_hash_state(std::string focal_domai
 }
 
 RateVector* BranchSegment::get_hypothetical_rate_vector(std::string focal_domain, std::map<std::string, state_element>& context, unsigned int pos) {
-  unsigned long extended_state = this->get_hypothetical_hash_state(focal_domain, context, pos);
+  unsigned long extended_state = this->get_hypothetical_hash_state(context, pos);
   return(ancestral->SM->selectRateVector({pos, focal_domain, extended_state}));
 }
 
@@ -120,7 +92,7 @@ std::pair<std::string, Substitution> BranchSegment::iterator::operator*() const 
   return(std::pair<std::string, Substitution>(it->first, branch.get_substitution(it->first, pos)));
 }
 
-BranchSegment::iterator& BranchSegment::iterator::operator++(int i) {
+BranchSegment::iterator& BranchSegment::iterator::operator++(int) {
   it++;
   return(*this);
 }

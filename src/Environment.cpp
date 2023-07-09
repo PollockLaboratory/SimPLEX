@@ -57,15 +57,3 @@ void Environment::InitializeRandomNumberGeneratorSeed() {
 void Environment::PrintOptions() {
   std::cout << "Received options:" << std::endl << *config << std::endl;
 }
-
-// Logger
-void Environment::log(std::string message) {
-  time_t raw_time;
-  time(&raw_time);
-  struct tm * timeinfo;
-  timeinfo = localtime(&raw_time);
-  char buffer[80];
-  strftime(buffer, 80, "%D %T", timeinfo);
-
-  //log_stream << "[ " << buffer << " ] " << message << std::endl;
-}

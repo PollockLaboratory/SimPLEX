@@ -358,7 +358,7 @@ DependencyGroup::DependencyGroup(std::string name) : AbstractComponent(name) {
   parent_parameter = nullptr;
 }
 
-void DependencyGroup::set_parent(Valuable* v) {
+void DependencyGroup::set_parent(Valuable*) {
   parent_parameter = nullptr;
 }
 

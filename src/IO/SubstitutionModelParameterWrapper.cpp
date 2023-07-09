@@ -119,7 +119,7 @@ namespace IO {
     return(new FixedFloat(name, value));
   }
 
-  VirtualSubstitutionRate* new_VirtualSubstitutionRate(std::string name, sol::table tbl) {
+  VirtualSubstitutionRate* new_VirtualSubstitutionRate(std::string name, sol::table) {
     return(new VirtualSubstitutionRate(name));
   }
 
@@ -231,7 +231,7 @@ namespace IO {
     return(this->name);
   }
 
-  DependencyGroupWrapper new_dependency_group(std::string name, sol::table tbl) {
+  DependencyGroupWrapper new_dependency_group(std::string name, sol::table) {
     DependencyGroup* group = new DependencyGroup(name);
     return(DependencyGroupWrapper(group));
   }

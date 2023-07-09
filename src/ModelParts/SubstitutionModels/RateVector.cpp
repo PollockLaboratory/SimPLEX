@@ -100,7 +100,7 @@ void RateVectorSet::add(RateVector* rv, IO::rv_use_class uc) {
     // Set up the AbstractValues themselves.
     //rv->rates[i]->add_host_vector(rv, i);
     Valuable* v = rv->rates[i];
-    parameter_locations[v].push_back({rv, i});
+    parameter_locations[v].push_back({rv, (int)i});
   }
 
   // Add rate vector to base collection.

@@ -15,7 +15,7 @@ extern IO::Files files;
 SubstitutionCounts::SubstitutionCounts() {
 }
 
-SubstitutionCounts::SubstitutionCounts(std::vector<RateVector*> rvs, std::list<float> b_lens, std::map<std::string, States> all_states) {
+SubstitutionCounts::SubstitutionCounts(std::vector<RateVector*> rvs, std::list<float> b_lens) {
   this->base_virtual = env.get<int>("MCMC.base_virtual");
   // Make empty structures ready for counts.
   subs_by_rateVector = {};
@@ -34,7 +34,7 @@ void SubstitutionCounts::clear() {
   // Clear structures ready for counts.
   for(auto it = subs_by_rateVector.begin(); it != subs_by_rateVector.end(); ++it) {
     for(unsigned int i = 0; i < it->second.size(); i++ ) {
-      if(i == (it->first)->state) {
+      if((int)i == (it->first)->state) {
 	// Always 1 virtual subtitution.
 	(it->second)[i] = this->base_virtual;
       } else {
@@ -94,7 +94,7 @@ void CountsParameter::refresh() {
   // Create new structs for counts.
   static bool updated_table = false;
   if(not updated_table) {
-    *counts = SubstitutionCounts(tree->get_SM()->get_RateVectors(), tree->get_branch_lengths(), tree->SM->get_all_states());
+    *counts = SubstitutionCounts(tree->get_SM()->get_RateVectors(), tree->get_branch_lengths());
     updated_table = true;
   }
 
@@ -155,16 +155,16 @@ void CountsParameter::refresh() {
   }
 
   //DEBUG
-  for(auto it = sub_counts.begin(); it != sub_counts.end(); ++it) {
-    int sum = 0;
-    std::cout << it->first << " [ ";
-    for(auto jt = it->second.begin(); jt != it->second.end(); ++jt) {
-      sum += *jt;
-      std::cout << *jt << " ";
-    }
-    std::cout << "] " << sum << " " << vir_sub_counts[it->first]
-	      << " " << (float)vir_sub_counts[it->first]/(sum+vir_sub_counts[it->first]) << std::endl;
-  }  
+  //for(auto it = sub_counts.begin(); it != sub_counts.end(); ++it) {
+  //  int sum = 0;
+  //  std::cout << it->first << " [ ";
+  //  for(auto jt = it->second.begin(); jt != it->second.end(); ++jt) {
+  //    sum += *jt;
+  //    std::cout << *jt << " ";
+  //  }
+  //  std::cout << "] " << sum << " " << vir_sub_counts[it->first]
+	//      << " " << (float)vir_sub_counts[it->first]/(sum+vir_sub_counts[it->first]) << std::endl;
+  //}  
 }
 
 void CountsParameter::print() {

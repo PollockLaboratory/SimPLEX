@@ -6,7 +6,7 @@
 #include <iterator>
 #include <iostream>
 
-#include "sol2/sol.hpp"
+#include "sol/sol.hpp"
 
 template <class T>
 static T value_from_table(sol::table tbl, std::string name) {

@@ -2,11 +2,10 @@
 \.d$
 \.o$
 debug
-testing/test_run/
 examples/output/
 bin/
 build/
-testing/
 \.png
 .*.swp
 *.html
+old_README.md

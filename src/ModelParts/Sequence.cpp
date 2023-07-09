@@ -223,10 +223,10 @@ std::vector<state_element> SequenceAlignment::encode_sequence(const std::string 
     } catch(const std::out_of_range& e) {
       // Temporary solution.
       if(current_pos == "-"){
-	encoded_sequence.at(site) = -1;
+        encoded_sequence.at(site) = -1;
       } else {
-	std::cerr << "Error: state \"" << current_pos << "\" in sequence alignment is not recognised. " << std::endl;
-	exit(EXIT_FAILURE);
+        std::cerr << "Error: state \"" << current_pos << "\" in sequence alignment is not recognised. " << std::endl;
+        exit(EXIT_FAILURE);
       }
     }
   }
@@ -499,20 +499,20 @@ void SequenceAlignment::find_marginal_at_pos(TreeNode* node, unsigned int pos, T
   double right_prob = 1.0;
   double up_prob = 1.0;
 
-  unsigned long extended_state;
+  //unsigned long extended_state;
   RateVector* rv;
 
   for(state_element state_i = 0; state_i < (signed char)n_states; state_i++) {
     // Most likely to be 0.0 so evaluated first.
     if(up_node != nullptr) {
       if(not taxa_names_to_gaps[up_node->name][pos]) {
-	up_prob = find_state_prob_given_anc_branch(node->up, state_i, marginal_state_distribution[up_node->name][pos], node, u, pos);
+        up_prob = find_state_prob_given_anc_branch(node->up, state_i, marginal_state_distribution[up_node->name][pos], node, u, pos);
 
-	// Return if probability if 0.0.
-	if(up_prob == 0.0) {
-	  marginal_state_distribution[node->name][pos][state_i] = 0.0;
-	  return;
-	}
+        // Return if probability if 0.0.
+        if(up_prob == 0.0) {
+          marginal_state_distribution[node->name][pos][state_i] = 0.0;
+          return;
+        }
       }
     }
 
@@ -524,8 +524,8 @@ void SequenceAlignment::find_marginal_at_pos(TreeNode* node, unsigned int pos, T
       left_prob = find_state_prob_given_dec_branch(left_node->up, state_i, marginal_state_distribution[left_node->name][pos], rv->rates, u, pos);
 
       if(left_prob == 0.0) {
-	marginal_state_distribution[node->name][pos][state_i] = 0.0;
-	return;
+        marginal_state_distribution[node->name][pos][state_i] = 0.0;
+        return;
       }
     }
 
@@ -536,8 +536,8 @@ void SequenceAlignment::find_marginal_at_pos(TreeNode* node, unsigned int pos, T
 
       right_prob = find_state_prob_given_dec_branch(right_node->up, state_i, marginal_state_distribution[right_node->name][pos], rv->rates, u, pos);
       if(right_prob == 0.0) {
-	marginal_state_distribution[node->name][pos][state_i] = 0.0;
-	return;
+        marginal_state_distribution[node->name][pos][state_i] = 0.0;
+        return;
       }
     }
 
@@ -652,6 +652,8 @@ int random_state_from_distribution(double* distribution, unsigned int n_states) 
       return(i);
     }
   }
+
+  return(n_states-1);
 }
 
 int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
@@ -683,8 +685,8 @@ int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
       probs[i] = 1.0;
     } else {
       if(probs[i] > largest_val) {
-	largest_val = probs[i];
-	largest_i = i;
+        largest_val = probs[i];
+        largest_i = i;
       }
       probs[i] = 0.0;
     }
@@ -733,11 +735,11 @@ void SequenceAlignment::reconstruct_expand(const std::list<TreeNode*>& recursion
       std::vector<bool> gaps = taxa_names_to_gaps[node->name];
 
       for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
-	if(not gaps[*pos]) {
-	  //update_state_probs(node, *pos, node->up->ancestral);
-	  fast_update_state_probs_tips(node, *pos, node->up->ancestral);
-	  normalize_state_probs(node, *pos);
-	}
+        if(not gaps[*pos]) {
+          //update_state_probs(node, *pos, node->up->ancestral);
+          fast_update_state_probs_tips(node, *pos, node->up->ancestral);
+          normalize_state_probs(node, *pos);
+        }
       }
     } else {
       // Internal Node.
@@ -796,8 +798,8 @@ sample_status SequenceAlignment::sample_with_double_recursion(const std::list<un
     for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
       // Note does not call for root node.
       if((not gaps[*pos]) and (not (up_node == nullptr))) {
-	update_state_probs(node, *pos, up_node);
-	normalize_state_probs(node, *pos);
+        update_state_probs(node, *pos, up_node);
+        normalize_state_probs(node, *pos);
       }
     }
 
@@ -829,8 +831,8 @@ sample_status SequenceAlignment::sample_with_triple_recursion(const std::list<un
     for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
       // Note does not call for root node.
       if((not gaps[*pos]) and (not (up_node == nullptr))) {
-	update_state_probs(node, *pos, up_node);
-	normalize_state_probs(node, *pos);
+        update_state_probs(node, *pos, up_node);
+        normalize_state_probs(node, *pos);
       }
 
     }
@@ -860,11 +862,11 @@ bool SequenceAlignment::validate(std::list<std::string> seq_names_on_tree, std::
     for(auto n = seq_names_on_tree.begin(); n != seq_names_on_tree.end(); ++n) {
       std::vector<bool> gaps = taxa_names_to_gaps[*n];
       std::vector<bool> alt_gaps = alt_msa->taxa_names_to_gaps[*n];
-      for(int i = 0; i < n_columns; i++) {
-	if(gaps[i] != alt_gaps[i]) {
-	  std::cerr << "Error: pattern of gaps do not match in MSAs for sequence " << *n << std::endl;
-	  exit(EXIT_FAILURE);
-	}
+      for(unsigned int i = 0; i < n_columns; i++) {
+        if(gaps[i] != alt_gaps[i]) {
+          std::cerr << "Error: pattern of gaps do not match in MSAs for sequence " << *n << std::endl;
+          exit(EXIT_FAILURE);
+        }
       }
     }
   }
@@ -880,18 +882,18 @@ bool SequenceAlignment::match_structure(SequenceAlignment* cmp_msa) {
     if(it != cmp_msa->taxa_names_to_sequences.end()) {
       //Check length of sequence matches.
       if(seq->second.size() != it->second.size()) {
-	std::cerr << "Error: in sequence alignment \"" << domain_name << "\": sequences are not the same length as reference." << std::endl;
-	exit(EXIT_FAILURE);
-	return(false);
+        std::cerr << "Error: in sequence alignment \"" << domain_name << "\": sequences are not the same length as reference." << std::endl;
+        exit(EXIT_FAILURE);
+        return(false);
       } else {
-	for(unsigned int i = 0; i < seq->second.size(); i++) {
-	  if((seq->second[i] == -1) xor (it->second[i] == -1)) {
-	    std::cout << seq->second[i] << " " << it->second[i] << std::endl;
-	    std::cerr << "Error: in sequence alignment \"" << domain_name << "\" in sequence " << seq->first << " at position " << i << " inconsistant gaps." << std::endl;
-	    exit(EXIT_FAILURE);
-	    return(false);
-	  }
-	} 
+        for(unsigned int i = 0; i < seq->second.size(); i++) {
+          if((seq->second[i] == -1) xor (it->second[i] == -1)) {
+            //std::cout << seq->second[i] << " " << it->second[i] << std::endl;
+            std::cerr << "Error: in sequence alignment \"" << domain_name << "\" in sequence " << seq->first << " at position " << i << " inconsistant gaps." << std::endl;
+            exit(EXIT_FAILURE);
+            return(false);
+          }
+        } 
       }
     } else {
       std::cerr << "Error: in sequence alignment \"" << domain_name << "\": sequence for \"" << seq->first << "\" is not found in reference." << std::endl;
@@ -939,25 +941,25 @@ sample_status SequenceAlignmentParameter::sample() {
   // Makes list of all positions.
   // Leaving room for a feature where not all positions are sampled each time.
 
-  std::cout << "Sampling " << msa->domain_name << ": "<< sample_loc << "->";
+  //std::cout << "Sampling " << msa->domain_name << ": "<< sample_loc << "->";
 
   //Find the positions to be sampled.
-  unsigned int last_pos = 0;
+  //unsigned int last_pos = 0;
   std::list<unsigned int> positions = {};
   while(positions.size() < n_sample) {
     positions.push_back(sample_loc);
-    last_pos = sample_loc;
-
-    sample_loc++;
-    if(sample_loc >= n_cols) {
-      if(not (positions.size() == n_sample)) {
-	std::cout << last_pos << ",0->";
-      }
-      sample_loc = 0;
-    }
+    //last_pos = sample_loc;
   }
+    //sample_loc++;
+    //if(sample_loc >= n_cols) {
+    // if(not (positions.size() == n_sample)) {
+    //    std::cout << last_pos << ",0->";
+    //  }
+    //  sample_loc = 0;
+    // }
+    // }
 
-  std::cout << last_pos << std::endl;
+    // std::cout << last_pos << std::endl;
 
   if(this->triple_recursion) {
     // Triple recursion
