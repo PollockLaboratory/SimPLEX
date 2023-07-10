@@ -1,6 +1,6 @@
 # SimPLEX
 
-Simplex is a tool for phylogenetic analysis, focussing on fitting complex substitution models to large datasets.
+Simplex is a tool for phylogenetic analysis, focusing on fitting complex substitution models to large datasets.
 
 It takes the input of a rooted tree, sequences for the node tips and a substitution model, and returns the posterior distribution of the parameters inside that substitution model.
 
