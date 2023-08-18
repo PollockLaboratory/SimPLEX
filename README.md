@@ -11,51 +11,62 @@ It takes the input of a rooted tree, sequences for the node tips and a substitut
 	$ git clone https://github.com/PollockLaboratory/SimPLEX.git
 
 ### Dependencies
-simPLEX has a number of external dependencies that can sometimes to be challenging to link/compile into the final binary. These include lua5.2 and the C++ boost library. To install them on Ubuntu/Debian based linux distributions use:
+
+SimPLEX has a number of external dependencies that are dynamically linked to the final binary at runtime: liblua5.2 and the C++ boost development library.
+
+To install them on Ubuntu/Debian based linux distributions use:
 
 	$ sudo apt update
 	
 	$ sudo apt install liblua5.2-dev libboost-all-dev
 	
 ### Compilation
-The simplest way to install this script is to use the install script. This will automatically carry out the following commands and copy the simPLEX binary to the /usr/bin directory on the user PATH.
+
+The simplest way to compile and install SimPLEX is to use the install script. This will automatically carry out the following commands and copy the SimPLEX binary to the /usr/bin directory on the user PATH.
 
 	$ sudo ./install.sh
 	
-To install simPLEX manually, use the following commands: 
+To install SimPLEX manually, use the following commands: 
 
 	$ mkdir build
 	
 	$ cd build/
 
-Set compiler options.
+To configure SimPLEX to compile in debug mode use:
 
 	$ cmake .. -DCMAKE_BUILD_TYPE=DEBUG	
 
-or, for full optimizations:
+or, for full optimizations (this is recommended for any real analysis):
 	
 	$ cmake .. -DCMAKE_BUILD_TYPE=RELEASE
 
-Actually compile:
+And to finally compile SimPLEX:
 
 	$ make
 	
-Test that everything is working:
+They can be used to testTest that everything is working:
 
-	$ ./bin/simPLEX ../resources/options.toml
-	
-Copy the simPLEX binary to a location on your path so simPLEX can be used in any directory, for example:
-
-	$ cp ./bin/simPLEX /usr/bin/simPLEX
-	
+	$ ./bin/SimPLEX --version
+   	
 ## Usage
 
-When configuring simPLEX there are 3 main core input files.
+There are no commandline arguments to SimPLEX, all configuration occurs though the options TOML file.
 
-1. Tree file - a rooted tree file in the newark tree format.
-2. Sequence file - a fasta file with the sequences for each of taxa on the tips of the tree.
-3. Model file - a lua script that configures the substitution model.
-4. Configuration file - a configuration for the Markov Chain parameters.
+For example, to invoke SimPLEX use:
+
+    $ SimPLEX options.toml
+
+There are two essential files for configuring SimPLEX:
+
+1. Option/configuration file - this file contains all the configuration options and specifies the location of all other necessary files.
+2. Model file - a lua script file that is used to configure the substitution model. This location of this file is provided to SimPLEX in the options file.
+
+### Running examples
+
+There are several examples of different models that can be configured with SimPLEX in the examples/ directory. To run the first example:
+
+    $ SimPLEX examples/1_basic_model/options.toml 
+    
 
 ### Configuration Parameters
 

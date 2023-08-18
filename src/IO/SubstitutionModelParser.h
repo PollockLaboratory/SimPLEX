@@ -54,7 +54,7 @@ namespace IO {
 
     void add_state(std::string name, sol::table states, sol::table options);
     void read_state_file(std::string domain, std::string file_name);
-    void create_uniform_prior(std::string domain);
+    void generate_uniform_data(std::string domain);
   };
 
   raw_substitution_model* read_substitution_model(std::string file_name);

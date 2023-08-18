@@ -61,13 +61,9 @@ seed = 0
   substitutions_out_file = "substitutions.out"
 
   # Order/Disorder States.
-  od_states = ["O", "D" ]
-  od_sequences_file = "datasets/hidden_state.efasta"
+  hidden_sequences_file = "datasets/hidden_state.efasta"
 
-  od_sequences_out_file = ""
-  od_substitutions_out_file = "od_substitutions.out"
-
-  # If true the rate of order->disorder is constrained to be equal to disorder->order.
-  equal_od_rates = true
+  hidden_sequences_out_file = ""
+  hidden_substitutions_out_file = "hidden_substitutions.out"
 
   step_size = 0.0005

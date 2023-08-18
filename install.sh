@@ -1,12 +1,13 @@
-#!/bin/bash
+#!/bin/env bash
 
-# A basic install script for simPLEX.
+# A basic script to complile and install SimPLEX.
 
-echo "Installing simPLEX."
+INSTALL_LOCATION=$HOME/.local/bin
+echo "Installing SimPLEX."
 
-if test -f /usr/bin/simPLEX; then
-    echo "Removing old version of simPLEX from /usr/bin"
-    rm -v /usr/bin/simPLEX
+if test -f $INSTALL_LOCATION/SimPLEX; then
+    echo "Removing old version of SimPLEX from" $INSTALL_LOCATION/SimPLEX
+    rm -v $INSTALL_LOCATION/SimPLEX
 fi
 
 echo "Creating build directory."
@@ -19,9 +20,9 @@ cmake .. -DCMAKE_BUILD_TYPE=RELEASE
 echo -e "Compiling simPLEX."
 make 
 
-if test -f ./bin/simPLEX; then
-    echo -e "Successful compile, copying binary to /usr/bin."
-    cp -v ./bin/simPLEX /usr/bin/simPLEX
+if test -f ./bin/SimPLEX; then
+    echo -e "Successful compile, copying binary to" $INSTALL_LOCATION/SimPLEX
+    install ./bin/SimPLEX $INSTALL_LOCATION/SimPLEX
 fi
 
 

@@ -56,7 +56,6 @@ seed = 123123
   substitutions_out_file = "substitutions.out"
 
 # Hiddin intrinsic order state
-  hidden_states = ['O', 'D']
   hidden_sequences_file = "datasets/hidden_state.efasta"
 
   hidden_sequences_out_file = ""

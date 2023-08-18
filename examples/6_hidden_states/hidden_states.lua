@@ -1,13 +1,13 @@
 -- Markov state
 nucleotide_states = { "a", "t", "c", "g" }
 States.new("nucleotide", nucleotide_states,
-           {sequences_output = Config.get_str("MODEL.sequences_out"), substitutions_output = Config.get_str("MODEL.substitutions_out")})
-Data.load_state("nucleotide", Config.get_str("MODEL.sequences_in"))
+           {sequences_output = Config.get_str("MODEL.sequences_out_file"), substitutions_output = Config.get_str("MODEL.substitutions_out_file")})
+Data.load_state("nucleotide", Config.get_str("MODEL.sequences_file"))
 
 hidden_states = { "A", "B" }
 States.new("hidden", hidden_states,
-	   { sequences_output = Config.get_str("MODEL.hidden_sequence_out"), substitutions_output = Config.get_str("MODEL.hidden_substitutions_out")})
-Data.load_state("hidden", Config.get_str("MODEL.hidden_sequences_in"));
+	   { sequences_output = Config.get_str("MODEL.hidden_sequences_out_file"), substitutions_output = Config.get_str("MODEL.hidden_substitutions_out_file")})
+Data.load_state("hidden", Config.get_str("MODEL.hidden_sequences_file"));
 
 -- Rate Vectors for Nucleotide state dimension.
 Q_hidden_A = {}

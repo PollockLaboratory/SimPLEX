@@ -79,7 +79,7 @@ namespace IO {
     state_data[domain] = MSA;
   }
 
-  void raw_substitution_model::create_uniform_prior(std::string domain) {
+  void raw_substitution_model::generate_uniform_data(std::string domain) {
     // Get the states.
     std::list<std::string> states = all_states[domain];
 
@@ -226,9 +226,9 @@ namespace IO {
 						   
 						 });
 
-    data_table.set_function("create_uniform_prior", [this](std::string hidden_state) -> void {
+    data_table.set_function("generate_uniform_data", [this](std::string hidden_state) -> void {
 						      std::cout << "Creating a uniform prior: " << hidden_state << std::endl;
-						      create_uniform_prior(hidden_state);
+						      generate_uniform_data(hidden_state);
 						    });
 
     // CONFIGURATION

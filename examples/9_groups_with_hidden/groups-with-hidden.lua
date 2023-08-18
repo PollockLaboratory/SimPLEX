@@ -16,16 +16,17 @@
 Model.set_name("Groups with hidden")
 
 -- Base.
-model_states = Config.get_string_array("MODEL.states")
+model_states = { 'a', 't', 'c', 'g' }
 States.new("primary", model_states,
-	   {sequences_output = Config.get_str("MODEL.sequences_out_file"), substitutions_output = Config.get_str("MODEL.substitutions_out_file")})
+           {sequences_output = Config.get_str("MODEL.sequences_out_file"),
+            substitutions_output = Config.get_str("MODEL.substitutions_out_file")})
 
 Data.load_state("primary", Config.get_str("MODEL.sequences_file"))
 
-od_states = Config.get_string_array("MODEL.od_states")
-States.new("orderVdisorder", od_states, {sequences_output = Config.get_str("MODEL.od_sequences_out_file"), substitutions_output = Config.get_str("MODEL.od_substitutions_out_file")})
+hidden_states = { 'A', 'B' }
+States.new("hidden", hidden_states, {sequences_output = Config.get_str("MODEL.hidden_sequences_out_file"), substitutions_output = Config.get_str("MODEL.hidden_substitutions_out_file")})
 
-Data.load_state("orderVdisorder", Config.get_str("MODEL.od_sequences_file"));
+Data.load_state("hidden", Config.get_str("MODEL.hidden_sequences_file"));
 
 -- Read file to group amino acid residues into groups.
 function lines_from(file)
@@ -40,58 +41,51 @@ end
 groups = lines_from(Config.get_root_directory()..Config.get_str("MODEL.groups_file"))
 
 -- Create rate parameters for each group.
-subs_to_rate_order = {}
-subs_to_rate_disorder = {}
+subs_to_rate_A = {}
+subs_to_rate_B = {}
 for i, str in pairs(groups) do
-   rate_order = Parameter.new("Group"..tostring(i).."-order", "continuous",
+   rate_A = Parameter.new("Group"..tostring(i).."-A", "continuous",
 			      {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0})
-   rate_disorder = Parameter.new("Group"..tostring(i).."-disorder", "continuous",
+   rate_B = Parameter.new("Group"..tostring(i).."-B", "continuous",
 				 {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0})
    
    for sub_pair in str:gmatch("%w+") do
       print(i, sub_pair)
-      subs_to_rate_order[sub_pair] = rate_order
-      subs_to_rate_disorder[sub_pair] = rate_disorder
+      subs_to_rate_A[sub_pair] = rate_A
+      subs_to_rate_B[sub_pair] = rate_B
    end
 end
 
 -- Build rate vectors.
 for i=1,#model_states do
-   rv_list_order = {}
-   rv_list_disorder = {}
+   rv_list_A = {}
+   rv_list_B = {}
    for j=1,#model_states do
       if i ~= j then
 	 sub_pair = States.primary[i]..States.primary[j]
 	 print(sub_pair)
-	 rv_list_order[j] = subs_to_rate_order[sub_pair]
-	 rv_list_disorder[j] = subs_to_rate_disorder[sub_pair]
+	 rv_list_A[j] = subs_to_rate_A[sub_pair]
+	 rv_list_B[j] = subs_to_rate_B[sub_pair]
       else
-	 rv_list_order[j] = Parameter.new("virtual-"..tostring(States.primary[i]).."-order", "virtual", {})
-	 rv_list_disorder[j] = Parameter.new("virtual-"..tostring(States.primary[i]).."-disorder", "virtual", {})
+	 rv_list_A[j] = Parameter.new("virtual-"..tostring(States.primary[i]).."-hiddenA", "virtual", {})
+	 rv_list_B[j] = Parameter.new("virtual-"..tostring(States.primary[i]).."-hiddenB", "virtual", {})
       end
    end
-   Model.add_rate_vector(RateVector.new("RV-"..tostring(States.primary[i]), {domain = "primary", state = States.primary[i], orderVdisorder = "O", pos = {}}, rv_list_order))
-   Model.add_rate_vector(RateVector.new("RV-"..tostring(States.primary[i]), {domain = "primary", state = States.primary[i], orderVdisorder = "D", pos = {}}, rv_list_disorder))
+   Model.add_rate_vector(RateVector.new("RV-"..tostring(States.primary[i]), {domain = "primary", state = States.primary[i], hidden = "A", pos = {}}, rv_list_A))
+   Model.add_rate_vector(RateVector.new("RV-"..tostring(States.primary[i]), {domain = "primary", state = States.primary[i], hidden = "B", pos = {}}, rv_list_B))
 end
 
-print("OD:", Config.get_bool("MODEL.equal_od_rates"));
-if Config.get_bool("MODEL.equal_od_rates") == 1 then
-   print("Order -> disorder and disorder -> order rates constrained to be equal.")
-   OtoD = Parameter.new("OD_transition_rate", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0 })
-   DtoO = OtoD
-else
-   print("Order -> disorder and disorder -> order rates are separate rate parameters.")
-   OtoD = Parameter.new("OtoD", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0 })
+AtoB = Parameter.new("AtoB", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0 })
 
-   DtoO = Parameter.new("DtoO", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0 })
-end
+BtoA = Parameter.new("BtoA", "continuous", {initial_value = 0.001, step_size = Config.get_float("MODEL.step_size"), lower_bound = 0.0 })
 
-Model.add_rate_vector(RateVector.new("RV-O",
-				     {domain = "orderVdisorder", state = "O", primary="*", pos = {}},
-				     {Parameter.new("virtual-O", "virtual", {}), OtoD}))
+--
+Model.add_rate_vector(RateVector.new("RV-A",
+				     {domain = "hidden", state = "A", primary="*", pos = {}},
+				     {Parameter.new("virtual-A", "virtual", {}), AtoB}))
 
-Model.add_rate_vector(RateVector.new("RV-D",
-				     {domain = "orderVdisorder", state = "D", primary="*", pos = {}},
-				     {DtoO, Parameter.new("virtual-D", "virtual", {})}))
+Model.add_rate_vector(RateVector.new("RV-B",
+				     {domain = "hidden", state = "B", primary="*", pos = {}},
+				     {BtoA, Parameter.new("virtual-A", "virtual", {})}))
 
 

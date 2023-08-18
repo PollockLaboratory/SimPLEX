@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 3.10 )
 set(CMAKE_CXX_STANDARD 17)
 
-project( simplex0_0
+project(SimPLEX
   VERSION 0.0
   DESCRIPTION "Bayesian tool for evolutionary analysis of complex substitution patterns"
   LANGUAGES CXX)
