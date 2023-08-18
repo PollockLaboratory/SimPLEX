@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 # Small helper script to clean output directories after running examples.
 for DIRECTORY in $(ls -d *_*/)
