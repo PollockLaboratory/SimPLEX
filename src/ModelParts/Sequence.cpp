@@ -941,25 +941,25 @@ sample_status SequenceAlignmentParameter::sample() {
   // Makes list of all positions.
   // Leaving room for a feature where not all positions are sampled each time.
 
-  //std::cout << "Sampling " << msa->domain_name << ": "<< sample_loc << "->";
+  std::cout << "Sampling " << msa->domain_name << ": "<< sample_loc << "->";
 
   //Find the positions to be sampled.
-  //unsigned int last_pos = 0;
+  unsigned int last_pos = 0;
   std::list<unsigned int> positions = {};
   while(positions.size() < n_sample) {
     positions.push_back(sample_loc);
-    //last_pos = sample_loc;
-  }
-    //sample_loc++;
-    //if(sample_loc >= n_cols) {
-    // if(not (positions.size() == n_sample)) {
-    //    std::cout << last_pos << ",0->";
-    //  }
-    //  sample_loc = 0;
-    // }
-    // }
+    last_pos = sample_loc;
 
-    // std::cout << last_pos << std::endl;
+    sample_loc++;
+    if(sample_loc >= n_cols) {
+      if(not (positions.size() == n_sample)) {
+        std::cout << last_pos << ",0->";
+      }
+      sample_loc = 0;
+    }
+  }
+
+  std::cout << last_pos << std::endl;
 
   if(this->triple_recursion) {
     // Triple recursion
