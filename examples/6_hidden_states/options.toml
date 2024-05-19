@@ -11,12 +11,9 @@ seed = 123123
 
 # Uniformization Constant
 [UNIFORMIZATION]
-  dynamic = false
   initial_value = 0.1
 
 [INPUT]
-  # This should be TRUE or FALSE
-  ancestral_sequences = false
   tree_file = "datasets/tree.newick"
 
 [OUTPUT]
@@ -38,10 +35,9 @@ seed = 123123
   output_frequency = 100
   print_frequency = 100
   full_update_freq = 1
-  base_virtual = 10
-  
+
+  base_virtual = 10 
   triple_recursion = false
-  include_alternative_domain = true
 
 [MODEL]
   script_file = "hidden_states.lua"

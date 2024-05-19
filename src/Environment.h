@@ -20,7 +20,7 @@ public:
   // Configuration parameters.
   int seed;                   // random number generator seed
   bool debug;                 // turns debugging on or off
-  bool ancestral_sequences;   // true if the ancestral_sequences have already been sampled.
+  //bool ancestral_sequences;   // true if the ancestral_sequences have already been sampled.
 
   template<typename T>
   T get(std::string);

@@ -11,16 +11,9 @@ seed = 23241234
 
 # Uniformization Constant
 [UNIFORMIZATION]
-  dynamic = false
-  sample_frequency = 2000
-  refresh_tree_on_update = true
   initial_value = 0.2
-  threshold = 0.01
-  max_step = 0.005
 
 [INPUT]
-  # This should be TRUE or FALSE
-  ancestral_sequences = false
   tree_file = "datasets/tree.newick"
 
 [OUTPUT]
@@ -37,18 +30,15 @@ seed = 23241234
   log_out_file = "run.log"
 
 [MCMC]
-  #generations = "1000001"
   generations = "1000000"
   position_sample_count = 6
   full_update_freq = 100
   alignment_sample_frequency = 2500
   output_frequency = 1000
   print_frequency = 1000
-  triple_recursion = true
-  rare_threshold = 0.001
 
   base_virtual = 0
-  include_alternative_domain = true # has no effect when there is only one state domain.
+  triple_recursion = true
 
 [MODEL]
   script_file = "basic_model_expand.lua"

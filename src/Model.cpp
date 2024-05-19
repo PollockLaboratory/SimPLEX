@@ -22,19 +22,16 @@ Model::Model() {
 }
 
 Valuable* Model::create_uniformization_constant() {
-  Valuable* val =  nullptr;
-  if(env.get<bool>("UNIFORMIZATION.dynamic")) {
-    UniformizationConstant* u = new UniformizationConstant(env.get<double>("UNIFORMIZATION.initial_value"));
-    //u->set_initial();
-    components.add_parameter(u, env.get<int>("UNIFORMIZATION.sample_frequency"));
-    val = u; 
-  } else {
-    FixedFloat* f = new FixedFloat("U", env.get<double>("UNIFORMIZATION.initial_value"));
-    f->hide();
-    components.add_parameter(f);
-    val = f;
-  }
-  return(val);
+  /*
+   * This create the uniformization constant as a model parameter.
+   * This is not strictly necessary as it is a static value, however this was more complicated
+   * when there was a possibility that the uniformization constant could change.
+   * This would be a cool feature, but it appears more trouble than its worth at this point.
+   */
+  FixedFloat* f = new FixedFloat("U", env.get<double>("UNIFORMIZATION.initial_value"));
+  f->hide();
+  components.add_parameter(f);
+  return(f);
 }
 
 void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &raw_sm) {

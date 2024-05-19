@@ -388,40 +388,38 @@ double SequenceAlignment::find_state_prob_given_dec_branch(BranchSegment* branch
 
   float t_b = branch->distance;
 
-  bool include_alt_domain = env.get<bool>("MCMC.include_alternative_domain");
-
   for(state_element state_j = 0; state_j < (state_element)n_states; state_j++) {
     double state_prob = state_probs[state_j];
 
     if(state_prob != 0.0) {
       // Likelihood contribution of all substitutions - including alternate domains.
       for(BranchSegment::iterator it = branch->begin(pos); it != branch->end(); it++) {
-	std::string domain = (*it).first;
+        std::string domain = (*it).first;
 
-	if(domain == this->domain_name) {
-	  double rate = rv[state_j]->get_value();
-	  if(state_i != state_j) {
-	    // Normal Substitution
-	    focal_domain_prob = calc_substitution_prob(rate, t_b, u);
-	  } else {
-	    // No substitution - or possibly virtual.
-	    focal_domain_prob = calc_no_substitution_prob(rate, t_b, u);
-	  }
-	} else if(include_alt_domain) {
-	  // Subsitutions in non focal domain.
-	  Substitution sub = (*it).second;
-	  std::map<std::string, state_element> context = {{domain, sub.anc_state},
-	  						  {this->domain_name, state_i}};
+        if(domain == this->domain_name) {
+          double rate = rv[state_j]->get_value();
+          if(state_i != state_j) {
+            // Normal Substitution
+            focal_domain_prob = calc_substitution_prob(rate, t_b, u);
+          } else {
+            // No substitution - or possibly virtual.
+            focal_domain_prob = calc_no_substitution_prob(rate, t_b, u);
+          }
+        } else {
+          // Subsitutions in non focal domain.
+          Substitution sub = (*it).second;
+          std::map<std::string, state_element> context = {{domain, sub.anc_state},
+                                                          {this->domain_name, state_i}};
 
-	  RateVector* rv = branch->get_hypothetical_rate_vector(domain, context, pos);
+          RateVector* rv = branch->get_hypothetical_rate_vector(domain, context, pos);
 
-	  if(sub.occuredp and (sub.anc_state != sub.dec_state)) {
-	    // Substitution including virtual substitutions.
-	    alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
-	  } else {
-	   alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
-	  }
-	}	
+          if(sub.occuredp and (sub.anc_state != sub.dec_state)) {
+            // Substitution including virtual substitutions.
+            alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
+          } else {
+            alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
+          }
+        }	
       }
       prob += (state_prob * focal_domain_prob * alt_domain_prob);
 
@@ -445,42 +443,40 @@ double SequenceAlignment::find_state_prob_given_anc_branch(BranchSegment* branch
 
   float t_b = branch->distance;
 
-  bool include_alt_domain = env.get<bool>("MCMC.include_alternative_domain");
-
   for(state_element state_i = 0; state_i < (signed char)n_states; ++state_i) {
     double state_prob = state_probs[state_i];
     if(state_prob != 0.0) {
       for(BranchSegment::iterator it = branch->begin(pos); it != branch->end(); it++) {
-	std::string domain = (*it).first;
+        std::string domain = (*it).first;
 
-	if(domain == this->domain_name) {
-	  // Focal Domain
-	  std::map<std::string, state_element> context = {{this->domain_name, state_i}};
-	  RateVector* rv = node->up->get_hypothetical_rate_vector(domain_name, context, pos);
+        if(domain == this->domain_name) {
+          // Focal Domain
+          std::map<std::string, state_element> context = {{this->domain_name, state_i}};
+          RateVector* rv = node->up->get_hypothetical_rate_vector(domain_name, context, pos);
 
-	  double rate = rv->rates[state_j]->get_value(); // i -> j rate.
-	  if(state_i != state_j) {
-	    // Normal Substitution.
-	    focal_domain_prob = calc_substitution_prob(rate, t_b, u); // Probability of the substitution.
-	  } else {
-	    // No substition - possibly virtual.
-	    focal_domain_prob = calc_no_substitution_prob(rate, t_b, u);
-	  }
+          double rate = rv->rates[state_j]->get_value(); // i -> j rate.
+          if(state_i != state_j) {
+            // Normal Substitution.
+            focal_domain_prob = calc_substitution_prob(rate, t_b, u); // Probability of the substitution.
+          } else {
+            // No substition - possibly virtual.
+            focal_domain_prob = calc_no_substitution_prob(rate, t_b, u);
+          }
 
-	} else if(include_alt_domain) {
-	  // Alternative domains.
-	  Substitution sub = (*it).second;
-	  std::map<std::string, state_element> context = {{domain, sub.anc_state},
-							  {this->domain_name, state_i}};
-	  
-	  RateVector* rv = branch->get_hypothetical_rate_vector(domain, context, pos);
-	  if(sub.occuredp and (sub.anc_state != sub.dec_state)) {
-	    //Substitution including virtual substitutions.
-	    alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
-	  } else {
-	    alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
-	  }
-	}
+        } else {
+          // Alternative domains.
+          Substitution sub = (*it).second;
+          std::map<std::string, state_element> context = {{domain, sub.anc_state},
+                                                          {this->domain_name, state_i}};
+          
+          RateVector* rv = branch->get_hypothetical_rate_vector(domain, context, pos);
+          if(sub.occuredp and (sub.anc_state != sub.dec_state)) {
+            //Substitution including virtual substitutions.
+            alt_domain_prob *= calc_substitution_prob(rv->rates[sub.dec_state]->get_value(), t_b, u);
+          } else {
+            alt_domain_prob *= calc_no_substitution_prob(rv->rates[sub.anc_state]->get_value(), t_b, u);
+          }
+        }
       }
       prob += (state_prob * focal_domain_prob * alt_domain_prob);
 

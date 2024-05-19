@@ -11,16 +11,9 @@ seed = 0
 
 # Uniformization Constant
 [UNIFORMIZATION]
-  dynamic = false
-  sample_frequency = 2000
-  refresh_tree_on_update = true
   initial_value = 0.2
-  threshold = 0.01
-  max_step = 0.005
 
 [INPUT]
-  # This should be TRUE or FALSE
-  ancestral_sequences = false
   tree_file = "dataset/G1LLZ1_Archaea.newick"
 
 [OUTPUT]
@@ -43,22 +36,22 @@ seed = 0
   position_sample_count = 175
   output_frequency = 1100000
   print_frequency = 50000
-  triple_recursion = false
+
   base_virtual = 100
-  include_alternative_domain = true
+  triple_recursion = false
 
 [MODEL]
   script_file = "intrinsic_order_model.lua"
 
   #Primary states.
-  states = ["A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"]
+  states = [ "A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"]
   sequences_file = "dataset/G1LLZ1_Archaea.fasta"
 
   sequences_out_file = "aa_sequences.fasta"
   substitutions_out_file = "aa_substitutions.csv"
 
   # Intrinsic Order/Disorder States.
-  intrinsic_order_states = ["O", "D" ]
+  intrinsic_order_states = [ "O", "D" ]
   intrinsic_order_sequences_file = "dataset/G1LLZ1_Archaea.iupred.io_prediction.efasta"
 
   intrinsic_order_sequences_out_file = "intrinsic_order_sequences.fasta"

@@ -11,15 +11,9 @@ seed = 0
 
 # Uniformization Constant
 [UNIFORMIZATION]
-  dynamic = false
-  sample_frequency = 2000
-  refresh_tree_on_update = true
   initial_value = 0.5
-  threshold = 0.01
-  max_step = 0.005
 
 [INPUT]
-  ancestral_sequences = false # Experimental - if true the tree_file must provide sequences for all inner nodes or tree also. No ancestral resampling.
   tree_file = "datasets/tree.newick"
 
 [OUTPUT]
@@ -41,9 +35,9 @@ seed = 0
   position_sample_count = 10
   output_frequency = 100
   print_frequency = 100
-  triple_recursion = false
+
   base_virtual = 0
-  include_alternative_domain = true
+  triple_recursion = false
 
 [MODEL]
   script_file = "basic_model.lua"

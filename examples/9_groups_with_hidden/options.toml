@@ -11,16 +11,9 @@ seed = 0
 
 # Uniformization Constant
 [UNIFORMIZATION]
-  dynamic = false
-  sample_frequency = 2000
-  refresh_tree_on_update = true
   initial_value = 0.5
-  threshold = 0.01
-  max_step = 0.005
 
 [INPUT]
-  # This should be TRUE or FALSE
-  ancestral_sequences = false
   tree_file = "datasets/tree.newick"
 
 [OUTPUT]
@@ -43,10 +36,9 @@ seed = 0
   output_frequency = 100
   print_frequency = 100
   position_sample_count = 20
-  base_virtual = 0
 
+  base_virtual = 0
   triple_recursion = true
-  include_alternative_domain = true
 
 [MODEL]
   script_file = "groups-with-hidden.lua"

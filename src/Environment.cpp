@@ -29,7 +29,7 @@ void Environment::ReadOptions(int argc, char* argv[]) {
   ReadTOMLfile(argv[1]);
 
   debug = get<bool>("debug");
-  ancestral_sequences = get<bool>("INPUT.ancestral_sequences");
+  //ancestral_sequences = get<bool>("INPUT.ancestral_sequences");
 
   InitializeRandomNumberGeneratorSeed();
 }

@@ -24,7 +24,7 @@ To install them on Ubuntu/Debian based linux distributions use:
 
 The simplest way to compile and install SimPLEX is to use the install script. This will automatically carry out the following commands and copy the SimPLEX binary to the /usr/bin directory on the user PATH.
 
-	$ sudo ./install.sh
+	$ ./install.sh
 	
 To install SimPLEX manually, use the following commands: 
 
@@ -44,7 +44,7 @@ And to finally compile SimPLEX:
 
 	$ make
 	
-They can be used to testTest that everything is working:
+They can be used to test that everything is working:
 
 	$ ./bin/SimPLEX --version
    	
