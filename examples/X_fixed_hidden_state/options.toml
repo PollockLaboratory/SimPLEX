@@ -1,0 +1,50 @@
+debug = true
+seed = 0
+
+# Tree Settings
+[TREE]
+  max_segment_probability = 0.08
+  branch_split_algorithm = 1
+  scale_tree = true
+  target_tree_length = 1.0
+  resolve_multifurcation = true
+
+# Uniformization Constant
+[UNIFORMIZATION]
+  initial_value = 0.5
+
+[INPUT]
+  tree_file = "datasets/tree.newick"
+
+[OUTPUT]
+  output_directory = "/output"
+  output_directory_append_time = false
+  overwrite_output = true
+  
+  tree_out_file = "tree_out.newick"
+  parameters_out_file = "parameters_out.csv"
+  parameters_counts_out_file = "parameters_out_file.csv"
+  rate_vectors_out_file = "rate_vectors_out.csv"
+  likelihood_out_file = "likelihoods_out.csv"
+  counts_out_file = "counts.csv"
+
+[MCMC]
+  generations = "10001"
+  full_update_freq = 200
+  alignment_sample_frequency = 200
+  position_sample_count = 10
+  output_frequency = 100
+  print_frequency = 100
+
+  base_virtual = 0
+  triple_recursion = false
+
+[MODEL]
+  script_file = "basic_model.lua"
+
+  # These configuration options are read inside model lua file.
+  sequences_file = "datasets/nucleotide.fasta"
+
+  sequences_out_file = ""
+  substitutions_out_file = "substitutions.out"
+  step_size = 0.0005

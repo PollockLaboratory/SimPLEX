@@ -69,7 +69,7 @@ public:
 
   std::list<std::list<signed char>> configure_hash(std::map<std::string, States> all_states);
 
-  void add(RateVector* v, IO::rv_use_class);
+  void add(RateVector* v, IO::RVScope);
   void organize();
 
   RateVector* select(rv_request);
@@ -93,7 +93,7 @@ public:
   std::list<signed char> ex_to_list(ExtendedState);
   
   // Old
-  std::map<int, IO::rv_use_class> id_to_uc; // Only used to before RateVectors are organized.
+  std::map<int, IO::RVScope> id_to_uc; // Only used to before RateVectors are organized.
 
   // Tree structure of Rate Vectors.
   // Organized via positions -> states -> possible RateVectors.

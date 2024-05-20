@@ -18,30 +18,37 @@ class Tree;
 class TreeNode;
 class BranchSegment;
 
-class SequenceAlignment {
- public:
+class SequenceAlignment { 
+  public:
+  enum class Tag {
+    DYNAMIC // This sequence alignment can be samples and can change across the tree.
+  };
   Tree* tree;
-  std::string domain_name; // Domain.
+
+  std::string domain_name; // State domain.
   unsigned int n_columns;
   unsigned int n_states;
-
-  SequenceAlignment(std::string name, std::string msa_out, std::string subs_out, const States*);
+  Tag tag;
 
   // States
   std::set<std::string> states;
   std::map<std::string, state_element> state_element_encode;
   std::map<state_element, std::string> state_element_decode;
 
+  // Constructor
+  SequenceAlignment(std::string name, std::string msa_out, std::string subs_out, const States*);
+
+  void initialize_dynamic(IO::RawMSA raw_msa);
+
   // Adding sequences to alignment.
   void add_internal(std::string name);
   void add_base(std::string name, const IO::FreqSequence &seq);
 
   void print();
-  void Initialize(IO::RawMSA raw_msa);
   void saveToFile(int i, uint128_t gen, double l);
 
   // Utilities
-  int n_cols();
+  unsigned int n_cols();
   std::string decode_state_element(state_element c);
   std::string decode_state_element_sequence(std::vector<state_element> &enc_seq);
   void find_parsimony_by_position(unsigned int pos);

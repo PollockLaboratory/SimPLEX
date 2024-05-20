@@ -13,7 +13,7 @@ sol::state lua;
 
 namespace IO {
   // RAW RATE VECTORS.
-  raw_rate_vector::raw_rate_vector(std::string name, rv_use_class uc, std::list<AbstractComponent*> new_rates) : name(name), uc(uc) {
+  raw_rate_vector::raw_rate_vector(std::string name, RVScope uc, std::list<AbstractComponent*> new_rates) : name(name), uc(uc) {
     static int i = -1;
     i++;
     ID = i;
@@ -69,39 +69,45 @@ namespace IO {
     std::string fh = "state_"+domain;
     files.add_file(fh, file_name, IOtype::INPUT);
 
-    IO::RawMSA MSA = {};
+    IO::RawMSA *MSA = new IO::RawMSA();
     try {
-      MSA = readRawMSA(files.read_all(fh), it->second);
+      *MSA = readRawMSA(files.read_all(fh), it->second);
     } catch(IO::ParseException const &err) {
       throw IO::ParseException(std::string("error reading ") + file_name + ": " + err.what());
     }
 
-    state_data[domain] = MSA;
+    StateData sd = { StateData::Tag::DYNAMIC, {} };
+    sd.data.dynamic = MSA;
+
+    //state_data[domain] = MSA;
+    state_data[domain] = sd;
   }
 
   void raw_substitution_model::generate_uniform_data(std::string domain) {
+    std::cout << "Implement me" << std::endl;
+    exit(EXIT_FAILURE);
     // Get the states.
-    std::list<std::string> states = all_states[domain];
+    //std::list<std::string> states = all_states[domain];
 
     // Find a MSA that is filled with external data.
     // This template msa is used to find the location of gaps.
-    IO::RawMSA template_msa;
-    for(auto it = state_data.begin(); it != state_data.end(); ++it) {
-      std::cout << it->first << " " << it->second.n << " " << it->second.cols << std::endl;
-      if(it->first == domain) {
-	std::cerr << "Error: cannot create a uniform prior for " << domain << ", as data for that domain already exists." << std::endl;
-	exit(EXIT_FAILURE);
-      } else {
-	template_msa = it->second;
-	break;
-      }
-    }
+    //IO::RawMSA template_msa;
+    //for(auto it = state_data.begin(); it != state_data.end(); ++it) {
+    //  std::cout << it->first << " " << it->second->n << " " << it->second->cols << std::endl;
+    //  if(it->first == domain) {
+    //    std::cerr << "Error: cannot create a uniform prior for " << domain << ", as data for that domain already exists." << std::endl;
+    //    exit(EXIT_FAILURE);
+    //  } else {
+    //    template_msa = it->second;
+    //    break;
+    //  }
+    //}
 
-    IO::RawMSA msa = IO::createUniformPrior(states, template_msa);
+    //IO::RawMSA msa = IO::createUniformPrior(states, template_msa);
 
-    IO::printRawAdvMSA(msa);
+    //IO::printRawAdvMSA(msa);
 
-    state_data[domain] = msa;
+    //state_data[domain] = msa;
   }
  
   std::list<int> get_positions(sol::table pos_tbl) {
@@ -113,11 +119,11 @@ namespace IO {
       sol::optional<int> maybe_param = val.as<sol::optional<int>>();
 
       if(maybe_param) {
-	int p = maybe_param.value();
-	out.push_back(p);
+        int p = maybe_param.value();
+        out.push_back(p);
       } else {
-	std::cerr << "Error: expecting a integer in pos table for new rate vector."  << std::endl;
-	exit(EXIT_FAILURE);
+        std::cerr << "Error: expecting a integer in pos table for new rate vector."  << std::endl;
+        exit(EXIT_FAILURE);
       }
     }
     return(out);
@@ -133,8 +139,8 @@ namespace IO {
     } else {
       state_domain = info_tbl["domain"];
       if(all_states.find(state_domain) == all_states.end()) {
-	std::cerr << "Error: domain \"" << state_domain << "\" has not been specified." << std::endl;
-	exit(EXIT_FAILURE);
+        std::cerr << "Error: domain \"" << state_domain << "\" has not been specified." << std::endl;
+        exit(EXIT_FAILURE);
       }
     }
 
@@ -142,13 +148,13 @@ namespace IO {
     // Check Secondary States.
     for(auto it = all_states.begin(); it != all_states.end(); ++it) {
       if(it->first != state_domain) {
-	if(info_tbl[it->first] == nullptr) {
-	  std::cerr << "Error: specify for which state (in domain \"" << it->first << "\") rate vector " << name << " applies to." << std::endl;
-	  exit(EXIT_FAILURE);
-	}
+        if(info_tbl[it->first] == nullptr) {
+          std::cerr << "Error: specify for which state (in domain \"" << it->first << "\") rate vector " << name << " applies to." << std::endl;
+          exit(EXIT_FAILURE);
+        }
 
-	// Check valid state has been specified.
-	secondary_state[it->first] = info_tbl[it->first];
+        // Check valid state has been specified.
+        secondary_state[it->first] = info_tbl[it->first];
       }
     }
 
@@ -161,8 +167,7 @@ namespace IO {
       exit(EXIT_FAILURE);		 
     }
 
-    std::list<int> possible_pos = get_positions(info_tbl["pos"]);
-    rv_use_class uc = {state_domain, state, possible_pos, secondary_state};
+    RVScope uc = {state_domain, state, secondary_state};
     std::list<AbstractComponent*> rates = {};
 
     for(auto kvp : params_tbl) {
@@ -171,10 +176,10 @@ namespace IO {
       sol::optional<ParameterWrapper> maybe_param = val.as<sol::optional<ParameterWrapper>>();
 
       if(maybe_param) {
-	rates.push_back(maybe_param.value().parameter);
+        rates.push_back(maybe_param.value().parameter);
       } else {
-	std::cerr << "Error: expecting a Parameter."  << std::endl;
-	exit(EXIT_FAILURE);
+        std::cerr << "Error: expecting a Parameter."  << std::endl;
+        exit(EXIT_FAILURE);
       }
     }
 
@@ -308,7 +313,7 @@ namespace IO {
     return(rv_list);
   }
 
-  const IO::RawMSA raw_substitution_model::get_state_data(std::string name) {
+  const StateData raw_substitution_model::get_state_data(std::string name) {
     return(state_data[name]);
   }
 

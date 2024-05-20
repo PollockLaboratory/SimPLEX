@@ -23,13 +23,13 @@ static const state_element gap_indicator = -1;
 
 SequenceAlignment::SequenceAlignment(std::string name, std::string msa_out, std::string subs_out, const States* states) : domain_name(name) {
   this->states = states->possible;
-  n_states = states->n;
+  this->n_states = states->n;
 
-  state_element_encode = states->state_to_int;
-  state_element_decode = states->int_to_state;
+  this->state_element_encode = states->state_to_int;
+  this->state_element_decode = states->int_to_state;
 
-  seqs_out_file = msa_out;
-  substitutions_out_file = subs_out;
+  this->seqs_out_file = msa_out;
+  this->substitutions_out_file = subs_out;
 }
 
 void SequenceAlignment::add_internal(std::string name) {
@@ -63,9 +63,9 @@ void SequenceAlignment::add_base(std::string name, const IO::FreqSequence &seq) 
     for(auto jt = it->begin(); jt != it->end(); ++jt) {
       // Loop through states.
       if(jt->state != '-') {
-	prior_state_distribution[name][pos][state_element_encode[std::string(1, jt->state)]] = jt->freq;
+        prior_state_distribution[name][pos][state_element_encode[std::string(1, jt->state)]] = jt->freq;
       } else {
-	assert(jt->freq == 1.0);
+        assert(jt->freq == 1.0);
       }
     }
     pos++;
@@ -92,7 +92,9 @@ void SequenceAlignment::print() {
   }
 }
 
-void SequenceAlignment::Initialize(IO::RawMSA raw_msa) {
+void SequenceAlignment::initialize_dynamic(IO::RawMSA raw_msa) {
+  this->tag = Tag::DYNAMIC;
+    
   for(auto it = raw_msa.seqs.begin(); it != raw_msa.seqs.end(); ++it) {
     add_base(it->first, it->second);
   }
@@ -105,7 +107,7 @@ void SequenceAlignment::Initialize(IO::RawMSA raw_msa) {
   files.add_file(substitutions_out_identifier, substitutions_out_file, IOtype::OUTPUT);
   files.write_to_file(substitutions_out_identifier, "I,GEN,LogL,Ancestral,Decendant,Substitutions\n");
 
-  n_columns = (*taxa_names_to_sequences.begin()).second.size();
+  this->n_columns = (*taxa_names_to_sequences.begin()).second.size();
 }
 
 void SequenceAlignment::saveToFile(int save_count, uint128_t gen, double l) {
@@ -127,11 +129,11 @@ void SequenceAlignment::saveToFile(int save_count, uint128_t gen, double l) {
     std::vector<Substitution> subs = (*it)->get_substitutions(domain_name);
     for(unsigned int pos = 0; pos < subs.size(); pos++) {
       if(subs[pos].occuredp == true) {
-	int anc = (*it)->ancestral->sequences[domain_name]->at(pos);
-	int dec = (*it)->decendant->sequences[domain_name]->at(pos);
+        int anc = (*it)->ancestral->sequences[domain_name]->at(pos);
+        int dec = (*it)->decendant->sequences[domain_name]->at(pos);
 
-	// Includes virtual substitutions.
-	subs_buffer << state_element_decode[anc] << pos << state_element_decode[dec] << " ";
+        // Includes virtual substitutions.
+        subs_buffer << state_element_decode[anc] << pos << state_element_decode[dec] << " ";
       }
     }
     subs_buffer << "]\n";
@@ -158,12 +160,12 @@ void SequenceAlignment::syncWithTree(std::string domain_name, unsigned int id, T
       n->sequences[domain_name] = &(taxa_names_to_sequences.at(n->name));
     } else {
       if(n->isTip()){
-	std::cerr << "Error: Missing sequence for \"" << n->name << "\"." << std::endl;
-	exit(EXIT_FAILURE);
+        std::cerr << "Error: Missing sequence for \"" << n->name << "\"." << std::endl;
+        exit(EXIT_FAILURE);
       } else {
-	// Add new sequence to sequence alignments.
-	add_internal(n->name);
-	n->sequences[domain_name] = &(taxa_names_to_sequences.at(n->name));	
+        // Add new sequence to sequence alignments.
+        add_internal(n->name);
+        n->sequences[domain_name] = &(taxa_names_to_sequences.at(n->name));	
       }
     }
   }
@@ -179,25 +181,25 @@ void SequenceAlignment::syncWithTree(std::string domain_name, unsigned int id, T
       // Internal Continous.
       TreeNode* dsNode = n->left->decendant; // ds = downstream.
       for(unsigned int i = 0; i < dsNode->sequences[domain_name]->size(); i++) {
-	taxa_names_to_gaps[n->name][i] = taxa_names_to_gaps[dsNode->name][i];
+        taxa_names_to_gaps[n->name][i] = taxa_names_to_gaps[dsNode->name][i];
       }
     } else {
       for(unsigned int pos = 0; pos < n->sequences[domain_name]->size(); pos++) {
-	// Checks left branch first - there is always a left branch, except tips.
-	if(taxa_names_to_gaps[n->left->decendant->name][pos]) {
-	  // Checks right branch next - right branches only on branching segment.
-	  if(n->right) {
-	    if(taxa_names_to_gaps[n->right->decendant->name][pos]) {
-	      taxa_names_to_gaps[n->name][pos] = true;
-	    } else {
-	      taxa_names_to_gaps[n->name][pos] = false;
-	    }
-	  } else {
-	    taxa_names_to_gaps[n->name][pos] = true;
-	  }
-	} else {
-	  taxa_names_to_gaps[n->name][pos] = false;
-	}
+        // Checks left branch first - there is always a left branch, except tips.
+        if(taxa_names_to_gaps[n->left->decendant->name][pos]) {
+          // Checks right branch next - right branches only on branching segment.
+          if(n->right) {
+            if(taxa_names_to_gaps[n->right->decendant->name][pos]) {
+              taxa_names_to_gaps[n->name][pos] = true;
+            } else {
+              taxa_names_to_gaps[n->name][pos] = false;
+            }
+          } else {
+            taxa_names_to_gaps[n->name][pos] = true;
+          }
+        } else {
+          taxa_names_to_gaps[n->name][pos] = false;
+        }
       }
     }
   }
@@ -235,7 +237,7 @@ std::vector<state_element> SequenceAlignment::encode_sequence(const std::string 
 }
 
 // Utilities
-int SequenceAlignment::n_cols() {
+unsigned int SequenceAlignment::n_cols() {
   return(n_columns);
 }
 

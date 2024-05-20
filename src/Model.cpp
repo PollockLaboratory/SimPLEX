@@ -34,6 +34,26 @@ Valuable* Model::create_uniformization_constant() {
   return(f);
 }
 
+SequenceAlignment* initialize_dynamic_alignment(std::string name, const IO::RawMSA* raw_msa, const States* states, std::string seqs_out_file, std::string subs_out_file) {
+  SequenceAlignment* MSA = new SequenceAlignment(name, seqs_out_file, subs_out_file, states); 
+  MSA->initialize_dynamic(*raw_msa);
+
+  return MSA;
+}
+
+std::optional<unsigned int> find_column_count(const std::map<std::string, SequenceAlignment*>& all_MSAs) {
+  std::optional<unsigned int> n_cols;
+  for(auto it = all_MSAs.begin(); it != all_MSAs.end(); ++it) {
+    if (n_cols) {
+      // If the column number is not consistant return null option.
+      if (n_cols.value() != it->second->n_cols()) return std::nullopt;
+    } else {
+      n_cols = std::optional<unsigned int>(it->second->n_cols());
+    }
+  }
+  return n_cols;
+}
+
 void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &raw_sm) {
 
   std::cout << "Initializing model:" << std::endl;
@@ -53,34 +73,46 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &
 
   std::list<std::string> tip_sequences = getRawTreeNodeTipNames(raw_tree);
 
-  // STATE DOMAINS.
-  unsigned int n_cols = 0;
+  // STATE DOMAINS / DATA
   std::map<std::string, SequenceAlignment*> all_MSAs = {};
-  std::map<std::string, std::list<std::string>> all_state_domains = raw_sm->get_all_states();
   std::list<std::string> state_domain_names = {};
+
+  std::map<std::string, std::list<std::string>> all_state_domains = raw_sm->get_all_states();
   for(auto it = all_state_domains.begin(); it != all_state_domains.end(); ++it) {
     state_domain_names.push_back(it->first);
-    const States *state_domain = substitution_model->get_state_domain(it->first);
+    const States *states = substitution_model->get_state_domain(it->first);
 
-    std::cout << "\t\tReading new states domain: ";
-    print_States(*state_domain);
-    SequenceAlignment* MSA = new SequenceAlignment(it->first,
-						   raw_sm->states_seqs_output_files[it->first],
-						   raw_sm->states_subs_output_files[it->first],
-						   state_domain);
-    MSA->Initialize(raw_sm->get_state_data(it->first));
+    std::cout << "\t\tReading new states domain \'" << it->first << "\': "; print_States(*states);
 
-    // Validate MSAs.
-    // Check node names are consistant between tree and sequence alignment.
-    // TODO - Check pattern of gaps is consistant.
-    if(MSA->validate(tip_sequences, all_MSAs) != true) {
-      std::cerr << "Error: sequence alignment for domain \"" << it->first << "\" cannot be validated." << std::endl;
-      exit(EXIT_FAILURE);
+    IO::StateData state_data = raw_sm->get_state_data(it->first);
+    switch(state_data.tag) {
+    case IO::StateData::Tag::DYNAMIC: {
+      const IO::RawMSA* raw_msa = state_data.data.dynamic;
+      SequenceAlignment* MSA = initialize_dynamic_alignment(it->first, raw_msa, states, raw_sm->states_seqs_output_files[it->first], raw_sm->states_subs_output_files[it->first]);
+ 
+      // Validate MSAs.
+      // Check node names are consistant between tree and sequence alignment.
+      // TODO - Check pattern of gaps is consistant.
+      if(MSA->validate(tip_sequences, all_MSAs) != true) {
+        std::cerr << "Error: sequence alignment for domain \"" << it->first << "\" cannot be validated." << std::endl;
+        exit(EXIT_FAILURE);
+      }
+
+      all_MSAs[it->first] = MSA;
+      break;
     }
+    default: {
+      std::cout << "Error: state data type not recognised." << std::endl;
+      exit(EXIT_FAILURE);
+      break;
+    }
+    }
+  }
 
-    all_MSAs[it->first] = MSA;
-
-    n_cols = MSA->n_cols();
+  std::optional<unsigned int> n_col_opt = find_column_count(all_MSAs);
+  if (not n_col_opt.has_value()) {
+    std::cout << "Error: MSA column counts are not equal across states." << std::endl;
+    exit(EXIT_FAILURE);
   }
 
   // Configuring the Tree.
@@ -89,24 +121,32 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &
   tree = new Tree();
   tree->Initialize(raw_tree);
   tree->connect_substitution_model(substitution_model);
-  tree->configure_branches(tree->root, n_cols, state_domain_names);
+  tree->configure_branches(tree->root, n_col_opt.value(), state_domain_names);
 
   // Configuring sequences.
   unsigned int n_sample = env.get<unsigned int>("MCMC.position_sample_count");
   RateVectorAssignmentParameter* rvap = new RateVectorAssignmentParameter(tree);
 
-  UniformizationConstant* u_param = dynamic_cast<UniformizationConstant*>(u);
   unsigned int ctr = 0;
   for(auto it = all_MSAs.begin(); it != all_MSAs.end(); ++it) {
-    it->second->syncWithTree(it->first, ctr, tree);
-    ctr++;
-    SequenceAlignmentParameter* msa_parameter = new SequenceAlignmentParameter(it->second, n_sample);
-    if(u_param and env.get<bool>("UNIFORMIZATION.refresh_tree_on_update")) {
-      msa_parameter->add_dependancy(u_param);
+    switch (it->second->tag) {
+    case SequenceAlignment::Tag::DYNAMIC: {
+      std::cout << it->first << "->DYNAMIC" << std::endl;
+      it->second->syncWithTree(it->first, ctr, tree);
+      ctr++;
+      SequenceAlignmentParameter* msa_parameter = new SequenceAlignmentParameter(it->second, n_sample);
+      msa_parameters.push_back(msa_parameter);
+
+      components.add_state_parameter(msa_parameter, env.get<int>("MCMC.alignment_sample_frequency"));
+      rvap->add_dependancy(msa_parameter);
+      break;
     }
-    components.add_state_parameter(msa_parameter, env.get<int>("MCMC.alignment_sample_frequency"));
-    rvap->add_dependancy(msa_parameter);
-    msa_parameters.push_back(msa_parameter);
+    default: {
+      std::cout << "Error: sequence alignment type not implemented." << std::endl;
+      exit(EXIT_FAILURE);
+      break;
+    }
+    }
   }
 
   // This should be closer to RateVector.Initialize() call.

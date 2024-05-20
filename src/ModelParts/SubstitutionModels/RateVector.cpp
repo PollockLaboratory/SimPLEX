@@ -94,7 +94,7 @@ void RateVectorSet::Initialize(std::map<std::string, States> all_states) {
   files.write_to_file("rate_vectors_out", buffer.str());
 }
 
-void RateVectorSet::add(RateVector* rv, IO::rv_use_class uc) {
+void RateVectorSet::add(RateVector* rv, IO::RVScope uc) {
   // Set the pointer inside the AbstractValue to point to the host rate vector.
   for(unsigned int i = 0; i < rv->rates.size(); i++) {
     // Set up the AbstractValues themselves.
@@ -249,7 +249,7 @@ void RateVectorSet::organize() {
       exit(EXIT_FAILURE);
     }
 
-    IO::rv_use_class uc = id_to_uc[(*it)->getID()];
+    IO::RVScope uc = id_to_uc[(*it)->getID()];
     ExtendedState s = ExtendedState_Null();
     s[uc.domain] = uc.state;
     std::list<ExtendedState> applicable_states = {s};
