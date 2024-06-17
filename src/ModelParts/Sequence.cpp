@@ -87,14 +87,13 @@ void SequenceAlignment::add_base(std::string name, const IO::FreqSequence &seq) 
 
 void SequenceAlignment::print() {
   std::cout << "SEQUENCES" << std::endl;
-  for(std::map<std::string, std::vector<state_element>>::iterator it = taxa_names_to_sequences.begin(); it != taxa_names_to_sequences.end(); ++it) {
-    std::cout << ">" << it->first << "\n" << decode_state_element_sequence(it->second) << std::endl;
+  //for(std::map<std::string, std::vector<state_element>>::iterator it = taxa_names_to_sequences.begin(); it != taxa_names_to_sequences.end(); ++it) {
+  for(const auto& [taxa_name, sequence] : this->taxa_names_to_sequences) {
+    std::cout << ">" << taxa_name << "\n" << decode_state_element_sequence(sequence) << std::endl;
   }
 }
 
-void SequenceAlignment::initialize_dynamic(IO::RawMSA raw_msa) {
-  this->tag = Tag::DYNAMIC;
-    
+void SequenceAlignment::initialize_common(IO::RawMSA raw_msa) {   
   for(auto it = raw_msa.seqs.begin(); it != raw_msa.seqs.end(); ++it) {
     add_base(it->first, it->second);
   }
@@ -107,7 +106,40 @@ void SequenceAlignment::initialize_dynamic(IO::RawMSA raw_msa) {
   files.add_file(substitutions_out_identifier, substitutions_out_file, IOtype::OUTPUT);
   files.write_to_file(substitutions_out_identifier, "I,GEN,LogL,Ancestral,Decendant,Substitutions\n");
 
+  // ASSUMES columns are same length.
   this->n_columns = (*taxa_names_to_sequences.begin()).second.size();
+}
+
+void SequenceAlignment::initialize_dynamic(IO::RawMSA raw_msa) {
+  this->tag = Tag::DYNAMIC;
+
+  this->initialize_common(raw_msa);
+}
+
+void SequenceAlignment::initialize_site_static(IO::RawMSA raw_msa) {
+  this->tag = Tag::SITE_STATIC;
+ 
+  this->initialize_common(raw_msa);
+
+  // VALIDATE that states are consistant across columns.
+  // And that nonoe of the sites have uncertain priors e.g. [A:0.5,B:0.5] etc.
+  std::vector<state_element> column_states(this->n_columns, -1);
+  for (const auto& [key, sequence] : this->taxa_names_to_sequences) {
+    for (size_t pos = 0; pos < sequence.size(); ++pos) {
+      if (column_states[pos] == -1) column_states[pos] = sequence[pos];
+      if (sequence[pos] != -1 and sequence[pos] != column_states[pos]) {
+        exit(EXIT_FAILURE);
+      }
+
+      for(size_t i = 0; i < this->states.size(); ++i) {
+        double state_probability = this->prior_state_distribution[key][pos][i];
+        if (state_probability != 0.0 and state_probability != 1.0) {
+          std::cout << "Error: uncertain state in SITE_STATIC state domain \'" << this->domain_name << "\'." << std::endl;
+          exit(EXIT_FAILURE);
+        }
+      }
+    }
+  }
 }
 
 void SequenceAlignment::saveToFile(int save_count, uint128_t gen, double l) {
@@ -141,7 +173,7 @@ void SequenceAlignment::saveToFile(int save_count, uint128_t gen, double l) {
   files.write_to_file(substitutions_out_identifier, subs_buffer.str());
 }
 
-void SequenceAlignment::syncWithTree(std::string domain_name, unsigned int id, Tree* tree) {
+void SequenceAlignment::syncWithTree(std::string domain_name, Tree* tree) {
   /*
     Connects all the tree nodes on the matching sequences in the MSAs for each state domain.
     Add new sequences to MSA for nodes present on the tree but missing in the alignment.
@@ -149,65 +181,54 @@ void SequenceAlignment::syncWithTree(std::string domain_name, unsigned int id, T
    */
 
   this->tree = tree;
-  std::cout << "\tAttaching " << domain_name << "[" << id << "] states to tree." << std::endl;
-  std::list<TreeNode*> nodes = tree->nodes();
+  std::cout << "\tAttaching \'" << domain_name << "\' states to tree." << std::endl;
 
-  for(auto it = nodes.begin(); it != nodes.end(); ++it) {
-    TreeNode* n = *it;
-    marginal_state_distribution[n->name] = create_state_probability_vector(n_columns, n_states);
+  for(const auto& node : tree->nodes()) {
+    this->marginal_state_distribution[node->name] = create_state_probability_vector(this->n_columns, this->n_states);
 
-    if(taxa_names_to_sequences.count(n->name)) {
-      n->sequences[domain_name] = &(taxa_names_to_sequences.at(n->name));
+    if(taxa_names_to_sequences.count(node->name)) {
+      node->sequences[domain_name] = &(this->taxa_names_to_sequences.at(node->name));
     } else {
-      if(n->isTip()){
-        std::cerr << "Error: Missing sequence for \"" << n->name << "\"." << std::endl;
+      if(node->isTip()){
+        std::cerr << "Error: Missing sequence for \"" << node->name << "\"." << std::endl;
         exit(EXIT_FAILURE);
       } else {
         // Add new sequence to sequence alignments.
-        add_internal(n->name);
-        n->sequences[domain_name] = &(taxa_names_to_sequences.at(n->name));	
+        this->add_internal(node->name);
+        node->sequences[domain_name] = &(this->taxa_names_to_sequences.at(node->name));	
       }
     }
   }
 
   // Set gaps for internal nodes.
-  for(auto it = nodes.begin(); it != nodes.end(); ++it) {
-    TreeNode* n = *it;
-    if(n->isTip()) {
-      continue;
-    }
+  for(const auto& node : tree->nodes()) {
+    if(node->isTip()) continue;
 
-    if(n->left != 0 and n->right == 0) {
+    if(node->left != 0 and node->right == 0) {
       // Internal Continous.
-      TreeNode* dsNode = n->left->decendant; // ds = downstream.
+      TreeNode* dsNode = node->left->decendant; // ds = downstream.
       for(unsigned int i = 0; i < dsNode->sequences[domain_name]->size(); i++) {
-        taxa_names_to_gaps[n->name][i] = taxa_names_to_gaps[dsNode->name][i];
+        this->taxa_names_to_gaps[node->name][i] = this->taxa_names_to_gaps[dsNode->name][i];
       }
     } else {
-      for(unsigned int pos = 0; pos < n->sequences[domain_name]->size(); pos++) {
+      for(unsigned int pos = 0; pos < node->sequences[domain_name]->size(); pos++) {
         // Checks left branch first - there is always a left branch, except tips.
-        if(taxa_names_to_gaps[n->left->decendant->name][pos]) {
+        if(this->taxa_names_to_gaps[node->left->decendant->name][pos]) {
           // Checks right branch next - right branches only on branching segment.
-          if(n->right) {
-            if(taxa_names_to_gaps[n->right->decendant->name][pos]) {
-              taxa_names_to_gaps[n->name][pos] = true;
-            } else {
-              taxa_names_to_gaps[n->name][pos] = false;
-            }
+          if(node->right) {
+            this->taxa_names_to_gaps[node->name][pos] = this->taxa_names_to_gaps[node->right->decendant->name][pos];
           } else {
-            taxa_names_to_gaps[n->name][pos] = true;
+            this->taxa_names_to_gaps[node->name][pos] = true;
           }
         } else {
-          taxa_names_to_gaps[n->name][pos] = false;
+          this->taxa_names_to_gaps[node->name][pos] = false;
         }
       }
     }
   }
 
   // Set initial states of internal sequences.
-  for(unsigned int i = 0; i < n_columns ; i++) {
-    find_parsimony_by_position(i);
-  } 
+  for(unsigned int i = 0; i < n_columns ; i++) find_parsimony_by_position(i);
 }
 
 // Reading Fasta files.
@@ -245,11 +266,9 @@ std::string SequenceAlignment::decode_state_element(state_element c) {
   return(state_element_decode[c]);
 }
 
-std::string SequenceAlignment::decode_state_element_sequence(std::vector<state_element> &enc_seq) {
+std::string SequenceAlignment::decode_state_element_sequence(const std::vector<state_element> &enc_seq) {
   std::string decoded_sequence;
-  for(std::vector<state_element>::iterator it = enc_seq.begin(); it != enc_seq.end(); ++it) {
-    decoded_sequence.append(decode_state_element(*it));
-  }
+  for(const auto& element : enc_seq) decoded_sequence.append(decode_state_element(element));
   return(decoded_sequence);
 }
 
@@ -407,7 +426,7 @@ double SequenceAlignment::find_state_prob_given_dec_branch(BranchSegment* branch
             // No substitution - or possibly virtual.
             focal_domain_prob = calc_no_substitution_prob(rate, t_b, u);
           }
-        } else {
+        } else if (not this->tree->get_SM()->is_static(domain)) {
           // Subsitutions in non focal domain.
           Substitution sub = (*it).second;
           std::map<std::string, state_element> context = {{domain, sub.anc_state},
@@ -465,7 +484,7 @@ double SequenceAlignment::find_state_prob_given_anc_branch(BranchSegment* branch
             focal_domain_prob = calc_no_substitution_prob(rate, t_b, u);
           }
 
-        } else {
+        } else if (not this->tree->get_SM()->is_static(domain)) {
           // Alternative domains.
           Substitution sub = (*it).second;
           std::map<std::string, state_element> context = {{domain, sub.anc_state},
@@ -549,7 +568,7 @@ void SequenceAlignment::find_state_probs_dec_only(TreeNode* node, std::list<unsi
    * Only uses infomation from nodes below - used for upward recursion.
    * Assumes that node is not a tip.
    */
-  
+
   std::string name = node->name;
   std::vector<bool> gaps = taxa_names_to_gaps[name];
   if(not node->isTip()) {
@@ -564,9 +583,9 @@ void SequenceAlignment::find_state_probs_dec_only(TreeNode* node, std::list<unsi
 
     for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
       if(not gaps[*pos]) {
-	// Always a left node.
-	find_marginal_at_pos(node, *pos, node->left->decendant, right_node, nullptr);
-	normalize_state_probs(node, *pos);
+        // Always a left node.
+        find_marginal_at_pos(node, *pos, node->left->decendant, right_node, nullptr);
+        normalize_state_probs(node, *pos);
       }
     }
   }
@@ -756,14 +775,12 @@ void SequenceAlignment::reverse_recursion(const std::list<unsigned int>& positio
    * Nodes are ordered in the list such that they are visted in order up the tree.
    */ 
 
-  const std::list<TreeNode*> nodes = this->tree->nodes();
-  
-  for(auto n = nodes.begin(); n != nodes.end(); ++n) {
-    if(not (*n)->isTip()) {
-      find_state_probs_dec_only(*n, positions);
+  for(const auto& n : this->tree->nodes()) {
+    if(not n->isTip()) {
+      find_state_probs_dec_only(n, positions);
     } else {
       // This is important as states at tips can be uncertain.
-      reset_to_base((*n)->name, positions);
+      reset_to_base(n->name, positions);
     }
 
     //std::cout << (*n)->name << " [ ";
@@ -775,14 +792,12 @@ void SequenceAlignment::reverse_recursion(const std::list<unsigned int>& positio
 }
 
 sample_status SequenceAlignment::sample_with_double_recursion(const std::list<unsigned int>& positions) {
-  const std::list<TreeNode*> nodes = tree->nodes();
-
   reverse_recursion(positions);
 
   // 2nd Recursion - Reverse recursion.
   // Skip first element of reverse list as thats the root - no need to sample second time.
-  for(auto n = nodes.rbegin(); n != nodes.rend(); ++n) {
-    TreeNode* node = *n;
+  for(const auto& node : tree->nodes()) { // = nodes.rbegin(); n != nodes.rend(); ++n) {
+    //TreeNode* node = *n;
     std::vector<bool> gaps = taxa_names_to_gaps[node->name];
 
     // Reculaculate state probability vector - including up branch.

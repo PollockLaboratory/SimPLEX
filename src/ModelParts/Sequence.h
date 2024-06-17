@@ -21,7 +21,8 @@ class BranchSegment;
 class SequenceAlignment { 
   public:
   enum class Tag {
-    DYNAMIC // This sequence alignment can be samples and can change across the tree.
+    DYNAMIC, // This sequence alignment can be samples and can change across the tree.
+    SITE_STATIC // Not samples - each column is statically assigned to state.
   };
   Tree* tree;
 
@@ -39,6 +40,7 @@ class SequenceAlignment {
   SequenceAlignment(std::string name, std::string msa_out, std::string subs_out, const States*);
 
   void initialize_dynamic(IO::RawMSA raw_msa);
+  void initialize_site_static(IO::RawMSA raw_msa);
 
   // Adding sequences to alignment.
   void add_internal(std::string name);
@@ -50,11 +52,11 @@ class SequenceAlignment {
   // Utilities
   unsigned int n_cols();
   std::string decode_state_element(state_element c);
-  std::string decode_state_element_sequence(std::vector<state_element> &enc_seq);
+  std::string decode_state_element_sequence(const std::vector<state_element> &enc_seq);
   void find_parsimony_by_position(unsigned int pos);
   std::list<std::string> getNodeNames();
 
-  void syncWithTree(std::string name, unsigned int id, Tree* tree);
+  void syncWithTree(std::string name, Tree* tree);
   void identify_gaps();
 
   // Sampling
@@ -65,7 +67,9 @@ class SequenceAlignment {
   // Validation.
   bool match_structure(SequenceAlignment*);
   bool validate(std::list<std::string> seq_names, std::map<std::string, SequenceAlignment*> other_alignments);
- private:
+private:
+  void initialize_common(IO::RawMSA raw_msa);
+
   // Processing input sequences - fasta.
   std::vector<signed char> encode_sequence(const std::string &sequence);
 

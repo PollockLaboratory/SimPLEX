@@ -134,12 +134,12 @@ void SubstitutionModel::organizeRateVectors() {
   rateVectors.organize();
 }
 
-RateVector* SubstitutionModel::selectRateVector(rv_request rq) {
+RateVector* SubstitutionModel::selectRateVector(RVQuery query) {
   /*
-   * This is a simple function right now but it will become hugely complex.
+   std::string domain* This is a simple function right now but it will become hugely complex.
    * Given infomation about a BranchSegment and state of interest will return the corresponding rate vector.
    */
-  return(rateVectors.select(rq));
+  return(rateVectors.select(query));
 }
 
 unsigned long SubstitutionModel::get_hash_state(std::map<std::string, signed char> states) {
@@ -166,7 +166,7 @@ void add_all_dependancies(std::list<AbstractComponent*>& all, std::set<AbstractC
 std::list<AbstractComponent*> SubstitutionModel::get_all_parameters() {
   std::set<AbstractComponent*> prev_parameters = {};
   std::list<AbstractComponent*> all_deps = {};
-  for(auto it = rateVectors.col.begin(); it != rateVectors.col.end(); ++it) {
+  for(auto it = rateVectors.collection.begin(); it != rateVectors.collection.end(); ++it) {
     for(auto jt = (*it)->rates.begin(); jt != (*it)->rates.end(); ++jt) {
       AbstractComponent* parameter = dynamic_cast<AbstractComponent*>(*jt);
       if(parameter == nullptr) {
@@ -179,8 +179,18 @@ std::list<AbstractComponent*> SubstitutionModel::get_all_parameters() {
   return(all_deps);
 }
 
+void SubstitutionModel::mark_static_state(std::string state_domain) {
+  // This marks a state as static/unsampled and therefore there is no need for rate vectors.
+  std::cout << state_domain << " - STATIC" << std::endl;
+  this->rateVectors.mark_static_state(state_domain);
+}
+
+bool SubstitutionModel::is_static(std::string state_domain) {
+  return(this->rateVectors.is_static(state_domain));
+}
+
 std::vector<RateVector*> SubstitutionModel::get_RateVectors() {
-  return(rateVectors.col);
+  return(rateVectors.collection);
 }
 
 void SubstitutionModel::saveToFile(uint128_t gen, double l, std::map<RateVector*, std::vector<double>> counts_by_rv) {

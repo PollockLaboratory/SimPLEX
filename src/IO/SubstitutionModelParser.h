@@ -13,16 +13,21 @@
 
 namespace IO {
   struct StateData {
-    enum Tag { DYNAMIC } tag;
+    enum Tag {
+      DYNAMIC, // state changes across tree and across sites.
+      SITE_STATIC // static across sites.
+    } tag;
+
     union {
       const RawMSA* dynamic;
+      const RawMSA* site_static;
     } data;
 
     ~StateData() {};
   };
     
   // RATE VECTOR
-  struct RVScope { // RENAME ME
+  struct RVScope {
     // Structure describing where a rate vector applies.
     std::string domain;
     std::string state;
@@ -58,11 +63,13 @@ namespace IO {
   private:
     void add_rate_vector(raw_rate_vector rv);
 
-    //std::map<std::string, const IO::RawMSA*> state_data;
     std::map<std::string, StateData> state_data;
 
     void add_state(std::string name, sol::table states, sol::table options);
-    void read_state_file(std::string domain, std::string file_name);
+
+    void load_dynamic_from_file(std::string domain, std::string file_name);
+    void load_site_static_from_file(std::string domain, std::string file_name);
+
     void generate_uniform_data(std::string domain);
   };
 

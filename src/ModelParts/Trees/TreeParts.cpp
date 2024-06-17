@@ -81,7 +81,7 @@ unsigned long BranchSegment::get_hypothetical_hash_state(std::map<std::string, s
 
 RateVector* BranchSegment::get_hypothetical_rate_vector(std::string focal_domain, std::map<std::string, state_element>& context, unsigned int pos) {
   unsigned long extended_state = this->get_hypothetical_hash_state(context, pos);
-  return(ancestral->SM->selectRateVector({pos, focal_domain, extended_state}));
+  return(ancestral->SM->selectRateVector({focal_domain, extended_state}));
 }
 
 BranchSegment::iterator::iterator(BranchSegment& branch, unsigned int pos, bool end): branch(branch), pos(pos) {
@@ -114,19 +114,18 @@ inline void BranchSegment::update_rate_vectors() {
   std::vector<state_element>* seq = ancestral->sequences.begin()->second;
   for(unsigned int pos = 0; pos < seq->size(); pos++) {
     if((*seq)[pos] != -1) {
-      unsigned long ex_state = ancestral->get_hash_state(pos);
+      unsigned long compound_state_hash = ancestral->get_hash_state(pos);
 
       // Set the rate vectors for each domain of the state.
-      for(auto it = ancestral->sequences.begin(); it != ancestral->sequences.end(); ++it) {
-	rv_request rq = {pos, it->first, ex_state};
+      for(const auto& [state_domain, sequence] : ancestral->sequences) {
+        if (this->ancestral->SM->is_static(state_domain)) continue;
+        RateVector* rv = ancestral->SM->selectRateVector({ state_domain, compound_state_hash });
+        if(rv == nullptr) {
+          std::cerr << "Error: cannot find RateVector for position: " << pos << " " << state_domain << std::endl;
+          exit(EXIT_FAILURE);
+        }
 
-	RateVector* rv = ancestral->SM->selectRateVector(rq);
-	if(rv == nullptr) {
-	  std::cerr << "Error: cannot find RateVector for position: " << pos << " " << it->first << std::endl;
-	  exit(EXIT_FAILURE);
-	}
-
-	rates[it->first][pos] = rv;
+        this->rates[state_domain][pos] = rv;
       }
     }
   }
@@ -134,40 +133,42 @@ inline void BranchSegment::update_rate_vectors() {
 
 void BranchSegment::set_new_substitutions() {
   // Set new substitutions for all state domains.
-  for(auto domain_it = substitutions.begin(); domain_it != substitutions.end(); ++domain_it) {
-    std::vector<state_element> *anc_seq = (ancestral->sequences[domain_it->first]);
-    std::vector<state_element> *dec_seq = (decendant->sequences[domain_it->first]);
+  for(auto& [state_domain, counts] : this->substitutions) {
+    if (this->ancestral->SM->is_static(state_domain)) continue;
 
-    std::vector<RateVector*> rv_set = rates[domain_it->first];
+    std::vector<state_element> *anc_seq = (ancestral->sequences[state_domain]);
+    std::vector<state_element> *dec_seq = (decendant->sequences[state_domain]);
+
+    std::vector<RateVector*> rv_set = this->rates[state_domain];
     for(unsigned int pos = 0; pos < anc_seq->size(); pos++) {
       if(anc_seq->at(pos) == -1 or dec_seq->at(pos) == -1) {
-	substitutions[domain_it->first][pos] = {false, -1, -1, nullptr};
+        counts[pos] = { false, -1, -1, nullptr };
       } else {
-	if(anc_seq->at(pos) != dec_seq->at(pos)) {
-	  // Normal substitutions.
-	  substitutions[domain_it->first][pos] = {true, anc_seq->at(pos), dec_seq->at(pos), rv_set[pos]};
-	} else {
-	  // No substitution - possibility of virtual substitution.
-	  // This could be faster - we just need the virtual substitution rate.
-	  double vir_rate = rv_set[pos]->rates[dec_seq->at(pos)]->get_value();
-	  double p = 1.0 - (1.0 / (1.0 + (vir_rate * distance)));
-	  //std::cout << vir_rate << " " << p << std::endl;
-	  if(Random() < p) {
-	    // Virtual Substitution.
-	    substitutions[domain_it->first][pos] = {true, anc_seq->at(pos), dec_seq->at(pos), rv_set[pos]};
-	  } else {
-	    // No Virtual Substitution.
-	    substitutions[domain_it->first][pos] = {false, anc_seq->at(pos), dec_seq->at(pos), rv_set[pos]};
-	  }
-	}
+        if(anc_seq->at(pos) != dec_seq->at(pos)) {
+          // Normal substitutions.
+          counts[pos] = {true, anc_seq->at(pos), dec_seq->at(pos), rv_set[pos]};
+        } else {
+          // No substitution - possibility of virtual substitution.
+          // This could be faster - we just need the virtual substitution rate.
+          double vir_rate = rv_set[pos]->rates[dec_seq->at(pos)]->get_value();
+          double p = 1.0 - (1.0 / (1.0 + (vir_rate * distance)));
+          //std::cout << vir_rate << " " << p << std::endl;
+          if(Random() < p) {
+            // Virtual Substitution.
+            counts[pos] = {true, anc_seq->at(pos), dec_seq->at(pos), rv_set[pos]};
+          } else {
+            // No Virtual Substitution.
+            counts[pos] = {false, anc_seq->at(pos), dec_seq->at(pos), rv_set[pos]};
+          }
+        }
       }
     }
   }
 }
 
 void BranchSegment::update() {
-  update_rate_vectors();
-  set_new_substitutions();
+  this->update_rate_vectors();
+  this->set_new_substitutions();
 }
 
 // TREE NODES

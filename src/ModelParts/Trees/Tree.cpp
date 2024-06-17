@@ -47,10 +47,6 @@ void Tree::Initialize(IO::RawTreeNode* raw_tree) {
   //Setup output.
   files.add_file("tree_out", env.get<std::string>("OUTPUT.tree_out_file"), IOtype::OUTPUT);
   record_tree();
-
-  //files.add_file("substitutions_out", env.get<std::string>("OUTPUT.substitutions_out_file"), IOtype::OUTPUT);
-  //files.write_to_file("substitutions_out", "I,GEN,LogL,Ancestral,Decendant,Substitutions\n");
-
 }
 
 // Creation of tree nodes.
@@ -244,14 +240,14 @@ void Tree::print_branchList() {
 
 void Tree::print_nodeList() {
   std::cout << "Printing Node list. Size:  " << nodeList.size() << std::endl;
-  for(auto it = nodeList.begin(); it != nodeList.end(); ++it) {
-    std::cout << "Node: " << (*it)->name << std::endl;
+  for(TreeNode* node : this->nodeList) {
+    std::cout << ">" << node->name << std::endl;
   }
 }
 
 // RateVectorAssignmentParameter
 // This parameter is refreshed everytime a SequenceAlignment is sampled.
-RateVectorAssignmentParameter::RateVectorAssignmentParameter(Tree* tree) : AbstractComponent("RateVectorassignment") {
+RateVectorAssignmentParameter::RateVectorAssignmentParameter(Tree* tree) : AbstractComponent("RateVectorAssignment") {
   this->tree = tree;
 }
 
@@ -263,14 +259,12 @@ std::string RateVectorAssignmentParameter::get_type() {
   return("RateVectorAssignment");
 }
  
-void RateVectorAssignmentParameter::fix() {
-}
+void RateVectorAssignmentParameter::fix() {}
 
 void RateVectorAssignmentParameter::refresh() {
   // Update all branches - new substitutions.
-  std::list<BranchSegment*> branches = tree->get_branches();
-  for(auto b = branches.begin(); b != branches.end(); ++b) {
-    (*b)->update();
+  for(auto& branch : tree->get_branches()) {
+    branch->update();
   }
 }
 

@@ -64,6 +64,7 @@ void MCMC::sample() {
 
     //std::cout << "Inter Likelihood: " << newLnL << " - " << test_LogL << " " << test_LogL - newLnL << " ";
   }
+
   //std::cout << std::endl;
   if(s.testp) {
     //Metropolis-Hasting method.
@@ -76,6 +77,7 @@ void MCMC::sample() {
     }
   } else {
     // No Metropolis Hastings needed - Gibbs sampling.
+    // e.g. when ancestral sequences are sampled.
     lnL = newLnL;
     model->accept();
   }

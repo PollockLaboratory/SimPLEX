@@ -98,7 +98,7 @@ void CountsParameter::refresh() {
     updated_table = true;
   }
 
-  counts->clear();
+  this->counts->clear();
 
   std::map<std::string, States> all_state_domains = tree->SM->get_all_states();
 
@@ -109,47 +109,48 @@ void CountsParameter::refresh() {
   std::map<std::string, std::vector<int>> sub_counts = {};
   std::map<std::string, double> vir_sub_counts = {};
 
-  for(auto jt = all_state_domains.begin(); jt != all_state_domains.end(); ++jt) {
-    int n_cols = (*branchList.begin())->get_substitutions(jt->first).size();
-    sub_counts[jt->first] = std::vector<int>(n_cols, 0);
-    vir_sub_counts[jt->first] = 0.0;
+  // RESET COUNTS
+  for(const auto& [state_domain, _] : all_state_domains) {
+    int n_cols = (*branchList.begin())->get_substitutions(state_domain).size();
+    sub_counts[state_domain] = std::vector<int>(n_cols, 0);
+    vir_sub_counts[state_domain] = 0.0;
   }
 
-  for(auto it = branchList.begin(); it != branchList.end(); ++it) {
-    BranchSegment* b = *it;
-    for(auto jt = all_state_domains.begin(); jt != all_state_domains.end(); ++jt) {
-      std::string domain = jt->first;
+  //for(auto it = branchList.begin(); it != branchList.end(); ++it) {
+  for(const auto& branch : tree->get_branches()) {
+    for(const auto& [state_domain, _] : all_state_domains) {
+      if (tree->get_SM()->is_static(state_domain)) continue;
+      //for(auto jt = all_state_domains.begin(); jt != all_state_domains.end(); ++jt) {
       int pos = 0;
-      for(auto sub = b->get_substitutions(domain).begin(); sub != b->get_substitutions(domain).end(); ++sub) {
-	if(sub->dec_state == -1) {
-	  // Skip gaps.
-	  pos++;
-	  continue;
-	}
+      for(auto sub = branch->get_substitutions(state_domain).begin(); sub != branch->get_substitutions(state_domain).end(); ++sub) {
+        if(sub->dec_state == -1) {
+          // Skip gaps.
+          pos++;
+          continue;
+        }
 
-	if(sub->anc_state != sub->dec_state) {
-	  // Normal substitutions.
-	  counts->subs_by_branch[b->distance].num1subs += 1;
-	  counts->subs_by_rateVector[sub->rate_vector][sub->dec_state] += 1;
-	  sub_counts[domain][pos] += 1;
-	  //std::cout << domain << " " << (unsigned int)sub->anc_state << " " << (unsigned int)sub->dec_state
-	  //	    << " " << b->ancestral->name
-	  //    << " " << b->decendant->name
-	  //    << " " << pos
-	  //    << std::endl;
-	} else {
-	  // Virtual substitutions.
-	  // Adds the expected virtual substitution count. Unlikely to be integer.
-	  double virtual_subs = sub->rate_vector->rates[sub->anc_state]->get_value() * b->distance;
-	  vir_sub_counts[domain] += virtual_subs;
+        if(sub->anc_state != sub->dec_state) {
+          // Normal substitutions.
+          counts->subs_by_branch[branch->distance].num1subs += 1;
+          counts->subs_by_rateVector[sub->rate_vector][sub->dec_state] += 1;
+          sub_counts[state_domain][pos] += 1;
+          //std::cout << state_domain << " " << (unsigned int)sub->anc_state << " " << (unsigned int)sub->dec_state
+          //          << " " << branch->ancestral->name
+          //          << " " << branch->decendant->name
+          //          << " " << pos
+          //          << std::endl;
+        } else {
+          // Virtual substitutions.
+          // Adds the expected virtual substitution count. Unlikely to be integer.
+          double virtual_subs = sub->rate_vector->rates[sub->anc_state]->get_value() * branch->distance;
+          vir_sub_counts[state_domain] += virtual_subs;
 
-	  counts->subs_by_branch[b->distance].num1subs += virtual_subs;
-	  counts->subs_by_branch[b->distance].num0subs += (1.0 - virtual_subs);
-	  counts->subs_by_rateVector[sub->rate_vector][sub->dec_state] += virtual_subs;
-
-	}
-
-	pos++;
+          counts->subs_by_branch[branch->distance].num1subs += virtual_subs;
+          counts->subs_by_branch[branch->distance].num0subs += (1.0 - virtual_subs);
+          counts->subs_by_rateVector[sub->rate_vector][sub->dec_state] += virtual_subs;
+        }
+        
+        pos++;
       }
     }
   }
@@ -164,7 +165,7 @@ void CountsParameter::refresh() {
   //  }
   //  std::cout << "] " << sum << " " << vir_sub_counts[it->first]
 	//      << " " << (float)vir_sub_counts[it->first]/(sum+vir_sub_counts[it->first]) << std::endl;
-  //}  
+  //}
 }
 
 void CountsParameter::print() {
@@ -185,10 +186,10 @@ void CountsParameter::save_to_file(boost::multiprecision::uint128_t gen, double 
 
   std::ostringstream buffer;
 
-  for(auto it = counts->subs_by_rateVector.begin(); it != counts->subs_by_rateVector.end(); ++it) {
-    buffer << index << "," << gen << "," << l << "," << it->first->get_name() << "," << it->first->get_state();
+  for (const auto& [rate_vector, pcounts] : counts->subs_by_rateVector) {
+    buffer << index << "," << gen << "," << l << "," << rate_vector->get_name() << "," << rate_vector->get_state();
     unsigned int total = 0;
-    for(auto jt = it->second.begin(); jt != it->second.end(); ++jt) {
+    for(auto jt = pcounts.begin(); jt != pcounts.end(); ++jt) {
       total += *jt;
       buffer << "," << *jt;
     }

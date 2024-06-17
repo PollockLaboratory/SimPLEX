@@ -46,12 +46,12 @@ void ComponentSet::Initialize() {
   }
 
   // Setup refresh list.
-  for(auto p = all_parameters.begin(); p != all_parameters.end(); ++p) {
-    p->second->setup_refresh_list();
+  for(const auto& [_, parameter] : all_parameters) {
+    parameter->setup_refresh_list();
   }
 
   // Refreshes all dependancies.
-  reset_dependencies();
+  this->reset_dependencies();
 
   // TODO offset.
   // Spread out state parameters so the don't update all at once.
@@ -62,8 +62,8 @@ void ComponentSet::Initialize() {
   for(auto it = state_parameters.begin(); it != state_parameters.end(); ++it) {
     for(auto jt = sampleable_parameter_list.begin(); jt != sampleable_parameter_list.end(); ++jt) {
       if(jt->ptr->get_ID() == *it) {
-	jt->last_sample = offset;
-	offset += freq/len;
+        jt->last_sample = offset;
+        offset += freq/len;
       }
     }
   }
@@ -118,18 +118,13 @@ SampleableComponent* ComponentSet::get_current_parameter() {
 }
 
 void ComponentSet::refresh_dependancies(AbstractComponent* v) {
-  //std::cout << "Refresh: ";
-  for(auto c = v->get_refresh_list().begin(); c != v->get_refresh_list().end(); ++c) {
-    (*c)->refresh();
-    //std::cout << (*c)->get_name() << " ";
-  }
-  //std::cout << std::endl;
+  for(AbstractComponent* c : v->get_refresh_list()) c->refresh();
 }
 
 void ComponentSet::reset_dependencies() {
-  for(auto p = all_parameters.begin(); p != all_parameters.end(); ++p) {
-    refresh_dependancies(p->second);
-    p->second->fix();
+  for(const auto& [_, parameter] : all_parameters) {
+    refresh_dependancies(parameter);
+    parameter->fix();
   }
 }
 
@@ -170,6 +165,8 @@ inline void ComponentSet::stepToNextParameter() {
   /*
    * Sets the current_parameter iterator to the next sample.
    */
+  if(this->sampleable_parameter_list.size() <= 1) return;
+
   ++current_parameter;
   if(current_parameter == sampleable_parameter_list.end()) {
     current_parameter = sampleable_parameter_list.begin();

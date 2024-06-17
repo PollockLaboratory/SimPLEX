@@ -22,14 +22,14 @@ seed = 0
   overwrite_output = true
   
   tree_out_file = "tree_out.newick"
-  parameters_out_file = "parameters_out.csv"
-  parameters_counts_out_file = "parameters_out_file.csv"
-  rate_vectors_out_file = "rate_vectors_out.csv"
-  likelihood_out_file = "likelihoods_out.csv"
+  parameters_out_file = "parameters.csv"
+  parameters_counts_out_file = "parameters_counts.csv"
+  rate_vectors_out_file = "rate_vectors.csv"
+  likelihood_out_file = "likelihoods.csv"
   counts_out_file = "counts.csv"
 
 [MCMC]
-  generations = "10001"
+  generations = "100001"
   full_update_freq = 200
   alignment_sample_frequency = 200
   position_sample_count = 10
@@ -46,5 +46,5 @@ seed = 0
   sequences_file = "datasets/nucleotide.fasta"
 
   sequences_out_file = ""
-  substitutions_out_file = "substitutions.out"
+  substitutions_out_file = ""
   step_size = 0.0005

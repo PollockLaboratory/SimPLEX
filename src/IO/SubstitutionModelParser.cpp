@@ -59,28 +59,50 @@ namespace IO {
     }
   }
 
-  void raw_substitution_model::read_state_file(std::string domain, std::string file_name) {
-    auto it = all_states.find(domain);
-    if(it == all_states.end()) {
-      std::cerr << "Error: attempting to read " << file_name << ", however \"" << domain << "\" is not a recognized hidden state." << std::endl;
-      exit(EXIT_FAILURE);
-    }
+  std::optional<std::list<std::string>> get_states_list(std::map<std::string, std::list<std::string>> all_states, std::string state_domain) {
+    auto it = all_states.find(state_domain);
+    if(it == all_states.end()) return std::nullopt;
+    return std::make_optional<std::list<std::string>>(it->second);
+  }
 
-    std::string fh = "state_"+domain;
+  const IO::RawMSA* read_input_MSA(std::string state_domain, std::string file_name, std::list<std::string> states) {
+    std::string fh = "state_"+state_domain;
     files.add_file(fh, file_name, IOtype::INPUT);
 
     IO::RawMSA *MSA = new IO::RawMSA();
     try {
-      *MSA = readRawMSA(files.read_all(fh), it->second);
+      *MSA = readRawMSA(files.read_all(fh), states);
     } catch(IO::ParseException const &err) {
       throw IO::ParseException(std::string("error reading ") + file_name + ": " + err.what());
     }
 
-    StateData sd = { StateData::Tag::DYNAMIC, {} };
-    sd.data.dynamic = MSA;
+    return MSA;
+  }
+  
+  void raw_substitution_model::load_dynamic_from_file(std::string state_domain, std::string file_name) {
+    auto opt_states = get_states_list(this->all_states, state_domain);
+    if(not opt_states.has_value()) {
+      std::cerr << "Error: attempting to read " << file_name << ", however \"" << state_domain << "\" is not a recognized hidden state." << std::endl;
+      exit(EXIT_FAILURE);
+    }
 
-    //state_data[domain] = MSA;
-    state_data[domain] = sd;
+    StateData sd = { StateData::Tag::DYNAMIC, {} };
+    sd.data.dynamic = read_input_MSA(state_domain, file_name, opt_states.value());
+
+    this->state_data[state_domain] = sd;
+  }
+
+  void raw_substitution_model::load_site_static_from_file(std::string state_domain, std::string file_name) {
+    auto opt_states = get_states_list(this->all_states, state_domain);
+    if(not opt_states.has_value()) {
+      std::cerr << "Error: attempting to read " << file_name << ", however \"" << state_domain << "\" is not a recognized hidden state." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    StateData sd = { StateData::Tag::SITE_STATIC, {} };
+    sd.data.site_static = read_input_MSA(state_domain, file_name, opt_states.value());
+
+    this->state_data[state_domain] = sd;
   }
 
   void raw_substitution_model::generate_uniform_data(std::string domain) {
@@ -226,15 +248,21 @@ namespace IO {
     // DATA - tools to incorperate additional data into the state, primarily hidden states.
     auto data_table = lua["Data"].get_or_create<sol::table>();
 
-    data_table.set_function("load_state", [this](std::string hidden_state, std::string file_name) -> void {
-						   read_state_file(hidden_state, file_name);
-						   
-						 });
+    data_table.set_function("load_state",
+                            [this](std::string state, std::string file_name) -> void {
+                              load_dynamic_from_file(state, file_name); 
+                            });
 
-    data_table.set_function("generate_uniform_data", [this](std::string hidden_state) -> void {
-						      std::cout << "Creating a uniform prior: " << hidden_state << std::endl;
-						      generate_uniform_data(hidden_state);
-						    });
+    data_table.set_function("load_site_static_state",
+                            [this](std::string state, std::string file_name) -> void {
+                              load_site_static_from_file(state, file_name); 
+                            }); 
+
+    data_table.set_function("generate_uniform_data",
+                            [this](std::string state) -> void {
+                              std::cout << "Creating a uniform prior: " << state << std::endl;
+                              generate_uniform_data(state);
+                            });
 
     // CONFIGURATION
     auto config_table = lua["Config"].get_or_create<sol::table>();
@@ -278,11 +306,11 @@ namespace IO {
 				       "named_divide", named_divide_parameters);
 
     // Not fully implimented at all.
-    lua.new_usertype<DependencyGroupWrapper>("DependencyGroup",
-					     "new", [](std::string name, sol::table tbl) -> DependencyGroupWrapper {
-						      return(new_dependency_group(name, tbl));
-						    },
-					     "name", &DependencyGroupWrapper::get_name);
+    //lua.new_usertype<DependencyGroupWrapper>("DependencyGroup",
+		//			     "new", [](std::string name, sol::table tbl) -> DependencyGroupWrapper {
+		//				      return(new_dependency_group(name, tbl));
+		//				    },
+		//			     "name", &DependencyGroupWrapper::get_name);
 
     // I think this can be tidied up a bit.
     auto CatsTable = lua["Categories"].get_or_create<sol::table>();

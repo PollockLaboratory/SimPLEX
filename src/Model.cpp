@@ -41,6 +41,13 @@ SequenceAlignment* initialize_dynamic_alignment(std::string name, const IO::RawM
   return MSA;
 }
 
+SequenceAlignment* initialize_site_static_alignment(std::string name, const IO::RawMSA* raw_msa, const States* states, std::string seqs_out_file, std::string subs_out_file) {
+  SequenceAlignment* MSA = new SequenceAlignment(name, seqs_out_file, subs_out_file, states); 
+  MSA->initialize_site_static(*raw_msa);
+
+  return MSA;
+}
+
 std::optional<unsigned int> find_column_count(const std::map<std::string, SequenceAlignment*>& all_MSAs) {
   std::optional<unsigned int> n_cols;
   for(auto it = all_MSAs.begin(); it != all_MSAs.end(); ++it) {
@@ -73,32 +80,35 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &
 
   std::list<std::string> tip_sequences = getRawTreeNodeTipNames(raw_tree);
 
-  // STATE DOMAINS / DATA
+  // STATE DOMAINS / DATA 
   std::map<std::string, SequenceAlignment*> all_MSAs = {};
-  std::list<std::string> state_domain_names = {};
+  for (const auto& [state_domain, states] : substitution_model->get_all_states()) {
+    std::cout << "\t\tReading new states domain \'" << state_domain << "\': "; print_States(states);
 
-  std::map<std::string, std::list<std::string>> all_state_domains = raw_sm->get_all_states();
-  for(auto it = all_state_domains.begin(); it != all_state_domains.end(); ++it) {
-    state_domain_names.push_back(it->first);
-    const States *states = substitution_model->get_state_domain(it->first);
-
-    std::cout << "\t\tReading new states domain \'" << it->first << "\': "; print_States(*states);
-
-    IO::StateData state_data = raw_sm->get_state_data(it->first);
+    IO::StateData state_data = raw_sm->get_state_data(state_domain);
     switch(state_data.tag) {
     case IO::StateData::Tag::DYNAMIC: {
       const IO::RawMSA* raw_msa = state_data.data.dynamic;
-      SequenceAlignment* MSA = initialize_dynamic_alignment(it->first, raw_msa, states, raw_sm->states_seqs_output_files[it->first], raw_sm->states_subs_output_files[it->first]);
+      SequenceAlignment* MSA = initialize_dynamic_alignment(state_domain, raw_msa, &states, raw_sm->states_seqs_output_files[state_domain], raw_sm->states_subs_output_files[state_domain]);
  
       // Validate MSAs.
       // Check node names are consistant between tree and sequence alignment.
       // TODO - Check pattern of gaps is consistant.
       if(MSA->validate(tip_sequences, all_MSAs) != true) {
-        std::cerr << "Error: sequence alignment for domain \"" << it->first << "\" cannot be validated." << std::endl;
+        std::cerr << "Error: sequence alignment for domain \"" << state_domain << "\" cannot be validated." << std::endl;
         exit(EXIT_FAILURE);
       }
 
-      all_MSAs[it->first] = MSA;
+      all_MSAs[state_domain] = MSA;
+      break;
+    }
+    case IO::StateData::Tag::SITE_STATIC: {
+      const IO::RawMSA* raw_msa = state_data.data.site_static;
+      SequenceAlignment* MSA = initialize_site_static_alignment(state_domain, raw_msa, &states, raw_sm->states_seqs_output_files[state_domain], raw_sm->states_subs_output_files[state_domain]);
+
+      // VALIDATE
+      all_MSAs[state_domain] = MSA;
+
       break;
     }
     default: {
@@ -118,6 +128,9 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &
   // Configuring the Tree.
   std::cout << "\tConstructing tree." << std::endl;
 
+  std::list<std::string> state_domain_names = {};
+  for (const auto& [state_domain, states] : substitution_model->get_all_states()) state_domain_names.push_back(state_domain);
+ 
   tree = new Tree();
   tree->Initialize(raw_tree);
   tree->connect_substitution_model(substitution_model);
@@ -127,18 +140,23 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &
   unsigned int n_sample = env.get<unsigned int>("MCMC.position_sample_count");
   RateVectorAssignmentParameter* rvap = new RateVectorAssignmentParameter(tree);
 
-  unsigned int ctr = 0;
-  for(auto it = all_MSAs.begin(); it != all_MSAs.end(); ++it) {
-    switch (it->second->tag) {
+  for(const auto& [state_domain, msa] : all_MSAs) {
+    switch (msa->tag) {
     case SequenceAlignment::Tag::DYNAMIC: {
-      std::cout << it->first << "->DYNAMIC" << std::endl;
-      it->second->syncWithTree(it->first, ctr, tree);
-      ctr++;
-      SequenceAlignmentParameter* msa_parameter = new SequenceAlignmentParameter(it->second, n_sample);
+      //std::cout << state_domain << "->DYNAMIC" << std::endl;
+      msa->syncWithTree(state_domain, tree);
+      SequenceAlignmentParameter* msa_parameter = new SequenceAlignmentParameter(msa, n_sample);
       msa_parameters.push_back(msa_parameter);
 
       components.add_state_parameter(msa_parameter, env.get<int>("MCMC.alignment_sample_frequency"));
       rvap->add_dependancy(msa_parameter);
+      break;
+    }
+    case SequenceAlignment::Tag::SITE_STATIC: {
+      //std::cout << state_domain << "->SITE_STATIC" << std::endl;
+      msa->syncWithTree(state_domain, tree);
+      this->substitution_model->mark_static_state(state_domain);
+
       break;
     }
     default: {
@@ -155,6 +173,8 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &
   components.add_parameter(rvap);
 
   std::cout << "\tPreparing substitution counts." << std::endl;
+
+  std::map<std::string, std::list<std::string>> all_state_domains = raw_sm->get_all_states();
   cp = new CountsParameter(&counts, tree, all_state_domains);
   cp->add_dependancy(rvap);
   components.add_parameter(cp);
@@ -175,7 +195,6 @@ void Model::Initialize(IO::RawTreeNode* &raw_tree, IO::raw_substitution_model* &
 // Sampling
 sample_status Model::sample() {
   if(ready) {
-    //std::cout << std::endl << "New sample." << std::endl;
     return(components.sample());
     ready = false;
   } else {
@@ -204,18 +223,16 @@ double Model::CalculateLikelihood() {
   double logL_waiting = 0.0;
   double logL_subs = 0.0;
 
-  float t;
   int num0subs;
   int num1subs;
 
   double u = substitution_model->get_u();
 
-  for(auto it = counts.subs_by_branch.begin(); it != counts.subs_by_branch.end(); ++it) {
-    t = it->first;
-    num0subs = it->second.num0subs;
-    num1subs = it->second.num1subs;
+  for(const auto& [branch_length, branch_counts] : this->counts.subs_by_branch) {
+    num0subs = branch_counts.num0subs;
+    num1subs = branch_counts.num1subs;
 
-    logL_waiting += num0subs * log(1/(1 + u*t)) + num1subs * log(t/(1 + u*t));
+    logL_waiting += num0subs * log(1/(1 + u*branch_length)) + num1subs * log(branch_length/(1 + u*branch_length));
   }
 
   for(auto it = counts.subs_by_rateVector.begin(); it != counts.subs_by_rateVector.end(); ++it) {

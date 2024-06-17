@@ -14,10 +14,9 @@
 
 using boost::multiprecision::uint128_t;
 
-struct rv_request {
+struct RVQuery {
   // Struct representing a request for a rate vector.
-  // More specific requests later, for example branch position.
-  unsigned int pos;
+  //unsigned int pos;
   std::string domain;
   unsigned long ex_state; // Extended state - as hash.
 };
@@ -64,15 +63,16 @@ class RateVectorSet {
   // This collection holds all of the rate vectors currently in the substitution model.
 public:
   RateVectorSet();
-  std::vector<RateVector*> col;
+  std::vector<RateVector*> collection;
   void Initialize(std::map<std::string, States>);
 
-  std::list<std::list<signed char>> configure_hash(std::map<std::string, States> all_states);
-
   void add(RateVector* v, IO::RVScope);
+  void mark_static_state(std::string);
+  bool is_static(std::string);
+  
   void organize();
 
-  RateVector* select(rv_request);
+  RateVector* select(RVQuery);
   unsigned long get_hash_state(const std::map<std::string, std::vector<signed char>*>& sequences, int pos) const;
   unsigned long get_hypothetical_hash_state(const std::map<std::string, std::vector<signed char>*>& sequences, int pos, std::string domain_name, signed char state) const;
 
@@ -87,10 +87,12 @@ public:
   unsigned int n_domains;
   std::list<std::string> domain_names;
 
+  std::set<std::string> static_domains; // List of domains that don't need rate vectors.
+
   std::map<std::string, std::map<unsigned long, RateVector*>> state_to_rv; // Domain -> hash(ExState) -> RateVector*;
 
   // Hash stuff
-  std::list<signed char> ex_to_list(ExtendedState);
+  std::list<signed char> flatten_compound_state(ExtendedState);
   
   // Old
   std::map<int, IO::RVScope> id_to_uc; // Only used to before RateVectors are organized.

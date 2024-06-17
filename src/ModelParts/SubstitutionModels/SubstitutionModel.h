@@ -26,10 +26,12 @@ public:
   // States.
   const States* get_state_domain(std::string domain);
   std::map<std::string, States> get_all_states();
+  void mark_static_state(std::string domain);
+  bool is_static(std::string domain);
 
   // Rate Vectors.
   void organizeRateVectors();
-  RateVector* selectRateVector(rv_request);
+  RateVector* selectRateVector(RVQuery);
   std::vector<RateVector*> get_RateVectors();
 
   unsigned long get_hash_state(std::map<std::string, signed char>);
