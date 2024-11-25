@@ -54,7 +54,6 @@ class SequenceAlignment {
   std::string decode_state_element(state_element c);
   std::string decode_state_element_sequence(const std::vector<state_element> &enc_seq);
   void find_parsimony_by_position(unsigned int pos);
-  std::list<std::string> getNodeNames();
 
   void syncWithTree(std::string name, Tree* tree);
   void identify_gaps();
@@ -86,7 +85,7 @@ private:
   std::map<std::string, std::vector<bool>> taxa_names_to_gaps;
 
   void reset_to_base(std::string name, const std::list<unsigned int>& positions);
-  void normalize_state_probs(TreeNode* node, unsigned int pos);
+  void normalize_state_probs(const TreeNode* node, unsigned int pos);
 
   // Marginal Calculations for indervidual positions.
   double find_state_prob_given_dec_branch(BranchSegment* branch, state_element state_i, double* state_probs, std::vector<Valuable*> rv, double u, unsigned int pos);
@@ -102,7 +101,7 @@ private:
   void fast_update_state_probs_tips(TreeNode* node, unsigned int pos, TreeNode* up_node); // Second Recursion
 
   // Picking states
-  int pick_state_from_probabilities(TreeNode*, int);
+  state_element pick_state_from_probabilities(TreeNode*, int);
   void pick_states_for_node(TreeNode*, const std::list<unsigned int>&);
 
   void reconstruct_expand(const std::list<TreeNode*>&, const std::list<unsigned int>&);

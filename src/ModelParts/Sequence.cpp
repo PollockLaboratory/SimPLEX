@@ -239,21 +239,21 @@ std::vector<state_element> SequenceAlignment::encode_sequence(const std::string 
    */
   std::vector<state_element> encoded_sequence(sequence.length());
 
-  for (unsigned int site = 0; site < sequence.length(); site++) {
-    std::string current_pos = sequence.substr(site, 1);
+  for (unsigned int pos = 0; pos < sequence.length(); pos++) {
+    std::string current_state = sequence.substr(pos, 1);
     try {
-      encoded_sequence.at(site) = state_element_encode.at(current_pos);
+      encoded_sequence.at(pos) = this->state_element_encode.at(current_state);
     } catch(const std::out_of_range& e) {
       // Temporary solution.
-      if(current_pos == "-"){
-        encoded_sequence.at(site) = -1;
+      if (current_state == "-") {
+        encoded_sequence.at(pos) = -1;
       } else {
-        std::cerr << "Error: state \"" << current_pos << "\" in sequence alignment is not recognised. " << std::endl;
+        std::cerr << "Error: state \"" << current_state << "\" in sequence alignment is not recognised. " << std::endl;
         exit(EXIT_FAILURE);
       }
     }
   }
-  
+
   return(encoded_sequence);
 }
 
@@ -273,13 +273,13 @@ std::string SequenceAlignment::decode_state_element_sequence(const std::vector<s
 }
 
 // PARSIMONY
-state_element pick_most_frequent_state(const std::vector<state_element> &clade_state, state_element above) {
+state_element pick_most_frequent_state(const std::vector<state_element> &clade_states, state_element above) {
   std::map<state_element, int> state_counts = {};
-  for(auto it = clade_state.begin(); it != clade_state.end(); ++it) {
-    if(state_counts.find(*it) == state_counts.end()) {
-      state_counts[*it] = 1;
+  for (const auto& it : clade_states) {
+    if(state_counts.find(it) == state_counts.end()) {
+      state_counts[it] = 1; // If state is not observed yet, initiate counts.
     } else {
-      state_counts[*it] += 1;
+      state_counts[it] += 1;
     }
   }
 
@@ -287,25 +287,25 @@ state_element pick_most_frequent_state(const std::vector<state_element> &clade_s
   // is used to influence the choice.
   state_element most_frequent = 0;
   int highest_count = 0;
-  for(auto it = state_counts.begin(); it != state_counts.end(); ++it) {
-    if((it->second > highest_count) or ((it->second == highest_count) and (it->first == above) and (above != -1))) {
-      most_frequent = it->first;
-      highest_count = it->second;
+  for (const auto& [state, count]: state_counts) {
+    if((count > highest_count) or ((count == highest_count) and (state == above) and (above != -1))) {
+      most_frequent = state;
+      highest_count = count;
     }
   }
   return(most_frequent);
 }
 
 void SequenceAlignment::find_parsimony_by_position(unsigned int pos) {
-  std::list<TreeNode*> nodes = tree->nodes();
-
+  /*
+   * This is not really parsimony at all, just selects the most common state observed
+   * at the tips in the clade below.
+   */
+  // Node names -> list of all states observed below a given node at a given site.
   std::map<std::string, std::vector<state_element>> clade_states = {};
 
-  for(auto it = nodes.begin(); it != nodes.end(); ++it) {
-    TreeNode* n = *it;
-    if(taxa_names_to_gaps[n->name][pos]) {
-      continue;
-    }
+  for (TreeNode* n : tree->nodes()) { // Recursively traverses the tree from the bottom up.
+    if(taxa_names_to_gaps[n->name][pos]) continue;
 
     if(n->isTip()) {
       clade_states[n->name] = {n->sequences[domain_name]->at(pos)};
@@ -314,26 +314,24 @@ void SequenceAlignment::find_parsimony_by_position(unsigned int pos) {
     }
 
     if(n->left != 0) {
-      for(auto it = clade_states[n->left->decendant->name].begin(); it != clade_states[n->left->decendant->name].end(); ++it) {
-	clade_states[n->name].push_back(*it);
+      for (const state_element& state : clade_states[n->left->decendant->name]) {
+        clade_states[n->name].push_back(state);
       }
     }
     if(n->right != 0) {
-      for(auto it = clade_states[n->right->decendant->name].begin(); it != clade_states[n->right->decendant->name].end(); it++) {
-	clade_states[n->name].push_back(*it);
+      for (const state_element& state : clade_states[n->right->decendant->name]) {
+        clade_states[n->name].push_back(state);
       }
     }
   }
 
-  for(auto it = nodes.rbegin(); it != nodes.rend(); ++it) {
+  for(auto it = tree->nodes().rbegin(); it != tree->nodes().rend(); ++it) {
     TreeNode* n = *it;
-    if(n->isTip() or taxa_names_to_gaps[n->name][pos]) {
-      continue;
-    }
+    if(n->isTip() or taxa_names_to_gaps[n->name][pos]) continue;
     
     int state_above;
     if(n->up == nullptr) {
-      state_above = -1;
+      state_above = -1; // ROOT
     } else {
       state_above = (*n->up->ancestral->sequences[domain_name])[pos];
     }
@@ -348,32 +346,25 @@ void SequenceAlignment::find_parsimony_by_position(unsigned int pos) {
   }
 }
 
-std::list<std::string> SequenceAlignment::getNodeNames() {
-  std::list<std::string> names;
-  for(auto it = taxa_names_to_sequences.begin(); it != taxa_names_to_sequences.end(); ++it) {
-    names.push_back(it->first);
-  }
-  return(names);
-}
-
-void SequenceAlignment::reset_to_base(std::string name, const std::list<unsigned int>& positions) {
-  for(auto pos_it = positions.begin(); pos_it != positions.end(); pos_it++) {
-    for(unsigned int j = 0; j < n_states; j++) {
-      marginal_state_distribution[name][*pos_it][j] = prior_state_distribution[name][*pos_it][j];
+// SAMPLING
+void SequenceAlignment::reset_to_base(std::string node_name, const std::list<unsigned int>& positions) {
+  for (unsigned int pos : positions) {
+    for(unsigned int i = 0; i < n_states; i++) {
+      marginal_state_distribution[node_name][pos][i] = prior_state_distribution[node_name][pos][i];
     }
   } 
 }
 
-void SequenceAlignment::normalize_state_probs(TreeNode* node, unsigned int pos) {
+void SequenceAlignment::normalize_state_probs(const TreeNode* node, unsigned int pos) {
   double normalize_total = 0.0;
 
   for(unsigned int i = 0; i < n_states; i++) {
-    normalize_total += marginal_state_distribution[node->name][pos][i];
+    normalize_total += this->marginal_state_distribution[node->name][pos][i];
   }
 
   if(normalize_total != 0.0) {
     for(unsigned int i = 0; i < n_states; i++) {
-      marginal_state_distribution[node->name][pos][i] /= normalize_total;
+      this->marginal_state_distribution[node->name][pos][i] /= normalize_total;
     }
   }
 }
@@ -397,7 +388,12 @@ inline double calc_no_substitution_prob(double rate, float t_b, double u) {
   return((prob_virtual * ((rate * t_b) * denom)) + ((1.0 - prob_virtual) * denom));
 }
 
-double SequenceAlignment::find_state_prob_given_dec_branch(BranchSegment* branch, state_element state_i, double* state_probs, std::vector<Valuable*> rv, double u, unsigned int pos) {
+double SequenceAlignment::find_state_prob_given_dec_branch(BranchSegment* branch,
+                                                           state_element state_i,
+                                                           double* state_probs,
+                                                           std::vector<Valuable*> rv,
+                                                           double u,
+                                                           unsigned int pos) {
   /*
    * Find state probability given decendent branch
    * state_probs = the marginal posterior distribution of the state at the node below.
@@ -527,7 +523,7 @@ void SequenceAlignment::find_marginal_at_pos(TreeNode* node, unsigned int pos, T
 
         // Return if probability if 0.0.
         if(up_prob == 0.0) {
-          marginal_state_distribution[node->name][pos][state_i] = 0.0;
+          this->marginal_state_distribution[node->name][pos][state_i] = 0.0;
           return;
         }
       }
@@ -541,7 +537,7 @@ void SequenceAlignment::find_marginal_at_pos(TreeNode* node, unsigned int pos, T
       left_prob = find_state_prob_given_dec_branch(left_node->up, state_i, marginal_state_distribution[left_node->name][pos], rv->rates, u, pos);
 
       if(left_prob == 0.0) {
-        marginal_state_distribution[node->name][pos][state_i] = 0.0;
+        this->marginal_state_distribution[node->name][pos][state_i] = 0.0;
         return;
       }
     }
@@ -553,12 +549,12 @@ void SequenceAlignment::find_marginal_at_pos(TreeNode* node, unsigned int pos, T
 
       right_prob = find_state_prob_given_dec_branch(right_node->up, state_i, marginal_state_distribution[right_node->name][pos], rv->rates, u, pos);
       if(right_prob == 0.0) {
-        marginal_state_distribution[node->name][pos][state_i] = 0.0;
+        this->marginal_state_distribution[node->name][pos][state_i] = 0.0;
         return;
       }
     }
 
-    marginal_state_distribution[node->name][pos][state_i] = left_prob * right_prob * up_prob;
+    this->marginal_state_distribution[node->name][pos][state_i] = left_prob * right_prob * up_prob;
   }
 }
 
@@ -581,11 +577,11 @@ void SequenceAlignment::find_state_probs_dec_only(TreeNode* node, std::list<unsi
       right_node = nullptr;
     }
 
-    for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
-      if(not gaps[*pos]) {
+    for (unsigned int pos : positions) {
+      if(not gaps[pos]) {
         // Always a left node.
-        find_marginal_at_pos(node, *pos, node->left->decendant, right_node, nullptr);
-        normalize_state_probs(node, *pos);
+        find_marginal_at_pos(node, pos, node->left->decendant, right_node, nullptr);
+        normalize_state_probs(node, pos);
       }
     }
   }
@@ -612,11 +608,11 @@ void SequenceAlignment::find_state_probs_all(TreeNode* node, std::list<unsigned 
   } else {
     up_node = nullptr;
   }
-
-  for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
-    if(not gaps[*pos]) {
-      find_marginal_at_pos(node, *pos, node->left->decendant, right_node, up_node);
-      normalize_state_probs(node, *pos);
+ 
+  for (unsigned int pos : positions) {
+    if(not gaps[pos]) {
+      find_marginal_at_pos(node, pos, node->left->decendant, right_node, up_node);
+      normalize_state_probs(node, pos);
     }
   }
 }
@@ -637,7 +633,7 @@ void SequenceAlignment::update_state_probs(TreeNode* node, unsigned int pos, Tre
 
 void SequenceAlignment::fast_update_state_probs_tips(TreeNode* node, unsigned int pos, TreeNode* up_node) {
   /*
-   * Only valid for tips.
+   * Only valid for tips - assumes only up node.
    * Equivilent of:
    * reset_to_base()
    * update_state_probs(node, *pos, node->up->ancestral);
@@ -665,15 +661,15 @@ int random_state_from_distribution(double* distribution, unsigned int n_states) 
   for(unsigned int i = 0; i < n_states; i++) {
     acc += distribution[i];
 
-    if(r < acc) {
-      return(i);
-    }
+    if(r < acc) return(i);
   }
+
+  assert(acc > 1.0);
 
   return(n_states-1);
 }
 
-int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
+state_element SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
   /*
    * Picks a state from the marginal posterior distribution (taxa_names_to_state_probs).
    * Also resets the marginal posterior distribution to 0 or 1.
@@ -690,47 +686,50 @@ int SequenceAlignment::pick_state_from_probabilities(TreeNode* node, int pos) {
 
   double r = Random();
   double acc = 0.0;
-  int val = -1;
+  state_element selected_state = -1; // Initially set as gap.
 
-  int largest_i = -1;
-  double largest_val = 0.0;
+  //state_element top_state = -1;
+  //double top_state_prob = 0.0;
   for(unsigned int i = 0; i < n_states; i++) {
     acc += probs[i];
 
-    if(r < acc and val == -1) {
-      val = i;
+    //if(probs[i] > top_state_prob) {
+    //  top_state = probs[i];
+    //  top_state_prob = i;
+    //}
+
+    if(r < acc and selected_state == -1) {
+      selected_state = i;
       probs[i] = 1.0;
-    } else {
-      if(probs[i] > largest_val) {
-        largest_val = probs[i];
-        largest_i = i;
-      }
+    } else { 
       probs[i] = 0.0;
     }
   }
 
-  //if(val == -1) {
-  // std::cerr << "Error: incorrectly picking a state: " <<  pos << " " << node->name << std::endl;
-  // exit(EXIT_FAILURE);
-  //}
-
-  if(val == -1) {
-    probs[largest_i] = 1.0;
-    return(largest_i);
-  } else {
-    return(val);
+  if (selected_state == -1) {
+    std::cout << "Error: unable to select top state." << std::endl;
+    exit(EXIT_FAILURE);
   }
+
+  return(selected_state);
+
+  //if(selected_state == -1) {
+  //  probs[top_state] = 1.0;
+  //  return(top_state);
+  //} else {
+  //  return(selected_state);
+  //}
 }
 
 void SequenceAlignment::pick_states_for_node(TreeNode* node, const std::list<unsigned int>& positions) {
   std::vector<bool> gaps = taxa_names_to_gaps[node->name];
 
-  for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
+  for (const unsigned int pos : positions) {
     // Pick state from marginal distributions.
-    if(gaps[*pos]) {
-      taxa_names_to_sequences[node->name][*pos] = -1;
+    if(gaps[pos]) {
+      taxa_names_to_sequences[node->name][pos] = -1;
     } else {
-      taxa_names_to_sequences[node->name][*pos] = pick_state_from_probabilities(node, *pos);
+      taxa_names_to_sequences[node->name][pos] = pick_state_from_probabilities(node, pos);
     }
   }
 }
@@ -751,11 +750,11 @@ void SequenceAlignment::reconstruct_expand(const std::list<TreeNode*>& recursion
 
       std::vector<bool> gaps = taxa_names_to_gaps[node->name];
 
-      for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
-        if(not gaps[*pos]) {
+      for (unsigned int pos : positions) {
+        if(not gaps[pos]) {
           //update_state_probs(node, *pos, node->up->ancestral);
-          fast_update_state_probs_tips(node, *pos, node->up->ancestral);
-          normalize_state_probs(node, *pos);
+          fast_update_state_probs_tips(node, pos, node->up->ancestral);
+          normalize_state_probs(node, pos);
         }
       }
     } else {
@@ -775,19 +774,13 @@ void SequenceAlignment::reverse_recursion(const std::list<unsigned int>& positio
    * Nodes are ordered in the list such that they are visted in order up the tree.
    */ 
 
-  for(const auto& n : this->tree->nodes()) {
-    if(not n->isTip()) {
-      find_state_probs_dec_only(n, positions);
+  for(TreeNode* node : this->tree->nodes()) {
+    if(not node->isTip()) {
+      find_state_probs_dec_only(node, positions);
     } else {
       // This is important as states at tips can be uncertain.
-      reset_to_base(n->name, positions);
+      reset_to_base(node->name, positions);
     }
-
-    //std::cout << (*n)->name << " [ ";
-    //for(signed int i = 0; i < (signed int)n_states; i++) {
-    //  std::cout << marginal_state_distribution[(*n)->name][0][i] << " ";
-    //} 
-    //std::cout << "]" << std::endl;
   }
 }
 
@@ -796,23 +789,18 @@ sample_status SequenceAlignment::sample_with_double_recursion(const std::list<un
 
   // 2nd Recursion - Reverse recursion.
   // Skip first element of reverse list as thats the root - no need to sample second time.
-  for(const auto& node : tree->nodes()) { // = nodes.rbegin(); n != nodes.rend(); ++n) {
-    //TreeNode* node = *n;
+  for (auto n = this->tree->nodes().rbegin(); n != this->tree->nodes().rend(); ++n) {
+    TreeNode* node = *n;
     std::vector<bool> gaps = taxa_names_to_gaps[node->name];
 
     // Reculaculate state probability vector - including up branch.
-    TreeNode* up_node;
-    if(node->up) {
-      up_node = node->up->ancestral;
-    } else {
-      up_node = nullptr;
-    }
+    TreeNode* up_node = node->up ? node->up->ancestral : nullptr;
 
-    for(auto pos = positions.begin(); pos != positions.end(); ++pos) {
+    for (unsigned int pos : positions) {
       // Note does not call for root node.
-      if((not gaps[*pos]) and (not (up_node == nullptr))) {
-        update_state_probs(node, *pos, up_node);
-        normalize_state_probs(node, *pos);
+      if((not gaps[pos]) and (up_node != nullptr)) {
+        update_state_probs(node, pos, up_node);
+        normalize_state_probs(node, pos);
       }
     }
 
@@ -977,8 +965,8 @@ sample_status SequenceAlignmentParameter::sample() {
   if(this->triple_recursion) {
     // Triple recursion
     return(msa->sample_with_triple_recursion(positions));
-    // Double recursion
   } else {
+    // Double recursion
     return(msa->sample_with_double_recursion(positions));
   }
 }

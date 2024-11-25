@@ -1,5 +1,5 @@
 debug = true
-seed = 0
+seed = 1234567
 
 # Tree Settings
 [TREE]
@@ -37,7 +37,7 @@ seed = 0
   print_frequency = 500
 
   base_virtual = 0
-  triple_recursion = false
+  triple_recursion = true
 
 [MODEL]
   script_file = "basic_model.lua"

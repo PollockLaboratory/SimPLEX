@@ -110,7 +110,7 @@ class TreeNode {
   std::string toString();
 
 
-  bool isTip();
+  bool isTip() const;
 };
 
 #endif

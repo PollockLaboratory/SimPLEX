@@ -246,7 +246,7 @@ unsigned long TreeNode::get_hash_state(unsigned int pos) {
   return(SM->get_hash_state(context));
 }
 
-bool TreeNode::isTip() {
+bool TreeNode::isTip() const {
   if(this->left == 0 and this->right == 0) {
     return(true);
   } else {
